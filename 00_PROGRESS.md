@@ -44,3 +44,18 @@
 1. `CSafebox::Add/Remove/Save` ile GUILDBANK item save/delete akışını kapat.
 2. Cross-channel lock senkronizasyonunu P2P seviyesinde doğrula.
 3. Statik olarak bulunan stuck-lock ve item-award riskleri için oyun içi reprodüksiyon planını netleştir.
+
+## Checkpoint — Guild Storage item persistence tamamlandı
+
+### Yeni doğrulananlar
+- `CSafebox::Add` GUILDBANK window + guild storage cell'i item'a yazar ve anında save/flush eder.
+- `ITEM_MANAGER::SaveSingleItem` GUILDBANK item owner'ını **guild ID** olarak üretir.
+- `HEADER_GD_ITEM_SAVE (30)` DB tarafında GUILDBANK için doğrudan `REPLACE INTO item` yoluna gider.
+- Checkout sonrası `HEADER_GD_ITEM_FLUSH (35)` DB item cache varsa zorla flush eder.
+- Checkin ve checkout persistence zincirleri artık uçtan uca kapalı.
+- `ENABLE_SAFEBOX_MONEY` açık build için Guild Storage kapanışında kişisel safebox gold'unu 0'a yazabilen statik bug doğrulandı.
+
+### Sıradaki
+- Cross-core/channel lock için repo-geneli son P2P taraması.
+- Guild üyeliği/rank değişimi sırasında açık/pending storage davranışı.
+- Sonra Guild Storage haritasını “tamamlandı / oyun içi test bekliyor” durumuna geçirmek.
