@@ -706,3 +706,23 @@ personal_shop event tax > 0
 -> net dwPrice is not sent to DB
 -> DB credits cached sold.price full amount
 -> seller stash receives pre-tax listed price.
+
+
+## Safebox / Mall — ownership and money flow
+
+### Checkin
+UI/Python -> SAFEBOX_CHECKIN -> `SafeboxCheckin` -> source `GetItem(TItemPos)` -> validation -> `RemoveFromCharacter` -> `CSafebox::Add` -> item window SAFEBOX -> forced save/flush -> DB owner account ID.
+
+### Checkout
+UI/Python -> SAFEBOX_CHECKOUT -> `SafeboxCheckout` -> source safebox item -> destination validation -> `CSafebox::Remove` -> `AddToCharacter` -> save/flush.
+
+SAFEBOX_IMPROVING auto target uses `GetEmptyInventory(item)`; explicit target remains client-controlled and is BUG-SAFEBOX-004 / BUG-ITEM-006 trust boundary.
+
+### Mall gold overwrite
+`LoadMall(gold=0) -> CloseMall -> CSafebox::Save -> HEADER_GD_SAFEBOX_SAVE(dwGold=0) -> UPDATE safebox.gold=0`.
+
+### Money withdraw
+request -> signed-int cap precheck -> Safebox debit -> player PointChange credit. If first check overflows but PointChange rejects actual cap, no rollback restores stash.
+
+### Internal stack
+SAFEBOX_ITEM_MOVE -> `CSafebox::MoveItem` -> stack capacity normalization -> erroneous sourceCount>=movedCount Remove(source) -> ownerless remainder -> persistence can emit ITEM_DESTROY.
