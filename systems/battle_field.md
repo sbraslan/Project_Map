@@ -53,3 +53,50 @@ Already observed server concepts:
 4. Audit cooldown and reconnect/disconnect behavior.
 5. Audit P2P state synchronization across cores.
 6. Start Battle Field-specific bug registry; do not duplicate Ranking bugs.
+
+
+## Entry / exit command audit — PARTIAL CLOSED
+
+Player command registrations:
+- `open_battle_ui` -> GM_PLAYER / POS_DEAD
+- `goto_battle` -> GM_PLAYER / POS_DEAD
+- `exit_battle_field` -> GM_PLAYER / POS_DEAD
+- `exit_battle_field_on_dead` -> GM_PLAYER / POS_DEAD
+- Battle-specific `restart_immediate` -> GM_PLAYER / POS_DEAD.
+
+`goto_battle -> RequestEnter` has server-side guards for:
+- active/open status;
+- minimum level 50;
+- not channel 99;
+- not a private map;
+- not riding;
+- `CanWarp()`;
+- 600-second return cooldown.
+
+The Battle-specific restart branch separately verifies the player is actually on the Battle Field map and has the required item, so it was rejected as a false-positive command-boundary bug.
+
+Exit paths are weaker:
+- `RequestExit` has no Battle Field map-membership check -> BUG-BFIELD-001.
+- `exit_battle_field_on_dead 1` bypasses map, death, `CanWarp` and exit-flow checks -> BUG-BFIELD-002.
+
+## Kill-score anti-farming audit
+`RewardKiller` correctly validates both participants are PCs on the Battle Field map, requires descriptors, rejects equal host names and calls `SetBattleKill(victimPID)`.
+
+Configured repeat interval:
+`BATTLE_FIELD_KILL_TIME = 60` seconds.
+
+`SetBattleKill` does not replace an expired map entry; it calls `emplace` on an already-existing PID. After the first expiry, the timestamp stays permanently in the past for that victim during the character session -> BUG-BFIELD-003.
+
+Temporary Battle Field points are explicitly initialized to zero in character initialization, along with the kill map and death-limit counter.
+
+## Current verified Battle Field bugs
+- `BUG-BFIELD-001`
+- `BUG-BFIELD-002`
+- `BUG-BFIELD-003`
+
+## Exact next audit
+1. Finish schedule/open-close resolver correctness.
+2. Audit event-mode state and P2P synchronization across cores.
+3. Trace Battle Field connect/disconnect/party removal into existing Party invariants.
+4. Audit score cash-out/ranking update atomicity and disconnect-loss behavior.
+5. Audit daily shop-point reset state.
