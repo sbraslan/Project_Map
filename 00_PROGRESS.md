@@ -577,3 +577,34 @@ Currency CHARACTER::Save() ise delayed-save kuyruğuna girer; item ownership sav
 
 ### Exchange statik durum
 Ana server/client/packet/transaction/lifecycle/persistence haritası tamamlanmaya yakın. Açık kalan başlıca alanlar runtime validation ve birkaç edge-path caller auditidir.
+
+
+## Checkpoint — Exchange/Trade static completion
+
+**Tarih:** 2026-09-26
+
+Player-to-player Exchange subsystem için ana statik haritalama tamamlandı.
+
+Kapatılan alanlar:
+- official UI ve modified-client trust boundary
+- CG/GC packet zinciri
+- source TItemPos validation
+- offer state / accept state
+- Check / CheckSpace / Done transaction modeli
+- normal + Special Inventory placement
+- extended inventory page4 simulation
+- Switchbot ve Additional Equipment source edge'leri
+- gold / cheque ordering
+- distance / movement / death / disconnect / standard warp lifecycle
+- per-item DB flush ve character delayed-save persistence.
+
+### BUG-EXCHANGE-003 etki doğrulaması
+- Active SWITCHBOT item Exchange AddItem'a modified client ile sokulabilir.
+- Item offer'dayken Switchbot event item ID üzerinden çalışmaya devam eder; IsExchanging kontrolü yoktur ve ChangeAttribute() çağırabilir. Böylece karşı tarafın gördüğü initial GC ITEM_ADD attribute snapshot'ı accept öncesinde stale olabilir.
+- Transfer anında SWITCHBOT SetItem(nullptr) UnregisterItem çağırdığı için slot transfer sonrasında kapanır; kritik pencere offer→commit arasındadır.
+- ADDITIONAL_EQUIPMENT_1 IsEquipPosition() sayılmaz. Exchange AddItem CanUnequipNow çağırmaz. Done içindeki RemoveFromCharacter/Unequip de ITEM_FLAG_IRREMOVABLE kontrolü yapmaz. Bu nedenle normal MoveItem yolunda çıkarılması reddedilecek equipped item Exchange yolu ile transfer edilebilir.
+
+### Statik completion
+Exchange için yeni source-code taraması ancak runtime test sonucu veya yeni çapraz subsystem bulgusu gerektirirse açılacak.
+
+Sonraki subsystem: Shop / Private Shop item-transfer ve currency transaction haritası.
