@@ -64,3 +64,47 @@ Packet:
 → server command handler.
 
 Client ayrıca 1000 birim mesafe aşımında UI'ı kapatıp close komutunu gönderiyor.
+
+## Inventory / Item Move — client zinciri
+
+### UI
+`Project_Binary/root/uiinventory.py`
+
+Inventory/equipment slot eventleri:
+- `SelectEmptySlot`
+- `SelectItemSlot`
+- `UseItemSlot`
+
+Normal inventory taşıma:
+`__SendMoveItemPacket(src,dst,count)`
+→ private-shop build/edit kontrolü
+→ `m2netm2g.SendItemMovePacket(src,dst,count)`
+
+5-parametreli window-aware kullanım da mevcut; örneğin SWITCHBOT:
+`SendItemMovePacket(SWITCHBOT, src, INVENTORY, dst, count)`.
+
+### Python → C++ binding
+`UserInterface/PythonNetworkStreamModule.cpp::netSendItemMovePacket`
+
+Desteklenen imzalar:
+- 3 arg: source cell, destination cell, count
+- 5 arg: source window, source cell, destination window, destination cell, count
+
+→ `CPythonNetworkStream::SendItemMovePacket(Cell, ChangeCell, count)`
+
+### C++ network send
+`PythonNetworkStreamPhaseGameItem.cpp::SendItemMovePacket`
+
+Client-side kontroller:
+- `__CanActMainInstance()`
+- equipment source ise exchange/shop sırasında equip cell hareketi engellenir
+- equipment source ve player attacking ise gönderim yapılmaz
+
+Packet:
+- `header = HEADER_CG_ITEM_MOVE`
+- `pos = source TItemPos`
+- `change_pos = destination TItemPos`
+- `num = count`
+
+→ `Send`
+→ `SendSequence`.
