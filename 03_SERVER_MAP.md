@@ -191,3 +191,36 @@ Bunlar `guildstoragestate` değerini diğer core'un `CGuild::m_data` nesnesine y
 `UPDATE guild SET guildstoragestate = 0`
 
 Bu global reset tüm guild lock kayıtlarını temizliyor.
+
+## Guild Storage — membership / permission lifecycle
+
+### Yetki değişimi
+`ChangeGradeAuth(grade, auth)`:
+- DB guild_grade auth günceller
+- local `grade_array[grade].auth_flag` günceller
+- online guild üyelerine grade auth packet yollar
+- **açık Guild Storage sessionlarını kontrol etmez/kapatmaz**
+
+`ChangeMemberGrade(pid, grade)`:
+- member grade'i değiştirir
+- client/member data update yollar
+- **hedef karakter storage açık mı kontrol etmez**
+
+### Üyelikten çıkarma
+`CGuild::RemoveMember(pid)`:
+- member map'ten silinir
+- guild manager unlink
+- online character bulunursa:
+  - memberOnline'dan çıkar
+  - `ch->SetGuild(nullptr)`
+- **`CloseGuildstorage()` çağrısı yok**
+
+`CHARACTER::SetGuild(nullptr)` yalnız `m_pGuild` pointer'ını değiştirir ve UpdatePacket yapar.
+
+Sonuç:
+`m_pkGuildstorage != nullptr` + `m_pGuild == nullptr` durumu oluşabilir.
+
+### Disband
+`CGuild::Disband()` online üyelerde:
+`ch->SetGuild(nullptr)`
+yapar; açık Guild Storage cleanup yok.
