@@ -42,3 +42,33 @@ Kod haritalaması bittikçe oyun içi testler buraya eklenir.
 ### GS-T09 — Concurrent checkout
 - Aynı guild storage slotuna iki guild üyesinin yakın zamanlı erişimi
 - Beklenen: yalnız bir işlem başarılı olmalı; duplicate/loss olmamalı
+
+### GS-T10 — Open request abort / stuck lock
+1. Guild storage open request başlat.
+2. DB cevabından önce çakışan bir pencere durumu oluşturulabilen senaryoyu dene veya kontrollü gecikme uygula.
+3. Load response'un abort yoluna girmesini sağla.
+4. Storage'ı tekrar açmayı dene.
+Beklenen güvenli davranış: lock temizlenmiş olmalı.
+Risk işareti: sürekli “already open”.
+
+### GS-T11 — Disconnect during pending load
+- Open request gönderildikten sonra, `HEADER_DG_GUILDSTORAGE_LOAD` gelmeden bağlantıyı kes.
+- Yeniden bağlan ve storage aç.
+- DB'de `guildstoragestate/guildstoragewho` kontrol et.
+Beklenen: state 0'a dönmeli.
+
+### GS-T12 — Cross-channel simultaneous open
+- Aynı guild'den iki yetkili karakteri farklı game core/channel'larda hazırla.
+- Aynı anda storage açmayı dene.
+Beklenen: yalnız biri açabilmeli.
+
+### GS-T13 — Guild ID / account ID collision
+- Guild ID ile aynı numeric ID'ye sahip account safebox satırı ve non-default safebox password bulunan kontrollü test DB'si kullan.
+- Guild storage aç.
+Beklenen: account safebox password'u guild storage'yı etkilememeli.
+
+### GS-T14 — Item award isolation
+- Test oyuncusuna alınmamış non-mall item_award tanımla.
+- Personal safebox yerine önce guild storage aç.
+- Award'ın hangi window/owner'a yazıldığını kontrol et.
+Beklenen: kişisel award guild bank'a taşınmamalı.
