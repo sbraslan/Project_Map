@@ -228,7 +228,7 @@ invalid row karantinaya/restore listesine alınmalı; array indexing yapılmamal
 değerlerini kontrol et.
 
 Amaç:
-`SwapItem` başındaki shadowed `srcCell/destCell` kodunun runtime etkisini belirlemek.
+`SwapItem` shadowing için statik incelemede doğrudan runtime placement etkisi bulunmadı. Bu test artık sınıflandırma testi değil, page 0/page 1 occupied-slot swap için **regression doğrulaması** olarak tutulur.
 
 ### SWITCHBOT-T01 — Cross-core warp memory leak
 - Switchbot manager oluşturmuş test karakteri.
