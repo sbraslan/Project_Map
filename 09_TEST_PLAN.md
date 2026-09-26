@@ -29,3 +29,16 @@ Kod haritalaması bittikçe oyun içi testler buraya eklenir.
 ### GS-T06 — Reconnect
 - İşlem sonrası reconnect
 - Beklenen: kalıcı state doğru yüklenir
+
+### GS-T07 — Direct packet authorization
+- Guild storage UI açılmadan checkout packet'i gönderme senaryosu
+- Beklenen: server işlemi reddetmeli
+- Amaç: authorization yalnız UI/open aşamasına bağımlı mı kontrol etmek
+
+### GS-T08 — Cross-role checkout
+- Storage yetkisi olmayan guild rank ile packet gönderimi
+- Beklenen: server-side reddetme
+
+### GS-T09 — Concurrent checkout
+- Aynı guild storage slotuna iki guild üyesinin yakın zamanlı erişimi
+- Beklenen: yalnız bir işlem başarılı olmalı; duplicate/loss olmamalı
