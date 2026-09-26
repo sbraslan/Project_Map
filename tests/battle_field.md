@@ -24,3 +24,18 @@ Covers BUG-BFIELD-003:
 - expected static defect signature: subsequent immediate repeats are accepted because the existing map timestamp was never overwritten.
 
 Do not execute these tests unless the user explicitly changes the project phase.
+
+
+## BFIELD-T04 — active-feature build check
+Future compile validation for BUG-BFIELD-004:
+- build GAME with the current `ENABLE_BATTLE_FIELD` + `ENABLE_RANKING_SYSTEM` defines;
+- verify the two unqualified `LoadRanking(RK_CATEGORY_BF)` sites fail symbol lookup unless an external/unmapped build injection supplies a wrapper.
+
+## BFIELD-T05 — sparse weekly winner rollover
+Future DB-isolated validation for BUG-BFIELD-005:
+- prefill `log.battle_week` positions 1..3 with old winners;
+- run a rollover with only one current `week_score > 0` row;
+- inspect `battle_week` and winner cache;
+- expected static defect signature: old positions 2/3 remain eligible.
+
+Do not execute during the current detection/mapping phase.
