@@ -1,0 +1,88 @@
+{
+  "schema_version": 2,
+  "updated_at": "2026-09-26",
+  "project": "Metin2 Project",
+  "mapping_repo": "sbraslan/Project_Map",
+  "mode": "static_mapping",
+  "canonical_rule": "GitHub state wins over chat history",
+  "active": {
+    "subsystem": "hunting",
+    "display_name": "Hunting System",
+    "status": "PARTIAL",
+    "system_file": "systems/hunting.md",
+    "bug_file": "bugs/hunting.md",
+    "test_file": "tests/hunting.md",
+    "verified_bug_ids": [
+      "BUG-HUNT-001",
+      "BUG-HUNT-002",
+      "BUG-HUNT-003",
+      "BUG-HUNT-004"
+    ],
+    "next_actions": [
+      "Validate all Hunting static mission/reward tables and exact dimensions.",
+      "Finish client parser plus packet-info/sequence audit.",
+      "Audit reward item grant failure/ground fallback and claim crash atomicity.",
+      "Verify quest-flag save/relogin behavior at reward boundaries.",
+      "Close final mission level-90 behavior end-to-end."
+    ]
+  },
+  "startup": {
+    "required_files": [
+      "STATE.json",
+      "CURRENT.md",
+      "systems/hunting.md"
+    ],
+    "conditional_files": {
+      "bugs": "bugs/hunting.md",
+      "runtime_tests": "tests/hunting.md"
+    },
+    "forbidden_by_default": [
+      "archive/",
+      "completed subsystem files",
+      "legacy monolithic root maps",
+      "bulk reads of systems/, bugs/, tests/"
+    ],
+    "source_read_strategy": "search exact symbols first, then fetch exact files/ranges only"
+  },
+  "repositories": {
+    "writable": [
+      "sbraslan/Project_Map"
+    ],
+    "read_only": [
+      "sbraslan/Project_ClientSrc",
+      "sbraslan/Project_ServerSRC",
+      "sbraslan/Project_Binary",
+      "sbraslan/Project_Game",
+      "sbraslan/Project_DumpProto"
+    ],
+    "source_snapshot": {
+      "sbraslan/Project_ClientSrc": "19c1e08141eb8ff2bf22fd8b93df3e4f3a516d81",
+      "sbraslan/Project_ServerSRC": "321712c849aa01d3635b9fe6a9cde79cc0adcb64",
+      "sbraslan/Project_Binary": "c87aea062f8c50e70a854d4e1dc0c75773960e27",
+      "sbraslan/Project_Game": "4f26f48e0b20b76825a5a6158c992b8c5670f44e",
+      "sbraslan/Project_DumpProto": "1066f4620af451c5f728260eb5f8a086672e6384"
+    }
+  },
+  "mapped_roots": [
+    "game/src/char_hunting.cpp",
+    "input_main.cpp::ReciveHuntingAction",
+    "char_battle.cpp::UpdateHuntingMission",
+    "input_login.cpp::CheckHunting",
+    "char.cpp::CheckHunting",
+    "root/uihunting.py",
+    "m2netm2g.SendHuntingAction",
+    "hunting_system.* quest flags"
+  ],
+  "write_protocol": {
+    "every_meaningful_turn": [
+      "update active systems/<name>.md",
+      "update active bugs/tests file only if affected",
+      "overwrite CURRENT.md with short cursor",
+      "update STATE.json"
+    ],
+    "on_status_change": [
+      "update INDEX.md"
+    ],
+    "history_policy": "Use Git commits for fine-grained history; history/ only for major milestones."
+  }
+}
