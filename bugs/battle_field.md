@@ -242,3 +242,30 @@ Thus Battle Field opening in event mode propagates the generic open state but no
 
 Related latent client defect, not separately numbered:
 `CPythonPlayer::GetBattleFieldEventEnable()` returns `bBattleFieldIsEventOpen` instead of `bBattleFieldIsEventEnable`. In the current minimap implementation the returned `IsEventEnable` local is assigned but not used, so no additional active failure is attributed to that getter yet.
+
+
+### BUG-BFIELD-011 — reconnect resets Battle Field anti-abuse session state while preserving map position
+- Statik durum: **doğrulandı**
+- Sınıf: reconnect/session-state bypass
+
+Two Battle Field controls are character-instance memory only:
+- `m_BattleFieldKillMap` — per-victim repeat-kill cooldown state;
+- `m_bBattleDeadLimit` — accumulated Battle Field death penalty used by restart timing.
+
+Character initialization executes:
+- `m_BattleFieldKillMap.clear()`;
+- `m_bBattleDeadLimit = 0`.
+
+On disconnect, the normal player save persists current map/position, but neither of these fields is part of `TPlayerTable`.
+
+If the Battle Field remains open, login restores the character on the Battle Field map and `CBattleField::Connect` leaves the player there.
+
+Consequences after reconnect:
+- a victim PID that was still inside the 60-second repeat-kill block is forgotten, allowing the same target to score again immediately;
+- accumulated death penalty is reset, so subsequent Battle Field restart wait is calculated from the initial low death-limit state again.
+
+This is independent of BUG-BFIELD-003:
+- 003 breaks cooldown renewal after the first expiry without reconnecting;
+- 011 clears the cooldown entry entirely on reconnect, even before its first 60-second expiry.
+
+Temporary unbanked Battle Field score is also RAM-only and is forfeited on reconnect, but whether that forfeit is intentional is not classified separately.
