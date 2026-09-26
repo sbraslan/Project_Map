@@ -12,14 +12,17 @@
     "system_file": "systems/party.md",
     "bug_file": "bugs/party.md",
     "test_file": "tests/party.md",
-    "verified_bug_ids": [],
+    "verified_bug_ids": [
+      "BUG-PARTY-001",
+      "BUG-PARTY-002"
+    ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Map Party Create -> DB -> peer replication.",
-      "Map Join / Leave / Delete lifecycle.",
-      "Map CG party handlers and server authority/validation.",
-      "Map GC party packets into client cache/UI.",
-      "Start Party bug-candidate audit."
+      "Audit reconnect/offline member ADD/LINK/UNLINK and duplicate PID cache behavior.",
+      "Audit CParty::SetRole internal bounds across DB/P2P paths.",
+      "Map near-member/bonus/EXP update lifecycle.",
+      "Separate and audit Party Match.",
+      "Continue client packet/state consistency checks."
     ]
   },
   "startup": {
@@ -94,7 +97,16 @@
     "game/src/party.cpp",
     "db/src/ClientManagerParty.cpp",
     "game/src/input_main.cpp::Party* handlers",
-    "root/uiparty.py"
+    "root/uiparty.py",
+    "game/src/party.cpp::CreateParty/DeleteParty/Join/P2PJoin/Quit/P2PQuit/Destroy",
+    "game/src/input_db.cpp::PartyCreate/PartyDelete/PartyAdd/PartyRemove/PartyStateChange/PartySetMemberLevel",
+    "game/src/char.cpp::PartyInvite/PartyInviteAccept/AcceptToParty/PartyJoinable",
+    "game/src/input_main.cpp::PartyInvite/PartyInviteAnswer/PartySetState/PartyRemove/PartyUseSkill/PartyParameter",
+    "db/src/ClientManagerParty.cpp::QUERY_PARTY_*",
+    "UserInterface/PythonNetworkStreamPhaseGame.cpp::party send/recv",
+    "UserInterface/PythonNetworkStreamModule.cpp::party Python bindings",
+    "UserInterface/PythonPlayer.cpp::party cache",
+    "root/uiparty.py::PartyMenu/RemovePartyMember"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
