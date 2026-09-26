@@ -504,3 +504,52 @@ Running switch event
 → callback tekrar schedule.
 
 Bu, BUG-SWITCHBOT-005'in temel akışı.
+
+
+## Player Exchange — initial end-to-end flow
+
+Client UI/Python
+→ `SendExchangeStartPacket(target VID)`
+→ server `CInputMain::Exchange START`
+→ state/window/distance/block checks
+→ iki adet `CExchange` oluşturulur ve company pointerları birbirine bağlanır.
+
+Item offer:
+`SendExchangeItemAddPacket(TItemPos, display)`
+→ `CExchange::AddItem`
+→ generic position validity
+→ anti-give / seal / basic / locked / already-exchanging checks
+→ exchange grid reservation
+→ item `SetExchanging(true)`.
+
+Accept:
+iki taraf accept
+→ owner `Check`
+→ owner `CheckSpace`
+→ company `Check`
+→ company `CheckSpace`
+→ DB cache connection check
+→ first `Done()`
+→ second `Done()`
+→ Cancel/cleanup.
+
+`Done()` item transfer:
+foreach offered item
+→ destination empty pos lookup
+→ sender quickslot sync
+→ `RemoveFromCharacter`
+→ `AddToCharacter(victim, destination)`
+→ `FlushDelayedSave`
+→ logs
+→ exchange slot pointer null.
+
+Ardından gold, sonra cheque transfer edilir.
+
+### Atomicity boundary
+Preflight yalnız tahmin yapar; commit transaction değildir.
+`Done()` içindeki herhangi bir orta-adım failure daha önce taşınmış item/gold mutationlarını geri almaz.
+
+Known divergences:
+- Special Inventory: CheckSpace regular-grid, Done type-aware `GetEmptyInventory(item)`.
+- Extend inventory page 4: CheckSpace reservation control-flow bug.
+- Source TItemPos: semantic window allowlist yok.
