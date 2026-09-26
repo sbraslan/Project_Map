@@ -6,39 +6,32 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "party",
-    "display_name": "Party System",
+    "subsystem": "party_match",
+    "display_name": "Party Match",
     "status": "PARTIAL — ACTIVE",
-    "system_file": "systems/party.md",
-    "bug_file": "bugs/party.md",
-    "test_file": "tests/party.md",
-    "verified_bug_ids": [
-      "BUG-PARTY-001",
-      "BUG-PARTY-002",
-      "BUG-PARTY-003",
-      "BUG-PARTY-004",
-      "BUG-PARTY-005",
-      "BUG-PARTY-006"
-    ],
+    "system_file": "systems/party_match.md",
+    "bug_file": "bugs/party_match.md",
+    "test_file": "tests/party_match.md",
+    "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Separate and audit Party Match.",
-      "Audit remaining quest Party APIs.",
-      "Audit party item ownership/drop rotation and EXP-centralize pointer lifecycle.",
-      "Check remaining party packet field/size consistency.",
-      "Decide whether core Party is STATIC COMPLETE."
+      "Establish cross-core impact of process-local SearchMap.",
+      "Audit duplicate SEARCH/HOLD client-server state behavior and reachability.",
+      "Audit item consumption to party creation to warp atomicity.",
+      "Audit raw LPCHARACTER queue lifetime beyond normal logout.",
+      "Audit completion and failure queue cleanup."
     ]
   },
   "startup": {
     "required_files": [
       "STATE.json",
       "CURRENT.md",
-      "systems/party.md"
+      "systems/party_match.md"
     ],
     "conditional_files": {
       "policy": "WORKFLOW.md",
-      "bugs": "bugs/party.md",
-      "deferred_tests": "tests/party.md"
+      "bugs": "bugs/party_match.md",
+      "deferred_tests": "tests/party_match.md"
     },
     "forbidden_by_default": [
       "archive/",
@@ -121,7 +114,18 @@
     "db/src/ClientManager.cpp::SendPartyOnSetup",
     "game/src/questlua_party.cpp::leave_party/delete_party/remove_player/get_near_member_pids",
     "game/src/char.cpp::ComputePoints party bonus preservation",
-    "common/CommonDefines.h::ENABLE_PASSIVE_ATTR/ENABLE_DUNGEON_RENEWAL/ENABLE_NEWSTUFF"
+    "common/CommonDefines.h::ENABLE_PASSIVE_ATTR/ENABLE_DUNGEON_RENEWAL/ENABLE_NEWSTUFF",
+    "game/src/party.cpp::IncreaseOwnership/GetNextOwnership",
+    "game/src/char_battle.cpp::party item ownership/dice and ExpCentralize consumer",
+    "game/src/party.cpp::SetExpCentralizeCharacter/GetExpCentralizeCharacter",
+    "game/src/Makefile::-m32",
+    "game/src/GroupMatchManager.h",
+    "game/src/GroupMatchManager.cpp",
+    "game/src/input_main.cpp::PartyMatch",
+    "UserInterface/PythonNetworkStreamPhaseGame.cpp::PartyMatch/RecvPartyMatch",
+    "UserInterface/PythonNetworkStreamPhaseLoading.cpp::LoadPartyMatchInfo",
+    "root/uipartymatch.py",
+    "locale/locale/common/partymatch_info.txt"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -153,7 +157,8 @@
     ]
   },
   "completed_subsystems": [
-    "ranking"
+    "ranking",
+    "party"
   ],
   "ranking_closure": {
     "status": "STATIC COMPLETE",
@@ -167,6 +172,17 @@
     ],
     "retracted_bug_ids": [
       "BUG-RANK-006"
+    ]
+  },
+  "party_closure": {
+    "status": "STATIC COMPLETE",
+    "verified_bug_ids": [
+      "BUG-PARTY-001",
+      "BUG-PARTY-002",
+      "BUG-PARTY-003",
+      "BUG-PARTY-004",
+      "BUG-PARTY-005",
+      "BUG-PARTY-006"
     ]
   }
 }
