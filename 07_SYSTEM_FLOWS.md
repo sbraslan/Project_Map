@@ -1015,3 +1015,34 @@ CG action 10/11/12
 -> playerindex UPDATE completed=1
 -> `BattlePassReward`
 -> AutoGiveItem.
+
+## Achievement System — initial flow
+
+Config:
+`share/locale/europe/achievements.xml`
+-> `CAchievementSystem::Initialize`
+-> server `_achievements` task/reward map.
+
+Player login:
+DB three-table load
+-> serialized map
+-> GAME `ProcessDBPackets`
+-> missing configured tasks are added
+-> `OnLogin`
+-> player achievement map/points/title
+-> title refresh
+-> GC initial packet
+-> login-time achievement hooks.
+
+Runtime:
+`OnKill / OnCharacterUpdate / OnSummon / OnToggle / OnFishItem / OnWinGuildWar / OnGoldChange / OnTrade / OnUpgrade / OnSocial / OnMasterSkill / OnFinishDungeon / OnVisitMap`
+-> mutate task values
+-> progress calculation
+-> `FinishAchievement`
+-> client update/notification
+-> `RewardPlayer`.
+
+Persistence:
+all runtime state remains on CHARACTER until `OnLogout`
+-> DB cache
+-> later multi-table flush.
