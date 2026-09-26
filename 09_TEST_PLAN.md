@@ -629,3 +629,12 @@ Dev/fault-injection only: instrument boundaries after item FlushDelayedSave and 
 - BP-T06 Event Manager start/stop season with configured ID >1 and inspect active ID.
 - BP-T07 process boot before Event Manager population; inspect uninitialized array values.
 - BP-T08 season rollover/reload with existing mission/playerindex rows.
+
+## Battle Pass — static-complete runtime matrix
+
+- BP-T09: complete a mission, wait until the reward item has left ITEM_MANAGER delayed-save queue / is visible in DB, then hard-kill GAME before clean logout; relog and verify whether mission can reward again. Covers BUG-BPASS-008.
+- BP-T10: inject crash/failure after `battlepass_playerindex.battlepass_completed=1` UPDATE but before/during `BattlePassReward`; relog and retry final claim. Covers BUG-BPASS-009.
+- BP-T11: repeated login/logout with many historical `battlepass_missions` rows under ASan/LSan or RSS monitoring; verify leaked `TPlayerExtBattlePassMission` objects. Covers BUG-BPASS-010.
+- BP-T12: fresh CHARACTER first ranking request before any setter; instrument/read `m_dwLastExtBattlePassOpenRankingTime`. Covers BUG-BPASS-011.
+- BP-T13: run `battlepass_set_mission` as GM_IMPLEMENTOR twice on an already completed mission with value >= target; verify duplicate mission reward. Covers BUG-BPASS-002.
+- BP-T14: temporarily configure BattlePassID 2 in isolated environment, start through Event Manager and verify active ID remains 1. Covers BUG-BPASS-007.
