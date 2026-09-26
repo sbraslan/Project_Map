@@ -1132,3 +1132,90 @@ Achievement System remains **PARTIAL**.
 3. inspect force-finish/admin command callers.
 4. close XML reload/config-evolution behavior.
 5. decide Achievement System STATIC COMPLETE and then move to the next unmapped subsystem.
+
+
+## Checkpoint — Achievement System STATIC COMPLETE
+
+**Tarih:** 2026-09-26
+
+Achievement System final static pass completed through gameplay caller coverage, client trust boundaries, ShopEx currency/debit flow, DB persistence, force-finish surfaces and config lifecycle.
+
+### Gameplay caller matrix
+- TYPE_KILL / TYPE_DIE -> `char_battle.cpp::OnKill`
+- TYPE_REACH_LEVEL / TYPE_REACH_PLAYTIME / TYPE_REACH_SPEED -> `char.cpp::OnCharacterUpdate`
+- TYPE_SUMMON_PET -> `PetSystem.cpp::OnSummon`
+- TYPE_ACTIVATE_TOGGLE -> `char_item.cpp::OnToggle`
+- TYPE_FISH / TYPE_BURN / TYPE_USE_BURN -> `fishing.cpp` + `char_item.cpp::OnFishItem`
+- TYPE_WIN_WARS -> `guild_manager.cpp::OnWinGuildWar`
+- TYPE_DEAL_DAMAGE / TYPE_GET_DAMAGAE -> `char_skill.cpp::DamageDealt`
+- TYPE_COLLECT / TYPE_COLLECT_ALIGNMENT / TYPE_COLLECT_GOLD -> `char_battle.cpp` + `char_item.cpp::Collect`
+- TYPE_SPEND_UPGRADE -> `char.cpp::PayRefineFee -> OnGoldChange`
+- TYPE_TRADE -> `exchange.cpp::OnTrade`
+- TYPE_UPGRADE_9 / TYPE_UPGRADE_15 -> `char_item.cpp::OnUpgrade`
+- TYPE_ADD_FRIEND -> `messenger_manager.cpp::OnSocial`
+- TYPE_JOIN_GUILD -> `guild.cpp::OnSocial` plus login backfill when already in guild
+- TYPE_WHISPER / TYPE_SHOUTS -> `input_main.cpp::OnSocial`
+- TYPE_PARTY -> `party.cpp::OnSocial`
+- TYPE_SKILL -> `char_skill.cpp::OnMasterSkill`
+- TYPE_DUNGEON -> `dungeon.cpp::OnFinishDungeon`
+- TYPE_EXPLORE -> only `OnLogin -> OnVisitMap`; no map-transition/warp hook found.
+
+### Missing configured gameplay hooks
+Current XML actively contains tasks for types with no mapped gameplay caller:
+- TYPE_SUMMON_MOUNT: 13 tasks
+- TYPE_SPEND_SEARCH_SHOP: 5 tasks
+- TYPE_SPEND_SHOP: 3 tasks
+- TYPE_WITHDRAW: 5 tasks
+
+These task families cannot progress through the mapped live gameplay paths.
+
+### Achievement Shop 104 closed
+`shop_table_ex.txt`:
+- Vnum 104
+- CoinType Achievement
+- items currently priced 10 / 2 / 5 achievement points.
+
+Client action:
+`HEADER_CG_OPEN_SHOP`
+-> `ProcessClientPackets`
+-> direct `Get(104)->AddGuest` with no NPC/distance authorization.
+
+Purchase:
+`CShopEx::Buy`
+-> achievement-point balance check
+-> CreateItem + inventory-space check
+-> `ChangeAchievementPoints(-price)`
+-> AddToCharacter
+-> `FlushDelayedSave(item)`.
+
+Achievement points remain part of logout-only achievement persistence, while the purchased item is immediately flushed. This creates a crash-consistency point-refund/item-retention window.
+
+### Force-finish surfaces
+- GM command `force_finish_achievement` is restricted to `GM_IMPLEMENTOR`.
+- Quest Lua registers:
+  - `pc.is_achievement_finished`
+  - `pc.finish_achievement`
+  - `pc.finish_achievement_task`
+- `FinishAchievement` itself does not reject an already finished achievement and calls `RewardPlayer` again. Therefore repeated GM/Lua force-finish can duplicate rewards.
+- `FinishAchievementTask` does stop when total progress is already 100%.
+
+### Config lifecycle
+`CAchievementSystem achievement` is initialized once in `main.cpp` and `achievement.Initialize()` loads `achievements.xml` during server boot.
+No Achievement-specific runtime reload command was found in the mapped command set.
+Config changes therefore take effect after restart; stale DB task IDs remain the BUG-ACH-003 migration risk.
+
+### Final verified bug set additions
+- BUG-ACH-005: Achievement Shop item durability vs point-debit durability split.
+- BUG-ACH-006: configured task families with no gameplay caller.
+- BUG-ACH-007: EXPLORE updates only at login, not when entering a map.
+- BUG-ACH-008: repeated force-finish re-grants rewards.
+
+### Status
+**Achievement System: STATIC COMPLETE.**
+
+Remaining work is runtime/fault-injection testing.
+
+### Next static subsystem
+**Biolog System** selected next:
+- server root: `game/src/BiologSystemManager.cpp/.h`
+- expected scope: client action -> mission state -> item submission -> cooldown/chance -> reward -> DB/player persistence.
