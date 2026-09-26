@@ -12,15 +12,18 @@
     "system_file": "systems/battle_field.md",
     "bug_file": "bugs/battle_field.md",
     "test_file": "tests/battle_field.md",
-    "verified_bug_ids": [],
+    "verified_bug_ids": [
+      "BUG-BFIELD-001",
+      "BUG-BFIELD-002",
+      "BUG-BFIELD-003"
+    ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Audit Battle Field entry/exit command authorization and channel/map restrictions.",
-      "Audit kill/death/score accounting and persistence.",
-      "Audit schedule day/time calculations.",
-      "Audit cooldown/reconnect behavior.",
-      "Audit P2P state synchronization across cores.",
-      "Record only Battle Field-specific bugs; do not duplicate Ranking bugs."
+      "Finish Battle Field schedule/open-close resolver correctness.",
+      "Audit event-mode and P2P synchronization across cores.",
+      "Trace Battle Field party removal into existing Party invariants.",
+      "Audit score cash-out/ranking persistence and disconnect behavior.",
+      "Audit daily Battle shop-point reset."
     ]
   },
   "startup": {
@@ -166,7 +169,12 @@
     "game/src/desc_manager.cpp::DestroyDesc",
     "game/src/desc.cpp::DESC::Destroy",
     "game/src/char.cpp::CHARACTER::Disconnect/Destroy",
-    "Project_Game::major dungeon quest unique/new_jump_party reachability sample"
+    "Project_Game::major dungeon quest unique/new_jump_party reachability sample",
+    "game/src/cmd.cpp::Battle Field player command registrations",
+    "game/src/cmd_general.cpp::do_goto_battle/do_exit_battle_field/do_exit_battle_field_on_dead/do_restart",
+    "game/src/battle_field.cpp::RequestEnter/RequestExit/ExitCharacter/RewardKiller/RewardVictim",
+    "game/src/char.cpp::SetBattleKill/Battle Field initialization",
+    "common/CommonDefines.h::BATTLE_FIELD_KILL_TIME"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
