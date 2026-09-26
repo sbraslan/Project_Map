@@ -77,3 +77,17 @@ Normal death gives two cleanup passes (death + later manager destruction), so th
 
 Subsequent unique APIs dereference that stale raw pointer, including `GetUniqueVid`, `IsUniqueDead`, `GetUniqueHpPerc` and `UniqueSet*`.
 
+
+
+### BUG-DUNGEON-004 — duplicate unique key leaves spawned/marked entity outside unique registry
+- Statik durum: **doğrulandı**
+- Sınıf: unique registry consistency / untracked entity
+- Surfaces: `d.spawn_unique`, `d.spawn_move_unique`, `d.set_unique`
+
+Unique registration uses `std::map::insert` and ignores the boolean insertion result.
+
+If a key already exists, `SpawnUnique` can still spawn a new mob, set its dungeon pointer and apply the dungeon-unique affect even though the map remains bound to the older mob.
+
+Similarly, `SetUnique` with an already-used key and another VID leaves the old mapping unchanged while still applying the unique affect to the new character.
+
+The registry and actual dungeon entities therefore diverge deterministically under duplicate-key use. Later `get/kill/purge/unique_set*` operations address only the first registered character.
