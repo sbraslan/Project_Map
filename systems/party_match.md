@@ -162,3 +162,56 @@ The eventual normal Party created after a match is DB-replicated, but that happe
 3. Audit success notification vs WarpSet return/error handling.
 4. Audit item removal semantics and inventory-state restrictions.
 5. Close UI/minimap state after every failure/success message.
+
+
+## Required-item / exchange lifecycle audit
+
+Party Match does not gate SEARCH or match completion on exchange/item-window state:
+- `CInputMain::PartyMatch` only routes SEARCH/CANCEL;
+- `CGroupMatchManager::AddSearcher` checks index, level, required items and existing party, but not `GetExchange()` or an equivalent window guard;
+- `CheckItems(ch,index)` uses `CHARACTER::CountSpecifyItem`;
+- `EraseItems(ch,index)` uses `CHARACTER::RemoveSpecifyItem`.
+
+`CountSpecifyItem` skips personal-shop items and sealed items, but does **not** skip `item->IsExchanging()`.
+
+`RemoveSpecifyItem` likewise does not skip exchange-listed items. If the required count consumes the whole item stack, it calls:
+`item->SetCount(0)`.
+
+`CItem::SetCount(0)` removes the item from the character and calls `M2_DESTROY_ITEM`, which resolves to `ITEM_MANAGER::DestroyItem`. `DestroyItem` ultimately executes:
+`M2_DELETE(item)`.
+
+Exchange keeps the same item as a raw pointer:
+- `CExchange::AddItem` stores it in `m_apItems[i]`;
+- records its inventory position;
+- calls `item->SetExchanging(true)`.
+
+Party Match item deletion does not notify or detach that exchange entry.
+
+Later `CExchange::Cancel` iterates all non-null `m_apItems[i]` and executes:
+`m_apItems[i]->SetExchanging(false)`.
+
+Character destruction also explicitly calls `m_pkExchange->Cancel()`.
+
+This creates BUG-PMATCH-002.
+
+### BUG-PMATCH-002 — Party Match can destroy an exchange-listed required item and leave a dangling CExchange pointer
+The server accepts Party Match operations while an exchange is active and counts exchange-listed inventory items toward dungeon requirements.
+
+At match completion, an exact required stack can be destroyed while the exchange still stores its raw pointer.
+
+Consequences:
+- exchange state retains a pointer to freed `CItem` memory;
+- later exchange cancel/destruction dereferences that dangling pointer;
+- cross-core Party Match warp makes character destruction/cancel a normal follow-up path for many source-core/target-map combinations;
+- even without immediate cross-core destruction, subsequent exchange operations retain invalid item state.
+
+The active Party Match maps 351/352/353/354/356 are hosted primarily on CH1 core3/core5, while searches can originate from other CH1 cores, so a matched character can naturally transition to another core after the item has already been consumed.
+
+This is independent from BUG-PMATCH-001: the first bug fragments search pools; BUG-PMATCH-002 concerns item/exchange lifetime once a local match actually succeeds.
+
+## Exact next audit
+1. Close duplicate SEARCH / PARTY_MATCH_HOLD client-state desynchronization and reachability.
+2. Audit other conflicting windows/states (safebox, refine, shop, change-look) against required-item consumption.
+3. Audit success notification vs WarpSet failure/return ordering.
+4. Audit UI/minimap state for every Party Match result code.
+5. Decide whether additional queue/core transition bugs remain.
