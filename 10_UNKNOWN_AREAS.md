@@ -643,3 +643,36 @@ Money tests yalnız ENABLE_SAFEBOX_MONEY yeniden açılırsa uygulanmalı.
 - MAIL-T17 block-list policy verification if mailbox blocking is intended.
 
 Statik Mailbox keşfi kapalı; yalnız test sonucu yeni edge çıkarsa tekrar açılmalı.
+
+## Recovered legacy systems — remaining work
+
+### Ticket System
+Core static path is mapped. Remaining runtime/security checks:
+- TICKET-T01 crafted foreign ticket ID -> PAGE_REPLY disclosure.
+- TICKET-T02 apostrophe/backslash payloads in title/content/reply/reason against isolated test DB.
+- TICKET-T03 force deterministic ID collision and observe create loop.
+- TICKET-T04 staff mode 5/255 against ASan/debug build.
+- TICKET-T05 client ticketLoadLogs(id == vector size).
+- TICKET-T06 packet fixed-char non-NUL termination audit/runtime test.
+
+### Dungeon Info
+Core static path is mapped. Remaining:
+- DUNGEON-T01 WARP/RANK index 255 and index >= server vector size.
+- DUNGEON-T02 client GC dungeon index 255 under ASan.
+- DUNGEON-T03 reload after multiple entries; verify stale slots from Clear().
+- DUNGEON-T04 malformed config: level-limit count != entry-position count.
+- DUNGEON-T05 config required-item/boss-drop over packet capacity.
+- DUNGEON-T06 vecBonus count POINT_MAX_NUM+1.
+- confirm Python getter wrappers cannot create additional independent slot/type OOB beyond current findings.
+
+### Battle Pass — static audit still open
+Priority:
+1. locate every `SetExtBattlePassMissionProgress` caller and classify whether repeat-completed invocation is reachable.
+2. map every `UpdateExtBattlePassMissionProgress` gameplay caller by mission type.
+3. map `TPlayerExtBattlePassMission` load/create/save/free lifecycle.
+4. map `player.battlepass_playerindex` create/load/completed/season rollover behavior.
+5. map Event Manager P2P receive side for `TPacketGGEventBattlePass` and reload/start/stop ordering.
+6. determine actual configured battle-pass IDs in Project_Game locale/config and impact of bool-as-ID.
+7. verify mission update bMissionType bug in live UI: progress packet should be dropped/misdirected when stack byte does not equal mission type.
+8. final-reward crash test with missing index row.
+9. decide STATIC COMPLETE only after caller+persistence+season lifecycle close.
