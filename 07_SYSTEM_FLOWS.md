@@ -293,3 +293,27 @@ Client DESTROY packet
 → `HEADER_GD_ITEM_DESTROY`
 → cache/SQL delete
 → item C++ object delete.
+
+## Invalid persisted item position → login risk akışı
+
+DB item row
+→ valid window enum fakat invalid/out-of-range `pos`
+→ `HEADER_DG_ITEM_LOAD`
+→ `CInputDB::ItemLoad`
+→ fresh `CItem` (`m_wCell=0`)
+→ `AddToCharacter(window, invalidPos)`
+→ yanlış bounds check: old `m_wCell` kontrol edilir
+→ passes
+→ `SetItem(window,invalidPos)`.
+
+BELT/DS:
+→ array index invalidPos bounds check öncesi kullanılabilir
+→ OOB memory access / core crash riski.
+
+INVENTORY vb.:
+→ `SetItem` erken return edebilir
+→ AddToCharacter yine owner set eder ve true döner
+→ item container'a yerleşmeden owner/state inconsistency oluşabilir.
+
+Normal `MoveItem` client yolu bu riskten farklıdır:
+→ destination önce `IsValidItemPosition` ile doğrulanır.
