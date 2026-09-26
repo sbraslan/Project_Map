@@ -6,42 +6,32 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "ranking",
-    "display_name": "Ranking System",
+    "subsystem": "party",
+    "display_name": "Party System",
     "status": "PARTIAL — ACTIVE",
-    "system_file": "systems/ranking.md",
-    "bug_file": "bugs/ranking.md",
-    "test_file": "tests/ranking.md",
-    "verified_bug_ids": [
-      "BUG-RANK-001",
-      "BUG-RANK-002",
-      "BUG-RANK-003",
-      "BUG-RANK-004",
-      "BUG-RANK-005",
-      "BUG-RANK-007"
-    ],
+    "system_file": "systems/party.md",
+    "bug_file": "bugs/party.md",
+    "test_file": "tests/party.md",
+    "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Determine whether any active caller opens generic PARTY ranking.",
-      "Determine whether any active caller opens generic SOLO categories 2..7.",
-      "Audit remaining ranking SQL/result null boundaries.",
-      "Check additional direct ranker-flag cleanup paths for BUG-RANK-007 lifetime.",
-      "Decide whether Ranking is STATIC COMPLETE."
-    ],
-    "retracted_bug_ids": [
-      "BUG-RANK-006"
+      "Map Party Create -> DB -> peer replication.",
+      "Map Join / Leave / Delete lifecycle.",
+      "Map CG party handlers and server authority/validation.",
+      "Map GC party packets into client cache/UI.",
+      "Start Party bug-candidate audit."
     ]
   },
   "startup": {
     "required_files": [
       "STATE.json",
       "CURRENT.md",
-      "systems/ranking.md"
+      "systems/party.md"
     ],
     "conditional_files": {
       "policy": "WORKFLOW.md",
-      "bugs": "bugs/ranking.md",
-      "deferred_tests": "tests/ranking.md"
+      "bugs": "bugs/party.md",
+      "deferred_tests": "tests/party.md"
     },
     "forbidden_by_default": [
       "archive/",
@@ -99,7 +89,12 @@
     "game/src/horse_rider.h::cmd.h transitive include",
     "game/src/p2p.cpp::P2P_MANAGER::Send",
     "game/src/cmd.cpp::open_battle_ui command",
-    "root/uiminimap.py::OpenbattleField"
+    "root/uiminimap.py::OpenbattleField",
+    "game/src/party.h",
+    "game/src/party.cpp",
+    "db/src/ClientManagerParty.cpp",
+    "game/src/input_main.cpp::Party* handlers",
+    "root/uiparty.py"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -128,6 +123,23 @@
       "record maps/checkpoints/findings in Project_Map",
       "record verified bugs in Project_Map",
       "record deferred test ideas in Project_Map"
+    ]
+  },
+  "completed_subsystems": [
+    "ranking"
+  ],
+  "ranking_closure": {
+    "status": "STATIC COMPLETE",
+    "verified_bug_ids": [
+      "BUG-RANK-001",
+      "BUG-RANK-002",
+      "BUG-RANK-003",
+      "BUG-RANK-004",
+      "BUG-RANK-005",
+      "BUG-RANK-007"
+    ],
+    "retracted_bug_ids": [
+      "BUG-RANK-006"
     ]
   }
 }
