@@ -1,6 +1,6 @@
 # dungeon info
 
-**Status:** PARTIAL — ACTIVE
+**Status:** STATIC COMPLETE
 
 > Canonical subsystem history split from legacy `00_PROGRESS.md`. Read this file only when this subsystem is active or explicitly revisited.
 
@@ -105,3 +105,52 @@ Ticket System STATIC COMPLETE sonrasında Dungeon Info aktif subsystem oldu.
 3. audit ranking query/result lifecycle and Python binding boundaries;
 4. close client clear/reload/state lifecycle;
 5. decide Dungeon Info STATIC COMPLETE and refresh tests.
+
+## Static close — Dungeon Info
+
+**Tarih:** 2026-09-26
+
+### Packet / sequence audit — COMPLETE
+- CG DungeonInfo is registered server-side with exact `sizeof(TPacketCGDungeonInfo)` and sequence=true.
+- Official client `SendDungeonInfo` sends the fixed struct and calls `SendSequence()`.
+- GC DungeonInfo and Ranking are registered client-side as STATIC packets with their exact struct sizes.
+- No header-size/sequence mismatch was found.
+
+### Current config snapshot audit — COMPLETE
+`Project_Game/share/locale/europe/dungeon_info.txt` currently contains 9 dungeon blocks.
+- required-item count: exactly 3 per block (packet capacity 3)
+- boss-drop maximum: 5 (packet capacity 16)
+- bonus maximum: 7 (below POINT_MAX_NUM)
+- each block has one LEVEL_LIMIT and one ENTRY_BASE_POSITION
+- QUEST-backed blocks: 4
+- explicit COOLDOWN lines: 0
+
+Thus BUG-DUNGEON-004/005/006/007 are real defensive/config-parser defects but are not triggered by current vector/token sizes. BUG-DUNGEON-010/011/012 do affect the normal checked-in configuration/path.
+
+### Client state / Python boundary audit — COMPLETE
+- `Clear()` only clears slot 0 -> BUG-DUNGEON-003.
+- 255-slot storage accepts index 255 / narrowing boundaries -> BUG-DUNGEON-002.
+- nested bonus/item getter indices are unvalidated -> BUG-DUNGEON-008.
+- `TPacketGCDungeonInfo` itself has a constructor that zero-initializes scalar/fixed-array fields; an earlier uninitialized-packet suspicion was rejected as a false positive.
+
+### Ranking audit — COMPLETE
+- server Warp/Ranking primary index validation is missing -> BUG-DUNGEON-001.
+- Ranking SQL is malformed at the adjacent literal boundary before LEFT JOIN -> BUG-DUNGEON-009.
+- ranking result packet has safe default initialization; terminator row is ignored by AddRanking because level=0 while still causing UI refresh.
+- no additional confirmed MYSQL_ROW null dereference was found in the normal ranking loop.
+
+### Config semantics / cooldown audit — COMPLETE
+- unbounded token `strcpy` -> BUG-DUNGEON-007.
+- documented numeric GLOBAL flag contract disagrees with parser -> BUG-DUNGEON-011.
+- expired/zero cooldown subtraction wraps through uint32 -> BUG-DUNGEON-012.
+
+### UI audit — COMPLETE
+- normal nonzero dungeon count skips list-button creation because the creation loop is inside the zero-count `else` branch -> BUG-DUNGEON-010.
+
+## Static status
+Dungeon Info: **STATIC COMPLETE**.
+
+Verified bugs: `BUG-DUNGEON-001..012`.
+Runtime/ASan validation remains in `../tests/dungeon_info.md`.
+
+Next project phase: runtime / in-game bug validation.
