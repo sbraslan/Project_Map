@@ -373,3 +373,31 @@ Gold/Cheque değişiklikleri PointChange ile memory state'i değiştirir. CExcha
 CHARACTER::Save() -> CHARACTER_MANAGER::DelayedSave. Bu, per-item FlushDelayedSave ile aynı DB transaction değildir.
 
 Özet: item saves per-item immediate flush; player currency saves delayed character save; cross-character atomic transaction yok.
+
+
+## Premium Private Shop DB transaction path
+
+Sale message from game:
+HEADER_GD_SHOP / SHOP_SUBHEADER_GD_BUY / seller pid / display pos.
+
+DB ShopSaleResult uses its cached shop table as source of truth:
+- FindItem(displayPos)
+- sold = shopTable->items[arrIndex]
+- AlterGoldStash(sold.price,true)
+- AlterChequeStash(sold.cheque,true)
+- optional online sale notification
+- RemoveItem(displayPos)
+- close if no items
+- PutShopCache(GetCacheTable()).
+
+### Stash limits
+GOLD_MAX = 2,000,000,000
+CHEQUE_MAX = 1,000.
+
+Shop::AlterGoldStash and AlterChequeStash clamp after mutation. There is no sale-side capacity rejection before buyer payment/item transfer.
+
+### Tax data gap
+SHOP_SUBHEADER_GD_BUY contains no net price/tax. Therefore DB credits cached listed price, not game-side post-tax dwPrice.
+
+### Cross-layer atomicity observation
+Game item owner transfer is immediately ITEM_MANAGER::FlushDelayedSave(item) before SHOP_SUBHEADER_GD_BUY is sent. Buyer currency uses CHARACTER::Save() delayed at end of Buy(). Shop stash/table is a separate DB shop cache mutation. No single commit/rollback primitive spans these three state stores.
