@@ -40,3 +40,12 @@ Haritalama sırasında bulunan her bilinmeyen alan önce buraya yazılır; çöz
 - Cross-core/channel storage lock için repo-geneli P2P son kontrolü.
 - Guild üyeliği/rank değişimi pending/open request sırasında ne oluyor.
 - Startup sonrası stale `guildstoragestate` reset mekanizması.
+
+## Çözülen concurrency soruları
+- Storage lock P2P senkronizasyonu: incelenen repo kapsamında **yok**.
+- Startup stale-state reset: var; `InitializeDonate()` tüm `guildstoragestate` alanlarını 0 yapıyor.
+
+## Kalan Guild Storage soruları
+- Guild member guild'den atılırsa/ayrılırsa açık veya pending storage nesnesi nasıl davranıyor.
+- Rank yetkisi storage açıkken kaldırılırsa mevcut session item packetleri kabul edilmeye devam ediyor mu.
+- Bu statik concurrency açıklarının oyun içi çoklu-core reprodüksiyonu.
