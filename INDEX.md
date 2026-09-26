@@ -28,7 +28,8 @@ This is the navigation index. Normal continuation starts at `STATE.json`, then `
 | Biolog System | STATIC COMPLETE | `systems/biolog.md` |
 | Hunting System | STATIC COMPLETE | `systems/hunting.md` |
 | Ranking System | STATIC COMPLETE | `systems/ranking.md` |
-| Party System | **PARTIAL — ACTIVE** | `systems/party.md` |
+| Party System | STATIC COMPLETE | `systems/party.md` |
+| Party Match | **PARTIAL — ACTIVE** | `systems/party_match.md` |
 
 ## Current phase
 - **Detection / mapping only.** Source and game repositories remain read-only.
