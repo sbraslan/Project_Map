@@ -89,7 +89,7 @@ Mapped triggers:
 
 `HEADER_GG_LOAD_RANKING` is registered with exact `sizeof(TPacketGGLoadRanking)`.
 
-The exact outbound/broadcast helper that emits `TPacketGGLoadRanking` still needs to be located.
+Targeted source scan of `ranking_system.cpp`, `battle_field.cpp`, `input_p2p.cpp`, `p2p.cpp`, `input_db.cpp`, `db.cpp`, the descriptor/P2P helpers and packet declarations found the `TPacketGGLoadRanking` struct plus the P2P receiver, but no outbound construction/send site. The receive path is therefore currently mapped as **receiver-only / sender not found**. Cross-channel impact still needs reachability closure before assigning a bug ID.
 
 ## GC packet flow
 Server BattleField UI open:
@@ -151,29 +151,41 @@ That function:
 - looks up the player in the cached top-3 winner vector;
 - sets one of `AFF_BATTLE_RANKER_1..3` when matched.
 
-Current mapped code does not show ranker-effect refresh being performed for already-online players when ranking data is reloaded. It also does not clear previous ranker flags inside `SetWeakRankingPosition`.
+Current mapped code does not show ranker-effect refresh being performed for already-online players when ranking data is reloaded. `SetWeakRankingPosition` sets `AFF_BATTLE_RANKER_1..3` directly through `CHARACTER::SetAffectFlag`, but does not clear an older ranker bit first.
 
-This is recorded as a lifecycle finding; persistence/reachability must be closed before assigning another verified bug ID.
+Cross-checks show `m_afAffectFlag` is initialized to zero in the `CHARACTER` constructor, while the generic reset path in `char_affect.cpp` only resets `pkAff->dwFlag` for real `CAffect` entries. The mapped BattleField ranker bits are not added through that `CAffect` path. This makes stale winner flags a high-confidence lifecycle defect, but a repo-wide direct-reset scan is still required before promotion to a verified bug ID.
+
+## Dynamic packet boundary audit
+`HEADER_GC_BATTLE_ZONE_INFO` is registered as a dynamic-size packet. `CheckPacket()` waits until the declared dynamic size is buffered, but it does not validate that the declared size is at least the base packet size or that the payload length is an exact multiple of `sizeof(TBattleRankingMember)`.
+
+`RecvBattleZoneInfo()` then subtracts `sizeof(TPacketGCBattleInfo)` from the `uint16_t wSize` and loops while `wSize > 0`, consuming one full ranking member each iteration. A too-small size can underflow; a non-multiple payload can cause a full member read beyond the packet's declared boundary. This creates BUG-RANK-005.
+
+## BattleField ranking reload call-site audit
+Both `CBattleField::CloseEnter()` and the scheduled weekly update call `LoadRanking(RK_CATEGORY_BF)` unqualified under `ENABLE_RANKING_SYSTEM`.
+
+The current `CBattleField` declaration contains no `LoadRanking` member, its `singleton<CBattleField>` base contains no such method, and the directly included headers/precompiled-header chain checked so far contains no `LoadRanking` macro/alias. The actual method is `CRankingSystem::LoadRanking(uint8_t)`. The active `CommonDefines.h` enables both `ENABLE_RANKING_SYSTEM` and `ENABLE_BATTLE_FIELD`, so these call sites are compiled in the mapped configuration. This creates BUG-RANK-006 as a static build blocker for the source snapshot, subject only to an external compiler-injected declaration/macro not represented in the repository.
 
 ## Verified bugs
 - BUG-RANK-001 — `SendBFRanking` takes `&vecBattleFieldRanking[0]` even when the vector is empty.
 - BUG-RANK-002 — current-player solo ranking API is a hard-coded empty stub.
 - BUG-RANK-003 — weekly winner table is not cleared, allowing stale prior-week positions.
 - BUG-RANK-004 — BattleField close reloads ranking before remaining players' final session points are committed.
+- BUG-RANK-005 — dynamic BattleField ranking packet length is not boundary/divisibility validated before fixed-record parsing.
+- BUG-RANK-006 — BattleField calls `LoadRanking(RK_CATEGORY_BF)` without a resolvable member/global declaration in the active source configuration.
 
 ## Latent / incomplete integration findings
 Not yet promoted to verified current-path bugs:
 - Generic PARTY board calls Python APIs that are not exported by `PythonRankingModule.cpp`.
 - Generic SOLO board declares categories beyond 0/1, while its name dictionary only defines 0 and 1.
-- Ranker winner-effect state is not visibly refreshed for already-online players when ranking cache changes.
-- Exact outbound P2P ranking-reload sender still needs mapping.
+- Ranker winner-effect state is not visibly refreshed for already-online players when ranking cache changes, and direct ranker bits are not cleared in the mapped lifecycle; repo-wide direct-reset closure is still pending.
+- `TPacketGGLoadRanking` has a mapped receiver but no sender in the targeted server-source scan; cross-channel reachability/impact remains pending.
 
 ## Exact next audit
-1. Locate the outbound `TPacketGGLoadRanking` sender/broadcast path.
-2. Close ranker-effect refresh/removal lifecycle.
+1. Map every live caller of `CBattleField::OpenBattleUI` and determine whether the missing outbound `TPacketGGLoadRanking` sender creates stale cross-channel ranking views.
+2. Finish the repo-wide direct-reset search for `AFF_BATTLE_RANKER_1..3` and decide whether to promote the stale-ranker-effect lifecycle to a verified bug.
 3. Determine whether any live caller opens generic PARTY ranking.
-4. Audit dynamic ranking packet length handling for malformed/non-multiple payload sizes.
-5. Audit SQL/result null handling and then decide whether Ranking is STATIC COMPLETE.
+4. Audit remaining SQL/result null boundaries.
+5. Reconcile BUG-RANK-006 against the actual build entry points/configuration and then decide whether Ranking is STATIC COMPLETE.
 
 
 ## Build/linkage anomaly under review
