@@ -1041,3 +1041,42 @@ Remaining work is runtime/fault-injection only.
 
 ### Next static subsystem
 Move to the next unmapped gameplay subsystem; Achievement System is selected next because it has direct event hooks, player persistence and reward state similar to Battle Pass.
+
+## Checkpoint — Achievement System audit started
+
+**Tarih:** 2026-09-26
+
+Battle Pass STATIC COMPLETE sonrası Achievement System ana omurgası açıldı.
+
+Mapped roots:
+- Server: `game/src/AchievementSystem.cpp/.h`
+- DB: `db/src/ClientManagerAchievement.cpp`, `db/src/Cache.cpp::CAchievementCache`
+- Client: `UserInterface/PythonAchievement.cpp/.h`
+- Binary UI: `root/uiachievementsystem.py`, `root/uiachievementwrapper.py`
+- Runtime config: `Project_Game/share/locale/europe/achievements.xml` (current count: 179 achievements)
+
+Initial flow:
+gameplay hooks
+-> `CAchievementSystem::On*`
+-> per-character `TAchievementsMap`
+-> `FinishAchievement`
+-> notification/update
+-> immediate `RewardPlayer`
+-> logout serialization
+-> `HEADER_GD_ACHIEVEMENT`
+-> DB `CAchievementCache`
+-> delayed cache flush/rebuild of achievement tables.
+
+Initial verified bugs:
+- BUG-ACH-001 reward is granted immediately but completion/progress is logout-persisted -> crash repeat-reward window.
+- BUG-ACH-002 DB cache flush deletes/rebuilds multiple tables without transaction -> partial/lost state on failure.
+- BUG-ACH-003 stale task IDs can dereference end iterator in max_value progress path after config evolution.
+
+Status: **PARTIAL**.
+
+Next:
+1. map every gameplay `On*` caller and task type.
+2. map client packet entry + shop/ranking/title trust boundaries.
+3. audit force-finish/admin paths.
+4. audit achievement shop currency/inventory interaction.
+5. audit XML config constraints/reload behavior.
