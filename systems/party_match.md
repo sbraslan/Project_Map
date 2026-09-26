@@ -1,6 +1,6 @@
 # Party Match
 
-**Status:** PARTIAL — ACTIVE
+**Status:** STATIC COMPLETE
 **Phase:** Detection / Mapping Only
 **Date:** 2026-09-26
 
@@ -266,3 +266,36 @@ However the stock Party Match button synchronously sets `MATCH_STATE_SEARCHING` 
 3. Audit map/core transition while already queued.
 4. Audit disabled/off-state enforcement.
 5. Decide whether Party Match can reach STATIC COMPLETE.
+
+
+## Final static closure
+
+### Warp target validation
+The hard-coded Party Match coordinates resolve exactly to the corresponding dungeon map base positions in Project_Game:
+- 351 -> `metin2_map_n_flame_dungeon_01` -> BasePosition 742400 614400
+- 352 -> `metin2_map_n_snow_dungeon_01` -> BasePosition 512000 153600
+- 353 -> `metin2_map_dawnmist_dungeon_01` -> BasePosition 768000 1408000
+- 354 -> `metin2_map_mt_th_dungeon_01` -> BasePosition 844800 1408000
+- 356 -> `metin2_map_n_flame_dragon` -> BasePosition 307200 1510400
+
+Thus the configured `WarpSet(x*100,y*100)` locations are valid in the mapped deployment. The ignored bool result remains a non-atomic robustness weakness, but no current configured normal failure path was verified.
+
+### Remaining item-window closure
+- personal-shop listed items are explicitly excluded by `CountSpecifyItem/RemoveSpecifyItem`;
+- sealed items are excluded;
+- safebox-held items are no longer inventory items and therefore are not counted;
+- no second raw-pointer lifetime failure equivalent to the verified Exchange path was found for the configured entry items.
+
+### Off/disable path
+Client code contains a `party_match_off` state and taskbar hiding helpers, but no active server/game-data producer was found in the mapped snapshot. Several direct UI off checks are commented. This path is treated as dormant and not promoted.
+
+### Protocol closure
+Server and client:
+- `EPacketGCPartyMatchSubHeader`
+- `EPartyMatchMsg`
+- `TPacketCGPartyMatch`
+- `TPacketGCPartyMatch`
+
+match in enum order, field types and layout.
+
+**Party Match static mapping is complete for the current source/deployment snapshot.**
