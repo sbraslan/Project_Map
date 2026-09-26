@@ -502,3 +502,36 @@ Client Python
 1. BUG-EXCHANGE-003'ün Switchbot active-event ve Additional Equipment unequip etkisini sınıflandır.
 2. gold/cheque late-overflow ve iki taraflı Done sırasındaki atomicity riskini kapat.
 3. disconnect/cancel lifecycle ve item `SetExchanging` cleanup davranışını tara.
+
+
+## Checkpoint — Exchange/Trade preflight + atomicity audit
+
+**Tarih:** 2026-09-26
+
+Inventory/Item statik completion sonrasında sıradaki subsystem olarak player-to-player Exchange/Trade haritalamasına geçildi.
+
+### Uçtan uca zincir
+`root/uiexchange.py`
+→ `PythonNetworkStreamModule.cpp`
+→ `CPythonNetworkStream::SendExchange*`
+→ `HEADER_CG_EXCHANGE / TPacketCGExchange`
+→ `CInputMain::Exchange`
+→ `CExchange::{AddItem,AddGold,Check,CheckSpace,Accept,Done,Cancel}`.
+
+Official UI item eklerken yalnız `INVENTORY` ve `DRAGON_SOUL_INVENTORY` source üretir. Python binding ise `window_type` değerini doğrudan `TItemPos` içine alır; server `AddItem` tarafı yalnız `IsValidItemPosition()` + `!IsEquipPosition()` kullanır.
+
+### Yeni doğrulanmış buglar
+- **BUG-EXCHANGE-001:** `CheckSpace()` special-inventory itemlarını normal inventory gridlerinde simüle ediyor; `Done()` ise `GetEmptyInventory(item)` ile gerçek special inventory type/range'e yönlendiriyor. Preflight true iken commit sırasında space failure oluşabilir. `Done()` itemları tek tek taşıdığı ve rollback yapmadığı için önceki itemlar transfer edilmiş halde kalabilir.
+- **BUG-EXCHANGE-002:** extended inventory page-4 branch'inde `s_grid4.Put()` yanlış `if (item->GetSize() > 1 && ...)` gövdesine bağlı. Size=1 itemlar simülasyon gridine hiç rezerve edilmiyor; birden fazla incoming item aynı tek boş slotu varmış gibi kullanabilir. Bu da `CheckSpace()==true` sonrası `Done()` partial transfer üretebilir.
+- **BUG-EXCHANGE-003:** `CExchange::AddItem` source window allowlist kullanmıyor. Modified Python/client `SWITCHBOT` ve `ADDITIONAL_EQUIPMENT_1` gibi valid fakat exchange için semantik olarak beklenmeyen source windowları gönderebilir; normal `MoveItem` guardları (active Switchbot / CanUnequipNow vb.) bypass edilir.
+
+### Ek gözlemler
+- `ENABLE_CHEQUE_SYSTEM` altında `AddGold` insufficient-funds kontrolü `&&` kullanıyor; tek currency yetersizliği offer aşamasında geçebilir, fakat final `Check()` her currency'yi ayrı doğruladığından statik olarak transaction exploitine dönüşmedi.
+- Client `SendExchange*` fonksiyonları `TPacketCGExchange packet;` nesnesini zero-init etmiyor. Subheader'a ait olmayan alanlar wire'a uninitialized gidebilir; server ise switch öncesi `pinfo->arg1` ile character lookup yapıyor. Bu şimdilik client nondeterminism / information-leak observation olarak tutuluyor.
+
+### Sıradaki
+1. Exchange accept/Done transaction ordering + rollback eksikliği ayrıntılandır.
+2. Currency max/balance recheck'lerini ve PointChange davranışını tara.
+3. Cancel / disconnect / death / distance lifecycle'ını kapat.
+4. Exchange persistence/DB flush ordering'ini haritala.
+5. Ardından runtime test matrisi oluştur.
