@@ -125,3 +125,61 @@ The Party registry already records this as normal reachability for:
 - `BUG-PARTY-005` stale party role bonuses.
 
 No duplicate Battle Field bug ID is assigned for those underlying Party defects.
+
+
+## Event-state / multi-core audit
+
+### BUG-BFIELD-006 — event date is process-local and battle_set_event is not channel-gated
+`do_battle_set_event` writes only `CBattleField::bEventMonth/bEventDay`.
+
+Force-open/force-close explicitly reject non-Battle-Field channels, but `battle_set_event` does not.
+
+The main heartbeat invokes `CBattleField::Update()` only on channel 99. Thus setting the event date from another channel modifies an inert local singleton instead of the scheduler-owning core.
+
+P2P `BroadcastCommand` paths transport client commands; they do not synchronize these server singleton fields.
+
+## Weekly winner affect lifecycle
+
+### BUG-BFIELD-007 — online players keep stale winner flags across rollover
+Winner flags are written directly into `m_afAffectFlag` by `SetWeakRankingPosition`.
+
+The weekly DB/cache reload does not iterate online characters, reset old `AFF_BATTLE_RANKER_1..3`, or assign flags to newly ranked online characters.
+
+This is separate from BUG-BFIELD-005:
+- 005 concerns stale DB rows when fewer than three winners exist;
+- 007 exists even with a perfectly correct fresh top three because online character flags are not reconciled.
+
+## Schedule resolver audit
+
+### BUG-BFIELD-008 — second component has wrong sign
+Same-day remaining time adds current `tm_sec` instead of subtracting it, creating a 0..118 second overstatement.
+
+Next-day calculation has a -60..58 second error for the same reason combined with the minute rollover formula.
+
+The schedule fallback only searches today and the immediate next day. Sparse schedules can therefore resolve to zero when the next configured opening is two or more days away, but the live SQL schedule rows are absent from this repository snapshot, so this remains an unpromoted config-dependent candidate.
+
+## Battle shop daily state — CLOSED
+Battle shop usable-point and last-reset timestamps live in `TPlayerTable::aiShopExUsablePoint/aiShopExDailyUse`.
+
+They are copied into player-save data and the Battle shop purchase path triggers character save after spending.
+
+`Connect` restores the allowance when more than 86400 seconds have elapsed since the saved timestamp.
+
+This is a rolling 24-hour allowance rather than a calendar-day reset; no separate persistence failure was established from the mapped path.
+
+## Current verified Battle Field set
+- BUG-BFIELD-001
+- BUG-BFIELD-002
+- BUG-BFIELD-003
+- BUG-BFIELD-004
+- BUG-BFIELD-005
+- BUG-BFIELD-006
+- BUG-BFIELD-007
+- BUG-BFIELD-008
+
+## Remaining before static close
+1. Audit disconnect/reconnect behavior for temporary score and cooldown semantics.
+2. Finish client event-state command wiring; classify the unused/mismatched event-enable fields.
+3. Audit close/open state propagation to connected clients across cores.
+4. Recheck score cash-out -> DB ranking write ordering.
+5. Decide Battle Field STATIC COMPLETE.
