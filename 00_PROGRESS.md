@@ -549,3 +549,31 @@ Runtime plan: EXCHANGE-T01..T05.
 Source repolara değişiklik yapılmadı. Tüm ilerleme yalnız `Project_Map` içine kaydedildi.
 
 Sonraki statik öncelik: Shop / Private Shop ownership-purchase transaction flow; Inventory ve Exchange ile ortak item/gold sınırları nedeniyle sıradaki mantıklı subsystem.
+
+
+## Checkpoint — Exchange lifecycle / currency / persistence audit
+
+**Tarih:** 2026-09-26
+
+Exchange ikinci statik turu tamamlandı: movement/distance lifecycle, death/disconnect/warp, currency cap TOCTOU ve DB save ordering incelendi.
+
+### Yeni doğrulanmış buglar
+- **BUG-EXCHANGE-004:** server exchange mesafesini yalnız START aşamasında kontrol ediyor. Normal movement exchange'i server-side iptal etmiyor ve final ACCEPT'te mesafe tekrar ölçülmüyor. Official UI 1000 mesafeyi aşınca CANCEL gönderiyor; modified client bu client-side korumayı atlayarak uzak mesafede trade'i tamamlayabilir.
+- **BUG-EXCHANGE-005:** gold recipient-cap kontrolü ELK_ADD/offer anında yapılıyor. Exchange açıkken ITEM_PICKUP engellenmediği için alıcının gold'u offer sonrası yükselebilir. Done() önce sender'dan gold düşüyor, sonra receiver PointChange(+gold) overflow nedeniyle return edebiliyor. Return değeri olmadığı için Done() bunu başarısızlık olarak görmüyor; sender gold kaybı + success-flow mümkündür.
+
+### Lifecycle sonucu
+- Character destruction/disconnect: m_pkExchange->Cancel().
+- Death: Dead() içinde exchange cancel.
+- Normal movement: cancel yok.
+- Normal warp gate: active ENABLE_CHECK_WINDOW_RENEWAL altında SetExchange W_EXCHANGE flag'i set ediyor; CanWarp() W_EXCHANGE açıkken false.
+- WarpSet() kendi içinde exchange cancel etmiyor; doğrudan WarpSet çağıran özel yollar ayrıca caller bazında değerlendirilebilir.
+
+### Persistence sonucu
+CExchange::Done() her moved item için RemoveFromCharacter -> AddToCharacter(victim) -> ITEM_MANAGER::FlushDelayedSave(item) -> SaveSingleItem -> HEADER_GD_ITEM_SAVE kullanıyor.
+
+Bu nedenle BUG-EXCHANGE-001/002 ile oluşan partial item transfer, final transaction başarıya ulaşmadan DB cache katmanına item ownership/position save olarak gönderilebilir. Exchange için atomik DB transaction/rollback katmanı yok.
+
+Currency CHARACTER::Save() ise delayed-save kuyruğuna girer; item ownership save'i ile iki karakterin currency save'i aynı atomic unit değildir.
+
+### Exchange statik durum
+Ana server/client/packet/transaction/lifecycle/persistence haritası tamamlanmaya yakın. Açık kalan başlıca alanlar runtime validation ve birkaç edge-path caller auditidir.
