@@ -632,3 +632,32 @@ Cheque tarafında `Done()` transferden hemen önce overflow'u tekrar kontrol ede
 şeklinde yapıyor.
 
 Bu, tek currency yetersizken AddGold'un geçici olarak offer state yazmasına veya yalnız bir currency varken offer'ın overwrite edilmesine izin verir. Final `Check()` sender funds'ı iki currency için ayrı ayrı kontrol ettiği için tek başına completed transfer exploit'i statik olarak gösterilmedi. Şimdilik observation.
+
+
+### BUG-EXCHANGE-004 — Final distance recheck yok / client-side range enforcement
+- Statik durum: **doğrulandı**
+- Sınıf: server trust-boundary / state invariant
+- Etki: modified client ile başlangıçtan sonra uzaklaşıp remote trade completion.
+
+ExchangeStart mesafeyi < EXCHANGE_MAX_DISTANCE (1000) kontrol eder. Normal movement exchange'i server-side cancel etmez ve final CExchange::Accept current distance'ı yeniden kontrol etmez.
+
+Official uiexchange.py::OnUpdate 1000 mesafe aşılırsa client tarafından CANCEL gönderir. Bu nedenle koruma server invariant değil, client davranışıdır.
+
+### BUG-EXCHANGE-005 — Gold recipient cap TOCTOU → sender debit without receiver credit
+- Statik durum: **doğrulandı**
+- Sınıf: currency transaction / TOCTOU / asymmetric commit
+- Etki: gold loss / griefing-risk; gain exploit olarak sınıflandırılmadı.
+
+ELK_ADD offer anında recipient gold cap kontrol edilir. Fakat exchange açıkken server ITEM_PICKUP kabul eder ve PickupItem exchange state kontrolü olmadan ITEM_ELK için GiveGold çalıştırır. Party pickup distribution da recipient gold'unu değiştirebilir.
+
+Final Check() recipient gold cap'i tekrar doğrulamaz. Done() önce sender debit, sonra receiver credit uygular. Receiver addition GOLD_MAX overflow nedeniyle PointChange içinde early-return edebilir. Fonksiyon void olduğundan Done() bunu algılayamaz. Sender debit zaten uygulanmıştır ve rollback yoktur.
+
+### BUG-EXCHANGE-001/002 persistence severity update
+Her başarılı moved item sonrasında ITEM_MANAGER::FlushDelayedSave(item) -> SaveSingleItem -> HEADER_GD_ITEM_SAVE gönderilir. Daha sonraki item fail olduğunda Cancel() bu item ownership değişimini geri almaz. Bu nedenle partial transfer DB cache'e persist edilebilir.
+
+### Exchange lifecycle — güvenli kapatılan alanlar
+- character teardown/disconnect -> Cancel
+- death -> Cancel
+- active ENABLE_CHECK_WINDOW_RENEWAL + SetExchange(W_EXCHANGE) nedeniyle standard CanWarp() active exchange sırasında false.
+
+Doğrudan WarpSet() kendi içinde exchange cancel/check yapmadığından özel callerlar ayrıca taranabilir, ancak standart warp için bug olarak sınıflandırılmadı.
