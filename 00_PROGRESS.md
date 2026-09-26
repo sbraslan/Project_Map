@@ -433,3 +433,43 @@ Kalan ana caller sınıfları tekrar tarandı:
 1. Special Inventory extend-feature build kombinasyonlarını tara.
 2. Proto/data tarafında special-inventory type olup size > 1 item var mı kontrol et.
 3. Inventory/Item subsystem completion checkpoint oluştur.
+
+
+## Checkpoint — Special Inventory extended build / trust-boundary audit
+
+**Tarih:** 2026-09-26
+
+### Aktif build kombinasyonu
+Server build'de birlikte aktif:
+- `ENABLE_SPECIAL_INVENTORY`
+- `ENABLE_EXTEND_INVEN_SYSTEM`
+- `ENABLE_EXTEND_INVEN_ITEM_UPGRADE`
+- `ENABLE_EXTEND_INVEN_ITEM_UPGRADE_SPECIAL_INV`
+
+Her special type'ın statik address range'i 4 × 45 slotu kapsıyor. Ancak kullanılabilir üst sınır character state içindeki `bSpecialInventoryStage[3]` ile dinamik:
+- başlangıç: 45 açık slot
+- her stage: +5 slot
+- type'lar: Skillbook / Stone / Material
+
+Normal placement:
+`MoveItem -> IsEmptyItemGrid -> IsEmptySpecialItemGrid`
+zinciriyle `GetExtendSpecialInvenMax(type)` üst sınırını uyguluyor. Kilitli special slot normal MoveItem yolundan reddediliyor.
+
+### Yeni buglar
+- **BUG-ITEM-007:** Special Inventory extend request/upgrade paketindeki client-controlled `bWindow` server'da 0..2 doğrulanmadan `bSpecialInventoryStage[bWindow]` ve ilişkili hesaplarda kullanılıyor. OOB read; upgrade akışında koşullar sağlanırsa OOB write riski.
+- **BUG-ITEM-008:** DB ItemLoad, persisted INVENTORY position'ı doğrudan `AddToCharacter` ile restore ediyor. `IsValidItemPosition` tüm statik special range'i geçerli sayıyor ve `SetItem` locked-stage sınırını placement engeli olarak uygulamıyor. Malformed/legacy DB row açılmamış special slotta item restore edebilir.
+
+### Proto/data sonucu
+Düz metin server-side `item_proto` mevcut repolarda bulunmadı. Project_Binary içinde locale başına derlenmiş `item_proto` blobları var.
+Special type source eşlemesi:
+- ITEM_SKILLBOOK -> Skillbook
+- ITEM_METIN -> Stone
+- ITEM_MATERIAL / ITEM_RESOURCE -> Material
+- vnum 27987 -> Material
+
+Bu yüzden gerçek dataset içinde special-type + size > 1 item bulunup bulunmadığı GitHub text source'dan güvenilir biçimde doğrulanamıyor; runtime DB/proto export testi olarak bırakıldı.
+
+### Sıradaki
+1. BUG-ITEM-007 için izole dev-server boundary testi.
+2. BUG-ITEM-008 için controlled DB-row restore testi.
+3. Inventory/Item statik haritasını completion checkpoint'e al ve sonraki subsystem'e geç.
