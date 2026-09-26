@@ -661,3 +661,24 @@ Her başarılı moved item sonrasında ITEM_MANAGER::FlushDelayedSave(item) -> S
 - active ENABLE_CHECK_WINDOW_RENEWAL + SetExchange(W_EXCHANGE) nedeniyle standard CanWarp() active exchange sırasında false.
 
 Doğrudan WarpSet() kendi içinde exchange cancel/check yapmadığından özel callerlar ayrıca taranabilir, ancak standart warp için bug olarak sınıflandırılmadı.
+
+
+### BUG-EXCHANGE-003 — concrete impact update
+Source-window allowlist eksikliğinin iki somut etkisi statik olarak kapatıldı:
+
+**Active Switchbot:**
+- Exchange AddItem active slotu reddetmez.
+- Switchbot event item_id ile itemı bulur ve item IsExchanging olsa da ChangeAttribute çalıştırabilir.
+- Trade UI'ye gönderilmiş item attribute snapshot'ı accept öncesinde değişebilir.
+- Transferde source SWITCHBOT slot unregister edilir; sorun özellikle offer→accept integrity penceresidir.
+
+**Additional Equipment:**
+- ADDITIONAL_EQUIPMENT_1 generic valid window'dur fakat IsEquipPosition değildir.
+- Normal MoveItem CanUnequipNow uygular; Exchange AddItem uygulamaz.
+- CanUnequipNow ITEM_FLAG_IRREMOVABLE dahil unequip policy uygular.
+- Done -> RemoveFromCharacter -> Unequip bu policy'i yeniden uygulamaz.
+
+Bu nedenle modified client, normal item-move kurallarınca çıkarılması engellenecek Additional Equipment itemını exchange transfer yoluna sokabilir.
+
+### Exchange static completion note
+BUG-EXCHANGE-001..005 ve OBS-EXCHANGE-001/002 ile ana statik risk seti çıkarıldı. Bundan sonraki Exchange işi öncelikle EX-T01..EX-T09 runtime doğrulamasıdır.
