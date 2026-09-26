@@ -277,23 +277,25 @@ INVENTORY gibi erken-return yapan windowlarda ise başka problem oluşur:
 Güvenlik sınırı:
 Normal client `CHARACTER::MoveItem` destination'ı önceden doğrular; doğrudan ITEM_MOVE exploit'i olarak işaretlenmemeli. En güçlü mevcut trigger bozuk DB item position veya yanlış internal caller'dır.
 
-### BUG-CANDIDATE-ITEM-005 — Additional Equipment SwapItem variable shadowing
-- Statik durum: **kod kusuru doğrulandı**, runtime etkisi henüz sınıflandırılmadı.
+### OBS-ITEM-002 — Additional Equipment SwapItem variable shadowing
+- Statik durum: **kod kusuru doğrulandı; mevcut çağrı zincirinde doğrudan runtime etkisi bulunamadı**
 - Build: `ENABLE_ADDITIONAL_EQUIPMENT_PAGE`
 
-`SwapItem` önce:
+`SwapItem` başında outer:
 `TItemPos srcCell(INVENTORY,...), destCell(EQUIPMENT,...)`
 
-oluşturuyor.
+oluşturuluyor; if/else içindeki aynı isimli tanımlar inner-scope olduğu için outer değerleri değiştirmiyor.
 
-Ardından if/else içinde tekrar:
-`TItemPos srcCell(...), destCell(...)`
-tanımlanıyor.
+Buna rağmen mevcut swap akışında gerçek Additional Equipment hedefi daha sonra bağımsız olarak belirleniyor:
+- `CheckAdditionalEquipment(wDestCell)`
+- `GetAdditionalEquipmentItem(wDestCell)`
+- `CItem::EquipTo`
+- `GetWear/SetWear`
+- `CheckAdditionalEquipment(bWearCell)`
 
-Bunlar yeni inner-scope değişkenler; outer `srcCell/destCell` değişmiyor.
-Dolayısıyla Additional Equipment seçimi için yazılmış görünen branch outer destination window'u hiçbir zaman `ADDITIONAL_EQUIPMENT_1` yapmıyor.
+Repo içinde görülen aktif çağrı da inventory itemı mevcut wear slotundaki itemla değiştiren `EquipItem` yoludur.
 
-Fonksiyonun ilerleyen kısımlarında ayrı `CheckAdditionalEquipment` kontrolleri bulunduğundan gerçek oyuncu etkisi runtime testiyle doğrulanmalı.
+Bu nedenle shadowing şu an için item duplication/loss/misplacement bugı olarak doğrulanmadı. Refactor sırasında yanlış güvenlik varsayımı yaratabileceği için cleanup/maintainability gözlemi olarak tutulur.
 
 ### BUG-SWITCHBOT-001 — Inter-core warp CSwitchbot memory leak
 - Statik durum: **çok yüksek güven / doğrudan ownership leak**
