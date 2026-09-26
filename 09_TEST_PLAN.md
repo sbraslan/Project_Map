@@ -457,3 +457,49 @@ Runtime server `item_proto` tablosu veya unpacked proto export üzerinde:
 için `size > 1` satırları ara.
 
 Kodun mevcut invariant'ı: `IsEmptySpecialItemGrid(..., bSize > 1) -> false`. Dataset'te böyle item varsa special auto-placement/movement uyumsuzluğu ayrıca sınıflandırılmalı.
+
+
+## Exchange / Trade — izole runtime test matrisi
+
+Bu testler yalnız local/dev server ve disposable test karakterleriyle yapılmalı.
+
+### EX-T01 — Special Inventory preflight/commit mismatch
+Amaç: BUG-EXCHANGE-001 partial transfer etkisini doğrulamak.
+
+Hazırlık:
+- alıcı normal inventory'de yeterli boş alan,
+- hedef special type inventory tamamen dolu,
+- gönderici offer sırasına önce normal item, ardından aynı special type item ekler.
+
+Beklenen güvenli davranış: accept öncesi trade tamamen reddedilmeli veya hiçbir item hareket etmeden rollback olmalı.
+Bug göstergesi: ilk normal item alıcıya geçer, special item space failure verir ve exchange kapanır.
+
+### EX-T02 — Page4 tek-slot / iki item
+Amaç: BUG-EXCHANGE-002'yi doğrulamak.
+
+Hazırlık:
+- alıcı page1-3 dolu,
+- page4 unlock edilmiş,
+- page4'te yalnız 1 adet size=1 boş slot,
+- gönderici 2 adet size=1 normal item offer eder.
+
+Beklenen güvenli davranış: preflight ikinci item için space yok diyerek commit öncesi reddetmeli.
+Bug göstergesi: accept başlar, ilk item transfer olur, ikinci itemda `Exchange::Done : Cannot find blank position` görülür ve ilk item rollback olmaz.
+
+### EX-T03 — Switchbot source window
+Amaç: BUG-EXCHANGE-003 server trust boundary etkisini doğrulamak.
+
+Modified test client/Python ile ITEM_ADD `TItemPos(SWITCHBOT, slot)` gönder.
+- inactive valid switchbot item
+- active switchbot item
+ayrı test edilmeli.
+
+Beklenen güvenli davranış: exchange source allowlist nedeniyle packet reddedilmeli.
+Mevcut statik beklenti: AddItem generic validity ile itemı kabul edebilir.
+
+### EX-T04 — Additional Equipment source
+Modified test client ile `TItemPos(ADDITIONAL_EQUIPMENT_1, wearCell)` offer et.
+Aktif/inaktif equipment page ve normalde `CanUnequipNow` engeli bulunan durumları ayrı test et.
+
+### EX-T05 — packet initialization
+Official clientte START sonrası ITEM_ADD/ACCEPT paketlerini debug packet dump ile izle; subheader dışı alanların deterministic zero olup olmadığını doğrula. Server `arg1` prelookup nedeniyle sporadic early-return logları ayrıca takip edilmeli.
