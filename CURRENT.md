@@ -1,7 +1,7 @@
 # CURRENT — Canonical Active Checkpoint
 
 **Active subsystem:** Hunting System
-**Status:** PARTIAL
+**Status:** PARTIAL — static audit nearly complete
 **Machine state:** `STATE.json`
 **Last updated:** 2026-09-26
 
@@ -19,23 +19,25 @@ Conditional:
 Do **not** reconstruct state from old chats. GitHub state is canonical.
 Do **not** read `archive/`, completed subsystem files, or legacy root maps unless recovery is required.
 
-## Current Hunting state
-Mapped:
-- server runtime: `game/src/char_hunting.cpp`
-- CG action dispatch: `input_main.cpp::ReciveHuntingAction`
-- kill progress hook: `char_battle.cpp::UpdateHuntingMission`
-- login/level bootstrap: `input_login.cpp::CheckHunting` + `char.cpp::CheckHunting`
-- client UI/send: `root/uihunting.py` + `m2netm2g.SendHuntingAction`
-- persistence: `hunting_system.*` quest flags
+## Closed this checkpoint
+- Hunting static mission/reward table declarations and initializer dimensions validated.
+- Levels 1-90 table contents checked for structural zero/missing pairs.
+- Money/EXP bands and random reward groups validated.
+- Client/server Hunting headers, structs, parser routing and sequence handling validated.
+- Quest-flag save lifecycle mapped.
+- Item-vs-quest persistence ordering mapped.
+- Mission-90 -> level-91 terminal behavior closed end-to-end.
+- New verified bug: `BUG-HUNT-005` crash-consistency item duplication window.
 
-Verified bugs: `BUG-HUNT-001..004`.
+Verified bugs: `BUG-HUNT-001..005`.
 
 ## Exact next work
-1. Validate all Hunting static mission/reward tables and exact dimensions.
-2. Finish client parser + packet-info/sequence audit.
-3. Audit reward item grant failure/ground fallback and claim crash atomicity.
-4. Verify quest-flag save/relogin behavior at reward boundaries.
-5. Close final mission level-90 behavior end-to-end.
+1. Validate the 62 unique Hunting reward VNUMs against the actual server item-proto dataset/export.
+2. Decide whether the unchecked `CreateItem(nullptr)` path is reachable with current data and should receive a new verified bug ID.
+3. Then mark Hunting STATIC COMPLETE and transition to the next subsystem/runtime phase.
+
+## Known blocker
+The checked-in `Project_DumpProto/tr/item_proto.txt` export is non-UTF8 and large; the GitHub connector cannot decode/read its content directly. No claim about missing reward VNUMs should be made until this dataset is read successfully.
 
 ## End-of-turn write rule
 When meaningful progress is made:
