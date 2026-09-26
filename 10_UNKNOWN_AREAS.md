@@ -255,3 +255,35 @@ Bu noktadan sonra Guild Storage için ek salt-okuma getirisi düşük; runtime t
 3. Special Inventory extend-feature build kombinasyonu
 4. Item subsystem genel checkpoint
 5. sonra bir sonraki ana sisteme geçiş.
+
+## Storage TItemPos caller audit — yeni durum
+
+### Kapatılan
+- Safebox/Mall/Guild Storage common checkout handler
+- window-aware client Python bindings
+- checkout occupancy/type checks
+- SWITCHBOT semantic validation farkı
+- ADDITIONAL_EQUIPMENT direct placement farkı
+- checkin source-window davranışı
+- Switchbot Unregister event davranışı
+- logout ClearItem bağlantısı.
+
+### Yeni buglar
+- BUG-ITEM-006: storage source/destination window allowlist eksikliği
+- BUG-SWITCHBOT-005: last-active Unregister event'i Stop etmiyor.
+
+### Açık runtime
+- official UI bu window kombinasyonlarını üretebiliyor mu
+- modified Python ile server sonucu
+- Additional Equipment direct checkout state corruption etkisi
+- Switchbot invalid item + START kombinasyonunun gerçek item-type etkisi
+- logout sonrası event sayısının profiler ile ölçümü.
+
+### AddToCharacter caller taramasında görülen diğer ana sınıflar
+- refine replacement: mevcut validated cell reuse
+- pickup: GetEmptyInventory / GetEmptyDragonSoulInventory sonucu
+- exchange/shop: precomputed empty position
+- quest rewards: empty-position helper
+- safebox/guild storage/mall: client TItemPos — **yüksek değerli trust boundary bulundu**.
+
+Bu nedenle BUG-ITEM-004 için en doğrudan crash trigger hâlâ bozuk DB/internal invalid pos; storage yolu ise bounds'tan çok window-semantic bypass sınıfına ayrıldı.
