@@ -43,4 +43,45 @@ Both `CPythonTicketLogs::Request` and Reply variant use:
 `if (m_vecData.size() < id)`.
 For `id == size()` the guard is false and `m_vecData[id]` is out of bounds.
 
+### BUG-TICKET-006 — non-NUL fixed-char Ticket subpackets can cause server out-of-bounds reads
+- Statik durum: **doğrulandı**
+- Sınıf: packet parsing / memory safety / client trust
+
+Ticket CG subpackets carry fixed char arrays such as:
+- `ticked_id[11]`
+- `title[33]`
+- `content[513]`
+- `reply[513]`
+- `char_name[13]`
+- `reason[33]`.
+
+`CInputMain::TicketSystem` validates only that the expected fixed subpacket byte count is present. It does not verify that each character field contains a terminating NUL inside its own array.
+
+The raw fields are then passed directly to `CTicketSystem::{Open,Create,Reply,Action}`, which call `strlen`, `strcmp`, build `std::string` values, and pass the fields to `%s` SQL/query formatting.
+
+A modified client can therefore fill a fixed array completely with nonzero bytes and make server string functions continue reading beyond the field boundary into adjacent packet/stack memory. This is an out-of-bounds read and can produce a crash or corrupted query/input interpretation.
+
+### BUG-TICKET-007 — normal-user ticket pagination contract is internally inconsistent
+- Statik durum: **doğrulandı**
+- Sınıf: client/server contract / pagination / data loss
+
+The three layers disagree on the number of normal-user ticket rows:
+
+Server:
+- `MAX_LOGS_GENERAL = 40`
+- `SendTicketLogs(LOGS_GENERAL)` queries up to 40 rows and sends `TSubPacketTicketLogsData.logs[40]`.
+
+C++ client:
+- `TICKET_MAX_LOGS_GENERAL = 10`
+- `CPythonTicketLogs::AddLogDetails` copies only `p.logs[0..9]` into the client vector.
+
+Python UI:
+- `TICKET_LOGS_PER_PAGE = 20`
+- `TICKET_MAX_PAGE_LOGS = 10`
+- page 1 reads indices 0..19 and later pages request local indices up to 199.
+
+There is no normal-user CG page request equivalent to the admin page-change packet. Therefore rows 10..39 already delivered by the server are discarded by the C++ cache, page 1 itself expects more rows than are cached, and pages 2..10 cannot be backed by server data.
+
+This is a deterministic static pagination/data-loss defect, not merely a cosmetic page-count mismatch.
+
 ## Dungeon Info — recovered canonical bugs
