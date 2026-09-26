@@ -438,3 +438,13 @@ Son active item MoveItem dışı bir yolla kaldırılırsa running event kalır.
 → yine `PASSES_PER_SEC(0.2f)` döndürerek schedule olur.
 
 Normal logout sırasında CHARACTER destructor → `ClearItem()` → SWITCHBOT item `RemoveFromCharacter` → UnregisterItem zinciri bulunduğundan bu kusur custom packet'e bağımlı değildir.
+
+### OBS-SWITCHBOT-002 — Client slot upper-bound off-by-one
+`PythonSwitchbot.cpp` Start/Stop bindingleri slot guard olarak:
+`if (bSlot > SWITCHBOT_SLOT_COUNT)`
+kullanıyor.
+
+Bu nedenle `slot == SWITCHBOT_SLOT_COUNT` client binding katmanından geçebilir.
+Server tarafındaki `ValidPosition(slot) -> slot < SWITCHBOT_SLOT_COUNT` bunu reddettiği için mevcut server state korunuyor.
+
+Doğru client-local sınır semantiği `>=` olmalı; şimdilik server tarafından absorbe edilen boundary observation.
