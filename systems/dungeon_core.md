@@ -197,3 +197,52 @@ Current source dungeon quests primarily use `d.new_jump_party` / `d.new_jump_all
 3. Audit participant registration and member sets under cross-core/private-map warp.
 4. Audit quest item-group removal and entry-item lifecycle.
 5. Continue spawn/unique/regen pointer lifecycle and promote only verified bugs.
+
+
+## Participant registry closure
+Under active `ENABLE_DUNGEON_RENEWAL`, participant state is:
+`std::map<uint32_t, std::string> m_Participants`.
+
+It stores PID and copied name only, not `LPCHARACTER`. Register/check/clear operations therefore do not retain character pointers across logout/core transitions. No dangling-character defect was found in this registry.
+
+## Unique mob pointer lifecycle closure
+`m_map_UniqueMob` does store raw `LPCHARACTER`, but the mapped destruction paths clean it:
+- normal dungeon mob death -> `CHARACTER::Dead -> GetDungeon()->DeadCharacter(this)`;
+- generic `CHARACTER_MANAGER::DestroyCharacter` also calls `dungeon->DeadCharacter(ch)` for dungeon monsters/stones before physical destruction;
+- `PurgeUnique` and `KillUnique` erase the unique-map entry before destroying/killing the character.
+
+`DeadCharacter` searches the unique map and erases the matching pointer. No additional normal unique-mob dangling pointer bug was found.
+
+## Live item-group quest path / cross-system reachability
+Devil Catacomb has an active timer flow:
+- `d.set_item_group("reapers_credit", ...)`
+- `d.exit_all_by_item_group("reapers_credit")`
+- `d.delete_item_in_item_group_from_all("reapers_credit")`.
+
+The item-group deletion path uses the same `CountSpecifyItem/RemoveSpecifyItem` primitives audited in Party Match.
+
+Relevant item vnums are 30319, 30320 and 76002. Their runtime item-proto anti-give/exchange flags are not present in the mapped repositories, so exchangeability of these specific items cannot be proven statically. The Party Match exchange UAF is therefore not duplicated as a Dungeon bug without that missing proto fact.
+
+The same Devil Catacomb `exit_all_by_item_group` path has a different confirmed cross-system consequence:
+- for a party member without the required item, it may call `pParty->Quit(ch->GetPlayerID())` when party size is greater than 2;
+- if that member is the party leader, it reaches the already verified BUG-PARTY-001 self-delete/use-after-free path.
+
+This adds a live dungeon-quest reachability path to BUG-PARTY-001 but is not assigned a duplicate Dungeon bug ID.
+
+## Dungeon Lua getter audit
+The following Lua getters contain a suspicious validation guard requiring two numeric Lua arguments even though the implementation does not use those arguments:
+- `d.get_kill_stone_count`
+- `d.get_kill_mob_count`
+- `d.is_use_potion`
+- `d.revived`.
+
+An arg-less call therefore returns the fallback value rather than current dungeon state.
+
+However all 98 non-generated source `.quest` files under `share/locale/europe/quest` were statically checked and no current call to these four APIs was found. They remain dormant API defects, not promoted current-gameplay bugs.
+
+## Exact next audit
+1. Audit regen list/event lifetime and ClearRegen ordering.
+2. Audit spawn/purge/kill bulk operations under pending-destroy iteration.
+3. Audit dungeon unique alias edge cases and SetUnique multi-key behavior.
+4. Close nested JumpParty ownership as dormant vs reachable.
+5. Continue toward Dungeon Core STATIC COMPLETE.
