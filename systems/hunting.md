@@ -1,6 +1,6 @@
 # hunting
 
-**Status:** PARTIAL — ACTIVE (static audit nearly complete)
+**Status:** STATIC COMPLETE
 
 > Canonical subsystem history split from legacy `00_PROGRESS.md`. Read this file only when this subsystem is active or explicitly revisited.
 
@@ -82,7 +82,17 @@ Content checks:
 - random reward entries have nonzero VNUM/count values.
 - Final `THuntingMissions` source comment says `// Lv80`, but physical position is index 90; this is a comment typo, not runtime logic.
 
-The remaining data-compatibility check is to compare the 62 unique Hunting reward VNUMs against the actual server item-proto dataset. The repository export is non-UTF8 and the GitHub connector cannot currently decode that large file, so no missing-proto claim is recorded.
+## Reward VNUM data audit — COMPLETE
+Hunting uses 62 unique nonzero item VNUMs across fixed race rewards and random reward tables.
+
+The checked-in `tr/item_proto.txt` export is non-UTF8 and cannot be decoded directly by the GitHub connector. As an independent index from the same DumpProto snapshot, `tr/item_names.txt` is readable and contains all 62/62 Hunting reward VNUMs with valid item names.
+
+`DumpProto_Unpack.bat` invokes `DumpProto -umi`, i.e. the checked-in item/mob unpack flow that produced the proto/name artifacts in this snapshot.
+
+Result:
+- missing reward VNUMs in the readable dump index: **0**
+- no current snapshot evidence that a configured Hunting reward references a nonexistent item.
+- because `item_names.txt` is an index rather than the GAME loader's runtime `TItemTable`, the unchecked `CreateItem(nullptr)` path remains a defensive robustness defect, but it is not promoted to a separate current-data verified bug.
 
 ## Packet/parser/sequence audit — COMPLETE
 Client/server values agree:
@@ -118,7 +128,7 @@ Therefore Hunting reward grant and reward-flag clearing are not one DB transacti
 `ReciveHuntingRewards()` creates both item rewards with `ITEM_MANAGER::CreateItem` and never checks for `nullptr`.
 `CreateItem` can return `nullptr` for an invalid/missing proto or creation failure. In that case the current code can dereference the null pointer during inventory/ground handling.
 
-This is a confirmed null-safety defect in the code path, but current-table reachability is not promoted to a separate verified bug until the actual server item-proto dataset can be checked.
+This is a confirmed null-safety defect in the code path. The current dump snapshot contains all 62 configured Hunting reward VNUMs in its item-name index, so there is no evidence that normal configured rewards reach this failure through a missing VNUM. It remains a defensive/fault-injection risk rather than a separate verified current-data bug.
 
 The full-inventory fallback calls `AddToGround()`, but ignores its boolean result and clears the reward flags afterward. A failed ground insertion is therefore also a reward-loss risk; normal connected-player reachability still needs runtime/fault-injection validation.
 
@@ -141,10 +151,21 @@ This confirms BUG-HUNT-004 end-to-end.
 - BUG-HUNT-004: final mission 90 claim advances level to 91 with no server terminal guard.
 - BUG-HUNT-005: reward item persistence can commit before reward quest flags, allowing duplicate claim after a GAME crash.
 
-## Remaining before static close
-1. Verify the 62 unique Hunting reward VNUMs against the actual server item-proto dataset/export.
-2. If all VNUMs exist, classify the `CreateItem(nullptr)` path as defensive robustness only; otherwise promote it to a verified crash bug.
-3. Then mark Hunting STATIC COMPLETE and move to the next subsystem/runtime phase.
+## Static close
+Hunting System is **STATIC COMPLETE**.
+
+Closed dimensions:
+- state machine / authorization
+- mission/reward static tables
+- reward VNUM snapshot validation
+- client/server packet headers, struct sizes, parser routing and sequence
+- quest/item/player persistence and crash ordering
+- final mission 90 terminal behavior
+- runtime/fault-injection test plan
+
+Verified bugs remain `BUG-HUNT-001..005`.
+
+Next canonical subsystem: **Ticket System**.
 
 ## Related
 - Bugs: `../bugs/hunting.md`
