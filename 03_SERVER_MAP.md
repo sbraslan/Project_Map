@@ -953,3 +953,36 @@ Final accept does not revalidate recipient gold overflow.
 Cheque has a late overflow check inside `Done()`, but it occurs after item and gold mutations.
 
 See BUG-EXCHANGE-001..004.
+
+
+## Exchange — lifecycle ve currency ikinci tur
+
+### Distance lifecycle
+CHARACTER::ExchangeStart başlangıçta DISTANCE_APPROX(...) < EXCHANGE_MAX_DISTANCE(1000) şartını uygular.
+
+Fakat CInputMain::Move exchange state kontrol etmez, CHARACTER::OnMove exchange cancel etmez ve CExchange::Accept final mesafeyi tekrar doğrulamaz.
+
+Official uiexchange.py::OnUpdate >1000 mesafede SendExchangeExitPacket() gönderir; bu yalnız client policy'dir.
+
+Sonuç: server trust boundary'de exchange mesafesi START sonrasında enforce edilmez.
+
+### Death / disconnect / warp
+- CHARACTER teardown/destruction: açık exchange Cancel().
+- CHARACTER::Dead: açık exchange Cancel().
+- ENABLE_CHECK_WINDOW_RENEWAL aktiftir; SetExchange W_EXCHANGE opened-window bitini yönetir.
+- CanWarp() W_EXCHANGE dahil açık window varsa false döner.
+- WarpSet() doğrudan çağrıldığında kendi içinde exchange kontrolü/cancel yoktur; standart callerlar için CanWarp koruması ayrıca önemlidir.
+
+### Gold cap TOCTOU
+ELK_ADD handler offer anında recipient current gold + offered gold < GOLD_MAX kontrolü yapar.
+
+PickupItem exchange state kontrol etmez, CanHandleItem() çağırmaz ve ITEM_ELK ise GiveGold(item->GetCount()) çalıştırır. Party distribution da nearby member'ın gold'unu exchange açıkken değiştirebilir.
+
+Final CExchange::Check() sender balance'ı doğrular fakat receiver gold cap'i tekrar kontrol etmez.
+
+CExchange::Done() sırası: sender PointChange(POINT_GOLD, -m_lGold), ardından receiver PointChange(POINT_GOLD, +m_lGold).
+
+POINT_GOLD receiver overflow halinde loglayıp return eder. PointChange void olduğu için Done() başarısızlığı algılamaz ve sender debit rollback edilmez.
+
+### Cheque farkı
+Cheque için Done() içinde receiver cap finalde tekrar kontrol edilir. Ancak bu check item ve gold transferlerinden sonra gelir. Dolayısıyla cheque cap failure da daha önce commit edilmiş item/gold değişikliklerini rollback etmez.
