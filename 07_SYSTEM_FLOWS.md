@@ -1046,3 +1046,57 @@ Persistence:
 all runtime state remains on CHARACTER until `OnLogout`
 -> DB cache
 -> later multi-table flush.
+
+
+## Achievement System — completed caller / shop / persistence flow
+
+Config lifecycle:
+`main.cpp -> CAchievementSystem::Initialize -> achievements.xml`
+(one boot-time load; no mapped Achievement runtime reload command).
+
+Player state:
+DB `achievement_data + achievements + achievement_tasks`
+-> DB serialized map
+-> GAME `ProcessDBPackets`
+-> merge missing current task IDs
+-> `OnLogin`
+-> runtime `TAchievementsMap + points + selected title`.
+
+Gameplay caller coverage:
+- combat/death: `char_battle.cpp`
+- level/playtime/speed: `char.cpp`
+- pet: `PetSystem.cpp`
+- toggle/refine/item collect: `char_item.cpp`
+- fishing/grill: `fishing.cpp`
+- guild war: `guild_manager.cpp`
+- damage/skill: `char_skill.cpp`
+- trade: `exchange.cpp`
+- social: guild/messenger/input_main/party
+- dungeon: `dungeon.cpp`
+- explore: login-only `OnVisitMap`.
+
+Configured-but-unwired task families:
+`SUMMON_MOUNT`, `SPEND_SEARCH_SHOP`, `SPEND_SHOP`, `WITHDRAW`.
+
+Achievement Shop:
+`CG OPEN_SHOP`
+-> `Get(104)`
+-> `AddGuest`
+-> ShopEx tab CoinType Achievement
+-> Buy
+-> check Achievement points
+-> create item / find slot
+-> debit in-memory Achievement points
+-> AddToCharacter
+-> immediate item FlushDelayedSave.
+
+Persistence mismatch:
+item can become durable immediately, Achievement points/completion/title state is exported only by `OnLogout` to the DB cache.
+
+Force-finish:
+`GM_IMPLEMENTOR /force_finish_achievement` OR trusted quest `pc.finish_achievement`
+-> `FinishAchievement`
+-> overwrite task map with finished marker
+-> update/notification
+-> `RewardPlayer`.
+No already-finished guard exists inside `FinishAchievement`.
