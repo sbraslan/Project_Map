@@ -29,7 +29,8 @@ This is the navigation index. Normal continuation starts at `STATE.json`, then `
 | Hunting System | STATIC COMPLETE | `systems/hunting.md` |
 
 ## Current phase
-- Runtime / in-game validation: `RUNTIME.md`
+- **Detection / mapping only.** Source and game repositories remain read-only.
+- Deferred runtime/fault-injection inventory: `RUNTIME.md` (documentation only; not active execution).
 
 ## Supporting files
 Each subsystem can have:
