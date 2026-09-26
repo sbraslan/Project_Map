@@ -81,3 +81,16 @@ Beklenen: kişisel award guild bank'a taşınmamalı.
 - `safebox.gold` değerini tekrar kontrol et.
 Beklenen güvenli davranış: kişisel safebox gold değişmemeli.
 Mevcut statik kod beklentisi: 0'a yazılma riski var.
+
+### GS-T16 — Core restart while storage open
+- En az iki game core/channel bulunan kontrollü test ortamı.
+- Core A'da Guild Storage açık tutulur.
+- Core B yeniden başlatılır.
+- DB'de `guildstoragestate/guildstoragewho` gözlenir.
+- Core B veya üçüncü core'dan aynı guild storage açılmaya çalışılır.
+
+Beklenen güvenli davranış:
+Aktif Core A lock'ı korunmalı ve ikinci açılış reddedilmeli.
+
+Mevcut statik kod beklentisi:
+Core B startup DB state'i 0'a çeker; cross-core erişim riski oluşur.
