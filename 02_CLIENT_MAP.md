@@ -185,3 +185,51 @@ Client receiver:
 → UI refresh.
 
 Packet struct içindeki `uint8_t vnum` alanı receiver tarafından okunmuş struct içinde bulunmasına rağmen item index güncellemesi için kullanılmıyor.
+
+## Switchbot — client zinciri
+
+### UI
+`Project_Binary/root/uiswitchbot.py`
+
+Item yerleştirme:
+- INVENTORY → SWITCHBOT: window-aware `SendItemMovePacket`
+- SWITCHBOT → SWITCHBOT: aynı move packet yolu
+- SWITCHBOT → INVENTORY: inventory UI tarafından aynı generic move sistemi.
+
+UI Start koruması:
+`__RefreshButtons()`
+→ selected slot boşsa veya hiçbir attribute configure edilmemişse Start/Stop disable.
+
+### Python module
+`Project_ClientSrc/UserInterface/PythonSwitchbot.cpp`
+
+`switchbot.Start(slot)`
+→ configured alternatives alınır
+→ `CPythonNetworkStream::SendSwitchbotStartPacket`.
+
+`switchbot.Stop(slot)`
+→ `SendSwitchbotStopPacket`.
+
+Not:
+Binding tarafında `if (bSlot > SWITCHBOT_SLOT_COUNT)` kullanılıyor.
+Bu nedenle tam `SLOT_COUNT` değeri client binding'den geçebilir; server tarafı `slot < SLOT_COUNT` ile yeniden doğrular.
+
+### Network
+`PythonNetworkStreamPhaseGame.cpp`
+
+Start:
+`HEADER_CG_SWITCHBOT`
+→ `SUBHEADER_CG_SWITCHBOT_START`
+→ 5 alternative table
+→ `SendSequence()`.
+
+Stop:
+`HEADER_CG_SWITCHBOT`
+→ `SUBHEADER_CG_SWITCHBOT_STOP`
+→ `SendSequence()`.
+
+Receive:
+`HEADER_GC_SWITCHBOT`
+→ UPDATE: local CPythonSwitchbot table refresh
+→ UPDATE_ITEM: SWITCHBOT TItemPos üzerindeki count/socket/attribute refresh
+→ SEND_ATTRIBUTE_INFORMATION: allowed attribute/max-value map refresh.
