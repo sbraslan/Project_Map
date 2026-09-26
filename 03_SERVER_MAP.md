@@ -897,3 +897,59 @@ Normal `MoveItem` içindeki:
 - active Switchbot source block
 - Additional Equipment `CanUnequipNow`
 semantik guardları Exchange AddItem yolunda yoktur.
+
+
+## Player Exchange — server transaction map
+
+Primary implementation: `game/src/exchange.cpp`.
+
+### Session lifecycle
+`CHARACTER::ExchangeStart(victim)` validates:
+- self/NPC/observer
+- block mode
+- distance < `EXCHANGE_MAX_DISTANCE`
+- existing exchange
+- conflicting safebox/shop/cube/guildstorage/aura/changelook/mail/attr windows
+- growth-pet states.
+
+Then creates one `CExchange` per player and links them with `m_pCompany`.
+
+`CExchange::Cancel()`:
+- sends END
+- owner `SetExchange(nullptr)`
+- remaining `m_apItems` -> `SetExchanging(false)`
+- detaches company pointer
+- recursively cancels peer
+- deletes exchange object.
+
+`CHARACTER::Destroy()` also cancels an existing exchange.
+
+### Preflight
+`Check()` validates sender still owns offered currency and every offered item pointer still equals `GetItem(original TItemPos)`.
+
+`CheckSpace()` snapshots recipient storage into temporary grids and attempts to reserve destination space.
+
+Important mismatches:
+- DS has dedicated simulation.
+- non-DS always uses regular inventory grids; special inventory routing is absent.
+- page4 reservation contains control-flow bug; `Put` is conditional when it should be unconditional after fit checks.
+
+### Commit
+`Done()` is incremental:
+1. choose destination for each item
+2. sender `RemoveFromCharacter`
+3. recipient `AddToCharacter`
+4. flush item save
+5. after all items, transfer gold
+6. then cheque.
+
+There is no rollback journal/transaction. Any later false/overflow leaves earlier mutations applied.
+
+### Currency
+Offer-time recipient overflow is checked in `CInputMain::Exchange(ELK_ADD)`.
+Final accept does not revalidate recipient gold overflow.
+`PointChange(POINT_GOLD/CHEQUE)` is void and early-returns on overflow; caller cannot distinguish success.
+
+Cheque has a late overflow check inside `Done()`, but it occurs after item and gold mutations.
+
+See BUG-EXCHANGE-001..004.
