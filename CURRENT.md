@@ -20,35 +20,34 @@ Strictly read-only:
 No C++, Python, quest, config, game-data, source or binary file may be edited, committed or pushed.
 
 ## Ranking checkpoint
-New unmapped subsystem opened: **Ranking System**.
+Mapped this turn:
+- targeted P2P sender audit: `TPacketGGLoadRanking` receiver/struct found, outbound sender still not found;
+- ranker effects are direct affect-flag bits, not normal `CAffect` entries in the mapped path;
+- dynamic BattleField ranking packet boundary handling audited;
+- BattleField ranking reload call sites audited against the active source configuration.
 
-Mapped:
-- server ranking manager and BattleField DB lifecycle;
-- BattleField score persistence / weekly rollover;
-- P2P ranking-reload receive path;
-- GC dynamic ranking packet;
-- client C++ ranking cache;
-- Python ranking module;
-- active BattleField ranking UI;
-- generic ranking-board integration.
+New verified bugs:
+- `BUG-RANK-005` — malformed dynamic ranking size can underflow/cross the declared packet boundary.
+- `BUG-RANK-006` — active BattleField source calls unresolved `LoadRanking(RK_CATEGORY_BF)`.
 
-Verified bugs:
-- `BUG-RANK-001` — empty ranking vector indexed with `&vec[0]`.
-- `BUG-RANK-002` — current-player ranking API is a hard-coded empty stub.
-- `BUG-RANK-003` — weekly winner table can retain stale prior-week positions.
-- `BUG-RANK-004` — BattleField close reloads cache before final player scores are persisted.
+Previously verified:
+- `BUG-RANK-001`
+- `BUG-RANK-002`
+- `BUG-RANK-003`
+- `BUG-RANK-004`
 
 ## Not promoted yet
-- PARTY ranking UI references Python APIs that are not exported, but no live PARTY opener has been located.
-- Generic SOLO categories 2..7 lack UI name entries, but no live opener has been located.
-- Ranker winner effects are not visibly refreshed for already-online players on ranking reload; exact lifecycle still needs closure.
+- No outbound `TPacketGGLoadRanking` sender has been located; cross-channel stale-cache impact needs OpenBattleUI reachability.
+- Ranker winner bits are not cleared in the mapped lifecycle; repo-wide direct-reset search still needs closure.
+- Generic PARTY ranking APIs are absent from the Python module, but no live PARTY opener has been located.
+- Generic SOLO categories 2..7 still lack UI name entries, but no live opener has been located.
 
 ## Exact next work
-1. Locate the exact outbound `TPacketGGLoadRanking` sender/broadcast path.
-2. Close ranker-effect refresh/removal lifecycle.
+1. Map all live callers of `CBattleField::OpenBattleUI` and test the missing-P2P-sender stale-cache hypothesis statically.
+2. Finish repo-wide direct-reset search for `AFF_BATTLE_RANKER_1..3`.
 3. Determine whether any active caller opens generic PARTY ranking.
-4. Audit dynamic GC ranking packet malformed-size handling.
-5. Audit remaining DB/result null boundaries and decide Ranking STATIC COMPLETE.
+4. Audit remaining ranking SQL/result null boundaries.
+5. Reconcile BUG-RANK-006 with actual build entry points/configuration, then decide Ranking STATIC COMPLETE.
 
 ## Startup
 For the next normal "ilerleyelim":
