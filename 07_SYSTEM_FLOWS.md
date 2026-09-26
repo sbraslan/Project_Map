@@ -553,3 +553,53 @@ Known divergences:
 - Special Inventory: CheckSpace regular-grid, Done type-aware `GetEmptyInventory(item)`.
 - Extend inventory page 4: CheckSpace reservation control-flow bug.
 - Source TItemPos: semantic window allowlist yok.
+
+
+## Exchange / Trade — uçtan uca
+
+Normal item offer:
+`uiexchange.SelectOwnerEmptySlot`
+→ `netSendExchangeItemAddPacket`
+→ `SendExchangeItemAddPacket(TItemPos, displayPos)`
+→ `HEADER_CG_EXCHANGE / ITEM_ADD`
+→ `CInputMain::Exchange`
+→ `CExchange::AddItem`
+→ item `SetExchanging(true)`
+→ GC ITEM_ADD iki tarafa.
+
+Commit:
+iki taraf ACCEPT
+→ `CExchange::Accept`
+→ iki taraf `Check`
+→ iki taraf `CheckSpace`
+→ DB cache bağlantı kontrolü
+→ ilk `Done`
+→ ikinci `Done`
+→ save/log
+→ recursive `Cancel` teardown.
+
+### Atomicity failure flow — Special Inventory
+A tarafı offer listesinde önce normal item, sonra special item bulundurur.
+B tarafının normal inventory'sinde preflight için alan vardır; ilgili special type inventory doludur.
+
+`CheckSpace(A)` normal grid üzerinde iki item için de alan görür
+→ accept devam eder
+→ `Done(A)` normal itemı B'ye taşır
+→ special item için `GetEmptyInventory(item)` special range'e gider
+→ boş slot yok, `Done=false`
+→ exchange cancel olur
+→ ilk taşınan item rollback edilmez.
+
+### Atomicity failure flow — page 4
+B'nin page1-3'ü dolu; unlocked page4'te tek bir uygun size=1 slot kalmıştır.
+A iki size=1 normal item gönderir.
+
+`CheckSpace(A)` ilk item için page4 blank bulur fakat `s_grid4.Put()` çalışmaz
+→ ikinci item aynı blank slotu tekrar bulur
+→ preflight true
+→ `Done(A)` ilk itemı taşır
+→ ikinci item gerçek inventory'de boşluk bulamaz
+→ false + cancel
+→ ilk transfer rollback edilmez.
+
+Bu iki yol aynı temel invariant ihlalini gösterir: **preflight placement modeli ile commit placement modeli eşdeğer değil ve commit rollback'sizdir.**
