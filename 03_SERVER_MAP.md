@@ -986,3 +986,24 @@ POINT_GOLD receiver overflow halinde loglayıp return eder. PointChange void old
 
 ### Cheque farkı
 Cheque için Done() içinde receiver cap finalde tekrar kontrol edilir. Ancak bu check item ve gold transferlerinden sonra gelir. Dolayısıyla cheque cap failure da daha önce commit edilmiş item/gold değişikliklerini rollback etmez.
+
+
+## Exchange — BUG-EXCHANGE-003 concrete effects
+
+### Active Switchbot source
+CExchange::AddItem generic valid SWITCHBOT TItemPos'u kabul eder ve active-slot kontrolü yapmaz.
+
+CSwitchbot::SwitchItems aktif slot için table'daki item_id ile ITEM_MANAGER::Find(item_id) yapar; item->IsExchanging kontrolü yoktur. Item trade offer'dayken ChangeAttribute() çalışabilir.
+
+Bu nedenle GC ITEM_ADD sırasında karşı tarafa gönderilen socket/attribute snapshot accept anına kadar değişebilir.
+
+Transfer sırasında RemoveFromCharacter -> SetItem(SWITCHBOT,nullptr) -> CSwitchbotManager::UnregisterItem çağrısı active flag'i kapatır. Yani asıl integrity problemi offer ile commit arasındaki mutable item state'tir.
+
+### Additional Equipment source
+TItemPos::IsEquipPosition yalnız EQUIPMENT window için true; ADDITIONAL_EQUIPMENT_1 ayrı helper ile tanınır.
+
+Normal MoveItem Additional Equipment source için CanUnequipNow çağırır. Bu helper ITEM_FLAG_IRREMOVABLE, empty-space ve açık refine/window kısıtlarını uygular.
+
+Exchange AddItem bu helperı çağırmaz. Done -> RemoveFromCharacter -> Unequip yolu da ITEM_FLAG_IRREMOVABLE kontrolü yapmaz.
+
+Sonuç: modified client ile ADDITIONAL_EQUIPMENT_1 source üzerinden normal move/unequip semantiğinin dışında equipped item transferi mümkündür.
