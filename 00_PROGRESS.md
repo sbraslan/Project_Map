@@ -345,3 +345,58 @@ Cross-core warp:
 - Switchbot cross-core runtime testi
 - Additional Equipment SwapItem runtime etkisi
 - Item subsystem genel checkpoint ve kalan internal AddToCharacter caller taraması.
+
+## Checkpoint — storage TItemPos caller audit
+
+`AddToCharacter` internal caller taraması storage yollarına genişletildi.
+
+### Yeni doğrulama
+Aynı server fonksiyonu:
+`CInputMain::SafeboxCheckout`
+
+şu üç kaynaktan çağrılıyor:
+- personal Safebox
+- Item Mall
+- Guild Storage.
+
+Checkout packet içindeki destination `TItemPos` client-controlled.
+
+Server:
+`IsEmptyItemGrid(p->ItemPos,...)`
+ile occupancy/range kontrolü yapıyor fakat destination window için explicit allowlist uygulamıyor.
+
+`IsEmptyItemGrid` ise:
+- SWITCHBOT
+- ADDITIONAL_EQUIPMENT_1
+windowlarını geçerli destination olarak destekliyor.
+
+Sonuç:
+normal MoveItem yolundaki bazı semantik kontroller storage checkout'ta atlanabiliyor.
+
+Özellikle:
+- SWITCHBOT destination için `SwitchbotHelper::IsValidItem` çağrılmıyor.
+- ADDITIONAL_EQUIPMENT_1 destination için equip eligibility / page-state kontrolü yapılmıyor.
+
+Client Python binding de checkout için 3 arg formunda `window_type` değerini doğrudan kabul ediyor.
+
+### Checkin yönü
+`SafeboxCheckin` source `TItemPos` için de window allowlist kullanmıyor.
+Active SWITCHBOT itemı normal MoveItem engeline uğramadan checkin yoluna sokulabilir.
+
+### Switchbot event detayı
+`CSwitchbotManager::UnregisterItem`:
+- item ID'yi sıfırlar
+- active=false yapar
+- config temizler
+fakat son active slot kaldırıldığında running event'i Stop etmez.
+
+Bu nedenle logout/ClearItem veya alternatif remove yolu sırasında boş event yaşamaya devam edebilir.
+
+### Yeni kayıtlar
+- BUG-ITEM-006: storage checkin/checkout destination/source window validation gap.
+- BUG-SWITCHBOT-005: UnregisterItem son active slotta event'i durdurmuyor.
+
+### Sıradaki
+- storage-window bypass runtime matrisi
+- Additional Equipment özel etkisi
+- AddToCharacter kalan internal caller sınıflandırması.
