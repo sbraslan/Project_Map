@@ -535,3 +535,17 @@ Official UI item eklerken yalnız `INVENTORY` ve `DRAGON_SOUL_INVENTORY` source 
 3. Cancel / disconnect / death / distance lifecycle'ını kapat.
 4. Exchange persistence/DB flush ordering'ini haritala.
 5. Ardından runtime test matrisi oluştur.
+
+
+## Checkpoint — Player Exchange static completion
+
+**Tarih:** 2026-09-26
+
+Player-to-player Exchange subsystem statik olarak completion seviyesine ulaştı.
+
+Canonical bugs: BUG-EXCHANGE-001..004.
+Runtime plan: EXCHANGE-T01..T05.
+
+Source repolara değişiklik yapılmadı. Tüm ilerleme yalnız `Project_Map` içine kaydedildi.
+
+Sonraki statik öncelik: Shop / Private Shop ownership-purchase transaction flow; Inventory ve Exchange ile ortak item/gold sınırları nedeniyle sıradaki mantıklı subsystem.
