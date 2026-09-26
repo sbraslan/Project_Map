@@ -246,3 +246,75 @@ However all 98 non-generated source `.quest` files under `share/locale/europe/qu
 3. Audit dungeon unique alias edge cases and SetUnique multi-key behavior.
 4. Close nested JumpParty ownership as dormant vs reachable.
 5. Continue toward Dungeon Core STATIC COMPLETE.
+
+
+## Regen lifetime audit — CLOSED
+**Tarih:** 2026-09-27
+
+Dungeon regen lifetime was traced end-to-end through `regen.cpp`, `dungeon.cpp` and `CHARACTER::Destroy`.
+
+For persistent dungeon regen:
+- `regen_do` allocates a `REGEN`, stores the dungeon ID in `dungeon_regen_event_info`, creates the event, and registers the pointer through `CDungeon::AddRegen`;
+- `ClearRegen` cancels each `regen->event`, deletes the `REGEN`, then clears `m_regen`;
+- `dungeon_regen_event` resolves the dungeon by ID before using its regen payload;
+- spawned characters keep both the raw regen pointer and the copied `regen_id_`;
+- `CHARACTER::Destroy` does not dereference the stored regen until `CDungeon::IsValidRegen(pointer,id)` succeeds;
+- `IsValidRegen` first checks that the pointer still exists in the current dungeon regen vector and only then reads its ID.
+
+Therefore a character that survives `ClearRegen` may still retain the old pointer value, but the current destruction path rejects it without dereferencing the freed `REGEN`. No additional verified bug was promoted from this path.
+
+## Bulk purge / kill iteration audit — CLOSED
+`CDungeon::KillAll`, `Purge` and `KillMonsters` iterate through `SECTREE_MAP::for_each`.
+
+That helper first collects entities into an `FCollectEntity` snapshot and only then invokes the destructive callback. Removing characters/items from their sectree during the callback therefore does not invalidate the map traversal itself.
+
+`CHARACTER_MANAGER::DestroyCharacter` also prevents duplicate destruction by checking the VID map, and supports deferred destruction when the pending-destroy mode is active.
+
+No deterministic Dungeon Core iterator invalidation was established for the mapped bulk purge/kill paths.
+
+A lower-level `SECTREE::for_each_entity` stale-relationship branch erases from its entity set in-place with questionable iterator handling, but no normal path producing that stale relationship has been mapped. It remains unpromoted defensive debt.
+
+## Unique alias audit
+
+### BUG-DUNGEON-002 — SpawnMoveUnique can spawn up to 100 mobs for one requested unique key
+`CDungeon::SpawnMoveUnique` has a 100-attempt loop.
+
+On a successful spawn it:
+- inserts `key -> ch` into `m_map_UniqueMob`;
+- marks the mob with the dungeon-unique affect;
+- binds it to the dungeon;
+- sends it toward the target area;
+- but does **not** break or return.
+
+The loop therefore continues after success. If spawning keeps succeeding, a single `d.spawn_move_unique(...)` call can create up to 100 mobs.
+
+Because `m_map_UniqueMob` is a `std::map` and insertion uses `insert`, only the first successful pointer is registered for that key. Later mobs remain alive in the dungeon but are not addressable through the requested unique key.
+
+The Lua API is registered as `d.spawn_move_unique`, so the defect exists at the public dungeon-script surface.
+
+### BUG-DUNGEON-003 — multi-key SetUnique aliases can leave dangling raw pointers
+`CDungeon::SetUnique(key, vid)` permits the same character VID to be inserted under multiple different string keys. No uniqueness-by-pointer invariant is enforced.
+
+`CDungeon::DeadCharacter(ch)`, however, scans `m_map_UniqueMob`, erases only the **first** entry whose pointer equals `ch`, then breaks.
+
+Consequences depend on destruction path:
+- direct destruction through generic `CDungeon::Purge` reaches `CHARACTER_MANAGER::DestroyCharacter` once; with two aliases, only one is removed before the character object is deleted and another alias remains stale;
+- normal mob death calls `DeadCharacter` once from `CHARACTER::Dead`, and later destruction calls it again; three or more aliases still leave at least one stale entry.
+
+Consumers including `GetUniqueVid`, `IsUniqueDead`, `GetUniqueHpPerc`, `UniqueSetMaxHP`, `UniqueSetHP` and `UniqueSetDefGrade` dereference the stored raw pointer.
+
+Therefore registered Lua `d.set_unique` can construct a dangling-pointer/UAF surface by assigning one mob to multiple unique keys.
+
+## Nested JumpParty ownership — still unpromoted
+`CDungeon::JumpParty` enforces ownership only while `pParty->GetDungeon_for_Only_party() == nullptr`.
+
+If that pointer is already non-null, the function does not check whether it equals the destination dungeon and proceeds to warp matching party members. This can theoretically place a party into Dungeon B while its exclusive pointer still names Dungeon A and while Dungeon B never sets `m_pParty`.
+
+The semantic invariant is weak, but no current source quest nested/re-entry call chain has yet been established. It remains a candidate until live source-script reachability is found.
+
+## Exact next audit
+1. Scan current source quests for live `d.spawn_move_unique` / multi-key `d.set_unique` usage and nested `d.new_jump_party` transitions.
+2. Close duplicate-key behavior for `SpawnUnique` / `SetUnique` and classify current-script reachability.
+3. Revisit dungeon manager ID wrap/stale-event identity safety.
+4. Close remaining eliminate-event null-ordering candidate.
+5. Decide Dungeon Core STATIC COMPLETE.
