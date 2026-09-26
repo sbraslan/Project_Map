@@ -94,3 +94,56 @@ Aktif Core A lock'ı korunmalı ve ikinci açılış reddedilmeli.
 
 Mevcut statik kod beklentisi:
 Core B startup DB state'i 0'a çeker; cross-core erişim riski oluşur.
+
+### GS-T17 — Bank auth revoke while storage open
+1. Oyuncu A'ya `GUILD_AUTH_BANK` ver.
+2. A Guild Storage açsın.
+3. Leader A'nın grade'ini bank yetkisiz grade'e değiştirsin veya mevcut grade'den bank auth bitini kaldırsın.
+4. A mevcut açık pencereden item checkin ve checkout denesin.
+
+Beklenen güvenli davranış:
+Session hemen kapanmalı veya sonraki packet reddedilmeli.
+
+Mevcut statik beklenti:
+İşlemler devam edebilir.
+
+### GS-T18 — Remove member while storage open
+1. A Guild Storage açsın.
+2. Yetkili B, A'yı guildden çıkarsın.
+3. A:
+   - item koymayı
+   - item çekmeyi
+   - storage kapatmayı
+   - logout/reconnect'i
+   ayrı ayrı denesin.
+4. Core log/core dump izle.
+
+Mevcut statik beklenti:
+Birden fazla null dereference/core crash yolu mevcut.
+
+### GS-T19 — Pending load + member removal
+1. DB load gecikmesi oluştur.
+2. A open request yollasın.
+3. Response gelmeden A guildden çıkarılsın.
+4. Response sonrası DB `guildstoragestate`, `guildstoragewho` ve karakter `m_bOpeningGuildstorage` davranışı kontrol edilsin.
+
+Risk:
+stuck lock.
+
+### GS-T20 — Disband with stored items
+1. Test guild bank'a benzersiz item ID'leri koy.
+2. Guild'i disband et.
+3. DB item tablosunda:
+   `owner_id=<oldGuildID> AND window='GUILDBANK'`
+   satırlarını kontrol et.
+
+Beklenen güvenli davranış:
+Item lifecycle açık bir politika ile cleanup/archive edilmeli.
+
+Mevcut statik beklenti:
+rows orphan kalıyor.
+
+### GUILD-T01 — Offline member remove with PulseManager
+- `ENABLE_PULSE_MANAGER` aktif test build.
+- Offline guild member'ı çıkar.
+- Core crash/log kontrolü.
