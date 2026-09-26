@@ -22,7 +22,7 @@ This is the navigation index. Normal continuation starts at `STATE.json`, then `
 | Safebox / Mall | STATIC COMPLETE | `systems/safebox_mall.md` |
 | Mailbox | STATIC COMPLETE | `systems/mailbox.md` |
 | Ticket System | STATIC COMPLETE | `systems/ticket.md` |
-| Dungeon Info | **PARTIAL — ACTIVE** | `systems/dungeon_info.md` |
+| Dungeon Info | STATIC COMPLETE | `systems/dungeon_info.md` |
 | Battle Pass | STATIC COMPLETE | `systems/battle_pass.md` |
 | Achievement System | STATIC COMPLETE | `systems/achievement.md` |
 | Biolog System | STATIC COMPLETE | `systems/biolog.md` |
