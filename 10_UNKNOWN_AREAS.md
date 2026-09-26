@@ -287,3 +287,22 @@ Bu noktadan sonra Guild Storage için ek salt-okuma getirisi düşük; runtime t
 - safebox/guild storage/mall: client TItemPos — **yüksek değerli trust boundary bulundu**.
 
 Bu nedenle BUG-ITEM-004 için en doğrudan crash trigger hâlâ bozuk DB/internal invalid pos; storage yolu ise bounds'tan çok window-semantic bypass sınıfına ayrıldı.
+
+
+## Canonical checkpoint — Swap/caller audit sonrası
+
+### Statik olarak çözülen
+- Additional Equipment `SwapItem` shadowing etkisi: kod kusuru var, fakat mevcut call/control-flow'da doğrudan runtime item placement bugı gösterilemedi.
+- `AddToCharacter` kalan ana internal caller sınıfları tarandı.
+- Dragon Soul caller target validation'ı doğrulandı.
+- exchange/shop/quest/refine/fishing/mining yolları validated/precomputed cell sınıfına alındı.
+
+### Hâlâ gerçek açık alanlar
+1. Special Inventory extend-feature build kombinasyonları.
+2. Proto/data içinde special-inventory type + size > 1 item olup olmadığı.
+3. BUG-ITEM-004 için kontrollü malformed DB row runtime testi.
+4. BUG-ITEM-006 storage window bypass runtime testi.
+5. Switchbot runtime/profiler testleri.
+
+### Item subsystem durumu
+Statik ana akış haritası completion'a çok yakın. Yukarıdaki Special Inventory veri/build taraması bittikten sonra Inventory/Item subsystem genel checkpoint'e alınabilir.
