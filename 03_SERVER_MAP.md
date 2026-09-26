@@ -837,3 +837,63 @@ The character helpers directly index `bSpecialInventoryStage[bPage]`. See BUG-IT
 `AddToCharacter` validates stale/current `m_wCell` rather than target pos (BUG-ITEM-004), then `SetItem` can write a target inside the full static special range even when it is above `GetExtendSpecialInvenMax`.
 
 Result: malformed/legacy persisted row can restore an item into a locked special slot. See BUG-ITEM-008.
+
+
+## Exchange / Trade — preflight ve commit modeli
+
+Giriş:
+`CInputMain::Exchange`
+→ START / ITEM_ADD / ITEM_DEL / ELK_ADD / ACCEPT / CANCEL
+→ `CExchange`.
+
+Offer state:
+- item pointerları `m_apItems[]`
+- original TItemPos `m_aItemPos[]`
+- display grid `m_pGrid`
+- gold / cheque offer state
+- iki tarafın `m_bAccept` state'i.
+
+İki taraf accept olduğunda sıra:
+1. owner `Check`
+2. owner `CheckSpace` (gerçekte company/victim space'ini kontrol eder)
+3. company `Check`
+4. company `CheckSpace`
+5. DB cache socket alive kontrolü
+6. `Done()`
+7. company `Done()`
+8. money save / notification
+9. `Cancel()` ile exchange state teardown.
+
+`Done()` transactional değildir: itemları sırayla `RemoveFromCharacter -> AddToCharacter(victim)` ile taşır; herhangi sonraki itemda boşluk bulunamazsa `false` döner ve daha önce taşınmış itemlar için rollback yoktur.
+
+### CheckSpace ↔ Done Special Inventory mismatch
+`CheckSpace()` Dragon Soul dışındaki bütün itemları normal inventory page gridlerinde simüle eder.
+
+Fakat `Done()` `ENABLE_SPECIAL_INVENTORY` altında:
+`victim->GetEmptyInventory(item)`
+kullanır ve special itemı Skillbook/Stone/Material special range'ine yönlendirir.
+
+Sonuç: preflight ile commit aynı placement domainini modellemez. Special inventory doluyken normal inventory boşsa preflight geçebilir, `Done()` ortada fail edebilir. Tersi durumda valid trade false-negative de üretilebilir.
+
+### Page-4 reservation control-flow bug
+Extended page 4 branch:
+- `FindBlank`
+- unlocked boundary hesaplanır
+- top-left boundary aşılırsa reject
+- fakat `s_grid4.Put()` multi-size boundary `if`'inin doğrudan statement'ıdır.
+
+Böylece size=1 incoming item gridde reserve edilmez; bir sonraki item aynı blank hücreyi tekrar bulabilir. Multi-size için de boundary semantiği tersleşir. Bu `CheckSpace()` false-positive'ini doğrudan `Done()` partial-transfer riskine bağlar.
+
+### Exchange source-window trust boundary
+`CExchange::AddItem`:
+- `item_pos.IsValidItemPosition()`
+- `item_pos.IsEquipPosition()` reject
+- `GetItem(item_pos)`
+- anti-give / sealed / basic / lock / exchanging kontrolleri.
+
+Ancak allowed source window listesi yoktur. `SWITCHBOT` ve `ADDITIONAL_EQUIPMENT_1` valid TItemPos olduğundan modified client ile AddItem'a ulaşabilir.
+
+Normal `MoveItem` içindeki:
+- active Switchbot source block
+- Additional Equipment `CanUnequipNow`
+semantik guardları Exchange AddItem yolunda yoktur.
