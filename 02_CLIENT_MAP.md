@@ -265,3 +265,18 @@ Aynı 2/3 arg destination modeli.
 Checkin ve checkout da 3 arg formunda client Python katmanından explicit window type kabul ediyor.
 
 Bu binding esnekliği nedeniyle server'ın yalnız normal UI davranışına güvenmemesi gerekir; supported window enumları Python tarafında doğrudan üretilebilir.
+
+
+## Extend Inventory — client packet boundary
+
+`PythonNetworkStreamModule.cpp`:
+- `net.SendExtendInvenButtonClick(step, bWindow)`
+- `net.SendExtendInvenUpgrade(bWindow)`
+
+Python binding `bWindow` değerini `uint8_t` olarak alıyor; 0..2 allowlist kontrolü yapmıyor.
+
+`PythonNetworkStreamPhaseGame.cpp`:
+- `bWindow == 10` ise normal inventory (`bSpecialState=false`)
+- diğer tüm values için `bSpecialState=true`
+
+Dolayısıyla normal UI 0/1/2 üretse bile Python/network boundary modified client tarafından 3..255 special-window değerlerini üretebilir. Server bunun için kendi bounds validation'ını yapmak zorunda.
