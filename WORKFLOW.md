@@ -39,7 +39,7 @@ Read-only source repositories:
 Writable mapping/checkpoint repository:
 - `Project_Map`
 
-During static mapping, never modify source repositories.
+At all times in the current detection/mapping phase, never modify source repositories.
 
 ## End-of-turn transaction
 Treat checkpoint writing as one logical transaction:
@@ -66,3 +66,18 @@ When a subsystem closes:
 
 ## Recovery
 Use `archive/` only if the canonical active files are missing/corrupt or an old decision must be recovered. It is never normal startup context.
+
+
+## Detection-only lock
+Current project phase is **detection / mapping only**.
+
+Hard constraints:
+- only `Project_Map` may be changed;
+- all source/game repositories are immutable/read-only;
+- do not patch C++ or Python;
+- do not edit quest files;
+- do not edit game/config/data files;
+- do not commit/push to any source repository;
+- runtime/fault-injection tests may be documented but not executed unless the user explicitly changes phase.
+
+Every finding must be persisted as documentation/checkpoint data inside `Project_Map`.
