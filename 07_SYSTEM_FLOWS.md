@@ -317,3 +317,20 @@ INVENTORY vb.:
 
 Normal `MoveItem` client yolu bu riskten farklıdır:
 → destination önce `IsValidItemPosition` ile doğrulanır.
+
+## Inventory occupied-target multi-slot swap
+
+Source item footprint S
+→ occupied destination footprint D
+→ preflight checks
+→ D içindeki itemları map'e topla
+→ size equality
+→ source remove
+→ D items remove
+→ D items → S footprint
+→ source → D base
+→ quickslot sync
+→ delayed save manager final positions serialize eder.
+
+Önemli persistence detayı:
+`SetItem` explicit Save çağırmasa da her swapped item öncesinde `RemoveFromCharacter` yaptığı için delayed-save set'te bulunur.
