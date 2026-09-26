@@ -688,3 +688,71 @@ EnterGame:
 ### Statik kusurlar
 - Cross-core P2P source path raw manager pointer'ını erase sonrası delete etmiyor → BUG-SWITCHBOT-001.
 - Server START item ID/existence/ownership tekrar doğrulaması yapmıyor → BUG-CANDIDATE-SWITCHBOT-002; normal resmi UI boş slot Start'ını disable ediyor.
+
+## Storage checkin/checkout — TItemPos trust boundary
+
+`CInputMain::SafeboxCheckout` personal Safebox, Mall ve Guild Storage için ortak handler.
+
+### Checkout validation
+Akış:
+client `TItemPos destination`
+→ `IsEmptyItemGrid(destination,itemSize)`
+→ DS özel kontrolü
+→ Belt item-type kontrolü
+→ Special Inventory type/range kontrolü
+→ storage remove
+→ `AddToCharacter(destination)`.
+
+Eksik genel kontrol:
+destination window için allowlist yok.
+
+`IsEmptyItemGrid` SWITCHBOT ve ADDITIONAL_EQUIPMENT_1 windowlarını da true döndürebildiği için bunlar checkout target olabilir.
+
+#### SWITCHBOT farkı
+Normal `MoveItem`:
+`DestCell.IsSwitchbotPosition()`
+→ `SwitchbotHelper::IsValidItem(item)`.
+
+SafeboxCheckout:
+bu kontrol yok.
+
+Dolayısıyla server packet seviyesinde invalid item type'ın SWITCHBOT slotuna doğrudan yerleşmesi mümkün.
+
+#### ADDITIONAL_EQUIPMENT_1 farkı
+`IsEmptyItemGrid` yalnız slot bound + empty pointer kontrolü yapıyor.
+Checkout yolunda:
+- `CanEquipNow`
+- `FindEquipCell`
+- page unlock/state
+- `EquipTo`
+çağrıları yok.
+
+Item `AddToCharacter(... ADDITIONAL_EQUIPMENT_1 ...)` ile doğrudan bu window'a yazılabilir.
+
+### Checkin validation
+`SafeboxCheckin`:
+client source TItemPos
+→ `GetItem(source)`
+→ storage restrictions
+→ `RemoveFromCharacter`
+→ safebox add.
+
+Source window allowlist yok.
+
+Bu nedenle SWITCHBOT source da kabul edilebilir.
+Normal MoveItem'ın active-slot guard'ı burada çalışmaz.
+
+## Switchbot Unregister event lifecycle
+
+`CSwitchbot::UnregisterItem(slot)`:
+- item=0
+- active=false
+- finished=false
+- alternatives clear.
+
+`CSwitchbotManager::UnregisterItem` sonrasında yalnız update gönderiyor.
+`HasActiveSlots()==false` olduğunda running `m_pkSwitchEvent` için Stop/Pause çağrısı yok.
+
+Event callback `SwitchItems()` çağırıp her durumda tekrar schedule edildiği için active slot kalmasa da boş tick devam edebilir.
+
+Character destructor `ClearItem()` çalıştırdığı ve SWITCHBOT itemları RemoveFromCharacter → UnregisterItem zincirinden geçtiği için bu normal logout yaşam döngüsüyle de ilişkilidir.
