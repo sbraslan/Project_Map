@@ -152,3 +152,44 @@ yorumunu taşıyor ancak implementasyon yok.
 
 Sonuç:
 Disband edilen guild ID'sine bağlı GUILDBANK item rows orphan olarak DB'de kalabilir.
+
+## Inventory / Item Move — persistence modeli
+
+Normal character itemlarında `ITEM_MANAGER::SaveSingleItem`:
+- `TPlayerItem.id = item ID`
+- `window = current item window`
+- `pos = current cell`
+- `count = current count`
+- owner switch'in default kolunda `character player ID`
+- `HEADER_GD_ITEM_SAVE`
+
+Normal INVENTORY/EQUIPMENT/BELT vb. itemlar DB tarafında player item cache yoluna gider.
+
+### Full move için önemli delayed-save davranışı
+`RemoveFromCharacter()`:
+1. source `SetItem(..., nullptr)`
+2. `m_pOwner=null`
+3. cell=0
+4. window=RESERVED
+5. `Save()` → item pointer delayed-save set'e girer
+
+Ardından aynı synchronous `MoveItem` çağrısında:
+`SetItem(destination,item)`
+→ `SetCell(character,destination)`
+→ destination window.
+
+Delayed-save set bir snapshot değil **item pointer** tuttuğu için, manager daha sonra `SaveSingleItem(item)` çağırdığında destination owner/window/cell state'i serialize edilir.
+
+### Stack
+`CItem::SetCount`:
+- `UpdatePacket()`
+- `Save()`
+yapar.
+Source ve target stack değişimleri delayed persistence'a gider.
+
+### Split
+Source count save edilir.
+Yeni item `AddToCharacter` sonunda `Save()` ile destination state'i kaydeder.
+
+### Equip
+`CItem::EquipTo` sonunda `Save()`; window/cell equipment state'i persistence'a gider.
