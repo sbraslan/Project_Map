@@ -56,3 +56,27 @@ Verified chain:
 Partial-stack consumption can also leave exchange-visible state inconsistent even when the object survives; exact-stack consumption is the critical freed-pointer case.
 
 The server must not assume the stock UI prevents this: `HEADER_CG_PARTY_MATCH` is accepted while exchange state is active.
+
+
+### BUG-PMATCH-003 — FAIL_NO_ITEM removes server queue state but leaves minimap matchmaking icon visible
+- Statik durum: **doğrulandı**
+- Sınıf: client/server UI state divergence
+
+After a successful search:
+- server has the player in SearchMap;
+- client `__SetInfo` sets SEARCHING and shows the minimap Party Match button.
+
+If the queued player no longer has a required item when a later `CheckPlayers` occurs, server:
+`StopSearching(player, PARTY_MATCH_FAIL_NO_ITEM, vnum)`
+removes the player from SearchMap.
+
+Client processing:
+- `__PartyMatchMsg(FAIL_NO_ITEM,...)` displays the error and resets the main Party Match state via `__Init()`;
+- then `__PartyMatchMinimapButton` runs;
+- that function hides the icon only for `PARTY_MATCH_CANCEL_SUCCESS`, `PARTY_MATCH_SUCCESS`, and generic `PARTY_MATCH_FAIL`.
+
+`PARTY_MATCH_FAIL_NO_ITEM` is omitted.
+
+Result: the minimap icon remains visible although matchmaking is no longer active on the server and the main UI state has reset.
+
+This has normal reachability because required items are not reserved/locked for the duration of searching.
