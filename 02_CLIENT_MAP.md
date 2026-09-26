@@ -306,3 +306,16 @@ Official Python UI source-type'i kısıtlasa da C++ binding değiştirilmiş Pyt
 
 ### Client packet initialization observation
 `SendExchange*` fonksiyonları `TPacketCGExchange packet;` kullanıyor, `{}` ile zero-init etmiyor. Her subheader yalnız kendi kullandığı alanları doldurduğundan diğer alanlar wire'da uninitialized kalabilir. Server `CInputMain::Exchange` switch öncesinde `arg1` okuyup character lookup yaptığı için bu salt cosmetic değildir; nadir nondeterministic early-return davranışı oluşturabilir.
+
+
+## Player Exchange — client send boundary
+
+Python network binding exchange item eklerken source'u iki parçalı alır:
+- `window_type` (`uint8_t`)
+- `cell` (`uint16_t`)
+
+ve doğrudan `TItemPos(window_type, cell)` üretir.
+
+Client binding tarafında trade source için INVENTORY/DRAGON_SOUL allowlist yoktur. Normal UI güvenli window gönderebilir; modified Python/client ise server `IsValidItemPosition()` tarafından desteklenen başka windowları gönderebilir.
+
+Bu sınır BUG-EXCHANGE-003 için client-side giriş noktasıdır.
