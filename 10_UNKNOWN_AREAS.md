@@ -579,3 +579,22 @@ mevcut build'de applicable değildir. Feature açılırsa tekrar aktive edilmeli
 2. aynı account safebox'ının iki karakter/core üzerinden concurrent open ihtimali
 3. warp/channel-change ve open safebox cleanup
 4. static completion checkpoint.
+
+
+## Safebox / Mall — static completion checkpoint
+
+Safebox/Mall statik keşfi kapatıldı.
+
+### Runtime-only kalan
+- SB-T01 crafted partial stack merge.
+- SB-T02 full destination stack + count=0.
+- SB-T03 checkout -> SWITCHBOT.
+- SB-T04 checkout -> ADDITIONAL_EQUIPMENT_1.
+- SB-T05 SWITCHBOT source -> checkin.
+- SB-T06 malformed bottom-boundary persisted item under ASan.
+- SB-T07 duplicate/overlap persisted positions.
+- SB-T08 force DB safebox item-query failure -> opening flag recovery.
+- SB-T09 Mall remote/open-during-other-window gameplay policy.
+- SB-T10 same-account reconnect race only if global login layer permits duplicate active session.
+
+Money tests yalnız ENABLE_SAFEBOX_MONEY yeniden açılırsa uygulanmalı.
