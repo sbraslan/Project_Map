@@ -789,3 +789,51 @@ Yüksek değerli trust boundary'ler:
 2. storage window semantic bypass → BUG-ITEM-006
 
 Diğer incelenen ana caller sınıflarında yeni bağımsız invalid-position kaynağı bulunmadı.
+
+
+## Special Inventory extended build — dynamic boundary
+
+Aktif feature zinciri:
+`ENABLE_SPECIAL_INVENTORY` + `ENABLE_EXTEND_INVEN_SYSTEM` + `ENABLE_EXTEND_INVEN_ITEM_UPGRADE` + `ENABLE_EXTEND_INVEN_ITEM_UPGRADE_SPECIAL_INV`.
+
+Static address model:
+- 3 logical special type
+- 5×9 = 45 slot/page
+- extended build nedeniyle 4 page/type static address reserve
+
+Runtime usable max:
+`GetExtendSpecialInvenMax(page)` = type base + 45 initial open slots + 5 × special stage.
+
+Stage persistence:
+- character init: three stage = 0
+- DB player table: `special_stage[3]`
+- load: `SetExtendSpecialInvenStage(t->special_stage[i], i)`
+- save: `tab.special_stage[i] = GetExtendSpecialInvenStage(i)`
+- client sync: `SendExtendInvenInfo`.
+
+Normal item movement:
+`MoveItem -> IsEmptyItemGrid -> IsEmptySpecialItemGrid` applies dynamic max and rejects size > 1.
+
+### Boundary mismatch
+`CHARACTER::IsValidItemPosition(INVENTORY)` only checks `cell < INVENTORY_SLOT_COUNT`; this is the whole static special address space, not the player's unlocked max.
+
+This is safe in normal MoveItem because emptiness validation applies the dynamic max, but is not sufficient for direct restore/internal paths.
+
+### Extend request/upgrade bounds gap
+`CInputMain::ExtendInvenRequest/Upgrade` forwards packet `bWindow` to:
+- `ExtendSpecialInvenRequest(bWindow)`
+- `ExtendSpecialInvenUpgrade(bWindow)`
+
+There is no `bWindow < 3` validation before:
+- `GetExtendSpecialInvenStage(bWindow)`
+- `SetExtendSpecialInvenStage(..., bWindow)`
+- related vector/index calculations.
+
+The character helpers directly index `bSpecialInventoryStage[bPage]`. See BUG-ITEM-007.
+
+### Locked special DB restore
+`ItemLoad` accepts persisted INVENTORY `p->pos` and calls `item->AddToCharacter(ch, TItemPos(INVENTORY, p->pos))`.
+
+`AddToCharacter` validates stale/current `m_wCell` rather than target pos (BUG-ITEM-004), then `SetItem` can write a target inside the full static special range even when it is above `GetExtendSpecialInvenMax`.
+
+Result: malformed/legacy persisted row can restore an item into a locked special slot. See BUG-ITEM-008.
