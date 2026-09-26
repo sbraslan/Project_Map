@@ -179,3 +179,33 @@ Bu noktadan sonra Guild Storage için ek salt-okuma getirisi düşük; runtime t
 - Switchbot item move/save lifecycle
 - Special Inventory type/range modeli
 - ardından Item subsystem genel checkpoint.
+
+## Switchbot statik haritalama durumu
+
+### Kapatılan
+- UI item move/use
+- active slot protection
+- valid item types
+- SWITCHBOT SetItem/Register/Unregister
+- player-item DB persistence
+- login reconstruction
+- START/STOP parser
+- attribute config payload
+- event loop
+- item switching/completion
+- same runtime manager state
+- P2P cross-core transfer
+- EnterGame resume
+- logout lifecycle incelemesi
+
+### Bulunan
+- cross-core transfer object leak
+- Initialize/destructor raw pointer leak
+- logout cleanup/event leak
+- empty/stale-slot START recurring event
+- UPDATE_ITEM 8-bit vnum observation
+
+### Kalan Item subsystem
+- Special Inventory exact ranges/type mapping
+- Additional Equipment runtime swap testi statik olarak açık
+- sonra Inventory/Item ana modülü completion checkpoint'e alınabilir.
