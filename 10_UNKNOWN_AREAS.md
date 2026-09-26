@@ -461,3 +461,29 @@ Non-blocking observations:
 
 ### Sıradaki statik subsystem
 Shop / Private Shop: buy/sell, owner/guest state, item reservation, currency debit-credit, DB persistence ve premium private shop ayrımları.
+
+
+## Shop / Premium Private Shop — first pass
+
+### Mapped
+- active premium/offline/search feature flags
+- CShopManager::Buy distance/closed gate
+- CShop::Buy funds + inventory + transfer ordering
+- per-item FlushDelayedSave
+- game -> DB sale packet
+- DB ShopSaleResult stash/item/cache update
+- stash max behavior
+- personal_shop tax split across game and DB.
+
+### New bugs
+- BUG-SHOP-001 — stash cap silent proceeds clipping
+- BUG-SHOP-002 — premium private shop personal_shop tax accounting mismatch.
+
+### Open next
+1. shop listing/open validation and client-controlled price/count/display position
+2. premium TransferItems source-window validation
+3. private-shop search remote-buy path and distance/guest bypass semantics
+4. withdraw + rollback game/DB handshake
+5. remove/edit/close item return path
+6. NPC Sell source TItemPos/special inventory behavior
+7. crash/recovery ordering across item/player/shop cache.
