@@ -6,36 +6,33 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "dungeon_core",
-    "display_name": "Dungeon Core",
+    "subsystem": "battle_field",
+    "display_name": "Battle Field System",
     "status": "PARTIAL — ACTIVE",
-    "system_file": "systems/dungeon_core.md",
-    "bug_file": "bugs/dungeon_core.md",
-    "test_file": "tests/dungeon_core.md",
-    "verified_bug_ids": [
-      "BUG-DUNGEON-001",
-      "BUG-DUNGEON-002",
-      "BUG-DUNGEON-003"
-    ],
+    "system_file": "systems/battle_field.md",
+    "bug_file": "bugs/battle_field.md",
+    "test_file": "tests/battle_field.md",
+    "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Scan current source quests for d.spawn_move_unique, multi-key d.set_unique and nested d.new_jump_party reachability.",
-      "Audit duplicate-key behavior in SpawnUnique/SetUnique.",
-      "Audit dungeon manager ID wrap against event identity.",
-      "Close eliminate-event null ordering.",
-      "Decide Dungeon Core STATIC COMPLETE."
+      "Audit Battle Field entry/exit command authorization and channel/map restrictions.",
+      "Audit kill/death/score accounting and persistence.",
+      "Audit schedule day/time calculations.",
+      "Audit cooldown/reconnect behavior.",
+      "Audit P2P state synchronization across cores.",
+      "Record only Battle Field-specific bugs; do not duplicate Ranking bugs."
     ]
   },
   "startup": {
     "required_files": [
       "STATE.json",
       "CURRENT.md",
-      "systems/dungeon_core.md"
+      "systems/battle_field.md"
     ],
     "conditional_files": {
       "policy": "WORKFLOW.md",
-      "bugs": "bugs/dungeon_core.md",
-      "deferred_tests": "tests/dungeon_core.md"
+      "bugs": "bugs/battle_field.md",
+      "deferred_tests": "tests/battle_field.md"
     },
     "forbidden_by_default": [
       "archive/",
@@ -163,7 +160,13 @@
     "game/src/sectree_manager.h::SECTREE_MAP::for_each snapshot",
     "game/src/char_manager.cpp::DestroyCharacter/BeginPendingDestroy/FlushPendingDestroy",
     "game/src/dungeon.cpp::SpawnMoveUnique/SpawnUnique/SetUnique/DeadCharacter",
-    "game/src/questlua_dungeon.cpp::spawn_move_unique/set_unique Lua bindings"
+    "game/src/questlua_dungeon.cpp::spawn_move_unique/set_unique Lua bindings",
+    "game/src/event.cpp::event_cancel/event_process",
+    "game/src/sectree_manager.cpp::DestroyPrivateMap",
+    "game/src/desc_manager.cpp::DestroyDesc",
+    "game/src/desc.cpp::DESC::Destroy",
+    "game/src/char.cpp::CHARACTER::Disconnect/Destroy",
+    "Project_Game::major dungeon quest unique/new_jump_party reachability sample"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -197,7 +200,8 @@
   "completed_subsystems": [
     "ranking",
     "party",
-    "party_match"
+    "party_match",
+    "dungeon_core"
   ],
   "ranking_closure": {
     "status": "STATIC COMPLETE",
@@ -230,6 +234,15 @@
       "BUG-PMATCH-001",
       "BUG-PMATCH-002",
       "BUG-PMATCH-003"
+    ]
+  },
+  "dungeon_core_closure": {
+    "status": "STATIC COMPLETE",
+    "verified_bug_ids": [
+      "BUG-DUNGEON-001",
+      "BUG-DUNGEON-002",
+      "BUG-DUNGEON-003",
+      "BUG-DUNGEON-004"
     ]
   }
 }
