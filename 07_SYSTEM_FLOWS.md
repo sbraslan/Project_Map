@@ -461,3 +461,46 @@ source manager
 
 Known defect:
 source `P2PSendSwitchbot` manager pointer'ını map'ten erase ettikten sonra free etmiyor.
+
+## Storage checkout → non-inventory window bypass
+
+Safebox / Mall / Guild Storage packet
+→ client-controlled destination `TItemPos`
+→ common `SafeboxCheckout`
+→ `IsEmptyItemGrid`.
+
+Branch örneği — SWITCHBOT:
+`window=SWITCHBOT, slot<7, slot empty`
+→ IsEmptyItemGrid=true
+→ non-DS
+→ belt check yok
+→ special type: normal item -1 == destination cell special type -1
+→ storage Remove
+→ `AddToCharacter(SWITCHBOT,slot)`
+→ `SetItem`
+→ Switchbot manager RegisterItem
+→ DB save `window=SWITCHBOT`.
+
+Bu yol normal MoveItem'taki `SwitchbotHelper::IsValidItem` kontrolüne uğramaz.
+
+ADDITIONAL_EQUIPMENT_1:
+empty valid slot
+→ checkout
+→ AddToCharacter
+→ direct additional window placement
+→ EquipTo/CanEquipNow akışı yok.
+
+## Active Switchbot remove → orphan event flow
+
+Running switch event
+→ active slot item storage-checkin / logout ClearItem gibi MoveItem dışı bir yolla RemoveFromCharacter
+→ SetItem(SWITCHBOT,null)
+→ manager UnregisterItem
+→ active=false + item=0
+→ manager event pointer hâlâ live
+→ event tick
+→ hiçbir active slot yok
+→ SwitchItems return
+→ callback tekrar schedule.
+
+Bu, BUG-SWITCHBOT-005'in temel akışı.
