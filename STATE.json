@@ -12,14 +12,16 @@
     "system_file": "systems/dungeon_core.md",
     "bug_file": "bugs/dungeon_core.md",
     "test_file": "tests/dungeon_core.md",
-    "verified_bug_ids": [],
+    "verified_bug_ids": [
+      "BUG-DUNGEON-001"
+    ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Map CHARACTER::SetDungeon against CDungeon::IncMember/DecMember.",
-      "Close party/dungeon pointer lifetime and member counts.",
-      "Close dungeon dead/exit/jump event lifetime and null ordering.",
-      "Map quest dungeon create/join/new_jump/new_jump_party flows.",
-      "Promote only statically verified Dungeon Core bugs."
+      "Audit JumpParty one-party ownership across nested/repeated dungeon creation.",
+      "Close dungeon dead/exit/jump event lifetime and manager ID reuse.",
+      "Audit participant registration across private-map/core transitions.",
+      "Audit dungeon item-group entry/removal lifecycle.",
+      "Audit spawn/unique/regen pointer lifecycle."
     ]
   },
   "startup": {
@@ -143,7 +145,11 @@
     "game/src/dungeon.cpp",
     "game/src/questlua_dungeon.cpp",
     "game/src/char.cpp::SetDungeon",
-    "game/src/sectree_manager.*::private map lifecycle"
+    "game/src/sectree_manager.*::private map lifecycle",
+    "game/src/dungeon.cpp::IncPartyMember/DecPartyMember/QuitParty",
+    "game/src/input_login.cpp::FindByMapIndex -> SetDungeon",
+    "game/src/questlua_dungeon.cpp::dungeon_join/new_jump/new_jump_all/new_jump_party/new_jump_guild",
+    "common/CommonDefines.h::D_JOIN_AS_JUMP_PARTY/ENABLE_D_NJGUILD"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
