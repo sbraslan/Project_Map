@@ -17,11 +17,11 @@
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Audit JumpParty one-party ownership across nested/repeated dungeon creation.",
-      "Close dungeon dead/exit/jump event lifetime and manager ID reuse.",
-      "Audit participant registration across private-map/core transitions.",
-      "Audit dungeon item-group entry/removal lifecycle.",
-      "Audit spawn/unique/regen pointer lifecycle."
+      "Audit dungeon regen list/event lifetime and ClearRegen ordering.",
+      "Audit bulk purge/kill behavior under pending-destroy iteration.",
+      "Audit unique alias/multi-key lifecycle edge cases.",
+      "Revisit nested JumpParty ownership reachability.",
+      "Continue toward Dungeon Core STATIC COMPLETE."
     ]
   },
   "startup": {
@@ -149,7 +149,12 @@
     "game/src/dungeon.cpp::IncPartyMember/DecPartyMember/QuitParty",
     "game/src/input_login.cpp::FindByMapIndex -> SetDungeon",
     "game/src/questlua_dungeon.cpp::dungeon_join/new_jump/new_jump_all/new_jump_party/new_jump_guild",
-    "common/CommonDefines.h::D_JOIN_AS_JUMP_PARTY/ENABLE_D_NJGUILD"
+    "common/CommonDefines.h::D_JOIN_AS_JUMP_PARTY/ENABLE_D_NJGUILD",
+    "game/src/dungeon.cpp::RegisterParticipant/IsParticipantRegistered/ClearParticipants",
+    "game/src/dungeon.cpp::DeadCharacter/PurgeUnique/KillUnique",
+    "game/src/questlua_dungeon.cpp::item-group APIs",
+    "Project_Game::Devil Catacomb item-group floor transition",
+    "Project_Game::98 source quest files getter reachability audit"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
