@@ -186,3 +186,59 @@ The next-day branch similarly builds a day/minute offset and then **adds** curre
 These functions feed Battle Field timing commands/UI and are also compared by the open/close scheduler. The defect is deterministic for any call made with nonzero seconds.
 
 A separate algorithm limitation remains unnumbered: the fallback searches only the immediate next day, so sparse schedules with a gap longer than one day can return 0. The repository does not contain the live `common.battlefield_open_info` rows, so current-data reachability for that limitation is not established.
+
+
+### BUG-BFIELD-009 — Battle Point cap rejection still clears temporary points and credits ranking
+- Statik durum: **doğrulandı**
+- Sınıf: reward/currency consistency / ranking divergence
+
+`CBattleField::ExitCharacter` handles temporary Battle Field score as:
+
+1. read `dwBattleFieldPoints`;
+2. `PointChange(POINT_BATTLE_FIELD, dwBattleFieldPoints)`;
+3. unconditionally `SetBattleFieldPoint(0)`;
+4. unconditionally `RegisterBattleRanking(..., dwBattleFieldPoints)`.
+
+The persistent point handler computes:
+`GetBattlePoint() + amount`
+and returns without applying the amount when:
+`BATTLE_POINT_MAX <= total`
+or total is negative.
+
+`BATTLE_POINT_MAX` is 2,000,000,000.
+
+`PointChange` returns `void`, so `ExitCharacter` cannot detect that the addition was rejected.
+
+Therefore when a player exits with temporary points that would reach/exceed the cap:
+- persistent Battle Point balance receives none of those temporary points;
+- temporary Battle Field score is still erased;
+- `log.battle_score` is still credited with the full temporary amount through `RegisterBattleRanking`.
+
+The player's spendable Battle Point balance and ranking score deterministically diverge at the cap boundary.
+
+### BUG-BFIELD-010 — event-mode open state is not propagated to Battle Field clients
+- Statik durum: **doğrulandı**
+- Sınıf: multi-core/client-state integration
+
+The Battle Field client has separate commands/state:
+- `battle_field_event enable start end` -> `SetBattleFieldEventInfo`;
+- `battle_field_event_open open` -> `SetBattleFieldEventOpen`.
+
+The minimap chooses the special event-open visuals only when:
+`IsBattleFieldOpen() == true && IsBattleFieldEventOpen() == true`.
+
+Server `OpenEnter(isEvent=true)`:
+- sets global Battle Field status open;
+- broadcasts `battle_field_open 1`;
+- sets only the channel-99 process-local `bEventStatus=true`;
+- does **not** broadcast `battle_field_event 1 ...`;
+- does **not** broadcast `battle_field_event_open 1`.
+
+On ordinary channel processes, `Connect` reads their own process-local `GetEventStatus()`, which remains false, so it also does not send the event-info command to those clients.
+
+P2P `HEADER_GG_COMMAND` forwarding calls `SendCommand` to clients; it does not mutate the remote `CBattleField` singleton event fields.
+
+Thus Battle Field opening in event mode propagates the generic open state but not the event-open state required by the client event UI. The dedicated client `battle_field_event_open` callback exists, but the mapped Battle Field opening path never feeds it.
+
+Related latent client defect, not separately numbered:
+`CPythonPlayer::GetBattleFieldEventEnable()` returns `bBattleFieldIsEventOpen` instead of `bBattleFieldIsEventEnable`. In the current minimap implementation the returned `IsEventEnable` local is assigned but not used, so no additional active failure is attributed to that getter yet.
