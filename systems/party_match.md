@@ -215,3 +215,54 @@ This is independent from BUG-PMATCH-001: the first bug fragments search pools; B
 3. Audit success notification vs WarpSet failure/return ordering.
 4. Audit UI/minimap state for every Party Match result code.
 5. Decide whether additional queue/core transition bugs remain.
+
+
+## Client result-state / minimap audit
+
+The SEARCH and CANCEL result argument shapes are unusual but internally consistent:
+- SEARCH packets pass `(MSG,index)` directly to Python, so `PARTY_MATCH_INFO` becomes the Python `type`;
+- CANCEL/failure packets pass `(PARTY_MATCH_CANCEL,(MSG,index))`.
+
+`uiPartyMatch.PartyMatchResult` is written for exactly that split. No protocol-to-Python argument mismatch is promoted.
+
+A normal stale minimap state does exist after a queued player's required item disappears.
+
+Normal sequence:
+1. successful SEARCH returns `PARTY_MATCH_INFO`;
+2. `__SetInfo` marks the client SEARCHING and calls `minimap.ShowPartyMatchButton()`;
+3. before the required second player arrives, the queued player can lose/move/consume a required item because Party Match does not lock the inventory requirement;
+4. when `CheckPlayers` later runs, server `CheckItems(index)` detects the missing item;
+5. server calls `StopSearching(player, PARTY_MATCH_FAIL_NO_ITEM, vnum)`, removing the player from SearchMap;
+6. client receives CANCEL + `FAIL_NO_ITEM`;
+7. `__PartyMatchMsg` displays the missing-item message and calls `__Init()`, so the main Party Match state is reset;
+8. `__PartyMatchMinimapButton` is then called, but it hides the minimap icon only for `CANCEL_SUCCESS`, `SUCCESS` and generic `FAIL`.
+
+`FAIL_NO_ITEM` is not included, so the Party Match minimap icon remains visible after the server has already removed the player from matchmaking.
+
+This creates BUG-PMATCH-003.
+
+### BUG-PMATCH-003 — minimap Party Match icon remains visible after queued FAIL_NO_ITEM removal
+This is a normal reachable UI/server state divergence, not a forged-packet-only condition.
+
+The stale icon can reopen the Party Match window even though:
+- server SearchMap no longer contains the player;
+- Python match state has already returned to NONE.
+
+The same helper omission also means HOLD does not hide the icon, but duplicate SEARCH/HOLD remains non-stock reachability and is not needed to establish this bug.
+
+## Duplicate SEARCH / HOLD closure
+The server treats a duplicate SEARCH from an already queued character by:
+`StopSearching(ch, PARTY_MATCH_HOLD, index)`.
+
+This removes the server queue entry.
+
+The client HOLD handler returns before `__Init()`, so a duplicate SEARCH would leave the stock client displaying SEARCHING/minimap state even though the server queue entry is gone.
+
+However the stock Party Match button synchronously sets `MATCH_STATE_SEARCHING` on the first click and sends CANCEL on the next click. No second stock SEARCH producer was found. The HOLD desync is therefore documented as malformed/alternate-client robustness, not separately promoted.
+
+## Exact next audit
+1. Audit safebox/refine/change-look/other item-window interactions beyond the verified exchange path.
+2. Audit success notification vs WarpSet failure/return ordering.
+3. Audit map/core transition while already queued.
+4. Audit disabled/off-state enforcement.
+5. Decide whether Party Match can reach STATIC COMPLETE.
