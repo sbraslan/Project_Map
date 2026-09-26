@@ -149,3 +149,20 @@ Promoted to **BUG-RANK-007** after reload and online-character lifecycle closure
 The sender exists in `cmd_general.cpp::LoadRanking(uint8_t)`.
 
 It constructs `TPacketGGLoadRanking`, broadcasts through `P2P_MANAGER::Send`, then reloads the local ranking cache. The earlier “sender not found” note was incomplete and is closed.
+
+
+## Static closure
+Ranking static audit closed on 2026-09-26.
+
+Verified active-path bugs:
+- BUG-RANK-001
+- BUG-RANK-002
+- BUG-RANK-003
+- BUG-RANK-004
+- BUG-RANK-005
+- BUG-RANK-007
+
+Retracted/reserved:
+- BUG-RANK-006 — false positive caused by initially missing the transitive `char.h -> horse_rider.h -> cmd.h` declaration path.
+
+Dormant generic PARTY / SOLO 2..7 integration gaps remain documented but were not promoted because no active opener/producer was found in the mapped source snapshot.
