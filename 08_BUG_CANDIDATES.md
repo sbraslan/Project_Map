@@ -90,3 +90,28 @@ Guild Storage kapatmak, kişisel safebox tablosundaki gold değerini sıfırlaya
 
 Not:
 Bu bug yalnız ilgili compile flag aktifse çalışır. Runtime testi veri kaybı riski nedeniyle yalnız kontrollü test DB'sinde yapılmalı.
+
+### BUG-GS-004 — Cross-core Guild Storage lock senkronizasyonu yok
+- Statik durum: **mimari kod yolu doğrulandı**
+- Runtime çoklu-core testi: bekliyor
+
+`SetStorageState` local guild objesi + SQL UPDATE yapıyor.
+Repo-geneli incelenen Guild P2P subheader'larında open/close lock state aktarımı yok.
+`GUILD_SUBHEADER_GG_REFRESH/REFRESH1` farklı guild bilgi refresh işlerine ayrılmış.
+
+Risk:
+Farklı game core/channel'lardaki aynı guild objeleri farklı `guildstoragestate` değerleri tutabilir ve aynı guild bank'ı eşzamanlı açabilir.
+
+### BUG-GS-008 — Yeni game core startup tüm Guild Storage kilitlerini DB'de sıfırlıyor
+- Statik durum: **kod yolu doğrulandı**
+- `main.cpp`: her non-auth game startup → `guild_manager.InitializeDonate()`
+- `InitializeDonate()`: `UPDATE guild SET guildstoragestate = 0`
+
+Risk senaryosu:
+1. Core A'da guild storage aktif ve state=1.
+2. Core B restart/startup yapar.
+3. Core B global SQL ile state'i 0 yapar.
+4. Yeni yüklenen/yenilenen runtime state üzerinden ikinci erişim mümkün hale gelebilir.
+
+Ek risk:
+Bu reset `guildstoragewho` alanını temizlemiyor; state=0 iken eski PID kalabilir.
