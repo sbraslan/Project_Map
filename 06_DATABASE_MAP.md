@@ -290,3 +290,33 @@ Active/configured alternatives DB'ye yazılmıyor.
 Runtime `TSwitchbotTable` game-core memory'de tutuluyor ve cross-core warp sırasında P2P ile taşınıyor.
 
 Normal process restart sonrasında bu runtime configuration'ın kalıcı DB restore yolu bulunmadı.
+
+## Switchbot persistence
+
+Switchbot item ayrı tablo kullanmıyor.
+
+Item `SWITCHBOT` slotuna taşındığında normal item persistence:
+`CItem::Save`
+→ delayed save
+→ `ITEM_MANAGER::SaveSingleItem`
+→ owner = player PID
+→ window = SWITCHBOT
+→ pos = switchbot slot
+→ `HEADER_GD_ITEM_SAVE`.
+
+Player item load query opsiyonel olarak:
+`window='SWITCHBOT'`
+satırlarını da seçer.
+
+Game load:
+`HEADER_DG_ITEM_LOAD`
+→ `CInputDB::ItemLoad`
+→ SWITCHBOT case
+→ `item->AddToCharacter(ch,TItemPos(SWITCHBOT,pos))`
+→ `SetItem`
+→ `CSwitchbotManager::RegisterItem`.
+
+Character delete item cleanup query de SWITCHBOT window'u kapsar.
+
+Switchbot'un active/finished/alternative konfigürasyonu item DB row'unda tutulmaz.
+Cross-core state `TSwitchbotTable` ile P2P üzerinden taşınır; normal login sırasında manager runtime state yoksa yalnız item slotu DB'den restore edilir.
