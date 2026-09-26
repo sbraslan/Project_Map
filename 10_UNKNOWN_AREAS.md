@@ -528,3 +528,30 @@ Shop ana kod haritası kapatıldı. Kalan runtime testleri:
 - SH-T10: official client cheque withdraw 255/256/300 behavior.
 
 Statik Shop keşfi için yeni açık alan kalmadı; yeni Shop çalışması bu testlerden bulgu çıkarsa açılmalı.
+
+
+## Safebox / Mall — first pass sonrası açık alanlar
+
+### Statik olarak çözülen
+- checkin/checkout primary flow
+- account-ID item persistence
+- DB safebox/mall load
+- money save/withdraw primary flow
+- Mall close money overwrite
+- safebox internal stack branch
+- explicit TItemPos trust boundary
+
+### Runtime testleri
+- SAFEBOX-T01: Mall aç/kapat öncesi ve sonrası persisted safebox.gold.
+- SAFEBOX-T02: player gold ~1.5B + withdraw >=0.7B cap/rollback.
+- SAFEBOX-T03: crafted occupied-stack partial merge.
+- SAFEBOX-T04: full destination stack + count=0 crafted move.
+- SAFEBOX-T05: checkout -> SWITCHBOT / ADDITIONAL_EQUIPMENT.
+- SAFEBOX-T06: unsupported source window -> checkin.
+
+### Kalan kısa statik tur
+1. malformed/overlapping DB row -> CSafebox::Add grid behavior
+2. SAFEBOX/MALL item expiration/removal
+3. ItemAward full/duplicate placement and isolation
+4. packet slot/count narrowing
+5. disconnect/logout/CloseSafebox/CloseMall persistence ordering
