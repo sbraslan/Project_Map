@@ -28,3 +28,15 @@ Haritalama sırasında bulunan her bilinmeyen alan önce buraya yazılır; çöz
 - Cross-core/channel guild storage state için gizli/başka bir P2P senkronizasyonu var mı: repo genelinde son doğrulama
 - `guildstoragestate=1` stale kaldığında startup/reload/reset mekanizması var mı
 - Guild üyeliği değişirken açık/pending guild storage davranışı
+
+## Kapatılan alanlar
+- `CSafebox::Add/Remove` GUILDBANK lifecycle: doğrulandı.
+- delayed save → `HEADER_GD_ITEM_SAVE`: doğrulandı.
+- GUILDBANK owner normalization → guild ID: doğrulandı.
+- DB `REPLACE item` persistence: doğrulandı.
+- checkout `HEADER_GD_ITEM_FLUSH` → cache flush: doğrulandı.
+
+## Hâlâ açık
+- Cross-core/channel storage lock için repo-geneli P2P son kontrolü.
+- Guild üyeliği/rank değişimi pending/open request sırasında ne oluyor.
+- Startup sonrası stale `guildstoragestate` reset mekanizması.
