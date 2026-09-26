@@ -125,3 +125,28 @@ Bu noktadan sonra Guild Storage için ek salt-okuma getirisi düşük; runtime t
 - full swap edge cases
 - malformed/invalid item position davranışı
 - Special Inventory / Switchbot ayrı lifecycle detayları
+
+## Inventory — pickup/drop/destroy durumu
+
+### Çözülen
+- pickup packet + server dispatch
+- distance + ownership
+- stack pickup
+- party pickup distribution
+- full/partial drop
+- ground lifecycle
+- DB delete/recreate persistence modeli
+- destroy packet → object delete → DB delete
+
+### Bulunan buglar
+- destroy use-after-free
+- destroy count ignored
+- failed AddToGround rollback eksikliği
+- destroy sender SendSequence farkı gözlem olarak tutuluyor
+
+### Kalan yüksek değerli alanlar
+- `AddToCharacter` target validation
+- SwapItem / Additional Equipment
+- Special Inventory exact type/cell rules
+- Switchbot move lifecycle
+- malformed TItemPos ve rollback sınırları.
