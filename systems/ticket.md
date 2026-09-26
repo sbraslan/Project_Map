@@ -1,6 +1,6 @@
 # ticket
 
-**Status:** STATIC MAPPED
+**Status:** PARTIAL — ACTIVE
 
 > Canonical subsystem history split from legacy `00_PROGRESS.md`. Read this file only when this subsystem is active or explicitly revisited.
 
@@ -87,3 +87,21 @@ Doğrulanan ilk buglar:
 - Bugs: `../bugs/ticket.md`
 - Runtime tests: `../tests/ticket.md`
 - Full legacy archive: `../archive/00_PROGRESS.md`
+
+
+## Active checkpoint — Ticket static close audit started
+
+**Tarih:** 2026-09-26
+
+Hunting System STATIC COMPLETE sonrasında Ticket System aktif subsystem oldu.
+
+### Already verified
+- core server/client/packet flow mapped;
+- BUG-TICKET-001..005 recorded.
+
+### Exact next audit
+1. validate every CG Ticket subpacket length/fixed-char parsing and TICKET-T06 non-NUL case;
+2. validate packet-info registration/size/sequence;
+3. close PAGE/ACTION/admin authorization matrix;
+4. audit DB null/empty result handling and ticket/reply lifecycle;
+5. decide Ticket STATIC COMPLETE and refresh runtime tests.
