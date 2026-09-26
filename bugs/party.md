@@ -125,3 +125,23 @@ The implementation itself carries:
 As a result, same-map party members farther than the normal 5000 party range are returned as "near".
 
 No concrete caller was found in the current Project_Game search, so current gameplay impact depends on quest usage; the exposed Lua API implementation itself is nevertheless incorrect.
+
+
+## Static closure
+Core Party static audit closed on 2026-09-26.
+
+Verified bugs:
+- BUG-PARTY-001
+- BUG-PARTY-002
+- BUG-PARTY-003
+- BUG-PARTY-004
+- BUG-PARTY-005
+- BUG-PARTY-006
+
+No additional bug was promoted from:
+- item ownership/drop rotation;
+- dormant EXP-centralize storage;
+- remaining packet field/layout comparison;
+- remaining quest helpers without a verified normal gameplay failure path.
+
+Party Match continues independently under `systems/party_match.md`.
