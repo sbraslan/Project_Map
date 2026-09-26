@@ -92,3 +92,46 @@ Bu nedenle stale-lock reset mekanizması var; fakat çalışan başka core'daki 
 
 ### Sıradaki
 Guild Storage için artık ana statik haritalama tamamlanmış kabul edilebilir. Bundan sonraki adım runtime test matrisi ve sonra diğer sistem modüllerine geçiş.
+
+## Checkpoint — Inventory / Item Move temel zinciri başlatıldı
+
+### Kapsam
+Guild Storage statik haritalaması tamamlandıktan sonra ortak omurga olan **Inventory / Item Move** sistemine geçildi.
+
+### Bu tur doğrulanan uçtan uca zincir
+`Project_Binary/root/uiinventory.py`
+→ `__SendMoveItemPacket(...)`
+→ Python `m2netm2g.SendItemMovePacket(...)`
+→ `Project_ClientSrc/PythonNetworkStreamModule.cpp::netSendItemMovePacket`
+→ `CPythonNetworkStream::SendItemMovePacket`
+→ `HEADER_CG_ITEM_MOVE = 13`
+→ `CInputMain::ItemMove`
+→ `CHARACTER::MoveItem`
+
+### MoveItem içinde kapatılan ana dallar
+- source/destination validity
+- item lock / exchange
+- `CanHandleItem()`
+- belt inventory kuralları
+- special inventory tip kontrolü
+- switchbot aktif-item kontrolü
+- equip / unequip
+- Dragon Soul routing
+- stack
+- swap
+- full move
+- split
+- quickslot sync
+
+### Persistence sonucu
+- stack: `SetCount()` → `Save()` → delayed save
+- split: source `SetCount()` + new item `AddToCharacter()`
+- full move: `RemoveFromCharacter()` save'i delayed queue'ya item pointer'ını koyar; ardından `SetItem()` aynı item'ın owner/window/cell bilgisini destination'a çevirir. Delayed save çalıştığında **son destination state** kaydedilir.
+- equip: `EquipTo()` sonunda `Save()`
+- unequip: `AddToCharacter()` sonunda `Save()`
+
+### Sıradaki
+- Inventory load/login zinciri
+- item pickup/drop/destroy
+- special inventory / switchbot sınırları
+- swap sisteminin tüm varyantları ve hata senaryoları
