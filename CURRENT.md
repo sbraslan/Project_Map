@@ -23,13 +23,16 @@ Do **not** reconstruct state from old chats. GitHub state is canonical.
 - Guild lifecycle remains represented as `MAPPED WITH GUILD STORAGE`, not as an open PARTIAL audit.
 
 ## First runtime cluster
-**Dungeon Info normal-path tests:**
-1. DUNGEON-T10 — current 9-dungeon UI list creation.
-2. DUNGEON-T09 — ranking SQL failure.
-3. DUNGEON-T11 — numeric GLOBAL flag parse mismatch.
-4. DUNGEON-T12 — unset/expired cooldown uint32 wrap.
+**Gate:** DUNGEON-T10 live reproduction.
 
-These should be validated before crafted-packet/ASan tests because they are current-data normal-path defects.
+Preflight confirms the full normal path and the current 9-entry dataset. T10 blocks the other normal UI tests because no dungeon rows are created.
+
+After T10 is reproduced and fixed/bypassed:
+1. DUNGEON-T09 — ranking SQL failure.
+2. DUNGEON-T11 — numeric GLOBAL flag parse mismatch.
+3. DUNGEON-T12 — unset/expired cooldown uint32 wrap.
+
+T09/T11/T12 are code-path confirmed but not yet marked runtime PASS.
 
 ## Write rule
 After each meaningful runtime result:
