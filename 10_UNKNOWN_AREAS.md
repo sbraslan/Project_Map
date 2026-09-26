@@ -79,3 +79,27 @@ Artık kapatılan ana alanlar:
 8. Disband orphan items
 
 Bu noktadan sonra Guild Storage için ek salt-okuma getirisi düşük; runtime testleri daha değerli.
+
+## Inventory / Item Move — yeni çalışma alanı
+
+### Çözülen
+- Python UI → binding → client network send
+- `HEADER_CG_ITEM_MOVE`
+- server dispatch
+- `CHARACTER::MoveItem` temel validation
+- stack
+- split
+- normal full move
+- equip / unequip
+- delayed-save persistence mantığı
+- quickslot sync ana dalları
+
+### Açık alanlar
+- Login sırasındaki item load → inventory/equipment reconstruction
+- Pickup / ground ownership
+- Drop / destroy
+- `ENABLE_SWAP_SYSTEM` edge-case matrisi
+- Special Inventory exact type/cell mapping
+- Switchbot move lifecycle
+- Additional Equipment Page etkileşimi
+- invalid destination / rollback davranışlarının bütün caller'larda doğrulanması
