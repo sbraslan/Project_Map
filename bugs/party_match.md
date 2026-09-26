@@ -80,3 +80,18 @@ Client processing:
 Result: the minimap icon remains visible although matchmaking is no longer active on the server and the main UI state has reset.
 
 This has normal reachability because required items are not reserved/locked for the duration of searching.
+
+
+## Static closure
+Party Match static audit closed on 2026-09-26.
+
+Verified bugs:
+- BUG-PMATCH-001 — same-channel search pool fragmented per game core.
+- BUG-PMATCH-002 — exchange-listed required item can be destroyed while CExchange retains its raw pointer.
+- BUG-PMATCH-003 — queued FAIL_NO_ITEM leaves the minimap Party Match icon stale/visible.
+
+Not promoted:
+- duplicate SEARCH/HOLD desync: requires a second SEARCH producer not present in stock UI;
+- ignored WarpSet result: configured target coordinates resolve correctly in current deployment;
+- client off-state helpers: no active producer found;
+- alternate country/ae Party Match config: active loader uses locale/common.
