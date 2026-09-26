@@ -191,3 +191,41 @@ ground itemların DB'den bilinçli olarak çıkarıldığını ve core memory'ye
 ### ITEM-T05 — Destroy sender sequence davranışı
 - Client network logging ile ardışık destroy + başka packet senaryoları test edilir.
 - `SendItemDestroyPacket` sonrası `SendSequence` eksikliğinin packet dispatch üzerinde etkisi olup olmadığı ölçülür.
+
+### ITEM-T06 — Invalid DB item position / AddToCharacter
+**Yalnız kontrollü test DB'de.**
+
+Ayrı testler:
+- INVENTORY pos > valid max
+- BELT_INVENTORY pos >= BELT_INVENTORY_SLOT_COUNT
+- DRAGON_SOUL_INVENTORY pos >= DRAGON_SOUL_INVENTORY_MAX_NUM
+- SWITCHBOT / ADDITIONAL invalid pos
+
+Karakter login edilir.
+
+Kontrol:
+- core crash / ASan OOB
+- item manager VID/ID map durumu
+- owner pointer
+- character slot arrays
+- DB row'un sonraki save davranışı
+
+Beklenen güvenli davranış:
+invalid row karantinaya/restore listesine alınmalı; array indexing yapılmamalı.
+
+### ITEM-T07 — Additional Equipment occupied-slot swap
+`ENABLE_ADDITIONAL_EQUIPMENT_PAGE` aktif build.
+
+- page 0 ve page 1 ayrı test
+- aynı wear slotunda mevcut item varken başka item equip et
+- swap sonrası iki itemın:
+  - window
+  - cell
+  - equipped state
+  - stat bonus
+  - client görünümü
+  - DB persistence
+değerlerini kontrol et.
+
+Amaç:
+`SwapItem` başındaki shadowed `srcCell/destCell` kodunun runtime etkisini belirlemek.
