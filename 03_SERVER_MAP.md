@@ -140,3 +140,31 @@ Server:
 - load-time reset
 
 Not: close komutunda state reset iki kez çağrılıyor.
+
+## Guild Storage — CSafebox item lifecycle
+
+### Checkin / Add
+`CSafebox::Add(pos,item)` GUILDBANK modunda:
+1. slot geçerliliği
+2. `item->SetWindow(GUILDBANK)`
+3. `item->SetCell(openingCharacter,pos)`
+4. `item->Save()`
+5. `ITEM_MANAGER::FlushDelayedSave(item)`
+6. local grid/slot update
+7. client'e `HEADER_GC_GUILDSTORAGE_SET`
+
+### Checkout / Remove
+`CSafebox::Remove(pos)`:
+1. grid occupancy kaldırılır
+2. `item->RemoveFromCharacter()`
+3. local storage slot temizlenir
+4. client'e `HEADER_GC_GUILDSTORAGE_DEL`
+
+Checkout handler daha sonra:
+`item->AddToCharacter(...)`
+→ save
+→ `FlushDelayedSave`
+→ `HEADER_GD_ITEM_FLUSH`
+
+### Container destroy
+`CSafebox::__Destroy()` mevcut storage itemlarında `SetSkipSave(true)` kullanarak in-memory container kapanışının item silme/save dönüşümüne yol açmasını önlüyor.
