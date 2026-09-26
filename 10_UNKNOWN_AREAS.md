@@ -725,3 +725,29 @@ Runtime-only remaining:
 Do not reopen static Achievement scanning unless runtime behavior contradicts the map or source/config commits change.
 
 Next static target: **Biolog System** (`BiologSystemManager.cpp/.h`).
+
+
+## Biolog System — closed static scope
+
+Mapped:
+- client open/send/timer bindings
+- GAME packet framing and runtime manager
+- mission submission/chance/cooldown/reminder
+- player-table save/load
+- DB mission/reward proto boot
+- client info cache/UI
+- quest Lua bridge
+- Project_Game registered quest integration.
+
+**Status: STATIC COMPLETE.**
+
+Repository-static limitation:
+actual `biolog_missions` / `biolog_rewards` DB rows are not stored in the mapped Git repos, so value-level proto validation is BIO-T08/runtime-data work.
+
+Do not reopen Biolog static scanning unless:
+- live DB rows expose a new code path,
+- runtime tests contradict this map,
+- `biolog_manager` quest is added,
+- build switches to 64-bit or ENABLE_SEQUENCE_SYSTEM is enabled.
+
+Next static target: **Hunting System**.
