@@ -232,3 +232,66 @@ Therefore the mapped Party Heal feature cannot become usable through its normal 
 3. Map EXP/bonus/near-member update lifecycle.
 4. Audit Party Match separately and decide whether it belongs to Party or its own subsystem.
 5. Continue client packet/state consistency audit.
+
+
+## Reconnect / offline synchronization audit
+P2P login/logout propagates party online state:
+- `P2P_MANAGER::Login -> CPartyManager::P2PLogin -> CParty::UpdateOnlineState`;
+- `P2P_MANAGER::Logout -> CPartyManager::P2PLogout -> CParty::UpdateOfflineState`.
+
+Both state changes reuse `HEADER_GC_PARTY_ADD`:
+- online sends the member name plus optional map/channel;
+- offline sends an empty display name and zeroed optional map/channel.
+
+The Python party board updates an existing PID board instead of duplicating it. `CPythonPlayer::AppendPartyMember` uses `emplace`, so an already-known PID retains its identity/name cache while Python can display it as offline. Server-side `strName` is not cleared on offline transition. No verified reconnect duplicate-PID cache defect was found in the mapped normal flow.
+
+## Role-state integrity audit
+`CInputMain::PartySetState` correctly requires:
+- party exists;
+- caller is leader;
+- target PID is a party member;
+- requested role is one of the whitelisted special roles.
+
+However, when `flag == false`, `CParty::SetRole(pid, bRole, false)` does not verify that `bRole` equals the target member's current role. It resets the target's actual role to NORMAL, then decrements `m_anRoleCount[bRole]` using the client-supplied role value.
+
+This creates BUG-PARTY-003.
+
+## Party-position dynamic packet audit
+With `WJ_SHOW_PARTY_ON_MINIMAP`, `HEADER_GC_PARTY_POSITION_INFO` is registered as a dynamic-size packet.
+
+`RecvPartyPositionInfo()` computes:
+`auto iPacketSize = Packet.wSize - sizeof(Packet)`
+and then repeatedly reads full `SPartyPosition` records while `iPacketSize > 0`.
+
+No minimum-base-size or payload-divisibility validation is performed. Because `sizeof(Packet)` participates as an unsigned size type, a declared size below the base packet can underflow; a payload not divisible by `sizeof(SPartyPosition)` can also wrap after subtraction and drive reads beyond the declared packet boundary.
+
+This creates BUG-PARTY-004. The normal server sender constructs a correct size from a buffer of whole `TPartyPosition` records; this finding concerns malformed/corrupted server packets, not a client-to-server input path.
+
+## Additional verified bugs
+
+### BUG-PARTY-003 — forged mismatched role-off packet corrupts party role counters
+A party leader can submit any whitelisted special role value with `flag=false`.
+
+If the member currently has a different special role, `SetRole`:
+1. accepts the member because its current role is neither LEADER nor NORMAL;
+2. changes its real role to NORMAL;
+3. decrements the counter indexed by the packet's `bRole`, not the member's previous role.
+
+Consequences:
+- the true old-role counter remains occupied/stale;
+- the forged role counter can become negative;
+- future role-cap checks use corrupted counters and can incorrectly block a free role or permit more assignments than the configured maximum.
+
+The normal Python UI sends the current role when turning a role off, but the server does not enforce that invariant.
+
+### BUG-PARTY-004 — malformed dynamic party-position size can underflow/desynchronize client parsing
+`RecvPartyPositionInfo` trusts the dynamic packet's `wSize` structure and consumes fixed-size records without checking base minimum or exact record alignment.
+
+Malformed server packet sizes can cause unsigned underflow / parsing beyond the packet's declared boundary.
+
+## Exact next audit
+1. Map near-member, role bonus and EXP-distribution update lifecycle.
+2. Audit party position/map/channel helpers across cross-core/channel transitions.
+3. Audit Party Match as an adjacent system and decide whether to split it into its own subsystem.
+4. Review quest party APIs for authority/lifetime interactions with `CParty::Quit/DeleteParty`.
+5. Continue remaining packet/state boundary checks.
