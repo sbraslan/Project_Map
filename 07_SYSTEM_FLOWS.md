@@ -628,3 +628,49 @@ Sonuç: sender gold azalır, receiver gold artmaz.
 preflight true -> Done item #1 Remove/Add -> FlushDelayedSave(item #1) -> DB HEADER_GD_ITEM_SAVE -> item #2 placement failure -> Done false -> Cancel.
 
 Item #1 için rollback veya compensating DB save yoktur. Bu, BUG-EXCHANGE-001/002'nin reconnect/restart sonrasında da kalıcı olabilmesine neden olur.
+
+
+## Shop / Premium Private Shop — transaction flow
+
+### Premium PC Shop purchase
+Buyer request
+→ shop manager / PrivateShopSearchBuy
+→ `CShop::Buy(ch,pos,...)`
+→ item slot + owner validation
+→ buyer gold/cheque validation
+→ type-aware destination lookup
+→ buyer currency debit
+→ shop item ownership transfer to buyer
+→ item save flush
+→ local shop slot clear/update
+→ GAME sends `SHOP_SUBHEADER_GD_BUY(pid,pos)`
+→ DB `ShopSaleResult`
+→ DB-side stored listing price added to seller stash
+→ DB-side listing removed
+→ shop cache saved
+→ optional online seller sale-info sync.
+
+Important boundary: buyer/item commit precedes seller-stash DB processing; there is no shared transaction or synchronous commit acknowledgement.
+
+### NPC shop buy
+Server creates item
+→ target slot found
+→ cost debited
+→ item added/flushed.
+
+### ShopEx
+Server creates item
+→ target slot found
+→ selected currency validated
+→ selected currency removed
+→ item added/flushed.
+
+### NPC sell
+inventory cell item
+→ anti-sell/locked/sealed checks
+→ price/tax + overflow check
+→ item count/remove
+→ gold credit.
+
+### Premium listing source
+Initial OpenMyShop and AddMyShopItem both restrict actual listed source items to INVENTORY or DRAGON_SOUL_INVENTORY; Premium add-item packet does not inherit the Exchange unsupported-window problem.
