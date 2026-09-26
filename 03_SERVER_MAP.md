@@ -687,7 +687,7 @@ EnterGame:
 
 ### Statik kusurlar
 - Cross-core P2P source path raw manager pointer'ını erase sonrası delete etmiyor → BUG-SWITCHBOT-001.
-- Server START item ID/existence/ownership tekrar doğrulaması yapmıyor → BUG-CANDIDATE-SWITCHBOT-002; normal resmi UI boş slot Start'ını disable ediyor.
+- Server START item ID/existence/ownership tekrar doğrulaması yapmıyor → BUG-SWITCHBOT-004; normal resmi UI boş slot Start'ını disable ediyor.
 
 ## Storage checkin/checkout — TItemPos trust boundary
 
