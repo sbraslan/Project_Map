@@ -174,3 +174,15 @@ Not yet promoted to verified current-path bugs:
 3. Determine whether any live caller opens generic PARTY ranking.
 4. Audit dynamic ranking packet length handling for malformed/non-multiple payload sizes.
 5. Audit SQL/result null handling and then decide whether Ranking is STATIC COMPLETE.
+
+
+## Build/linkage anomaly under review
+`battle_field.cpp` contains two unqualified calls to `LoadRanking(RK_CATEGORY_BF)`.
+
+Current bounded checks found:
+- no `CBattleField::LoadRanking` declaration in `battle_field.h`;
+- no free `LoadRanking` declaration in the directly inspected BattleField includes;
+- no `LoadRanking` macro in the game Makefile flags inspected;
+- the actual implemented loader is `CRankingSystem::LoadRanking(uint8_t)`.
+
+This is **not yet assigned a bug ID**. It may represent a missing wrapper/declaration or a compile-time integration defect, but the full transitive include graph has not yet been exhausted. Keep it as an explicit next-check item rather than assuming intended behavior.
