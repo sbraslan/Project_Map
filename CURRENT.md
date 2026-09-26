@@ -19,39 +19,25 @@ Strictly read-only:
 
 No C++, Python, quest, config, game-data, source or binary file may be edited, committed or pushed.
 
-## Closed this turn — Ranking
-Ranking System is now **STATIC COMPLETE**.
+## Party checkpoint
+Mapped:
+- Create / Join / Remove / Delete lifecycle;
+- GD -> DB channel map -> DG peer replication;
+- game-side DB receive handlers;
+- invite/accept authority and mutable-condition revalidation;
+- role/remove/skill/EXP parameter authority;
+- GC party packet bridge and normal client cache removal;
+- party destructor/member-map cleanup.
 
-Verified Ranking bugs:
-- `BUG-RANK-001`
-- `BUG-RANK-002`
-- `BUG-RANK-003`
-- `BUG-RANK-004`
-- `BUG-RANK-005`
-- `BUG-RANK-007`
-
-Retracted/reserved:
-- `BUG-RANK-006` — false positive.
-
-## Active Party checkpoint
-Initial Party roots are mapped:
-- game `party.h/.cpp`;
-- DB `ClientManagerParty.cpp`;
-- game request handlers in `input_main.cpp`;
-- client network/player layer;
-- `root/uiparty.py` / interface / game bridge.
-
-Known architecture:
-- game creates/changes parties and reports to DB;
-- DB tracks party state per channel and forwards party changes to peers;
-- game exposes invite/answer/state/remove/skill/parameter handlers;
-- client UI contains role, member, heal/warp, leave/disband and EXP distribution actions.
+Verified bugs:
+- `BUG-PARTY-001` — leader `Quit()` returns from a self-deleting `P2PQuit()` and uses the freed `CParty`.
+- `BUG-PARTY-002` — Party Heal UI/server integration is hard-disabled; heal cannot execute.
 
 ## Exact next work
-1. Map Party Create -> DB -> peer replication.
-2. Map Join / Leave / Delete lifecycle.
-3. Map CG handlers and validation.
-4. Map GC client cache/UI updates.
-5. Start bug-candidate audit.
+1. Audit reconnect/offline member ADD/LINK/UNLINK and duplicate PID cache behavior.
+2. Audit `SetRole` internal bounds across DB/P2P paths.
+3. Map near-member/bonus/EXP update lifecycle.
+4. Separate/audit Party Match.
+5. Continue packet/state consistency checks.
 
 GitHub state is canonical. Do not reconstruct from old chats.
