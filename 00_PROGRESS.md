@@ -135,3 +135,27 @@ Guild Storage statik haritalaması tamamlandıktan sonra ortak omurga olan **Inv
 - item pickup/drop/destroy
 - special inventory / switchbot sınırları
 - swap sisteminin tüm varyantları ve hata senaryoları
+
+## Checkpoint — Inventory login/load zinciri tamamlandı
+
+### DB → game item reconstruction
+Player login sırasında itemlar DB/cache'den:
+`HEADER_DG_ITEM_LOAD = 42`
+ile game'e gönderiliyor.
+
+Game:
+`CInputDB::ItemLoad`
+→ her `TPlayerItem` için `CreateItem`
+→ sockets/attributes/random/seal/change-look/set/growth-pet data uygulanır
+→ `SetLastOwnerPID(p->owner)`
+→ window'a göre `AddToCharacter`, `EquipTo`, `EquipToDB` vb.
+
+Load boyunca `SetSkipSave(true)` kullanıldığı için mevcut DB itemını tekrar save etme döngüsü engelleniyor; item kurulduktan sonra false'a dönüyor.
+
+Slot çakışması/equip başarısızlığı durumunda item restore listesine alınır:
+- boş inventory slotu varsa oraya taşınır
+- yer yoksa karakterin bulunduğu yere ground item olarak bırakılır
+- 180 sn ownership verilir
+- destroy event başlatılır.
+
+Bu bölümle Inventory save ↔ load çift yönlü temel persistence haritası kapanmış oldu.
