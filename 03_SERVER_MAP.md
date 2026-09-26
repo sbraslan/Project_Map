@@ -756,3 +756,36 @@ Normal MoveItem'ın active-slot guard'ı burada çalışmaz.
 Event callback `SwitchItems()` çağırıp her durumda tekrar schedule edildiği için active slot kalmasa da boş tick devam edebilir.
 
 Character destructor `ClearItem()` çalıştırdığı ve SWITCHBOT itemları RemoveFromCharacter → UnregisterItem zincirinden geçtiği için bu normal logout yaşam döngüsüyle de ilişkilidir.
+
+
+## Additional Equipment SwapItem — shadowing impact resolution
+
+`SwapItem` başındaki local `srcCell/destCell` shadowing statik olarak mevcut.
+
+Ancak actual occupied-slot swap seçiminde:
+`wDestCell`
+→ `CheckAdditionalEquipment(wDestCell)`
+→ normal equipment veya `GetAdditionalEquipmentItem`
+→ `item1->EquipTo(..., bEquipCell)`
+→ `CHARACTER::GetWear/SetWear`
+→ `CheckAdditionalEquipment(bWearCell)`
+
+zinciri kullanılıyor.
+
+Sonuç: outer `destCell` değerinin ADDITIONAL_EQUIPMENT_1'e dönüşmemesi mevcut çağrı akışında placement kararını belirlemiyor. Doğrudan runtime corruption/duplication etkisi statik olarak gösterilemedi.
+
+## AddToCharacter caller audit — kapanış
+
+Ana caller sınıfları:
+- Dragon Soul PullOut → target validity + empty-DS fallback
+- refine/fishing/mining replacement → mevcut geçerli hücre reuse
+- exchange/shop → precomputed empty slot
+- quest rewards → empty-slot helper
+- ItemLoad → persisted window/pos
+- storage checkout/checkin → client-controlled TItemPos
+
+Yüksek değerli trust boundary'ler:
+1. malformed/persisted DB position → BUG-ITEM-004
+2. storage window semantic bypass → BUG-ITEM-006
+
+Diğer incelenen ana caller sınıflarında yeni bağımsız invalid-position kaynağı bulunmadı.
