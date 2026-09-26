@@ -30,3 +30,31 @@ Packet adı, struct, opcode/header ve handler eşleşmesi kaynak koddan doğrula
 - 85 → `SafeboxCheckout(..., 2)`
 
 Durum: **packet → server entry doğrulandı**.
+
+## Guild Storage — DB packet katmanı
+
+Game → DB:
+- `HEADER_GD_GUILDSTORAGE_LOAD = 150`
+- `HEADER_GD_GUILDSTORAGE_CHANGE_SIZE = 151`
+
+DB → Game:
+- `HEADER_DG_GUILDSTORAGE_LOAD = 52`
+- `HEADER_DG_GUILDSTORAGE_CHANGE_SIZE = 53`
+
+### Load dispatch
+Game:
+`ReqGuildstorageLoad()`
+→ `HEADER_GD_GUILDSTORAGE_LOAD`
+
+DB:
+`CClientManager`
+→ `QUERY_SAFEBOX_LOAD(..., 2)`
+
+Result:
+`RESULT_SAFEBOX_LOAD`
+→ mode 2 ise `HEADER_DG_GUILDSTORAGE_LOAD`
+
+Game:
+`CInputDB::GuildstorageLoad`
+→ `CHARACTER::LoadGuildstorage`
+→ client `HEADER_GC_GUILDSTORAGE_OPEN`.
