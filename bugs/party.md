@@ -83,3 +83,45 @@ The stock Python UI normally sends the member's current role; the defect is miss
 A too-small or non-aligned declared size can underflow/wrap the loop counter and lead to reads beyond the packet's declared boundary / receive-stream desynchronization.
 
 The normal server sender builds well-formed packets from whole position records. This bug is recorded as malformed-server-packet robustness, not a client-to-server exploit.
+
+
+### BUG-PARTY-005 — leader Quit can preserve party role bonuses after party destruction
+- Statik durum: **doğrulandı**
+- Sınıf: stale combat stats / lifecycle
+- Build koşulu: `ENABLE_PASSIVE_ATTR` aktif
+
+Leader `P2PQuit` flow:
+1. leader entry is erased from `m_memberMap`;
+2. cleanup calls `ComputeRolePoint(ch, GetLeaderCharacter(), role, false)`;
+3. `GetLeaderCharacter()` uses `m_memberMap[leaderPID]`, recreating an empty leader entry;
+4. the returned leader pointer is null;
+5. passive-attr `ComputeRolePoint` immediately returns when `pkLeader == nullptr`.
+
+Then leader removal triggers `DeleteParty(this)`.
+
+During destructor `RemoveBonus()`, remaining party members also pass the same null leader pointer to `ComputeRolePoint`, so their party bonus cleanup can be skipped as well.
+
+The stale points include the `POINT_PARTY_*_BONUS` family. They are not automatically erased by `ComputePoints()`; that function explicitly snapshots and restores the party bonus values.
+
+Verified normal reachability:
+- BattleField leader entry;
+- active quest API `party.leave_party` when a leader leaves a party with more than two members.
+
+This is distinct from BUG-PARTY-001: BUG-PARTY-001 is the freed-`this` access after return from `P2PQuit`; BUG-PARTY-005 is stale combat-stat state created during the self-delete path itself.
+
+### BUG-PARTY-006 — `party.get_near_member_pids` returns same-map members without near filtering
+- Statik durum: **doğrulandı**
+- Sınıf: quest Lua API semantic defect
+- Build koşulu: `ENABLE_DUNGEON_RENEWAL` aktif
+
+The registered API is named `get_near_member_pids`, but its implementation only calls:
+`ForEachOnMapMember(..., currentMapIndex)`.
+
+There is no range check and no `IsNearLeader/bNear` check.
+
+The implementation itself carries:
+`// Near Check missing!`
+
+As a result, same-map party members farther than the normal 5000 party range are returned as "near".
+
+No concrete caller was found in the current Project_Game search, so current gameplay impact depends on quest usage; the exposed Lua API implementation itself is nevertheless incorrect.
