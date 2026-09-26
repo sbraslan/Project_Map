@@ -147,3 +147,47 @@ rows orphan kalıyor.
 - `ENABLE_PULSE_MANAGER` aktif test build.
 - Offline guild member'ı çıkar.
 - Core crash/log kontrolü.
+
+### ITEM-T01 — Destroy count semantics
+- Stack count örneğin 50 olan test itemı kullan.
+- Destroy packetini count=1 / 10 gibi partial değerlerle gönder.
+- Sonuç inventory + DB'de gözlenir.
+
+Beklenen API davranışı:
+requested count kadar işlem veya count alanının açıkça ignored/full-delete olarak tasarlanması.
+
+Mevcut statik kod:
+tüm item stack objesini siliyor.
+
+### ITEM-T02 — Destroy use-after-free
+- Debug/ASan mümkünse aktif test game core.
+- Destroy system üzerinden normal item yok et.
+- `CHARACTER::RemoveItem` dönüşündeki ChatPacket/GetName yolunu izle.
+- crash / sanitizer UAF raporu / bozuk isim kontrol et.
+
+### ITEM-T03 — Drop AddToGround failure rollback
+Kontrollü test ortamında `AddToGround` false yolu üret:
+- invalid/olmayan sectree veya kontrollü instrumentation.
+
+Full ve partial stack ayrı test edilir.
+
+Beklenen:
+item/count source'a geri dönmeli veya işlem false olmalı.
+
+Mevcut statik kod:
+rollback yok, fonksiyon true dönüyor.
+
+### ITEM-T04 — Ground DB lifecycle
+1. Benzersiz item ID'li itemı inventory'de doğrula.
+2. Yere bırak.
+3. DB row/cache durumunu kontrol et.
+4. Item hâlâ world'de iken tekrar pickup yap.
+5. DB row'un player owner/window ile yeniden oluştuğunu doğrula.
+6. Ek olarak item yerdeyken game core crash/restart senaryosunu kontrollü test et.
+
+Amaç:
+ground itemların DB'den bilinçli olarak çıkarıldığını ve core memory'ye bağımlı olduğunu doğrulamak.
+
+### ITEM-T05 — Destroy sender sequence davranışı
+- Client network logging ile ardışık destroy + başka packet senaryoları test edilir.
+- `SendItemDestroyPacket` sonrası `SendSequence` eksikliğinin packet dispatch üzerinde etkisi olup olmadığı ölçülür.
