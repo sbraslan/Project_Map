@@ -5,33 +5,32 @@
 **Status:** PARTIAL — ACTIVE
 **Machine state:** `STATE.json`
 **Canonical map:** `systems/dungeon_core.md`
-**Last updated:** 2026-09-26
+**Last updated:** 2026-09-27
 
 ## Hard rule
 Only `sbraslan/Project_Map` is writable. All source/game repositories remain read-only.
 
 ## Dungeon Core checkpoint
 Verified bugs:
-- `BUG-DUNGEON-001` — rejected `d.join` / `d.new_jump_guild` entry can orphan an empty private dungeon without dead-event cleanup.
+- `BUG-DUNGEON-001` — rejected `d.join` / `d.new_jump_guild` can orphan an empty private dungeon.
+- `BUG-DUNGEON-002` — `SpawnMoveUnique` does not stop after success and can create up to 100 mobs while tracking one key.
+- `BUG-DUNGEON-003` — multi-key `SetUnique` aliases can survive character destruction as dangling raw pointers.
 
-Newly closed:
-- party/dungeon member counters and raw party-key cleanup;
-- destination SetDungeon binding;
-- participant registry uses PID/name, not raw character pointers;
-- unique mob raw pointers are erased on normal death and manager destruction paths;
-- all 98 source quest files checked for suspicious kill/potion/revive getters: no current callers;
-- Devil Catacomb item-group path adds live reachability to existing `BUG-PARTY-001`.
+Closed without new bug:
+- persistent regen event/REGEN lifetime: event cancellation + dungeon-ID lookup + pointer/id validity guard closes the mapped UAF path;
+- bulk `KillAll/Purge/KillMonsters` traversal: `SECTREE_MAP::for_each` uses an entity snapshot, avoiding direct iterator invalidation;
+- normal participant and party-member bookkeeping previously closed.
 
-Not promoted:
-- eliminate event null-ordering: destructor cancellation still closes normal stale-event path;
-- nested JumpParty ownership: semantic weakness, no mapped live nested caller;
-- item-group exchange risk: specific Reaper's Credit item anti-flags unavailable.
+Still candidate / not promoted:
+- nested `JumpParty` can bypass exclusive-dungeon equality when party already has an ownership pointer, but current nested quest reachability is not yet established;
+- eliminate event null-ordering remains incorrect but no surviving-event lifecycle path is mapped;
+- lower-level stale SECTREE relationship erase has no established normal producer.
 
 ## Exact next work
-1. Audit regen lifetime.
-2. Audit bulk purge/kill pending-destroy behavior.
-3. Audit unique alias edge cases.
-4. Revisit nested JumpParty reachability.
-5. Continue Dungeon Core closure.
+1. Scan current source quests for `d.spawn_move_unique`, multi-key `d.set_unique`, and nested `d.new_jump_party` reachability.
+2. Audit duplicate-key behavior in `SpawnUnique/SetUnique`.
+3. Audit dungeon manager ID wrap against event identity.
+4. Close eliminate-event null ordering.
+5. Decide Dungeon Core STATIC COMPLETE.
 
 GitHub state is canonical.
