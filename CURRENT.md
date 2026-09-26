@@ -1,48 +1,62 @@
 # CURRENT — Canonical Active Checkpoint
 
 **Active phase:** Detection / Mapping Only
-**Status:** ACTIVE
+**Active subsystem:** Ranking System
+**Status:** PARTIAL — ACTIVE
 **Machine state:** `STATE.json`
+**Canonical map:** `systems/ranking.md`
 **Last updated:** 2026-09-26
 
 ## Hard rule
 Only `sbraslan/Project_Map` is writable.
 
-The following repositories are strictly read-only:
+Strictly read-only:
 - `Project_ClientSrc`
 - `Project_ServerSRC`
 - `Project_Binary`
 - `Project_Game`
 - `Project_DumpProto`
 
-No C++, Python, quest, config, game-data, source, binary or gameplay file may be edited, committed or pushed.
+No C++, Python, quest, config, game-data, source or binary file may be edited, committed or pushed.
 
-## What we do now
-- inspect code;
-- map architecture and data flow;
-- identify bugs, security/correctness risks and edge cases;
-- record evidence in `systems/`, `bugs/`, `tests/`, `CURRENT.md` and `STATE.json`;
-- use GitHub history as the durable project memory.
+## Ranking checkpoint
+New unmapped subsystem opened: **Ranking System**.
 
-Runtime/fault-injection tests may be documented as future tests, but they are **not executed as part of the current phase** unless the user explicitly changes the phase later.
+Mapped:
+- server ranking manager and BattleField DB lifecycle;
+- BattleField score persistence / weekly rollover;
+- P2P ranking-reload receive path;
+- GC dynamic ranking packet;
+- client C++ ranking cache;
+- Python ranking module;
+- active BattleField ranking UI;
+- generic ranking-board integration.
 
-## Static mapping checkpoint
-- Hunting System -> STATIC COMPLETE, BUG-HUNT-001..005.
-- Ticket System -> STATIC COMPLETE, BUG-TICKET-001..007.
-- Dungeon Info -> STATIC COMPLETE, BUG-DUNGEON-001..012.
-- Other subsystem statuses remain in `INDEX.md`.
+Verified bugs:
+- `BUG-RANK-001` — empty ranking vector indexed with `&vec[0]`.
+- `BUG-RANK-002` — current-player ranking API is a hard-coded empty stub.
+- `BUG-RANK-003` — weekly winner table can retain stale prior-week positions.
+- `BUG-RANK-004` — BattleField close reloads cache before final player scores are persisted.
 
-## Current direction
-Continue read-only source inspection and improve/extend the canonical maps and bug registries.
+## Not promoted yet
+- PARTY ranking UI references Python APIs that are not exported, but no live PARTY opener has been located.
+- Generic SOLO categories 2..7 lack UI name entries, but no live opener has been located.
+- Ranker winner effects are not visibly refreshed for already-online players on ranking reload; exact lifecycle still needs closure.
 
-The previously prepared Dungeon remediation notes are reference-only. They do not authorize source changes.
+## Exact next work
+1. Locate the exact outbound `TPacketGGLoadRanking` sender/broadcast path.
+2. Close ranker-effect refresh/removal lifecycle.
+3. Determine whether any active caller opens generic PARTY ranking.
+4. Audit dynamic GC ranking packet malformed-size handling.
+5. Audit remaining DB/result null boundaries and decide Ranking STATIC COMPLETE.
 
 ## Startup
-For a normal "ilerleyelim" turn:
+For the next normal "ilerleyelim":
 1. read `STATE.json`;
 2. read `CURRENT.md`;
-3. read `WORKFLOW.md`;
-4. inspect only the exact source symbols needed;
-5. write findings only to `Project_Map`.
+3. read `systems/ranking.md`;
+4. read `bugs/ranking.md` only when validating/adding a bug;
+5. inspect exact source symbols read-only;
+6. write findings only to `Project_Map`.
 
-Do not reconstruct state from old chats. GitHub state is canonical.
+GitHub state is canonical. Do not reconstruct from old chats.
