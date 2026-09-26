@@ -1100,3 +1100,57 @@ Force-finish:
 -> update/notification
 -> `RewardPlayer`.
 No already-finished guard exists inside `FinishAchievement`.
+
+
+## Biolog System — completed static flow
+
+Open:
+`ExpandedTaskBar -> Interface.BiologManagerOpen -> biologmgr.SendPacket(OPEN)`
+-> `CPythonNetworkStream::SendBiologManagerAction`
+-> `HEADER_CG_BIOLOG_MANAGER`
+-> `CInputMain::BiologManager`
+-> `CBiologSystem::RecvClientPacket(OPEN)`
+-> mission/reward proto lookup
+-> GC info packet
+-> `CPythonBiologManager::_LoadBiologInformation`
+-> `uibiologmanager.py`.
+
+Submit:
+`SendPacketItem -> CG SEND`
+-> current mission
+-> level / item / cooldown checks
+-> researcher-elixir chance override
+-> remove required item
+-> chance roll
+-> collected count
+-> completion flag OR next cooldown
+-> UI refresh.
+
+Timer:
+UI checkbox
+-> Python binding sends CG TIMER header then a bool payload
+-> server handler consumes bool and updates reminder preference/event.
+
+Mission/reward proto:
+DB startup
+-> SELECT `biolog_missions` + `biolog_rewards`
+-> DB boot packet
+-> GAME `InitializeMissions/InitializeRewards`
+-> map keyed by uint8 mission.
+
+Player durability:
+runtime Biolog fields
+-> normal CHARACTER save event
+-> `TPlayerTable`
+-> player SQL columns
+-> next login restores fields
+-> new per-character `CBiologSystem`.
+
+Completion bridge intended:
+required count reached
+-> quest flag `biolog_manager.*`
+-> UI event quest request `biolog_manager`
+-> expected `pc.biolog_*` calls
+-> reward affect/item + next mission.
+
+Current Project_Game breaks this intended final bridge because no `biolog_manager` quest is present or registered; only legacy biolog quests are registered.
