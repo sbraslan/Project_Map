@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "updated_at": "2026-09-26",
+  "updated_at": "2026-09-27",
   "project": "Metin2 Project",
   "mapping_repo": "sbraslan/Project_Map",
   "mode": "detection_only_mapping",
@@ -13,15 +13,17 @@
     "bug_file": "bugs/dungeon_core.md",
     "test_file": "tests/dungeon_core.md",
     "verified_bug_ids": [
-      "BUG-DUNGEON-001"
+      "BUG-DUNGEON-001",
+      "BUG-DUNGEON-002",
+      "BUG-DUNGEON-003"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Audit dungeon regen list/event lifetime and ClearRegen ordering.",
-      "Audit bulk purge/kill behavior under pending-destroy iteration.",
-      "Audit unique alias/multi-key lifecycle edge cases.",
-      "Revisit nested JumpParty ownership reachability.",
-      "Continue toward Dungeon Core STATIC COMPLETE."
+      "Scan current source quests for d.spawn_move_unique, multi-key d.set_unique and nested d.new_jump_party reachability.",
+      "Audit duplicate-key behavior in SpawnUnique/SetUnique.",
+      "Audit dungeon manager ID wrap against event identity.",
+      "Close eliminate-event null ordering.",
+      "Decide Dungeon Core STATIC COMPLETE."
     ]
   },
   "startup": {
@@ -154,7 +156,14 @@
     "game/src/dungeon.cpp::DeadCharacter/PurgeUnique/KillUnique",
     "game/src/questlua_dungeon.cpp::item-group APIs",
     "Project_Game::Devil Catacomb item-group floor transition",
-    "Project_Game::98 source quest files getter reachability audit"
+    "Project_Game::98 source quest files getter reachability audit",
+    "game/src/regen.cpp::dungeon_regen_event/regen_do",
+    "game/src/dungeon.cpp::SpawnRegen/AddRegen/ClearRegen/IsValidRegen",
+    "game/src/char.cpp::SetRegen/CHARACTER::Destroy regen guard",
+    "game/src/sectree_manager.h::SECTREE_MAP::for_each snapshot",
+    "game/src/char_manager.cpp::DestroyCharacter/BeginPendingDestroy/FlushPendingDestroy",
+    "game/src/dungeon.cpp::SpawnMoveUnique/SpawnUnique/SetUnique/DeadCharacter",
+    "game/src/questlua_dungeon.cpp::spawn_move_unique/set_unique Lua bindings"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
