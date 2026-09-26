@@ -224,3 +224,28 @@ Normal client `MoveItem` yolu `IsValidItemPosition(DestCell)` ile korunuyor. Ris
 
 ### Swap
 `ENABLE_ADDITIONAL_EQUIPMENT_PAGE` altında `SwapItem` başındaki `srcCell/destCell` yeniden tanımlamaları inner-scope shadowing nedeniyle outer değişkenleri değiştirmiyor. Bu kod kusuru ayrıca gözlem/bug adayı olarak kaydedildi.
+
+## Checkpoint — ENABLE_SWAP_SYSTEM multi-slot swap kapatıldı
+
+### Sonuç
+Normal ve Special Inventory occupied-target swap algoritması incelendi.
+
+Akış:
+- destination grid doluysa full-stack zorunlu
+- source/destination inventory türü doğrulanır
+- target base item `GetItem_NEW` ile bulunur
+- self-swap / lock / exchange kontrolleri
+- destination footprint içindeki itemlar `moveItemMap` ile toplanır
+- toplam footprint `sizeLeft` ile kaynak item boyuna eşitlenir
+- source item kaldırılır
+- destination item(lar) kaldırılır
+- destination itemlar source footprint'e
+- source item destination base'e yerleştirilir
+- quickslotlar en sonda senkronize edilir
+
+Bu blokta statik olarak doğrudan duplicate yolu bulunmadı.
+
+Persistence:
+Her `RemoveFromCharacter()` item pointer'ını delayed-save'e sokar; sonraki `SetItem()` owner/cell/window state'ini değiştirir. Manager save cycle son yerleşimi yazar.
+
+Additional Equipment `SwapItem` shadowing adayı açık kalıyor.
