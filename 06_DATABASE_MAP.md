@@ -468,3 +468,30 @@ GAME process uses direct SQL for:
 This table and `battlepass_missions` are therefore separate durability domains.
 
 Atomicity consequences are recorded as BUG-BPASS-008 and BUG-BPASS-009.
+
+## Achievement System — initial DB map
+
+Login tables:
+- `achievement_data(pid, points, title)`
+- `achievements(pid, achievement, finished)`
+- `achievement_tasks(pid, achievement_id, task_id, task_value)`
+
+DB load chain:
+`QUERY_PLAYER_ACHIEVEMENTS_LOAD`
+-> achievement_data
+-> achievements
+-> achievement_tasks
+-> serialize `TAchievementsMap`
+-> `HEADER_DG_ACHIEVEMENT / ACHIEVEMENT_SUBHEADER_LOGIN`
+-> GAME `ProcessDBPackets`
+-> `OnLogin`.
+
+Logout chain:
+GAME `OnLogout`
+-> serialize complete achievement map + points + selected title
+-> `HEADER_GD_ACHIEVEMENT / ACHIEVEMENT_SUBHEADER_LOGOUT`
+-> DB `RecvAchievementPacket`
+-> `CAchievementCache::Put`.
+
+Cache expiry is 1800 seconds.
+`CAchievementCache::OnFlush` destructively rebuilds achievements/tasks without a DB transaction (BUG-ACH-002).
