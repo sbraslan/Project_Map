@@ -14,15 +14,17 @@
     "test_file": "tests/party.md",
     "verified_bug_ids": [
       "BUG-PARTY-001",
-      "BUG-PARTY-002"
+      "BUG-PARTY-002",
+      "BUG-PARTY-003",
+      "BUG-PARTY-004"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Audit reconnect/offline member ADD/LINK/UNLINK and duplicate PID cache behavior.",
-      "Audit CParty::SetRole internal bounds across DB/P2P paths.",
-      "Map near-member/bonus/EXP update lifecycle.",
+      "Map near-member/role-bonus/EXP lifecycle.",
+      "Audit party map/channel position helpers across cores/channels.",
+      "Audit quest party APIs against party lifetime/delete.",
       "Separate and audit Party Match.",
-      "Continue client packet/state consistency checks."
+      "Continue packet/state boundaries and decide Party STATIC COMPLETE."
     ]
   },
   "startup": {
@@ -106,7 +108,12 @@
     "UserInterface/PythonNetworkStreamPhaseGame.cpp::party send/recv",
     "UserInterface/PythonNetworkStreamModule.cpp::party Python bindings",
     "UserInterface/PythonPlayer.cpp::party cache",
-    "root/uiparty.py::PartyMenu/RemovePartyMember"
+    "root/uiparty.py::PartyMenu/RemovePartyMember",
+    "game/src/party.cpp::UpdateOnlineState/UpdateOfflineState",
+    "game/src/party.cpp::SetRole",
+    "game/src/party.cpp::SendPositionInfo",
+    "UserInterface/PythonNetworkStreamPhaseGame.cpp::RecvPartyPositionInfo",
+    "UserInterface/PythonNetworkStream.cpp::HEADER_GC_PARTY_POSITION_INFO dynamic registration"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
