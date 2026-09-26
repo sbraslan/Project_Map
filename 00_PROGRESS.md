@@ -473,3 +473,32 @@ Bu yüzden gerçek dataset içinde special-type + size > 1 item bulunup bulunmad
 1. BUG-ITEM-007 için izole dev-server boundary testi.
 2. BUG-ITEM-008 için controlled DB-row restore testi.
 3. Inventory/Item statik haritasını completion checkpoint'e al ve sonraki subsystem'e geç.
+
+
+## Checkpoint — Player Exchange / Trade static audit başladı
+
+**Tarih:** 2026-09-26
+
+Inventory/Item statik completion sonrasında yeni yüksek öncelikli subsystem olarak player-to-player Exchange seçildi.
+
+### Uçtan uca zincir
+Client Python
+→ `SendExchangeStartPacket / SendExchangeItemAddPacket / SendExchangeElkAddPacket / SendExchangeAcceptPacket`
+→ `HEADER_CG_EXCHANGE`
+→ `CInputMain::Exchange`
+→ `CExchange::{AddItem,AddGold,Check,CheckSpace,Done,Accept,Cancel}`
+→ item RemoveFromCharacter/AddToCharacter + FlushDelayedSave
+→ gold/cheque PointChange + character Save.
+
+### Yeni doğrulanmış problemler
+- **BUG-EXCHANGE-001:** `CheckSpace()` ile `Done()` special-inventory placement modeli farklı. Ön kontrol regular inventory gridini simüle ediyor; commit `GetEmptyInventory(item)` ile special itemı special tab'a yönlendiriyor. Commit incremental ve rollback yok; bu nedenle ön kontrol true iken gerçek commit ortada fail ederek kısmi trade oluşturabilir.
+- **BUG-EXCHANGE-002:** `CheckSpace()` page-4 branch'inde size-boundary `if` sonrasında beklenen `return false` yok. `s_grid4.Put(...)` koşullu statement haline geliyor; çoğu valid item için grid reservation yapılmayabiliyor. Birden çok incoming item aynı boş alanı paylaşmış gibi hesaplanabilir ve Done ortada fail edebilir.
+- **BUG-EXCHANGE-003:** Exchange ITEM_ADD source `TItemPos` için semantic window allowlist yok. Client Python binding explicit window_type gönderiyor; server `IsValidItemPosition()` kabul ettiği için SWITCHBOT ve ADDITIONAL_EQUIPMENT_1 itemları crafted client ile trade offer'a sokulabilir.
+
+### Atomicity sonucu
+`Accept()` iki taraf için Check/CheckSpace yapıyor, sonra ilk taraf `Done()`, ardından ikinci taraf `Done()` çalışıyor. `Done()` itemları tek tek kalıcı olarak taşır. Herhangi bir sonraki item/currency adımında false dönerse önceki mutationları geri alan transaction/rollback yoktur.
+
+### Sıradaki
+1. BUG-EXCHANGE-003'ün Switchbot active-event ve Additional Equipment unequip etkisini sınıflandır.
+2. gold/cheque late-overflow ve iki taraflı Done sırasındaki atomicity riskini kapat.
+3. disconnect/cancel lifecycle ve item `SetExchanging` cleanup davranışını tara.
