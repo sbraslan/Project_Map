@@ -503,3 +503,54 @@ Aktif/inaktif equipment page ve normalde `CanUnequipNow` engeli bulunan durumlar
 
 ### EX-T05 — packet initialization
 Official clientte START sonrası ITEM_ADD/ACCEPT paketlerini debug packet dump ile izle; subheader dışı alanların deterministic zero olup olmadığını doğrula. Server `arg1` prelookup nedeniyle sporadic early-return logları ayrıca takip edilmeli.
+
+
+### EXCHANGE-T01 — Special Inventory preflight/commit divergence
+İzole development server ve disposable karakterlerle:
+1. recipient regular inventory'de yeterli boşluk bırak.
+2. ilgili special tabı doldur veya target type için kullanılabilir special slot bırakma.
+3. sender trade'e önce normal tradeable item, sonra special-type tradeable item eklesin.
+4. iki taraf accept etsin.
+
+Kontrol:
+- CheckSpace sonucu
+- ilk item ownership değişimi
+- ikinci special item için `GetEmptyInventory(item)` sonucu
+- Cancel sonrası iki itemın gerçek owner/window/cell ve DB state'i.
+
+Beklenti: hiçbir item kısmi transfer olmamalı; bug mevcut kodda partial mutation riski gösteriyor.
+
+### EXCHANGE-T02 — Extend inventory page-4 reservation
+Recipient'ın boş alanını yalnız 4. inventory sayfasında kontrollü bırak.
+Birden fazla size=1 ve ardından multi-slot item ile CheckSpace simülasyonunu gerçek `GetEmptyInventory` sonuçlarıyla karşılaştır.
+
+Özellikle `s_grid4.Put` çağrısının her accepted item için reserve edip etmediğini logla.
+
+### EXCHANGE-T03 — Unsupported source windows
+Yalnız test client/dev server:
+- SWITCHBOT source
+- ADDITIONAL_EQUIPMENT_1 source
+ile ITEM_ADD gönder.
+
+Beklenti: production fix sonrası exchange server yalnız açıkça desteklenen source windowları kabul etmeli.
+
+Kontrol: item `SetExchanging`, Switchbot register/event state, additional-equipment effects ve Cancel sonrası state.
+
+### EXCHANGE-T04 — Gold overflow TOCTOU
+1. recipient gold'u `GOLD_MAX - offer - delta` seviyesine getir.
+2. sender gold offer eklesin; offer-time overflow check geçsin.
+3. final accept öncesinde recipient dev ortamında normal reachable bir gold gain yolu ile bakiyesini artırıp `recipient + offer >= GOLD_MAX` yap.
+4. accept et.
+
+Kontrol:
+- sender gold before/after
+- recipient gold before/after
+- overflow log
+- Done return/success UI.
+
+Beklenti: currency transfer atomic olmalı; sender debit recipient credit başarısızken kalıcılaşmamalı.
+
+### EXCHANGE-T05 — Cheque late overflow rollback
+Offer oluşturulduktan sonra recipient cheque bakiyesini limite yaklaştır ve final accept et.
+
+Kontrol: cheque check false olduğunda daha önce taşınan item/gold mutationlarının geri dönüp dönmediği.
