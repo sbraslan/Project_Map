@@ -19,6 +19,12 @@
 - DUNGEON-T04 mismatch LEVEL_LIMIT vs ENTRY_BASE_POSITION counts.
 - DUNGEON-T05 exceed required-item/boss-drop config capacities.
 - DUNGEON-T06 POINT_MAX_NUM+1 bonus entries.
+- DUNGEON-T07 put a >QUEST_NAME_MAX_LEN token into an isolated dungeon_info.txt and reload under ASan; covers BUG-DUNGEON-007.
+- DUNGEON-T08 call Python getters with bonus index/type 255/65535 and required/boss slot 255 under ASan; covers BUG-DUNGEON-008.
+- DUNGEON-T09 request a valid ranking and capture the GAME SQL error; verify the missing whitespace before LEFT JOIN; covers BUG-DUNGEON-009.
+- DUNGEON-T10 load the current 9-dungeon config and open the UI; verify no list buttons are created despite GetCount()>0; covers BUG-DUNGEON-010.
+- DUNGEON-T11 inspect `dragon_lair_access dragon_lair_time 1`; compare PC quest flag vs global event flag selection; covers BUG-DUNGEON-011.
+- DUNGEON-T12 with an unset/expired configured quest cooldown flag, open Dungeon Info and verify the wrapped huge cooldown; covers BUG-DUNGEON-012.
 
 ### Battle Pass
 - BP-T01 complete mission, then invoke any reachable SetExt caller again at threshold; check duplicate reward.
