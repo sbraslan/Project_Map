@@ -1755,3 +1755,68 @@ The nearby source comment explicitly says the player should have to open it from
 
 Therefore a modified client can send the achievement OPEN_SHOP action from an arbitrary location and remotely enter shop 104.
 The economic impact still depends on shop 104's actual currency/item configuration, which remains to be mapped.
+
+
+### BUG-ACH-005 — Achievement Shop purchase can retain item while point debit rolls back after GAME crash
+- Statik durum: **doğrulandı**
+- Sınıf: crash consistency / currency rollback
+
+Shop 104 uses `CoinType Achievement`.
+
+`CShopEx::Buy` first verifies `GetAchievementPoints() >= price`, creates the item and reserves a valid inventory slot. It then calls:
+`CAchievementSystem::ChangeAchievementPoints(ch, -dwPrice)`
+and afterward adds the item and calls `ITEM_MANAGER::FlushDelayedSave(item)`.
+
+Achievement points are not synchronously persisted by `ChangeAchievementPoints`; they are serialized with the rest of Achievement state only from `CAchievementSystem::OnLogout` and then stored through the DB achievement cache.
+
+Crash ordering therefore exists:
+1. points debited only in GAME memory;
+2. purchased item added;
+3. item explicitly flushed and becomes durable;
+4. GAME crashes before clean Achievement logout save;
+5. player reloads old Achievement points while retaining the purchased item.
+
+This needs fault injection for deterministic reproduction, but the durability split is statically confirmed.
+
+### BUG-ACH-006 — four configured task families have no mapped gameplay caller
+- Statik durum: **doğrulandı**
+- Sınıf: unreachable progression / dead achievement content
+
+Current `achievements.xml` contains live tasks for:
+- TYPE_SUMMON_MOUNT: 13 tasks
+- TYPE_SPEND_SEARCH_SHOP: 5 tasks
+- TYPE_SPEND_SHOP: 3 tasks
+- TYPE_WITHDRAW: 5 tasks.
+
+Caller audit found:
+- `OnSummon` is called by PetSystem for TYPE_SUMMON_PET, but no mount/horse path calls it with TYPE_SUMMON_MOUNT.
+- normal shop / ShopEx / shop manager paths do not call `OnGoldChange(...TYPE_SPEND_SHOP)`.
+- mapped private-shop/search entry paths do not call TYPE_SPEND_SEARCH_SHOP.
+- safebox/withdraw paths do not call TYPE_WITHDRAW.
+
+The configured achievements in these families therefore cannot progress through the mapped gameplay implementation.
+
+### BUG-ACH-007 — EXPLORE progression is only evaluated on login
+- Statik durum: **doğrulandı**
+- Sınıf: missing lifecycle hook / delayed achievement update
+
+All current TYPE_EXPLORE tasks have max_value=1.
+
+`CAchievementSystem::OnLogin` calls `OnVisitMap(player)`, but the mapped character movement/warp/input/dungeon paths contain no corresponding `OnVisitMap` call when the player actually enters another map.
+
+A player who enters an exploration target during an existing session does not get immediate progress; the task is evaluated only after a later login while located on that map.
+
+### BUG-ACH-008 — force-finish can re-grant an already completed achievement
+- Statik durum: **doğrulandı**
+- Sınıf: trusted admin/script correctness / repeat reward
+
+Two force surfaces exist:
+- `/force_finish_achievement` restricted to `GM_IMPLEMENTOR`;
+- quest Lua `pc.finish_achievement(id)`.
+
+Both call `CAchievementSystem::FinishAchievement`.
+
+`FinishAchievement` does not check `IsAchievementFinished` or the existing task-0 completion marker before clearing/replacing the map and calling `RewardPlayer`.
+Calling the force path repeatedly for the same achievement therefore re-grants its reward each time.
+
+This is not a normal-player packet exploit in the mapped source; it is a GM/trusted-quest duplication hazard.
