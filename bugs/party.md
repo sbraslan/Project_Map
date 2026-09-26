@@ -51,3 +51,35 @@ Thus:
 - Party warp resolves the client VID but `SummonToLeader` verifies the resulting PID is a party member.
 - EXP distribution mode is bounds-checked in `CParty::SetParameter`.
 - Normal GC party removal clears the C++ player party cache through the Python UI callback.
+
+
+### BUG-PARTY-003 — mismatched role-off packet corrupts role counters
+- Statik durum: **doğrulandı**
+- Sınıf: server authority / state-counter corruption
+
+`PartySetState` restricts callers to the party leader and whitelists special role IDs, but it does not require the role supplied for a remove operation to match the member's current role.
+
+For `flag=false`, `CParty::SetRole`:
+- checks only that the member's current role is neither LEADER nor NORMAL;
+- changes the member to NORMAL;
+- decrements `m_anRoleCount[bRole]` using the packet-supplied role.
+
+A leader can therefore remove an ATTACKER state while supplying DEFENDER as the role ID, for example. The member becomes NORMAL, ATTACKER remains falsely counted as occupied, and DEFENDER can be decremented below zero.
+
+Role assignment limits subsequently rely on these counters, so state/capacity becomes inconsistent.
+
+The stock Python UI normally sends the member's current role; the defect is missing server enforcement of that assumption.
+
+### BUG-PARTY-004 — malformed party-position dynamic packet can underflow parser length
+- Statik durum: **doğrulandı**
+- Sınıf: client packet parser / dynamic-size boundary validation
+
+`HEADER_GC_PARTY_POSITION_INFO` is dynamic.
+
+`RecvPartyPositionInfo()` computes the payload length from `Packet.wSize - sizeof(Packet)` and loops by subtracting `sizeof(SPartyPosition)`, but never validates:
+- `wSize >= sizeof(TPacketGCPartyPosition)`;
+- payload size is an exact multiple of `sizeof(SPartyPosition)`.
+
+A too-small or non-aligned declared size can underflow/wrap the loop counter and lead to reads beyond the packet's declared boundary / receive-stream desynchronization.
+
+The normal server sender builds well-formed packets from whole position records. This bug is recorded as malformed-server-packet robustness, not a client-to-server exploit.
