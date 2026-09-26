@@ -115,3 +115,80 @@ Risk senaryosu:
 
 Ek risk:
 Bu reset `guildstoragewho` alanını temizlemiyor; state=0 iken eski PID kalabilir.
+
+### BUG-GS-009 — Yetki kaldırıldıktan sonra açık Guild Storage erişimi devam ediyor
+- Statik durum: **yüksek güven / kod yolu doğrulandı**
+- Build: özellikle `ENABLE_GUILDRENEWAL_SYSTEM && ENABLE_GUILDSTORAGE_SYSTEM`
+
+Açılışta `GUILD_AUTH_BANK` kontrolü var.
+Ancak `SafeboxCheckin(..., bMall=2)` ve `SafeboxCheckout(..., bMall=2)` packet yollarında:
+- current guild membership
+- current member grade
+- current `GUILD_AUTH_BANK`
+yeniden kontrol edilmiyor.
+
+`ChangeMemberGrade` ve `ChangeGradeAuth` açık sessionı kapatmıyor.
+
+Sonuç:
+Bir oyuncunun bank yetkisi storage açıkken kaldırılırsa mevcut oturum üzerinden item koyma/çekme devam edebilir.
+
+### BUG-GS-010 — Guildden çıkarılan/disband edilen açık-storage kullanıcısında null dereference/core crash
+- Statik durum: **çok yüksek güven / birden fazla crash yolu doğrulandı**
+
+Koşul:
+`m_pkGuildstorage != nullptr`
+ve ardından
+`ch->SetGuild(nullptr)`
+
+Bu durum `RemoveMember` ve `Disband` sırasında oluşabiliyor.
+
+Crash yolları:
+1. Checkin → `SaveSingleItem` → GUILDBANK owner → `GetGuild()->GetID()`.
+2. Checkout sonunda GuildLog → `ch->GetGuild()->GetID()`.
+3. Disconnect → `CloseGuildstorage()` → `GetGuild()->SetStorageState(...)`.
+
+Ek problem:
+`/guildstorage_close` komutu `GetGuild()==nullptr` ise erken return ediyor; açık storage objesi temizlenmiyor.
+
+Bu nedenle guild officer'ın storage kullanan üyeyi çıkarması bile core crash'e dönüşebilir.
+
+### BUG-GS-003 ek doğrulama — Pending load sırasında guild üyeliği kaybı
+DB load cevabı geldiğinde:
+`gID = ch->GetGuild() ? guildID : 0`
+ve response guildID ile eşleşmezse fonksiyon direkt return ediyor.
+
+Bu yolda:
+- `m_bOpeningGuildstorage` temizlenmiyor
+- daha önce set edilmiş guild storage lock temizlenmiyor
+
+Dolayısıyla pending-load removal senaryosu stuck lock riskini güçlendiriyor.
+
+### BUG-GS-011 — Guild disband sonrası orphan GUILDBANK itemları
+- Statik durum: **yüksek güven**
+
+Guild disband DB cleanup:
+- guild
+- guild_grade
+- guild_member
+- guild_comment
+
+siliniyor.
+
+Ancak guild ID owner'lı ve `window=GUILDBANK` item satırları silinmiyor.
+
+Kaynakta ayrıca:
+`//ADD_DELETE_FUNCTION_FOR_GUILD_ITEMS_IN_STORAGE`
+yorumu mevcut fakat karşılığında kod yok.
+
+Sonuç:
+Disband sonrası eski guild itemları DB'de orphan kalabilir. Guild ID yeniden kullanılabilen/migrate edilen bir ortamda eski itemların başka guild tarafından görülmesi riski ayrıca test edilmeli.
+
+### BUG-GUILD-001 — Offline member removal + ENABLE_PULSE_MANAGER null pointer
+`CGuild::RemoveMember`:
+`LPCHARACTER ch = FindByPID(pid)`
+sonrasında `if (ch)` kontrolünden **önce**
+`ch->GetPlayerID()`
+kullanıyor.
+
+`ENABLE_PULSE_MANAGER` aktif build'de offline member remove işlemi null dereference riski taşıyor.
+Guild Storage dışı genel guild bug'ı olarak ayrıca kaydedildi.
