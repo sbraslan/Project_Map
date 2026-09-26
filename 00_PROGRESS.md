@@ -338,8 +338,8 @@ Cross-core warp:
 
 ### Yeni bug / adaylar
 - **BUG-SWITCHBOT-001:** `P2PSendSwitchbot` raw `CSwitchbot*` pointer'ını map'ten erase ediyor fakat delete etmiyor → her cross-core transferde memory leak.
-- **BUG-CANDIDATE-SWITCHBOT-002:** server START slotta gerçek item bulunduğunu doğrulamıyor. Normal UI boş slotu engelliyor; custom/malformed client yolu runtime resource testine açık.
-- **OBS-SWITCHBOT-001:** client Python binding slot kontrolü `bSlot > SWITCHBOT_SLOT_COUNT`; eşit değer client katmanından geçse de server `ValidPosition` tarafından reddediliyor.
+- **BUG-SWITCHBOT-004:** server START slotta gerçek item bulunduğunu doğrulamıyor. Normal UI boş slotu engelliyor; custom/malformed client yolu runtime resource testine açık.
+- **OBS-SWITCHBOT-002:** client Python binding slot kontrolü `bSlot > SWITCHBOT_SLOT_COUNT`; eşit değer client katmanından geçse de server `ValidPosition` tarafından reddediliyor.
 
 ### Sıradaki
 - Switchbot cross-core runtime testi
