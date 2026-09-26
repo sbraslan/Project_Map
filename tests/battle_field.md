@@ -61,3 +61,19 @@ Future deterministic validation for BUG-BFIELD-008:
 - expected same-day difference: +2*SS seconds.
 
 Do not execute during the current detection/mapping phase.
+
+
+## BFIELD-T09 — Battle Point cap cash-out divergence
+Future validation for BUG-BFIELD-009:
+- place persistent Battle Point close enough to `BATTLE_POINT_MAX` that temporary score would reach/exceed it;
+- exit normally with temporary score;
+- compare persistent balance, temporary score and `log.battle_score`;
+- expected defect: persistent amount unchanged, temp cleared, ranking credited.
+
+## BFIELD-T10 — event-mode client state propagation
+Future validation for BUG-BFIELD-010:
+- configure an event-mode opening on the scheduler-owning channel;
+- keep a client on a normal channel and observe Battle Field minimap state;
+- expected defect: generic Battle Field open state changes, event-open state remains false and event-specific visual is not selected.
+
+Do not execute during the current detection/mapping phase.
