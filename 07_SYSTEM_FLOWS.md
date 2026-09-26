@@ -132,3 +132,55 @@ Yeni/non-auth core başlarken:
 → DB'deki **tüm** guild storage state'lerini 0 yapıyor.
 
 Bu reset crash sonrası stale lock temizlemeye yarıyor gibi görünse de başka core'da halen açık storage varsa DB lock'ını da silebilir.
+
+## Guild Storage — permission revocation race
+
+Başlangıç:
+member grade → `GUILD_AUTH_BANK` var
+→ `ReqGuildstorageLoad()`
+→ permission geçer
+→ storage açılır
+
+Sonra leader:
+- member grade değiştirir veya
+- grade auth içinden `GUILD_AUTH_BANK` bitini kaldırır
+
+Mevcut açık session:
+- kapanmaz
+- checkin handler `GetGuildstorage()` var mı diye bakar
+- checkout handler `GetGuildstorage()` var mı diye bakar
+- anlık `HasGradeAuth(... GUILD_AUTH_BANK)` kontrolü yok
+
+Dolayısıyla session kapatılana kadar eski yetki fiilen devam edebilir.
+
+## Guild Storage — member removal while open
+
+Storage açık
+→ `RemoveMember(pid)`
+→ `SetGuild(nullptr)`
+→ `m_pkGuildstorage` yaşamaya devam eder
+
+Sonraki checkin:
+`CSafebox::Add`
+→ `FlushDelayedSave`
+→ `SaveSingleItem`
+→ GUILDBANK owner çözümü:
+`item->GetOwner()->GetGuild()->GetID()`
+→ guild pointer null ise crash riski.
+
+Sonraki checkout:
+- item local storage'dan çıkarılıp inventory'ye eklenebilir
+- ardından GuildLog yolunda
+`ch->GetGuild()->GetID()`
+→ null dereference riski.
+
+Client normal close:
+`/guildstorage_close`
+→ server `GetGuild()==nullptr` ise erken return
+→ storage nesnesi kapanmaz.
+
+Disconnect:
+`CHARACTER::Disconnect`
+→ `CloseGuildstorage()`
+→ `GetGuild()->SetStorageState(false,0)`
+→ guild pointer null ise crash riski.
