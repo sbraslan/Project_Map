@@ -1,6 +1,6 @@
 # Party System
 
-**Status:** PARTIAL — ACTIVE
+**Status:** STATIC COMPLETE
 **Phase:** Detection / Mapping Only
 **Date:** 2026-09-26
 
@@ -9,7 +9,7 @@
 ## Initial scope
 Core party lifecycle, DB/P2P replication, client packet bridge, and the normal in-game party UI.
 
-Party Match is adjacent but will be separated if its packet/data lifecycle is independent.
+Party Match is architecturally separate and is mapped under `systems/party_match.md`.
 
 ## Confirmed source roots
 
@@ -396,3 +396,44 @@ Current Project_Game code search did not identify a concrete live caller, so imp
 3. Audit Party ownership/drop rotation and centralized EXP pointer lifecycle.
 4. Review remaining client/server party packet definitions for size/field mismatches.
 5. Decide whether core Party can be marked STATIC COMPLETE and Party Match opened separately.
+
+
+## Final core Party closure
+
+### Item ownership / dice
+The rotating ownership cursor is maintained through `m_itNextOwner`.
+- first member initializes the cursor;
+- removing the current owner advances it before erase;
+- `GetNextOwnership` walks at most the current member count;
+- only linked characters within 3000 of the drop point are eligible;
+- otherwise ownership falls back to the supplied attacker.
+
+Dice-enabled drop paths call `FPartyDropDiceRoll`; normal ownership rotation remains bounded to live party members. No additional verified ownership iterator defect was found.
+
+### EXP centralize
+`m_pkChrExpCentralize` is initialized to null and is read by the kill EXP path.
+
+A setter `SetExpCentralizeCharacter(pid)` exists, but the repo-wide targeted/static symbol audit found no active producer/caller in the current server snapshot. Therefore the raw-pointer lifetime concern is dormant in this snapshot and is not promoted as a verified bug.
+
+### Packet layout closure
+Party CG/GC packet structures were compared between server and client.
+Field names differ in a few places but byte layout/types match.
+
+The minimap position records use `long` for X/Y on both sides. The server game Makefile explicitly compiles with `-m32`, so server `long` is 32-bit and matches the Windows client packet layout. No additional protocol-size mismatch was found.
+
+### Remaining quest API review
+The remaining Party Lua functions are script-facing and mostly operate on the current quest character/party.
+
+Some APIs assume valid quest context/argument types; no additional normal gameplay reachability was found that warrants another verified core Party bug beyond BUG-PARTY-001..006.
+
+### Party Match boundary
+Party Match is not just another Party UI operation:
+- it owns a separate `CGroupMatchManager`;
+- keeps an independent in-memory `SearchMap`;
+- uses separate `HEADER_CG/GC_PARTY_MATCH` packets;
+- loads separate client `partymatch_info.txt`;
+- creates a normal `CParty` only after matchmaking succeeds.
+
+It is therefore split into its own subsystem.
+
+**Core Party System static mapping is complete for the current source snapshot.**
