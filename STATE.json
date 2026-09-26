@@ -6,31 +6,37 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "detection_mapping",
-    "display_name": "Detection / Mapping Only",
-    "status": "ACTIVE",
-    "system_file": "CURRENT.md",
-    "bug_file": null,
-    "test_file": null,
-    "verified_bug_ids": [],
+    "subsystem": "ranking",
+    "display_name": "Ranking System",
+    "status": "PARTIAL — ACTIVE",
+    "system_file": "systems/ranking.md",
+    "bug_file": "bugs/ranking.md",
+    "test_file": "tests/ranking.md",
+    "verified_bug_ids": [
+      "BUG-RANK-001",
+      "BUG-RANK-002",
+      "BUG-RANK-003",
+      "BUG-RANK-004"
+    ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Continue read-only inspection of source repositories.",
-      "Record only architecture maps, bug findings, evidence and checkpoints in Project_Map.",
-      "Do not apply fixes, patches, config changes or runtime modifications.",
-      "Keep runtime/fault-injection plans deferred until the user explicitly changes phase."
+      "Locate the exact outbound TPacketGGLoadRanking sender/broadcast path.",
+      "Close ranker-effect refresh/removal lifecycle.",
+      "Determine whether any active caller opens generic PARTY ranking.",
+      "Audit dynamic GC ranking packet malformed-size handling.",
+      "Audit remaining DB/result null boundaries and decide Ranking STATIC COMPLETE."
     ]
   },
   "startup": {
     "required_files": [
       "STATE.json",
       "CURRENT.md",
-      "WORKFLOW.md"
+      "systems/ranking.md"
     ],
     "conditional_files": {
-      "selected_system_map": "systems/<selected-system>.md",
-      "selected_bug_registry": "bugs/<selected-system>.md",
-      "selected_test_plan": "tests/<selected-system>.md"
+      "policy": "WORKFLOW.md",
+      "bugs": "bugs/ranking.md",
+      "deferred_tests": "tests/ranking.md"
     },
     "forbidden_by_default": [
       "archive/",
@@ -59,7 +65,24 @@
       "sbraslan/Project_DumpProto": "1066f4620af451c5f728260eb5f8a086672e6384"
     }
   },
-  "mapped_roots": [],
+  "mapped_roots": [
+    "game/src/ranking_system.h",
+    "game/src/ranking_system.cpp",
+    "game/src/battle_field.cpp",
+    "game/src/battle_field.h",
+    "game/src/input_p2p.cpp",
+    "game/src/packet.h::TPacketGGLoadRanking/TBattleRankingMember/TPacketGCBattleInfo",
+    "game/src/packet_info.cpp::HEADER_GG_LOAD_RANKING",
+    "UserInterface/PythonRanking.h",
+    "UserInterface/PythonRanking.cpp",
+    "UserInterface/PythonRankingModule.cpp",
+    "UserInterface/PythonNetworkStream.cpp::HEADER_GC_BATTLE_ZONE_INFO",
+    "UserInterface/PythonNetworkStreamPhaseGame.cpp::RecvBattleZoneInfo",
+    "root/uibattlefield.py",
+    "root/uirankingboard.py",
+    "root/interfacemodule.py::OpenRankingBoardWindow",
+    "root/game.py::OpenRankingBoard"
+  ],
   "write_protocol": {
     "every_meaningful_turn": [
       "update active systems/<name>.md",
