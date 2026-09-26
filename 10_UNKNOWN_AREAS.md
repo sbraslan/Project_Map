@@ -167,3 +167,15 @@ Bu noktadan sonra Guild Storage için ek salt-okuma getirisi düşük; runtime t
 - `ENABLE_SWAP_SYSTEM` inventory multi-slot swap algoritması
 - Special Inventory exact range/type doğrulaması
 - Switchbot move/save lifecycle.
+
+## Swap durumu
+- Normal inventory multi-slot swap: statik harita tamamlandı.
+- Special Inventory multi-slot swap: statik harita tamamlandı.
+- Direkt duplication/loss yolu bulunmadı.
+- Additional Equipment `SwapItem` shadowing runtime etkisi açık.
+- Runtime stress: farklı item size kombinasyonları ve quickslot senkronizasyonu yine test edilmeli.
+
+### Sıradaki
+- Switchbot item move/save lifecycle
+- Special Inventory type/range modeli
+- ardından Item subsystem genel checkpoint.
