@@ -39,3 +39,25 @@ Future DB-isolated validation for BUG-BFIELD-005:
 - expected static defect signature: old positions 2/3 remain eligible.
 
 Do not execute during the current detection/mapping phase.
+
+
+## BFIELD-T06 — event-date command on wrong channel
+Future validation for BUG-BFIELD-006:
+- execute `battle_set_event` as implementor on a non-99 channel;
+- inspect that channel's local Battle Field event info and channel 99's event info;
+- expected defect: command succeeds locally but channel 99 scheduler remains unchanged.
+
+## BFIELD-T07 — online weekly winner flag refresh
+Future validation for BUG-BFIELD-007:
+- keep an old winner and a newly promoted winner online across rollover;
+- reload winner cache;
+- inspect Battle rank affect flags before reconnect;
+- expected defect: old winner retains stale flag, new winner lacks its new flag until reconnect/SetWeakRankingPosition.
+
+## BFIELD-T08 — schedule seconds arithmetic
+Future deterministic validation for BUG-BFIELD-008:
+- evaluate GetOpenTime/GetCloseTime at a known HH:MM:SS with SS != 0;
+- compare against exact target-time subtraction;
+- expected same-day difference: +2*SS seconds.
+
+Do not execute during the current detection/mapping phase.
