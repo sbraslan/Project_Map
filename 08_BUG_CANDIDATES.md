@@ -377,3 +377,64 @@ Server assignment truncation yapıyor.
 
 Ancak mevcut client receiver bu alanı kullanmıyor; item index normal ITEM_SET state'inden geliyor.
 Şu an için kullanıcı-visible bug olarak sınıflandırılmadı, ileride bu alan kullanılmaya başlanırsa protokol hatasına dönüşür.
+
+### BUG-ITEM-006 — Storage checkin/checkout window allowlist eksikliği
+- Statik durum: **doğrulandı**
+- Etki: client-controlled TItemPos ile normal MoveItem semantic guard'larının bypass edilmesi
+- Handler: personal Safebox + Mall + Guild Storage ortak yolu
+
+`SafeboxCheckout` destination için `IsEmptyItemGrid` kullanıyor ancak allowed destination window listesi tanımlamıyor.
+
+`IsEmptyItemGrid` şu windowları da kabul ediyor:
+- SWITCHBOT
+- ADDITIONAL_EQUIPMENT_1.
+
+#### SWITCHBOT
+Normal MoveItem destination'da:
+`SwitchbotHelper::IsValidItem(item)`
+zorunlu.
+
+Checkout'ta bu kontrol yok.
+Normal/uygunsuz item, slot boşsa doğrudan SWITCHBOT window'una yerleştirilebilir ve manager'a register edilir.
+
+#### Additional Equipment
+Checkout'ta:
+- CanEquipNow
+- FindEquipCell
+- EquipTo
+- page eligibility
+kontrolleri yok.
+
+Doğrudan `AddToCharacter(ADDITIONAL_EQUIPMENT_1,...)` mümkün.
+
+#### Checkin yönü
+`SafeboxCheckin` source window için de allowlist uygulamıyor.
+SWITCHBOT source item normal MoveItem active guard'ını bypass ederek storage'a alınabilir.
+
+Client binding'in 3-arg formu explicit window_type kabul ettiği için bu yalnız wire-format teorisi değildir; değiştirilmiş Python/client tarafından üretilebilir.
+
+Normal resmi UI davranışı ayrıca test edilmeli; server bug sınıflandırması client'ın dürüst olmasına bağlı olmamalı.
+
+### BUG-SWITCHBOT-005 — UnregisterItem running event'i sonlandırmıyor
+- Statik durum: **doğrulandı**
+- BUG-SWITCHBOT-003 logout/event leak için kesin mekanizmalardan biri
+
+`CSwitchbot::UnregisterItem` slotun:
+- item ID
+- active
+- finished
+- alternatives
+state'ini temizler.
+
+Fakat `CSwitchbotManager::UnregisterItem`:
+`!HasActiveSlots() && IsSwitching()`
+durumunda Stop çağırmıyor.
+
+Son active item MoveItem dışı bir yolla kaldırılırsa running event kalır.
+
+`switchbot_event`:
+→ `SwitchItems()`
+→ active slot yoksa iş yapmadan döner
+→ yine `PASSES_PER_SEC(0.2f)` döndürerek schedule olur.
+
+Normal logout sırasında CHARACTER destructor → `ClearItem()` → SWITCHBOT item `RemoveFromCharacter` → UnregisterItem zinciri bulunduğundan bu kusur custom packet'e bağımlı değildir.
