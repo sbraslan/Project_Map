@@ -486,3 +486,57 @@ Fakat DB load: `ItemLoad -> persisted window=INVENTORY,pos -> AddToCharacter -> 
 `IsValidItemPosition(INVENTORY)` tüm static `INVENTORY_SLOT_COUNT` aralığını kabul eder. `SetItem` special branch'i target static special range içindeyse locked max üzerindeki hücreyi kesin olarak reject etmez ve item/grid pointerlarını kurabilir.
 
 Sonuç: malformed, legacy veya başka bir bug tarafından üretilmiş DB row açılmamış special slotta item restore edebilir. Bu durum görünmeyen/erişilemeyen item ve persistence tutarsızlığına dönüşebilir.
+
+
+### BUG-EXCHANGE-001 — CheckSpace/Done Special Inventory divergence
+- Statik durum: **doğrulandı**
+- Sınıf: preflight/commit mismatch + non-atomic transfer
+
+`CExchange::CheckSpace()` Dragon Soul dışındaki tüm itemları regular inventory `CGrid` sayfalarında simüle eder.
+
+`CExchange::Done()` ise `ENABLE_SPECIAL_INVENTORY` altında non-DS item için `victim->GetEmptyInventory(item)` çağırır; special type itemlar Skillbook/Stone/Material tabına yönlenir.
+
+İki model eşdeğer değildir:
+- regular inventory'de yer var ama ilgili special tab dolu/locked olabilir -> CheckSpace true, Done false.
+- regular inventory dolu ama special tab boş olabilir -> CheckSpace false, gerçekte placement mümkün.
+
+Daha kritik olan ilk durumdur. `Done()` itemları sırayla `RemoveFromCharacter -> AddToCharacter -> FlushDelayedSave` ile taşır. Sonraki itemda boş special slot bulunamazsa false döner; önce taşınan itemlar rollback edilmez.
+
+Bu nedenle trade kısmi olarak uygulanıp ardından Cancel ile kapanabilir.
+
+### BUG-EXCHANGE-002 — Page-4 CheckSpace grid reservation control-flow bug
+- Statik durum: **doğrulandı**
+- Build: extend inventory
+
+`CheckSpace()` page 4 branch'inde:
+`if (item->GetSize() > 1 && iPos > boundary)`
+satırından sonra `return false` yoktur.
+
+Preprocessor bloğu bittikten sonraki `s_grid4.Put(...)` bu `if` statement'ının gövdesi olur.
+
+Sonuç:
+- size=1 itemlarda condition false -> page4 grid slotu reserve edilmez.
+- size>1 ve düzgün sığan itemlarda condition false -> yine reserve edilmez.
+- sonraki incoming item aynı blank position'ı yeniden bulabilir.
+
+Preflight bu nedenle gerçek kapasiteyi olduğundan fazla görebilir. `Done()` gerçek inventory placement'ında sonraki item için yer bulamazsa BUG-EXCHANGE-001 ile aynı non-atomic partial-transfer sınıfına girer.
+
+### BUG-EXCHANGE-003 — Exchange item source window allowlist eksikliği
+- Statik durum: **doğrulandı**
+- Trigger: modified/crafted client packet gerekir
+
+Client `netSendExchangeItemAddPacket(window_type, cell, display)` doğrudan `TItemPos(window_type,cell)` gönderir ve window allowlist uygulamaz.
+
+Server `CExchange::AddItem`:
+1. `item_pos.IsValidItemPosition()`
+2. `item_pos.IsEquipPosition()` reject
+3. `GetItem(item_pos)`
+kontrollerini yapar.
+
+`IsValidItemPosition()` SWITCHBOT ve ADDITIONAL_EQUIPMENT_1 windowlarını geçerli sayar. `IsEquipPosition()` yalnız EQUIPMENT windowundaki normal/DragonSoul equip alanlarını kapsar; ADDITIONAL_EQUIPMENT_1'i equip olarak sınıflandırmaz.
+
+`CHARACTER::GetItem` her iki özel windowdan da item döndürebilir. Bu nedenle normal inventory/DS trade source semantiği server'da zorunlu tutulmuyor.
+
+Switchbot Start itemı `SetLocked` ile kilitlemiyor; active state manager tablosunda tutuluyor. Böyle bir item exchange commit ile RemoveFromCharacter olduğunda Switchbot unregister/event lifecycle buglarıyla birleşebilir.
+
+Additional Equipment itemı `m_bEquipped=true` olabilir; exchange source validator bunu equipment position olarak görmez. Commit RemoveFromCharacter üzerinden unequip davranışına gidebilir ve normal trade UI/CanUnequipNow sınırlarını bypass eden bir yol oluşur.
