@@ -554,3 +554,30 @@ Beklenti: currency transfer atomic olmalı; sender debit recipient credit başar
 Offer oluşturulduktan sonra recipient cheque bakiyesini limite yaklaştır ve final accept et.
 
 Kontrol: cheque check false olduğunda daha önce taşınan item/gold mutationlarının geri dönüp dönmediği.
+
+
+### EX-T06 — final distance server enforcement
+Amaç: BUG-EXCHANGE-004 runtime doğrulaması.
+
+Dev client ile iki karakter <=1000 range içinde trade açsın; client-side auto-CANCEL devre dışı bırakılarak taraflardan biri >1000 uzaklaşsın; iki taraf accept etsin.
+
+Beklenen güvenli davranış: server final ACCEPT sırasında mesafeyi ölçüp transactionı reddetmeli. Statik mevcut beklenti: mesafe recheck olmadığı için commit devam eder.
+
+### EX-T07 — gold cap TOCTOU
+Amaç: BUG-EXCHANGE-005 doğrulaması.
+
+Disposable karakterlerle: receiver başlangıçta cap kontrolünü geçecek gold seviyesinde olsun; sender gold offer etsin; offer sonrası receiver ground gold pickup/party distribution ile GOLD_MAX - offered üstüne çıksın fakat GOLD_MAX altında kalsın; iki taraf accept etsin.
+
+İzlenecekler: sender/receiver gold before-after, OVERFLOW_GOLD log, exchange success/end packetleri, DB player save sonucu.
+
+Bug göstergesi: sender debit gerçekleşir, receiver addition overflow'da reddedilir.
+
+### EX-T08 — partial transfer persistence
+EX-T01 veya EX-T02 ile partial item transfer oluştur. Ardından iki karakteri logout/login yap; gerekirse local DB cache/game restart sonrası item owner/position kontrol et.
+
+Bug göstergesi: önce taşınmış item yeni owner'da kalır; failed remainder eski owner'dadır.
+
+### EX-T09 — lifecycle cancellation sanity
+Ayrı ayrı participant disconnect, participant death ve standard CanWarp kullanan portal/channel change test et.
+
+Beklenti: disconnect/death exchange'i cancel eder; active W_EXCHANGE nedeniyle standard CanWarp reddedilir.
