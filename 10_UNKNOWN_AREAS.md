@@ -487,3 +487,27 @@ Shop / Private Shop: buy/sell, owner/guest state, item reservation, currency deb
 5. remove/edit/close item return path
 6. NPC Sell source TItemPos/special inventory behavior
 7. crash/recovery ordering across item/player/shop cache.
+
+
+## Shop / Premium Private Shop — second pass sonrası kalanlar
+
+### Statik olarak çözülen
+- initial OpenMyShop validations
+- source window allowlist
+- add-item source checks
+- remove-item transfer path
+- PrivateShopSearchBuy same-map/range enforcement
+- stash withdraw request/result/rollback
+- NPC Sell temel zinciri
+- close/save last-item davranışı
+
+### Runtime / son statik açık
+1. BUG-SHOP-004 slot==size crafted remove packet testi.
+2. BUG-SHOP-005 bCount=81 kontrollü test ve item recovery sonucu.
+3. BUG-SHOP-006 duplicate display_pos kontrollü test.
+4. BUG-SHOP-007 withdraw request-response arasında gold/cheque mutation testi.
+5. empty search result ASan testi.
+6. GAME<->DB sale fault-injection.
+7. DB boot/load shop reconstruction + item bind son turu.
+8. item expiration -> RemoveItemByID -> DB consistency.
+9. runtime configte SHOP_PRICE_3X_TAX açılırsa high-price overflow testi.
