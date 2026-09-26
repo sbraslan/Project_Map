@@ -418,3 +418,59 @@ Ardından:
 → DB destroy packet
 → ID/VID maps erase
 → `M2_DELETE(item)`.
+
+## CItem::AddToCharacter — target validation
+
+Fonksiyon:
+`const uint16_t pos = Cell.cell`
+`const uint8_t window_type = Cell.window_type`
+
+Ancak bounds kontrolleri:
+- INVENTORY
+- EQUIPMENT
+- BELT_INVENTORY
+- DRAGON_SOUL_INVENTORY
+- PREMIUM_PRIVATE_SHOP
+- SWITCHBOT
+- ADDITIONAL_EQUIPMENT_1
+
+için target `pos` yerine **`m_wCell`** kullanıyor.
+
+Yeni item `Initialize()`:
+- window = RESERVED
+- owner = null
+- `m_wCell = 0`
+
+Sonra:
+`ch->SetItem(TItemPos(window_type,pos),this,...)`
+→ `m_pOwner=ch`
+→ `Save()`
+→ true.
+
+`SetItem` void döndüğü için target placement başarısız olsa bile AddToCharacter bunu algılayamaz.
+
+### SetItem invalid-cell farkları
+INVENTORY/EQUIPMENT/SWITCHBOT/SHOP/ADDITIONAL gibi bazı windowlar array erişiminden önce bounds check yapıyor.
+
+Ancak:
+**BELT_INVENTORY**
+`pOld = pBeltItems[wCell]`
+→ sonra pItem varsa bounds check.
+
+**DRAGON_SOUL_INVENTORY**
+`pOld = pDSItems[wCell]`
+→ sonra pItem varsa bounds check.
+
+Bu nedenle invalid cell bu iki windowda OOB read/write yoluna girebilir.
+
+### DB load bağlantısı
+`CInputDB::ItemLoad` DB'den gelen:
+- INVENTORY
+- DRAGON_SOUL_INVENTORY
+- BELT_INVENTORY
+- SWITCHBOT
+- NPC_STORAGE
+
+pozisyonlarını doğrudan `AddToCharacter(ch,TItemPos(p->window,p->pos))` yoluna aktarır.
+
+Inventory/Belt collision getter'ları bazı korumalar sunsa da invalid pos DB verisi AddToCharacter katmanında doğru target validation ile reddedilmiyor.
