@@ -358,3 +358,63 @@ START reddedilmeli ve periyodik event bırakılmamalı.
 ### SWITCHBOT-T06 — Client boundary
 Python binding'e slot == SWITCHBOT_SLOT_COUNT ile Start/Stop çağrısı ver.
 Server'ın range check ile işlemi reddettiğini ve state değişmediğini doğrula.
+
+### ITEM-T09 — Storage TItemPos destination allowlist
+Kontrollü test clientı/Python console ile Safebox, Mall ve Guild Storage checkout için 3-arg window-aware binding kullan.
+
+Destination matris:
+- INVENTORY
+- special inventory doğru/yanlış subrange
+- BELT
+- SWITCHBOT
+- ADDITIONAL_EQUIPMENT_1
+- DRAGON_SOUL_INVENTORY.
+
+SWITCHBOT:
+- geçerli weapon
+- normal potion/material
+- costume/non-supported type
+ayrı denenir.
+
+Kontrol:
+- server reject/accept
+- item window/cell
+- manager registration
+- DB persistence
+- relog state.
+
+Beklenen güvenli tasarım:
+yalnız storage özelliğinin açıkça desteklediği destination windowları kabul edilmeli ve hedef window'un semantic validator'ı yeniden çalışmalı.
+
+### SWITCHBOT-T07 — Remove active item outside MoveItem
+Active tek slot ile:
+1. normal logout
+2. kontrollü SafeboxCheckin source=SWITCHBOT
+3. item expiration/removal mümkünse
+senaryoları ayrı test et.
+
+İzle:
+- `HasActiveSlots`
+- `IsSwitching`
+- event count
+- CPU/tick
+- manager map entry.
+
+Mevcut statik beklenti:
+Unregister active flag'i temizler fakat event Stop edilmediği için empty recurring event kalabilir.
+
+### ITEM-T10 — Additional Equipment direct checkout
+`ENABLE_ADDITIONAL_EQUIPMENT_PAGE` build.
+
+Safebox/Mall/Guild Storage checkout destination:
+`ADDITIONAL_EQUIPMENT_1`.
+
+Uygun ve uygunsuz item ile:
+- slot pointer
+- item window/cell
+- IsEquipped
+- stat bonus
+- client visibility
+- page unlock state
+- relog persistence
+kontrol edilir.
