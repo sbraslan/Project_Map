@@ -576,3 +576,115 @@ Her tick:
 → kaynak yeterliyse ChangeAttribute + item update.
 
 Bu nedenle active+missing-item state kendi kendini iyileştirmiyor.
+
+## Special Inventory — server modeli
+
+Feature: `ENABLE_SPECIAL_INVENTORY`.
+
+Special Inventory ayrı window enum değil; `INVENTORY` içindeki genişletilmiş cell aralıklarıdır.
+
+Range sırası:
+1. Skillbook
+2. Stone
+3. Material
+
+`INVENTORY_SLOT_COUNT`, special slot end'e kadar büyütülür.
+
+### Item → special type
+`CItem::GetSpecialInventoryType()`:
+- ITEM_SKILLBOOK → SKILLBOOK
+- ITEM_METIN → STONE
+- ITEM_MATERIAL / ITEM_RESOURCE → MATERIAL
+- VNUM 27987 → MATERIAL
+- diğer → -1.
+
+### Position → special type
+`TItemPos::IsSpecialInventoryPosition`
+→ INVENTORY window + special global range.
+
+`TItemPos::GetSpecialInventoryType`
+→ cell'in hangi special subrange'de olduğuna bakar.
+
+### Empty-slot / autogive
+`IsEmptySpecialItemGrid`:
+- size > 1 → false
+- cell kendi type range'i içinde olmalı
+- grid boş veya exception item olmalı.
+
+`GetEmptyInventory(LPITEM item)`:
+special type varsa search aralığını yalnız o tipe daraltır.
+
+### Move validation
+`CHARACTER::MoveItem`:
+- normal item special destination'a giremez
+- source window INVENTORY ise item special type == destination special type olmalı.
+
+Bu yüzden standard MoveItem yolu yanlış special tab/type placement'ı reddeder.
+DB/internal `AddToCharacter` ise item-type ↔ special-cell type eşleşmesini ayrıca kontrol etmez; bozuk persisted row yanlış special subrange'e restore edilebilir. Şimdilik data-integrity gözlemi olarak tutuluyor.
+
+## Switchbot — server lifecycle
+
+Feature: `ENABLE_SWITCHBOT`.
+Slot count: 7.
+
+### Move
+`CHARACTER::MoveItem`:
+- active SWITCHBOT source slotu hareket ettirilemez.
+- SWITCHBOT destination itemı `SwitchbotHelper::IsValidItem` ile doğrulanır.
+- kabul edilen temel tipler: WEAPON, ARMOR; costume-attr feature altında BODY/HAIR/WEAPON costume.
+
+`SetItem(SWITCHBOT,...)`:
+- bounds check
+- occupied slot üzerine ikinci itemı reddeder
+- add → `CSwitchbotManager::RegisterItem(pid,itemID,slot)`
+- remove → `UnregisterItem(pid,slot)`
+- runtime item pointer `pSwitchbotItems[slot]`.
+
+### Start/Stop
+`CInputMain::Switchbot`
+→ packet length check
+→ START alternatives parse
+→ `CSwitchbotManager::Start`
+veya
+→ `Stop`.
+
+Start:
+- slot bounds
+- manager object var mı
+- slot zaten active mi
+- active=true
+- alternatives kopyalanır
+- event yoksa `CSwitchbot::Start()`.
+
+Event:
+`switchbot_event`
+→ `SwitchItems()`
+→ active slot item ID lookup
+→ target attributes tamamlandıysa slot finish
+→ değilse switcher/yang maliyeti
+→ `ChangeAttribute()`
+→ Switchbot-specific item update.
+
+### Warp/P2P
+`CHARACTER::WarpSet`
+→ `SetIsWarping(true)`
+→ farklı core port ise `P2PSendSwitchbot`.
+
+`P2PSendSwitchbot`:
+- event Pause
+- source manager map entry erase
+- complete table P2P packet ile target port'a gönderilir.
+
+Target:
+`CInputP2P::Switchbot`
+→ port match
+→ `P2PReceiveSwitchbot(table)`.
+
+EnterGame:
+- warping=false
+- table client'e yollanır
+- active slot varsa ve event yoksa Start.
+
+### Statik kusurlar
+- Cross-core P2P source path raw manager pointer'ını erase sonrası delete etmiyor → BUG-SWITCHBOT-001.
+- Server START item ID/existence/ownership tekrar doğrulaması yapmıyor → BUG-CANDIDATE-SWITCHBOT-002; normal resmi UI boş slot Start'ını disable ediyor.
