@@ -75,3 +75,68 @@ Başarılı işlem:
 → log / guild log
 
 Guild Renewal aktifse ayrıca son checkout bilgisi güncellenip P2P refresh gönderiliyor.
+
+## Guild Storage — open / lock / close
+
+### Open command
+`cmd.cpp`
+- `click_guildstorage` → `do_click_guildstorage`
+
+`cmd_general.cpp::do_click_guildstorage`
+→ `SetGuildstorageOpenPosition()`
+→ `ReqGuildstorageLoad()`
+
+### `CHARACTER::ReqGuildstorageLoad()`
+Doğrulamalar:
+- guild pointer
+- guild storage satın alınmış/seviye > 0
+- exchange/shop/mailbox/change-look/safebox/cube çakışması
+- `ENABLE_GUILDRENEWAL_SYSTEM` aktifse:
+  - guild member alınır
+  - `GUILD_AUTH_BANK` yetkisi kontrol edilir
+- `pGuild->IsStorageOpen()`
+- growth-pet window
+- mevcut `GetGuildstorage()`
+- 1 saniyelik pulse/rate limit
+- açılış noktasına mesafe ≤ 1000
+- `m_bOpeningGuildstorage` overlap kontrolü
+
+Başarılı request:
+`HEADER_GD_GUILDSTORAGE_LOAD`
+→ DB
+→ **hemen ardından**
+`pGuild->SetStorageState(true, GetPlayerID())`
+
+### Load response
+`CInputDB::GuildstorageLoad`
+- response guild ID, karakterin güncel guild ID'si ile eşleştiriliyor
+- çakışan pencere kontrolü tekrar yapılıyor
+- guild storage boyutu guild objesinden alınıyor
+- `LoadGuildstorage(...)` çağrılıyor
+
+`LoadGuildstorage`:
+- `SetOpenGuildstorage(true)`
+- `CSafebox` oluştur/değiştir
+- window mode = `GUILDBANK`
+- `HEADER_GC_GUILDSTORAGE_OPEN`
+- DB'den gelen item'lar local storage'a ekleniyor
+
+### Close
+Client:
+`/guildstorage_close`
+
+Server:
+`do_guildstorage_close`
+→ `CloseGuildstorage()`
+→ `ch->Save()`
+→ tekrar `SetStorageState(false,0)`
+
+`CloseGuildstorage()` zaten kendi içinde de:
+- `SetOpenGuildstorage(false)`
+- `GetGuild()->SetStorageState(false,0)`
+- storage save (SAFEBOX_MONEY build'inde)
+- object delete
+- client `CloseGuildstorage` command
+- load-time reset
+
+Not: close komutunda state reset iki kez çağrılıyor.
