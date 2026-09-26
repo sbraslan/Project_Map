@@ -30,12 +30,16 @@ Initial roots:
 - client player/network bindings
 - Ranking integration boundaries
 
+## Verified Battle Field bugs
+- `BUG-BFIELD-001` — player `exit_battle_field` works outside Battle Field wherever CanWarp permits.
+- `BUG-BFIELD-002` — `exit_battle_field_on_dead 1` directly executes Battle Field exit without map/death/CanWarp validation.
+- `BUG-BFIELD-003` — repeat-kill cooldown timestamp is not renewed after first expiry.
+
 ## Exact next work
-1. Audit entry/exit command authorization and channel/map restrictions.
-2. Audit kill/death/score accounting and persistence.
-3. Audit schedule day/time calculations.
-4. Audit cooldown/reconnect behavior.
-5. Audit P2P state synchronization.
-6. Record only Battle Field-specific bugs; Ranking bugs stay in Ranking registry.
+1. Finish schedule/open-close resolver correctness.
+2. Audit event-mode/P2P state across cores.
+3. Trace Battle Field party removal into existing Party invariants.
+4. Audit score cash-out/ranking persistence and disconnect behavior.
+5. Audit daily Battle shop-point reset.
 
 GitHub state is canonical.
