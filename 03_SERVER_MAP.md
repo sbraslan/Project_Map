@@ -474,3 +474,31 @@ Bu nedenle invalid cell bu iki windowda OOB read/write yoluna girebilir.
 pozisyonlarını doğrudan `AddToCharacter(ch,TItemPos(p->window,p->pos))` yoluna aktarır.
 
 Inventory/Belt collision getter'ları bazı korumalar sunsa da invalid pos DB verisi AddToCharacter katmanında doğru target validation ile reddedilmiyor.
+
+## ENABLE_SWAP_SYSTEM — occupied inventory swap
+
+`MoveItem` destination boş değilse ve stack branch'e girmediyse swap denenebilir.
+
+Normal inventory:
+- full item move dışında swap yok
+- source/destination default inventory olmalı
+- target base `GetItem_NEW(DestCell)`
+- target locked/exchanging değil
+- optional bind/unbind itemları reddedilir
+- destination footprint aynı inventory page içinde kalmalı
+- footprintteki itemlar source itemdan büyük olamaz
+- toplam occupied+empty footprint tam item size olmalı
+
+Special Inventory:
+Aynı mekanizma special-position şartıyla çalışır.
+Üst taraftaki special inventory type kontrolü source special item ile destination special type eşleşmesini zorlar.
+
+Mutation sırası:
+1. source quickslot mapping kaydedilir
+2. source item `RemoveFromCharacter`
+3. destination footprint itemları tek tek `RemoveFromCharacter`
+4. her destination item source-corresponding hücreye `SetItem`
+5. source item destination base'e `SetItem`
+6. quickslotlar topluca güncellenir.
+
+Bu akış rollback/transaksiyon kullanmıyor; ancak tüm temel geometry/lock kontrolleri mutation öncesinde yapılmış durumda.
