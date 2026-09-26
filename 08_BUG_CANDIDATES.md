@@ -1346,3 +1346,146 @@ A source item is fetched directly and destroyed through `RemoveFromCharacter`, a
 
 ### Mailbox first-pass persistence observation
 DB mailbox state has no immutable mail ID in the GAME<->DB mutation packets. `TMailBox` contains only recipient name + uint8 Index. This is the root cause behind index-drift sensitivity.
+
+
+## Mailbox — final static pass (2026-09-26)
+
+### BUG-MAIL-008 — boot loader early-return prevents persisted mailbox reload
+- Statik durum: **doğrulandı / aktif build**
+- Etki: DB restart sonrası mailbox durability failure
+
+`CClientManager::InitializeTables()` startup sırasında `InitializeMailBoxTable()` çağırır.
+
+Fonksiyonun başı:
+`if (m_map_mailbox.empty()) return true;`
+
+Fresh DB process'te `m_map_mailbox` default olarak boşdur. Bu nedenle SQL `SELECT ... FROM mailbox%s` satırına ulaşılmaz.
+
+Sonuç:
+- shutdown backup ile SQL'e yazılmış postalar restart sonrası RAM map'e geri yüklenmez,
+- kullanıcı mailbox load'ları boş map görür,
+- sonraki `MAILBOX_BACKUP()` boş map ile tabloyu TRUNCATE ederek persisted kayıtları kalıcı silebilir.
+
+Bu koşul büyük olasılıkla ters yazılmıştır.
+
+### BUG-MAIL-009 — MAILBOX_BACKUP TRUNCATE + individual INSERTs non-transactional
+- Statik durum: **doğrulandı**
+- Sınıf: destructive full-table rewrite / crash atomicity
+
+Backup önce:
+`TRUNCATE TABLE player.mailbox`
+çalıştırır.
+
+Daha sonra her mail için ayrı `DirectQuery(INSERT...)` yürütür.
+Transaction / staging table / atomic rename yoktur.
+
+Crash, SQL error veya process kill TRUNCATE sonrası herhangi bir noktada olursa persistent mailbox table boş veya kısmi kalabilir.
+
+Ayrıca TRUNCATE hard-coded `player.mailbox` kullanırken INSERT `mailbox%s` + `GetTablePostfix()` kullanır. Non-empty table postfix konfigürasyonunda farklı tabloların truncate/insert edilmesi mümkündür.
+
+### BUG-MAIL-010 — user-controlled mailbox strings are written to SQL without escaping
+- Statik durum: **doğrulandı**
+- Sınıf: SQL query corruption / injection surface
+
+`MAILBOX_BACKUP` raw:
+- recipient name,
+- sender name,
+- title,
+- message
+
+değerlerini:
+`VALUES('%s','%s','%s','%s',...)`
+ile query içine gömer.
+
+`mysql_real_escape_string` / DB escape helper kullanılmaz.
+Mailbox banword kontrolü SQL escaping değildir.
+
+Normal bir apostrof bile INSERT syntax'ını bozabilir; crafted text SQL syntax manipulation surface oluşturur.
+Bu durum BUG-MAIL-009'un full-table rewrite modeliyle birleştiğinde backup sırasında mail persistence kaybını büyütebilir.
+
+### BUG-MAIL-011 — fixed packet strings are not server-NUL-terminated before strlen/%s
+- Statik durum: **doğrulandı**
+- Reachability: crafted client
+- Sınıf: server memory-safety / OOB read
+
+`TPacketCGMailboxWrite` fixed char arrays taşır:
+- szName
+- szTitle
+- szMessage
+
+Server input packet üzerinde terminator force etmez.
+
+`CMailBox::Write` doğrudan:
+- `sys_err("%s"...)`
+- `strlen(szName/title/message)`
+kullanır.
+
+Non-NUL-terminated crafted array packet buffer sınırından öteye okunabilir; crash / undefined read riski vardır.
+
+Benzer şekilde confirm-name DB path'inde `p->szName` `%s` ile SQL query'ye sokulur.
+
+Official client `strcpy` ile normalde NUL üretir fakat server güvenlik sınırı client davranışına bağımlı olmamalıdır.
+
+### BUG-MAIL-012 — receiver grants attachment before DB GET acknowledgement
+- Statik durum: **doğrulandı**
+- Sınıf: cross-process atomicity / duplication-loss window
+
+`CMailBox::GetItem` sırası:
+1. item Create + AutoGiveItem
+2. GiveGold
+3. GiveCheque
+4. local snapshot attachment fields = 0
+5. `HEADER_GD_MAILBOX_GET(name,index)`.
+
+DB acknowledgement yoktur.
+
+GAME tarafındaki grant persist olurken DB GET packet'i kaybolur / DB peer fail olursa DB map attachment'ı koruyabilir ve reopen sonrası tekrar claim edilebilir.
+Tersi crash sıralarında local grant kaybolup DB attachment temizlenebilir.
+
+BUG-MAIL-005 index drift ile birleşirse yanlış DB mailinin temizlenmesi daha da kolaylaşır.
+
+### OBS-MAIL-001 — W_MAILBOX is set but omitted from CanWarp opened-window mask
+`CHARACTER::SetMailBox` aktif mailbox için `W_MAILBOX` set eder.
+
+`CHARACTER::CanWarp` son mailbox işleminden sonraki portal cooldown'u kontrol eder fakat opened-window bitmask içinde `W_MAILBOX` yoktur.
+
+Cooldown geçince mailbox object açıkken warp mümkün olabilir.
+Cross-core character teardown mailbox'ı kapatır; same-process warp/access policy runtime'da doğrulanmalıdır.
+
+Sınıf: gameplay/access-policy observation, doğrudan duplication olarak sınıflandırılmadı.
+
+### OBS-MAIL-002 — mailbox block result enums exist but enforcement absent
+`POST_WRITE_TARGET_BLOCKED` ve `POST_WRITE_BLOCKED_ME` result enumları mevcut.
+Current MailBox.cpp write/check-name flow Messenger/block relationship sorgulamıyor.
+
+Block sisteminin mailbox'ı da kapsaması ürün beklentisiyse enforcement eksiktir; mevcut koddan tek başına intended policy kesinleştirilmediği için observation olarak tutulur.
+
+### OBS-MAIL-003 — client write bindings also trust Python lengths
+Official client `SendPostWrite` ve `SendPostWriteConfirm` fixed packet arrays için `std::strcpy` kullanır.
+Normal UI length-limit uygularsa sorun görünmez; arbitrary Python caller uzun string ile client stack overwrite/self-crash yüzeyi oluşturabilir.
+
+Server BUG-MAIL-011 bağımsız olarak geçerlidir.
+
+### Mailbox STATIC COMPLETE
+Kapatılan alanlar:
+- open/load/create/close
+- confirm/check-name
+- send item/Yang/Won
+- receive item/Yang/Won
+- get-all/delete/delete-all/add-data
+- DB runtime map
+- index identity
+- periodic persistence
+- boot reload
+- expiry filtering
+- SQL serialization
+- string trust
+- item-source windows
+- warp/logout lifecycle
+- client write bindings.
+
+Canonical active bugs:
+BUG-MAIL-001 .. BUG-MAIL-012.
+
+Observations:
+OBS-MAIL-001 .. OBS-MAIL-003.
