@@ -33,6 +33,26 @@ Start with defects that should reproduce using current checked-in data/UI:
 - other subsystem persistence tests already recorded in their individual test files.
 
 ## Current next target
-**Dungeon Info normal-path cluster: DUNGEON-T10 -> T09 -> T11 -> T12.**
+**DUNGEON-T10 live reproduction is the gate.**
 
-These four tests require no intentionally corrupt config/packet for the first pass and directly exercise the current snapshot.
+Preflight result:
+- current server config has 9 dungeon entries;
+- client receives/stores them before GC OPEN;
+- UI `Initialize()` creates list rows only in the zero-count branch;
+- therefore T10 has a deterministic normal-path trigger.
+
+Dependency:
+`T10 live repro -> fix/bypass T10 -> T09 -> T11 -> T12`.
+
+T09, T11 and T12 are code-path confirmed but remain **LIVE PENDING** because the broken T10 list prevents normal dungeon selection/UI inspection.
+
+### Exact live action
+On the current running client/server:
+1. log in normally;
+2. click the Dungeon Info icon next to the minimap;
+3. capture whether the window has dungeon rows.
+
+Reproduction criterion for BUG-DUNGEON-010:
+**window opens, but the dungeon list is empty/missing even though the server config contains 9 dungeons.**
+
+No source/config modification is needed for this first test.
