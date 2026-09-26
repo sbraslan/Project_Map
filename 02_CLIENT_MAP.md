@@ -233,3 +233,35 @@ Receive:
 → UPDATE: local CPythonSwitchbot table refresh
 → UPDATE_ITEM: SWITCHBOT TItemPos üzerindeki count/socket/attribute refresh
 → SEND_ATTRIBUTE_INFORMATION: allowed attribute/max-value map refresh.
+
+## Safebox/Mall/Guild Storage — window-aware binding
+
+`PythonNetworkStreamModule.cpp` storage bindingleri hem legacy cell-only hem window-aware form destekliyor.
+
+### Safebox checkin
+2 arg:
+- source window otomatik INVENTORY
+
+3 arg:
+- source `window_type`
+- source cell
+- safebox slot
+
+### Safebox checkout
+2 arg:
+- safebox slot
+- destination cell
+- `TItemPos` default ctor nedeniyle window INVENTORY
+
+3 arg:
+- safebox slot
+- destination `window_type`
+- destination cell
+
+### Mall checkout
+Aynı 2/3 arg destination modeli.
+
+### Guild Storage
+Checkin ve checkout da 3 arg formunda client Python katmanından explicit window type kabul ediyor.
+
+Bu binding esnekliği nedeniyle server'ın yalnız normal UI davranışına güvenmemesi gerekir; supported window enumları Python tarafında doğrudan üretilebilir.
