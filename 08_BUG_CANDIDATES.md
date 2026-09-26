@@ -1697,3 +1697,44 @@ Boot ordering confirms Event Manager table initialization occurs before `CBattle
 Current `Project_Game/share/locale/europe/battlepass/{normal,premium,event}.txt` all use `BattlePassID 1`.
 Therefore bool `bState` accidentally equals the current ID while active.
 This masks the defect today; any future season configured with ID 2+ will still be represented as active ID 1.
+
+## Achievement System — initial canonical bugs
+
+### BUG-ACH-001 — completion reward is durable before achievement completion state
+- Statik durum: **doğrulandı**
+- Sınıf: crash consistency / repeat reward
+
+`FinishAchievement` mutates only the in-memory player achievement map, sends client packets, then immediately calls `RewardPlayer`.
+Rewards can be items (`AutoGiveItem`), gold, titles or achievement points.
+
+The complete achievement/progress/points/title map is sent to DB only from `CAchievementSystem::OnLogout`.
+DB then stores it in `CAchievementCache` for later flush.
+
+Item rewards can independently become durable through normal ITEM_MANAGER delayed saves while the achievement completion remains only GAME RAM.
+A hard GAME crash before clean logout can therefore reload the old unfinished state and allow the same achievement to finish/reward again.
+
+### BUG-ACH-002 — achievement cache flush is non-transactional destructive rebuild
+- Statik durum: **doğrulandı**
+- Sınıf: persistence atomicity / data loss
+
+`CAchievementCache::OnFlush` performs:
+1. DELETE all `achievement_tasks` rows for pid and DELETE all `achievements` rows for pid;
+2. REPLACE `achievement_data`;
+3. INSERT every achievement row;
+4. INSERT every unfinished task row.
+
+These are separate DirectQuery calls with no transaction.
+DB/process failure after the DELETE and before complete reconstruction can permanently leave a player with missing or partially rebuilt achievement/task state.
+
+### BUG-ACH-003 — stale task ID can crash GetAchievementProgress for max_value achievements
+- Statik durum: **doğrulandı**
+- Sınıf: config-evolution / server crash
+
+DB load preserves stored task IDs.
+The login merge adds missing current tasks but does not remove obsolete task IDs from an existing achievement.
+
+In `GetAchievementProgress`, when the current achievement has `max_value > 0`, code does:
+`cTask = target_achievement->tasks.find(task.first)`
+and immediately reads `cTask->second.type` without verifying `cTask != end()`.
+
+If an XML update removes/renumbers a task while the DB still contains that old task ID, progress evaluation can dereference end() and crash the GAME core.
