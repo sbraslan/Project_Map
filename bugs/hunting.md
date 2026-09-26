@@ -96,7 +96,7 @@ This is not one transactional commit and is independent of the client packet byp
 `ReciveHuntingRewards()` does not check the return from `ITEM_MANAGER::CreateItem`.
 `CreateItem` can return `nullptr` for a missing/invalid item proto or another creation failure, after which Hunting can dereference the null pointer during inventory/ground handling.
 
-Current Hunting reward VNUM reachability still requires comparison against the actual server item-proto dataset before assigning a separate verified bug ID.
+Current snapshot check: all 62 unique configured Hunting reward VNUMs exist in `Project_DumpProto/tr/item_names.txt`, the readable item index from the same DumpProto snapshot. No configured missing-VNUM case was found, so this remains a defensive robustness finding and is not assigned a separate verified bug ID.
 
 ### Ground fallback result ignored
 When inventory is full, Hunting calls `AddToGround(...)` but ignores its boolean return value, then starts ownership/destroy handling and clears reward flags.
