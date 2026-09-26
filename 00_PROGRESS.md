@@ -640,3 +640,32 @@ Exchange static completion sonrasında Shop / Premium Private Shop transaction f
 2. Premium shop stash withdraw rollback akışını haritala.
 3. ShopEx ve NPC Sell için source/currency invariantlarını kapat.
 4. Shop subsystem completion checkpoint oluştur.
+
+
+## Checkpoint — Shop / Premium Private Shop first transaction pass
+
+**Tarih:** 2026-09-26
+
+Exchange static completion sonrasında Shop / Private Shop subsystem başlatıldı.
+
+Active build:
+- ENABLE_PREMIUM_PRIVATE_SHOP
+- ENABLE_PREMIUM_PRIVATE_SHOP_TIME
+- ENABLE_OPEN_SHOP_WITHOUT_BAG
+- ENABLE_OPEN_SHOP_ONLY_IN_MARKET
+- ENABLE_OPEN_SHOP_WITH_PASSWORD
+- ENABLE_PREMIUM_PRIVATE_SHOP_TEXTTAIL
+- ENABLE_SHOP_NO_SPEND_MIN_IF_ONLINE
+- ENABLE_PRIVATESHOP_SEARCH_SYSTEM.
+
+İlk buy transaction zinciri çıkarıldı:
+CShopManager::Buy -> CShop::Buy -> buyer balance/space checks -> buyer currency debit -> item owner transfer -> per-item FlushDelayedSave -> game-to-DB SHOP_SUBHEADER_GD_BUY -> DB CClientManager::ShopSaleResult -> shop stash credit + item removal + shop cache update.
+
+### Yeni doğrulanmış buglar
+- **BUG-SHOP-001:** Premium shop DB stash için sale-before-cap precheck yok. AlterGoldStash / AlterChequeStash önce tutarı ekleyip sonra GOLD_MAX/CHEQUE_MAX'e clamp ediyor. Stash limite yakınsa buyer tam fiyatı öder ve itemı alır; seller limit üstü geliri sessizce kaybeder.
+- **BUG-SHOP-002:** personal_shop tax premium private shop seller stash'ine uygulanmıyor. Game CShop::Buy tax sonrası local dwPrice hesaplıyor fakat DB'ye tax/net price gönderilmiyor; yalnız pid+displayPos gider. DB ShopSaleResult kendi cached sold.price değerini tam olarak stash'e ekler.
+
+### Persistence observation
+Buyer debit, item ownership save ve offline-shop sale/cache update tek atomic transaction değildir. Item yeni owner'a FlushDelayedSave edilir; shop sale DB packet'i bunun ardından gider; buyer CHARACTER::Save ise fonksiyon sonunda delayed save'dir. Crash/failure ordering ayrıca test edilmelidir.
+
+Sıradaki Shop adımları: listing/open validation, private-shop search buy path, withdraw/rollback, remove/close/edit ve sell-to-NPC akışları.
