@@ -10,7 +10,8 @@
 - TICKET-T03 deterministic ticket-ID collision.
 - TICKET-T04 staff sort modes 0/5/255 and high pages.
 - TICKET-T05 client log request id == vector size under ASan.
-- TICKET-T06 crafted non-NUL fixed-char subpacket.
+- TICKET-T06 crafted non-NUL fixed-char subpacket: for OPEN/CREATE/REPLY/ADMIN fill one fixed char field completely without a NUL and run GAME under ASan/UBSan. Covers BUG-TICKET-006.
+- TICKET-T07 normal-user pagination mismatch: create >=25 tickets, open the Ticket UI, verify server sends up to 40 while client cache contains only 10; inspect page-1 rows 10..19 and pages 2+. Covers BUG-TICKET-007.
 
 ### Dungeon Info
 - DUNGEON-T01 WARP/RANK 255 and vector-size boundary.
