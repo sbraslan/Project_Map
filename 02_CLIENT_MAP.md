@@ -108,3 +108,31 @@ Packet:
 
 → `Send`
 → `SendSequence`.
+
+## Inventory — pickup / drop / destroy client zinciri
+
+### Pickup
+Python:
+`netSendItemPickUpPacket(vid)`
+→ `CPythonNetworkStream::SendItemPickUpPacket(vid)`
+→ `HEADER_CG_ITEM_PICKUP`
+→ `SendSequence()`.
+
+### Drop
+Legacy:
+`netSendItemDropPacket`
+→ `SendItemDropPacket`
+→ `HEADER_CG_ITEM_DROP`.
+
+Count-aware:
+`netSendItemDropPacketNew`
+→ `SendItemDropPacketNew`
+→ `HEADER_CG_ITEM_DROP2`.
+
+### Destroy
+`netSendItemDestroyPacket(Cell,count)`
+→ `SendItemDestroyPacket(Cell,0,count)`
+→ `HEADER_CG_ITEM_DESTROY`.
+
+Not:
+Destroy sender `Send(...)` sonrası doğrudan `true` dönüyor; diğer yakın item sender'larının aksine `SendSequence()` çağırmıyor. Bu şimdilik **davranış farkı** olarak kaydedildi, tek başına bug ilan edilmedi.
