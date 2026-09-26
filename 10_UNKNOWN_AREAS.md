@@ -511,3 +511,20 @@ Shop / Private Shop: buy/sell, owner/guest state, item reservation, currency deb
 7. DB boot/load shop reconstruction + item bind son turu.
 8. item expiration -> RemoveItemByID -> DB consistency.
 9. runtime configte SHOP_PRICE_3X_TAX açılırsa high-price overflow testi.
+
+
+## Shop static completion sonrası yalnız runtime doğrulama
+
+Shop ana kod haritası kapatıldı. Kalan runtime testleri:
+- SH-T01: AddMyShopItem targetPos 79/80/89 sınırları (ASan tercih).
+- SH-T02: initial MyShop display_pos 80 ve duplicate display_pos.
+- SH-T03: bCount 80/81 boundary.
+- SH-T04: ClosePlayerShop regular inventory available + special tab full partial-close.
+- SH-T05: withdraw request sonrası gold/cheque değiştirip DB response TOCTOU.
+- SH-T06: empty private-shop-search result ASan.
+- SH-T07: GAME->DB sale packet fault injection.
+- SH-T08: shop cache flush DELETE sonrası crash / INSERT öncesi recovery.
+- SH-T09: persisted missing price metadata / pos=80 MyShopInfoLoad ASan.
+- SH-T10: official client cheque withdraw 255/256/300 behavior.
+
+Statik Shop keşfi için yeni açık alan kalmadı; yeni Shop çalışması bu testlerden bulgu çıkarsa açılmalı.
