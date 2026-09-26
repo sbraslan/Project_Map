@@ -1,31 +1,42 @@
 # CURRENT — Canonical Active Checkpoint
 
 **Active phase:** Detection / Mapping Only
-**Active subsystem:** Party Match
+**Active subsystem:** Dungeon Core
 **Status:** PARTIAL — ACTIVE
 **Machine state:** `STATE.json`
-**Canonical map:** `systems/party_match.md`
+**Canonical map:** `systems/dungeon_core.md`
 **Last updated:** 2026-09-26
 
 ## Hard rule
 Only `sbraslan/Project_Map` is writable. All source/game repositories remain read-only.
 
-## Party Match checkpoint
-Verified bugs:
-- `BUG-PMATCH-001` — same-channel matchmaking pool fragmented per game core.
-- `BUG-PMATCH-002` — required exchange-listed item can be destroyed while CExchange retains a raw pointer.
-- `BUG-PMATCH-003` — queued FAIL_NO_ITEM resets main state but leaves minimap Party Match icon visible.
+## Closed this turn — Party Match
+Party Match is now **STATIC COMPLETE**.
 
-## Client state closure
-SEARCH/CANCEL Python argument shapes are odd but intentionally matched by `uiPartyMatch.PartyMatchResult`.
+Verified Party Match bugs:
+- `BUG-PMATCH-001`
+- `BUG-PMATCH-002`
+- `BUG-PMATCH-003`
 
-Duplicate SEARCH/HOLD can desync client/server state, but stock UI sends CANCEL after the first search, so HOLD remains a robustness finding rather than a separate active bug.
+## Active Dungeon Core checkpoint
+Initial roots mapped:
+- `dungeon.h/.cpp`;
+- `questlua_dungeon.cpp`;
+- character dungeon association;
+- party dungeon association;
+- private-map create/destroy;
+- dead/exit/jump event lifecycle.
+
+Initial candidates:
+- event lookup null-ordering;
+- JoinParty state mutation before map validation;
+- raw party lifetime in dungeon maps.
 
 ## Exact next work
-1. Audit remaining conflicting item windows.
-2. Audit success notification vs WarpSet failure.
-3. Audit queued map/core transitions.
-4. Audit Party Match off/disable enforcement.
-5. Decide Party Match STATIC COMPLETE.
+1. Close CHARACTER::SetDungeon membership lifecycle.
+2. Close party/dungeon pointer lifetime.
+3. Close event callback lifetime/null ordering.
+4. Map quest dungeon creation/join flows.
+5. Promote only verified bugs.
 
 GitHub state is canonical.
