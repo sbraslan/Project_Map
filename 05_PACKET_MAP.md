@@ -269,3 +269,47 @@ Server ITEM_ADD path:
 Packet boundary semantic allowlist uygulamaz. Generic `TItemPos::IsValidItemPosition()` SWITCHBOT ve ADDITIONAL_EQUIPMENT_1 gibi windowları da valid saydığı için exchange-specific source validation eksiktir.
 
 ELK_ADD ayrıca gold/cheque recipient-overflow check'ini yalnız offer packet işlendiği anda yapar; final ACCEPT öncesi aynı snapshot yeniden doğrulanmaz.
+
+## Recovered packet map — Ticket / Dungeon Info / Battle Pass
+
+### Ticket
+- CG `HEADER_CG_TICKET_SYSTEM = 129`
+  - OPEN
+  - CREATE
+  - REPLY
+  - ADMIN
+  - ADMIN_PAGE
+- GC `HEADER_GC_TICKET_SYSTEM = 148`
+  - LOGS
+  - LOGS_REPLY
+- Variable packet base contains `wSize` and subheader; server validates subpacket byte length but semantic/string trust remains in CTicketSystem.
+
+### Dungeon Info
+- CG `HEADER_CG_DUNGEON_INFO = 159`
+  - action, uint8 index, uint8 rankType.
+- GC `TPacketGCDungeonInfo`
+  - uint16 byIndex
+  - fixed required-item, bonus, boss-drop arrays.
+- GC ranking packet returns name/level/points.
+- Width mismatch: GC uint16 index -> client `AddDungeon(uint8_t)`.
+
+### Battle Pass
+CG:
+- `HEADER_CG_EXT_BATTLE_PASS_ACTION = 218`
+- `HEADER_CG_EXT_SEND_BP_PREMIUM = 219`
+
+GC:
+- OPEN 163
+- GENERAL_INFO 164
+- MISSION_INFO 165
+- MISSION_UPDATE 166
+- SEND_RANKING 167
+
+`TPacketGCExtBattlePassMissionUpdate` fields:
+- bHeader
+- bBattlePassType
+- bMissionIndex
+- bMissionType
+- dwNewProgress
+
+Current server update paths do not assign bMissionType before send.
