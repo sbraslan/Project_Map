@@ -540,3 +540,64 @@ kontrollerini yapar.
 Switchbot Start itemı `SetLocked` ile kilitlemiyor; active state manager tablosunda tutuluyor. Böyle bir item exchange commit ile RemoveFromCharacter olduğunda Switchbot unregister/event lifecycle buglarıyla birleşebilir.
 
 Additional Equipment itemı `m_bEquipped=true` olabilir; exchange source validator bunu equipment position olarak görmez. Commit RemoveFromCharacter üzerinden unequip davranışına gidebilir ve normal trade UI/CanUnequipNow sınırlarını bypass eden bir yol oluşur.
+
+
+### BUG-EXCHANGE-001 — Special Inventory CheckSpace/Done domain mismatch → partial transfer
+- Statik durum: **doğrulandı**
+- Sınıf: transaction preflight/commit mismatch + rollback eksikliği
+- Build: `ENABLE_SPECIAL_INVENTORY`
+
+`CExchange::CheckSpace()` Dragon Soul dışındaki incoming itemları yalnız normal inventory page gridlerinde simüle eder.
+
+`CExchange::Done()` ise special item için `victim->GetEmptyInventory(item)` kullanır; bu helper item type'a göre Skillbook/Stone/Material special inventory range'ine gider.
+
+Bu nedenle normal inventory'de alan varken ilgili special inventory dolu olabilir:
+- `CheckSpace()` true
+- `Done()` special itema geldiğinde `empty_pos < 0`.
+
+`Done()` daha önceki itemları çoktan `RemoveFromCharacter -> AddToCharacter(victim)` ile taşıdıysa rollback yapmaz. Offer array sırası nedeniyle önce normal item, sonra başarısız special item olduğunda one-sided/partial item transfer statik olarak mümkündür.
+
+Ek olarak normal inventory dolu ama special inventory boş olduğunda false-negative trade rejection oluşur.
+
+### BUG-EXCHANGE-002 — Extended inventory page 4 reservation hatası → CheckSpace false-positive
+- Statik durum: **doğrulandı**
+- Build: `ENABLE_EXTEND_INVEN_ITEM_UPGRADE`
+- Sınıf: space-simulation control-flow bug + transaction atomicity
+
+`CExchange::CheckSpace()` page4 branch'inde `s_grid4.Put(iPos,...)` şu multi-size boundary condition'ın statement'ı haline gelmiş:
+`if (item->GetSize() > 1 && iPos > wSlotPos - (...))`
+
+Sonuç:
+- size=1 item için condition false → `Put` çalışmaz,
+- normal şekilde sığan size>1 item için de çoğu durumda `Put` çalışmaz,
+- boundary'yi aşan bazı size>1 durumlarda tersine `Put` çalışır.
+
+En basit etkisi: page4'te tek boş slot varken birden fazla size=1 incoming item aynı slotu preflight'ta tekrar kullanabilir. `CheckSpace()` true döndükten sonra gerçek `Done()` ilk itemı yerleştirir, sonraki item boşluk bulamayabilir. Önce taşınan item rollback edilmez.
+
+### BUG-EXCHANGE-003 — Exchange source-window allowlist eksikliği
+- Statik durum: **doğrulandı**
+- Sınıf: client-controlled TItemPos / semantic guard bypass
+
+Official UI ITEM_ADD source olarak Inventory veya Dragon Soul kullanır. Fakat Python binding explicit `window_type` kabul eder.
+
+Server `CExchange::AddItem` yalnız:
+- generic `IsValidItemPosition`
+- `!IsEquipPosition`
+- item existence / anti-give / lock / exchange state
+kontrollerini uygular.
+
+Bu, `SWITCHBOT` ve `ADDITIONAL_EQUIPMENT_1` gibi generic olarak valid fakat exchange için beklenmeyen source windowları geçirir.
+
+Etkiler:
+- active SWITCHBOT item normal `MoveItem` içindeki `CSwitchbotManager::IsActive` source guardını bypass ederek exchange offer'a girebilir,
+- Additional Equipment item normal move yolundaki `CanUnequipNow` semantiğini bypass edebilir.
+
+Runtime sonuçları izole testte doğrulanmalı; server-side allowlist eksikliği statik olarak kesindir.
+
+### OBS-EXCHANGE-001 — TPacketCGExchange zero-init eksikliği
+Client `SendExchange*` fonksiyonları `TPacketCGExchange packet;` oluşturup yalnız subheader'a gerekli alanları dolduruyor.
+
+Server `CInputMain::Exchange` switch öncesinde her packet için `pinfo->arg1` character lookup yapıyor. START dışındaki paketlerde `arg1` initialize edilmemiş olabilir. Bu nondeterministic early-return ve client stack data'nın gereksiz wire'a çıkması açısından gözlem olarak tutuluyor.
+
+### OBS-EXCHANGE-002 — AddGold cheque-build boolean kontrolü
+`ENABLE_CHEQUE_SYSTEM` altında offer-stage balance kontrolü gold ve cheque yetersizliğini `&&` ile birleştiriyor. Tek currency yetersizliği AddGold aşamasından geçebilir. Final `CExchange::Check()` gold ve cheque'yi ayrı kontrol ettiği için şu an doğrudan currency exploit olarak sınıflandırılmadı; UX/state inconsistency ve future-regression riski.
