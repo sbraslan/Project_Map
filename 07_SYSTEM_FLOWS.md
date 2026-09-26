@@ -1154,3 +1154,54 @@ required count reached
 -> reward affect/item + next mission.
 
 Current Project_Game breaks this intended final bridge because no `biolog_manager` quest is present or registered; only legacy biolog quests are registered.
+
+
+## Hunting System — first-pass flow
+
+Bootstrap:
+login or level-up
+-> `CheckHunting`
+-> initialize quest flags / flash button.
+
+Open:
+UI `SendHuntingAction(1,0)`
+-> CG 220
+-> `ReciveHuntingAction`
+-> `OpenHuntingWindowMain`
+-> current mission/reward-range packets.
+
+Select:
+UI `SendHuntingAction(2,type)`
+-> if inactive and level gate passes
+-> set is_active=1, type, count=0
+-> open current mission.
+
+Progress:
+monster death
+-> `char_battle.cpp`
+-> `UpdateHuntingMission(vnum)`
+-> mission target check
+-> increment count
+-> GC update
+-> when complete, `SetCachedRewards`.
+
+Cache:
+race/class reward table
++ random item table by mission-level band
++ random gold
++ random EXP percent
+-> persisted as quest flags.
+
+Claim:
+UI action 4
+-> `ReciveHuntingRewards`
+-> grant race item
+-> grant random item
+-> grant gold
+-> grant EXP
+-> clear cached reward flags
+-> is_active=-1
+-> type=-1/count=0
+-> level++.
+
+Current server action 4 does not first prove reward_cached/completion state.
