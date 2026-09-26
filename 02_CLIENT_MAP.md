@@ -319,3 +319,26 @@ ve doğrudan `TItemPos(window_type, cell)` üretir.
 Client binding tarafında trade source için INVENTORY/DRAGON_SOUL allowlist yoktur. Normal UI güvenli window gönderebilir; modified Python/client ise server `IsValidItemPosition()` tarafından desteklenen başka windowları gönderebilir.
 
 Bu sınır BUG-EXCHANGE-003 için client-side giriş noktasıdır.
+
+## Recovered client map — Ticket / Dungeon Info / Battle Pass
+
+### Ticket
+- `root/uiticket.py`: ticket board, create/reply/admin UI.
+- `UserInterface/PythonTicket.cpp`: Python send bindings and fixed-size client caches.
+- `PythonNetworkStreamPhaseGame.cpp::RecvTicketSystemPacket`: GC variable packet receiver.
+- Client cache requests have BUG-TICKET-005 boundary issue at id==size.
+
+### Dungeon Info
+- `root/uidungeoninfo.py` uses exported dungeonInfo module.
+- `UserInterface/PythonDungeonInfo.cpp/.h`: local packet cache/ranking cache and Open/Warp/Close.
+- `m_vecDungeonInfoDataMap[255]` is indexed directly by network/Python index.
+- `Clear()` only clears first slot vector.
+- `PythonNetworkStreamPhaseGame.cpp::RecvDungeonInfo` narrows packet.byIndex into `AddDungeon(uint8_t,...)`.
+
+### Battle Pass
+- `PythonNetworkStreamPhaseGame.cpp::RecvExtBattlePassMissionUpdatePacket`
+  -> `game.py::BINARY_ExtBattlePassUpdate`
+  -> interface
+  -> `uibattlepass.py::UpdateMission`.
+- Client consumes all four fields: pass type, mission index, mission type, new progress.
+- This confirms server BUG-BPASS-001 affects actual UI routing because missionType is part of `HaveMission(...)`.
