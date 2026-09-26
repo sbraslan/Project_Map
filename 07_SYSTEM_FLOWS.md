@@ -225,3 +225,25 @@ Disconnect:
 → DB cache / item table.
 
 Quickslot mapping INVENTORY↔BELT ve aynı-window taşımalarda ayrıca senkronize ediliyor.
+
+## Inventory — login/load ters persistence zinciri
+
+DB/cache
+→ `TPlayerItem`
+→ `HEADER_DG_ITEM_LOAD(42)`
+→ `CInputDB::ItemLoad`
+→ `CreateItem(vnum,count,id)`
+→ metadata restore
+→ destination window reconstruction
+→ INVENTORY/BELT/SWITCHBOT/etc: `AddToCharacter`
+→ EQUIPMENT: `EquipTo`
+→ client item/equipment packets
+→ `SetItemLoaded`
+
+Load sırasında `SetSkipSave(true)` sayesinde `AddToCharacter/EquipTo` içindeki normal `Save()` çağrıları DB'ye geri yazılmaz.
+
+Collision:
+DB target occupied / equip restore fail
+→ restore queue
+→ free inventory slot
+→ yoksa ground + temporary ownership.
