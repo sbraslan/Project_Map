@@ -83,23 +83,43 @@ Therefore:
 
 This requires a malformed server packet; no client-to-server exploit path is asserted here.
 
-### BUG-RANK-006 — active BattleField source calls an unresolved `LoadRanking` identifier
-- Statik durum: **doğrulandı (repository source snapshot)**
-- Sınıf: C++ build blocker / call-site qualification defect
+### BUG-RANK-006 — RETRACTED: suspected unresolved `LoadRanking` call
+- Statik durum: **geri çekildi / yanlış pozitif**
+- Sınıf: audit correction
 
-Under `ENABLE_RANKING_SYSTEM`, both `CBattleField::CloseEnter()` and the scheduled weekly ranking update call:
+The original finding missed a transitive include path.
 
-`LoadRanking(RK_CATEGORY_BF);`
+Verified resolution:
+- `cmd_general.cpp` defines global `LoadRanking(uint8_t)` and sends `TPacketGGLoadRanking` through `P2P_MANAGER::Send` before reloading the local `CRankingSystem` cache;
+- `cmd.h` declares the helper;
+- `battle_field.cpp -> char.h -> horse_rider.h -> cmd.h` makes that declaration visible to the BattleField translation unit.
 
-The mapped source shows:
-- no `CBattleField::LoadRanking` declaration;
-- no such method in `singleton<CBattleField>`;
-- no `LoadRanking` macro/alias in the checked direct/precompiled include chain;
-- the actual ranking method is `CRankingSystem::LoadRanking(uint8_t)`.
+Therefore the two unqualified `LoadRanking(RK_CATEGORY_BF)` calls are resolvable and this is not a build blocker.
 
-`common/CommonDefines.h` enables both `ENABLE_RANKING_SYSTEM` and `ENABLE_BATTLE_FIELD`, so the two call sites are included in the mapped build configuration.
+The ID remains reserved as a retracted finding and is not reused.
 
-Unless the real build injects an external declaration/macro that is not present in the repository snapshot, these call sites are not resolvable C++ and should block compilation of this translation unit.
+### BUG-RANK-007 — online BattleField winner flags are not refreshed when ranking changes
+- Statik durum: **doğrulandı**
+- Sınıf: ranking lifecycle / stale direct affect flags
+
+`CBattleField::Connect` calls `SetWeakRankingPosition`, which looks up the current top-3 winner vector and directly sets one of:
+- `AFF_BATTLE_RANKER_1`
+- `AFF_BATTLE_RANKER_2`
+- `AFF_BATTLE_RANKER_3`
+
+The ranking reload paths are:
+- local global helper `LoadRanking(uint8_t)`;
+- P2P `CInputP2P::LoadRanking`;
+- `CRankingSystem::LoadRanking/LoadBFRanking`.
+
+Those paths reload ranking vectors only. They do not iterate online characters and do not call `SetWeakRankingPosition`.
+
+In addition, `SetWeakRankingPosition` does not clear an older ranker bit before setting a new one.
+
+Consequences at weekly rollover while players remain online:
+- an old top-3 player can keep the previous winner flag after losing the position;
+- an already-online new top-3 player does not receive the corresponding flag from the ranking reload itself;
+- reconnect/recreation can rebuild the flag state, but the live reload path does not.
 
 ## Findings awaiting reachability closure
 
@@ -123,13 +143,9 @@ Opening a generic solo category 2..7 would index a missing dictionary key.
 No verified bug ID is assigned until an active caller for those categories is mapped.
 
 ### Ranker-effect refresh gap
-`SetWeakRankingPosition` sets a winner effect when a player connects, but mapped ranking reload paths do not iterate online players to refresh winner effects.
+Promoted to **BUG-RANK-007** after reload and online-character lifecycle closure.
 
-The function itself also does not clear previous ranker flags.
+### P2P ranking reload sender gap — CLOSED
+The sender exists in `cmd_general.cpp::LoadRanking(uint8_t)`.
 
-The online-state update gap is structurally visible. Additional mapping now shows the flags are set directly on `m_afAffectFlag`, while the generic reset path only resets flags belonging to `CAffect` entries. A final repo-wide search for any direct `AFF_BATTLE_RANKER_1..3` reset remains before assigning a verified bug ID.
-
-### P2P ranking reload sender gap
-`TPacketGGLoadRanking` is defined and received by `CInputP2P::LoadRanking`, but the targeted server-source scan has not found any construction/send site for that packet.
-
-The next reachability step is to map all callers of `CBattleField::OpenBattleUI` and determine whether non-BattleField channels can display stale ranking caches after weekly rollover.
+It constructs `TPacketGGLoadRanking`, broadcasts through `P2P_MANAGER::Send`, then reloads the local ranking cache. The earlier “sender not found” note was incomplete and is closed.
