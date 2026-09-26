@@ -258,3 +258,35 @@ Pickup:
 - item ID mevcut ve skip-save değilse `HEADER_GD_ITEM_DESTROY`
 - DB `QUERY_ITEM_DESTROY`
 - cache varsa silinir; yoksa SQL DELETE.
+
+## Switchbot item persistence
+
+SWITCHBOT ayrı config DB tablosu kullanmıyor.
+
+Item persistence normal player item tablosu üzerinden:
+- owner = player PID
+- window = SWITCHBOT
+- pos = switchbot slot
+- normal item ID/vnum/count/socket/attrs.
+
+Inventory → SWITCHBOT:
+`MoveItem`
+→ source remove
+→ `SetItem(SWITCHBOT)`
+→ RegisterItem
+→ delayed-save final state
+→ `HEADER_GD_ITEM_SAVE`
+→ player item cache/DB.
+
+Login:
+player item load sorgusu SWITCHBOT window'u dahil eder
+→ `CInputDB::ItemLoad`
+→ `AddToCharacter(SWITCHBOT,pos)`
+→ `SetItem`
+→ RegisterItem.
+
+### Switchbot configuration persistence
+Active/configured alternatives DB'ye yazılmıyor.
+Runtime `TSwitchbotTable` game-core memory'de tutuluyor ve cross-core warp sırasında P2P ile taşınıyor.
+
+Normal process restart sonrasında bu runtime configuration'ın kalıcı DB restore yolu bulunmadı.
