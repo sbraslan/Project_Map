@@ -418,3 +418,42 @@ Uygun ve uygunsuz item ile:
 - page unlock state
 - relog persistence
 kontrol edilir.
+
+
+### ITEM-T11 — Special Inventory bWindow bounds
+Yalnız izole development server'da test et.
+
+Extend Inventory request ve upgrade için special-state açıkken sınır değerleri:
+- valid: 0, 1, 2
+- invalid: 3 ve 255
+
+İzle:
+- server log/crash
+- ASan/UBSan varsa array OOB
+- `bSpecialInventoryStage[3]` komşu state
+- key consumption
+- stage mutation
+- player save/load sonucu.
+
+Beklenti: invalid window server tarafında hiçbir state'e dokunmadan reddedilmeli.
+
+### ITEM-T12 — Locked special slot persistence restore
+Kontrollü test karakteri ve yedek DB ile:
+1. special stage=0 bırak.
+2. aynı special type'ın ilk 45 açık slotunun üstünde fakat static type range içinde bir persisted item position hazırla.
+3. login/item load çalıştır.
+4. item owner/window/cell, grid pointer, client visibility ve relog persistence kontrol et.
+
+Beklenti: locked position restore edilmemeli; item güvenli recovery inventory path'ine alınmalı veya explicit reject/restore queue uygulanmalı.
+
+### ITEM-T13 — Special type size > 1 dataset audit
+Runtime server `item_proto` tablosu veya unpacked proto export üzerinde:
+- ITEM_SKILLBOOK
+- ITEM_METIN
+- ITEM_MATERIAL
+- ITEM_RESOURCE
+- vnum 27987
+
+için `size > 1` satırları ara.
+
+Kodun mevcut invariant'ı: `IsEmptySpecialItemGrid(..., bSize > 1) -> false`. Dataset'te böyle item varsa special auto-placement/movement uyumsuzluğu ayrıca sınıflandırılmalı.
