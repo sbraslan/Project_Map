@@ -280,3 +280,29 @@ Python binding `bWindow` değerini `uint8_t` olarak alıyor; 0..2 allowlist kont
 - diğer tüm values için `bSpecialState=true`
 
 Dolayısıyla normal UI 0/1/2 üretse bile Python/network boundary modified client tarafından 3..255 special-window değerlerini üretebilir. Server bunun için kendi bounds validation'ını yapmak zorunda.
+
+
+## Exchange / Trade client zinciri
+
+UI: `Project_Binary/root/uiexchange.py`
+
+Item add:
+`SelectOwnerEmptySlot`
+→ attached slot type yalnız Inventory veya Dragon Soul ise
+→ `m2netm2g.SendExchangeItemAddPacket(window, sourceCell, displayCell)`.
+
+Binding: `Project_ClientSrc/UserInterface/PythonNetworkStreamModule.cpp`
+- `netSendExchangeItemAddPacket` explicit `uint8_t window_type`, `uint16_t cell`, `display_pos` alır.
+- Binding katmanında Inventory/Dragon Soul allowlist yoktur.
+
+Network: `PythonNetworkStreamPhaseGame.cpp`
+- `SendExchangeStartPacket`
+- `SendExchangeElkAddPacket`
+- `SendExchangeItemAddPacket`
+- `SendExchangeAcceptPacket`
+- `SendExchangeExitPacket`.
+
+Official Python UI source-type'i kısıtlasa da C++ binding değiştirilmiş Python/client tarafından başka valid TItemPos windowlarıyla çağrılabilir; server trust boundary buna göre ele alınmalıdır.
+
+### Client packet initialization observation
+`SendExchange*` fonksiyonları `TPacketCGExchange packet;` kullanıyor, `{}` ile zero-init etmiyor. Her subheader yalnız kendi kullandığı alanları doldurduğundan diğer alanlar wire'da uninitialized kalabilir. Server `CInputMain::Exchange` switch öncesinde `arg1` okuyup character lookup yaptığı için bu salt cosmetic değildir; nadir nondeterministic early-return davranışı oluşturabilir.
