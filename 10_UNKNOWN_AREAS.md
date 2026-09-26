@@ -337,3 +337,36 @@ Kalan işler artık ağırlıklı runtime doğrulama:
 - dataset size audit.
 
 Sonraki statik haritalama turu yeni subsystem'e geçebilir; Item subsystem'e yalnız test sonuçları veya yeni cross-system caller çıktığında geri dönülmeli.
+
+
+## Exchange / Trade — yeni statik çalışma alanı
+
+Inventory/Item ana statik haritası completion seviyesine alındıktan sonra Exchange subsystem başlatıldı.
+
+### Statik olarak çözülen
+- UI → Python binding → C++ send → CG packet → CInputMain → CExchange zinciri
+- offer item state / display grid
+- dual-accept gate
+- `Check` / `CheckSpace` / `Done` ayrımı
+- Special Inventory placement-domain mismatch
+- extended page4 space-simulation bug
+- source TItemPos allowlist eksikliği
+- basic currency offer/final-check ayrımı.
+
+### Yeni buglar
+- BUG-EXCHANGE-001 — Special Inventory CheckSpace/Done mismatch + partial transfer
+- BUG-EXCHANGE-002 — page4 reservation control-flow bug + partial transfer
+- BUG-EXCHANGE-003 — SWITCHBOT / Additional Equipment source-window semantic bypass.
+
+### Açık Exchange alanları
+1. `Done()` iki taraflı commit sırasının tüm failure noktaları ve rollback etkisi.
+2. Gold/Cheque receiver max değerlerinin accept anında yeniden doğrulanması.
+3. `PointChange(POINT_GOLD/POINT_CHEQUE)` clamp/overflow semantiği.
+4. disconnect / death / warp / distance değişimi sırasında Exchange lifecycle.
+5. DB delayed-save / FlushDelayedSave / character Save ordering'i.
+6. source-window bypass'ın active Switchbot ve Additional Equipment runtime etkisi.
+7. GC exchange state ile client UI cleanup/accept reset senkronu.
+8. uninitialized CG packet alanlarının gerçek wire davranışı.
+
+### Sonraki checkpoint hedefi
+Exchange transaction/lifecycle haritasını kapat; ardından Shop/Private Shop veya bir sonraki item-transfer subsystemine geç.
