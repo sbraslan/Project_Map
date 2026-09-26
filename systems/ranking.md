@@ -1,6 +1,6 @@
 # Ranking System
 
-**Status:** PARTIAL — ACTIVE
+**Status:** STATIC COMPLETE
 **Phase:** Detection / Mapping Only
 **Date:** 2026-09-26
 
@@ -201,10 +201,24 @@ Not yet promoted to verified current-path bugs:
 - Generic ranker-effect lifecycle is now promoted to BUG-RANK-007.
 - P2P sender mapping is closed: `cmd_general.cpp::LoadRanking` broadcasts `TPacketGGLoadRanking` and reloads local state.
 
-## Exact next audit
-1. Determine whether any live caller opens generic PARTY ranking.
-2. Determine whether generic SOLO categories 2..7 have any live opener.
-3. Audit remaining ranking SQL/result null boundaries.
-4. Check whether any additional ranker-flag cleanup path changes BUG-RANK-007 severity/lifetime (the missing reload refresh itself is already verified).
-5. Decide whether Ranking is STATIC COMPLETE.
+## Final static closure
+Generic ranking reachability was checked against the active network callback layer and the feature-specific client UIs:
+- the only mapped C++ network callback that invokes Python `OpenRankingBoard` is BattleField `OpenRankingBoard(0, 0)`;
+- no active callback was found for generic PARTY ranking or generic SOLO categories 2..7;
+- candidate Guild Dragon Lair / 12ZI / World Boss UI modules use their own feature UIs rather than the generic ranking board in the mapped snapshot.
+
+The generic PARTY API gap and SOLO 2..7 name-table gap therefore remain dormant/incomplete integration findings, not promoted current-path bugs.
+
+SQL/result closure:
+- `CAsyncSQL::DirectQuery` always creates and returns an `SQLMsg`, then stores a result object even after a query error;
+- ranking loops gate on `uiNumRows` before iterating stored results;
+- no additional verified SQL/result boundary defect was found in the mapped Ranking queries.
+
+Ranker flag lifetime:
+- character construction resets `m_afAffectFlag`;
+- reconnect calls `CBattleField::Connect -> SetWeakRankingPosition`, so reconnect/recreation can rebuild ranker state;
+- live ranking reload still does not refresh already-online characters, which remains BUG-RANK-007.
+
+**Ranking System static mapping is complete for the current source snapshot.**
+
 
