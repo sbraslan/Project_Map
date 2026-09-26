@@ -86,3 +86,28 @@ Python `uiguildbank.Close`
 
 ### Yetki
 `GUILD_AUTH_BANK` kontrolü packet checkin/checkout handler'ında değil, **open/load request aşamasında** bulunuyor ve yalnız `ENABLE_GUILDRENEWAL_SYSTEM` build koşulu altında derleniyor.
+
+## Guild Storage — item checkin persistence
+
+Client packet
+→ `SafeboxCheckin(...,2)`
+→ inventory item validation
+→ `RemoveFromCharacter`
+→ `Guildstorage::Add`
+→ window = GUILDBANK
+→ owner pointer = opening character
+→ `SaveSingleItem` owner normalization = guild ID
+→ `HEADER_GD_ITEM_SAVE`
+→ DB direct `REPLACE item`
+→ persisted as `owner_id=guildID, window=GUILDBANK`.
+
+## Guild Storage — item checkout persistence
+
+`SafeboxCheckout(...,2)`
+→ `Guildstorage::Remove`
+→ `AddToCharacter`
+→ inventory window / player owner
+→ `FlushDelayedSave`
+→ `HEADER_GD_ITEM_SAVE`
+→ `HEADER_GD_ITEM_FLUSH`
+→ DB state forced toward current inventory ownership.
