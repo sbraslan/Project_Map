@@ -852,3 +852,50 @@ Runtime source of truth in DB process:
 Mutations do not immediately write SQL.
 Periodic `MAILBOX_BACKUP` rewrites SQL table from the entire map.
 This creates a long crash window between user-visible success and durable persistence.
+
+
+## Mailbox — boot/persistence failure chain
+
+DB shutdown
+→ MAILBOX_BACKUP
+→ TRUNCATE persistent mailbox
+→ INSERT current m_map rows.
+
+Next DB startup
+→ InitializeTables
+→ InitializeMailBoxTable
+→ m_map_mailbox is empty
+→ early return true
+→ SQL mailbox rows are never loaded.
+
+Later periodic backup
+→ TRUNCATE mailbox again
+→ empty m_map
+→ persisted rows can be erased.
+
+## Mailbox — backup identity hazard
+
+GAME holds mailbox snapshot ordered at open time.
+
+DB m_map vector may change:
+- new mail append
+- deleted/expired erase
+- periodic SendTime sort.
+
+Mutation packets contain only:
+recipient name + uint8 index.
+
+No immutable mail ID exists.
+Therefore index N is not a stable transaction identity across snapshot lifetime.
+
+## Mailbox — receiver commit
+
+GET_ITEMS(index)
+→ local snapshot validate
+→ create/grant item
+→ grant Yang/Won
+→ clear local attachment
+→ DB GET(name,index)
+→ DB clears attachment.
+
+No DB ack / transaction ties character gains and mailbox mutation together.
