@@ -8,7 +8,7 @@
   "active": {
     "subsystem": "hunting",
     "display_name": "Hunting System",
-    "status": "PARTIAL",
+    "status": "PARTIAL — static audit nearly complete",
     "system_file": "systems/hunting.md",
     "bug_file": "bugs/hunting.md",
     "test_file": "tests/hunting.md",
@@ -16,15 +16,22 @@
       "BUG-HUNT-001",
       "BUG-HUNT-002",
       "BUG-HUNT-003",
-      "BUG-HUNT-004"
+      "BUG-HUNT-004",
+      "BUG-HUNT-005"
+    ],
+    "completed_audits": [
+      "Static mission/reward table declarations, initializer counts and structural content",
+      "Client/server Hunting packet headers, struct sizes, parser routing and sequence handling",
+      "Quest-flag persistence lifecycle",
+      "Item-vs-quest reward persistence ordering and crash consistency",
+      "Mission level-90 terminal behavior end-to-end"
     ],
     "next_actions": [
-      "Validate all Hunting static mission/reward tables and exact dimensions.",
-      "Finish client parser plus packet-info/sequence audit.",
-      "Audit reward item grant failure/ground fallback and claim crash atomicity.",
-      "Verify quest-flag save/relogin behavior at reward boundaries.",
-      "Close final mission level-90 behavior end-to-end."
-    ]
+      "Validate the 62 unique Hunting reward VNUMs against the actual server item-proto dataset/export.",
+      "Decide whether unchecked CreateItem(nullptr) is reachable with current data and deserves a verified bug ID.",
+      "If data validation passes, mark Hunting STATIC COMPLETE and transition to the next subsystem/runtime phase."
+    ],
+    "blocker": "Project_DumpProto/tr/item_proto.txt is large/non-UTF8 and cannot currently be decoded by the GitHub connector; do not infer missing VNUMs from failed reads."
   },
   "startup": {
     "required_files": [
@@ -65,10 +72,19 @@
   },
   "mapped_roots": [
     "game/src/char_hunting.cpp",
+    "game/src/constants.h",
+    "game/src/constants.cpp",
+    "game/src/packet.h",
+    "game/src/packet_info.cpp",
     "input_main.cpp::ReciveHuntingAction",
     "char_battle.cpp::UpdateHuntingMission",
     "input_login.cpp::CheckHunting",
     "char.cpp::CheckHunting",
+    "game/src/questpc.cpp",
+    "game/src/item_manager.cpp",
+    "UserInterface/Packet.h",
+    "UserInterface/PythonNetworkStream.cpp",
+    "UserInterface/PythonNetworkStreamPhaseGame.cpp",
     "root/uihunting.py",
     "m2netm2g.SendHuntingAction",
     "hunting_system.* quest flags"
