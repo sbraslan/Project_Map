@@ -35,3 +35,24 @@ Thus:
 The post-match `CParty` object is DB/channel replicated, but queue state is not; replication begins too late to fix matchmaking.
 
 This is an active architectural defect for the mapped deployment, not merely a theoretical multi-core concern.
+
+
+### BUG-PMATCH-002 — required Party Match item can be destroyed while still referenced by CExchange
+- Statik durum: **doğrulandı**
+- Sınıf: item lifecycle / dangling pointer / use-after-free risk
+
+Verified chain:
+1. `CExchange::AddItem` keeps a raw `LPITEM` in `m_apItems[]` and sets `IsExchanging=true`.
+2. Party Match SEARCH has no exchange-state rejection.
+3. `CheckItems` uses `CountSpecifyItem`, which counts exchange-listed items.
+4. Match completion calls `RemoveSpecifyItem`, which does not exclude `IsExchanging` items.
+5. Consuming an exact stack reaches `CItem::SetCount(0)`.
+6. `SetCount(0)` calls `ITEM_MANAGER::DestroyItem`.
+7. `DestroyItem` ends with `M2_DELETE(item)`.
+8. `CExchange::m_apItems[]` is not cleared by this removal path.
+9. `CExchange::Cancel` later calls `m_apItems[i]->SetExchanging(false)` on the stale pointer.
+10. `CHARACTER::Destroy` automatically calls `m_pkExchange->Cancel()`, giving a normal follow-up dereference path, especially when Party Match warps the player to another game core.
+
+Partial-stack consumption can also leave exchange-visible state inconsistent even when the object survives; exact-stack consumption is the critical freed-pointer case.
+
+The server must not assume the stock UI prevents this: `HEADER_CG_PARTY_MATCH` is accepted while exchange state is active.
