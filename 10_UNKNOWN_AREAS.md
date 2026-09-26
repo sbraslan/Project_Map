@@ -704,3 +704,24 @@ Open:
 - inspect config reload behavior and stale achievement/task migration.
 - inspect point/title reward overflow/duplication and selected-title consistency.
 - client cache/parser boundary audit.
+
+
+## Achievement System — closed static scope
+
+Achievement gameplay callers, client actions, ShopEx currency path, force-finish surfaces, DB/cache persistence and boot/config lifecycle are now mapped.
+
+**Status: STATIC COMPLETE.**
+
+Runtime-only remaining:
+- ACH-T01 remote shop authorization
+- ACH-T02 point rollback/item retention crash window
+- ACH-T03 missing task-family live confirmation
+- ACH-T04 EXPLORE login-only confirmation
+- ACH-T05/T06 repeat force-finish reward
+- ACH-T07 completion reward crash replay
+- ACH-T08 stale-task migration crash
+- DB destructive-rebuild fault injection for BUG-ACH-002.
+
+Do not reopen static Achievement scanning unless runtime behavior contradicts the map or source/config commits change.
+
+Next static target: **Biolog System** (`BiologSystemManager.cpp/.h`).
