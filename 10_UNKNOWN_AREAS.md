@@ -150,3 +150,20 @@ Bu noktadan sonra Guild Storage için ek salt-okuma getirisi düşük; runtime t
 - Special Inventory exact type/cell rules
 - Switchbot move lifecycle
 - malformed TItemPos ve rollback sınırları.
+
+## Inventory validation — yeni durum
+
+### Kapatılan
+- `AddToCharacter` bounds logic
+- fresh item başlangıç state'i
+- `SetItem` invalid target davranışı
+- DB ItemLoad ile bağlantısı
+
+### Yeni bug
+- BUG-ITEM-004: target yerine old `m_wCell` doğrulaması
+
+### Açık
+- Additional Equipment SwapItem shadowing runtime etkisi
+- `ENABLE_SWAP_SYSTEM` inventory multi-slot swap algoritması
+- Special Inventory exact range/type doğrulaması
+- Switchbot move/save lifecycle.
