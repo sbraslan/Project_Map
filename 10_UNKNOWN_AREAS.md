@@ -239,9 +239,9 @@ Bu noktadan sonra Guild Storage için ek salt-okuma getirisi düşük; runtime t
 
 ### Yeni bulgular
 - BUG-SWITCHBOT-001: cross-core source manager pointer leak
-- BUG-CANDIDATE-SWITCHBOT-002: server START item-state revalidation eksikliği
-- OBS-SWITCHBOT-001: client slot upper-bound off-by-one
-- OBS-SWITCHBOT-002: UPDATE_ITEM vnum 8-bit fakat receiver kullanmıyor.
+- BUG-SWITCHBOT-004: server START item-state revalidation eksikliği
+- OBS-SWITCHBOT-002: client slot upper-bound off-by-one
+- OBS-SWITCHBOT-001: UPDATE_ITEM vnum 8-bit fakat receiver kullanmıyor.
 
 ### Switchbot açık
 - cross-core leak runtime ölçümü
