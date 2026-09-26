@@ -224,3 +224,72 @@ Sonuç:
 `CGuild::Disband()` online üyelerde:
 `ch->SetGuild(nullptr)`
 yapar; açık Guild Storage cleanup yok.
+
+## Inventory / Item Move — server dispatch
+
+`HEADER_CG_ITEM_MOVE`
+→ `CInputMain::ItemMove`
+→ `CHARACTER::MoveItem(source,destination,count)`
+
+Observer mode'da packet işlenmiyor.
+
+### CHARACTER::MoveItem başlangıç doğrulamaları
+- source `IsValidItemPosition`
+- source item mevcut
+- item exchange'de değil
+- requested count source count'u aşmıyor
+- extend inventory / IRREMOVABLE koşulu
+- item locked değil
+- destination `IsValidItemPosition`
+- `CanHandleItem()`
+
+Ek sistem kontrolleri:
+- Belt Inventory: item tipi + belt varlığı + unlocked cell
+- Special Inventory: item special type eşleşmesi
+- Switchbot: aktif slot taşınamaz; target item tipi doğrulanır
+- equipped source: `CanUnequipNow`
+- destination equipment: occupied slot reddedilir ve `EquipItem` çağrılır
+- Dragon Soul: özel pull-out/valid-cell kuralları
+
+### Stack
+Destination aynı vnum, stackable, anti-stack değil, exchange'de değil ve socketler eşitse:
+- count 0 ise source count kullanılır
+- count item-limit'e göre clamp edilir
+- source `SetCount(old-count)`
+- target `SetCount(old+count)`
+- her `SetCount` client update + `Save()` yapar.
+
+### Full move
+`RemoveFromCharacter()`
+→ source slot client-side temizlenir
+→ item owner=null, cell=0, window=RESERVED
+→ `Save()` ile delayed-save queue'ya eklenir
+→ `SetItem(DestCell,item,true)`
+→ `SetCell(this,dest)` owner'ı tekrar character yapar
+→ destination window atanır
+→ destination item packet'i client'e gönderilir.
+
+Burada ikinci explicit `Save()` yoktur; persistence, daha önce queue'ya eklenmiş aynı item pointer'ının son state'i üzerinden gerçekleşir.
+
+### Split
+- source `SetCount(source-count)`
+- yeni item `CreateItem(vnum,count)`
+- sockets kopyalanır
+- `AddToCharacter(destination)`
+- split log
+
+### Equip / Unequip
+Equip:
+`MoveItem` → `EquipItem` → `CItem::EquipTo`
+→ source remove
+→ `SetWear`
+→ owner/equipped/cell
+→ stat/event refresh
+→ `Save()`
+
+Unequip:
+`UnequipItem`
+→ uygun boş inventory / DS slotu bul
+→ `RemoveFromCharacter`
+→ `AddToCharacter`
+→ `Save()`.
