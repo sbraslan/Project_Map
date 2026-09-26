@@ -61,6 +61,43 @@ Every reward claim unconditionally executes:
 `hunting_system.level = hunting_system.level + 1`.
 
 Thus legitimate completion/claim of mission 90 stores level 91.
-For a character whose player level satisfies that hunting level, later select/open/update paths index Hunting mission/reward tables using level 91 with no terminal guard.
+For a character whose player level is >=91, the later normal open flow reaches `OpenHuntingWindowSelect()`, which indexes Hunting mission/reward tables with level 91 and has no terminal guard.
 
-This is a normal-progression boundary bug, not only a modified-client path.
+The client-side completed-state UI is too late to protect this server access: the server must construct the packet first.
+
+### BUG-HUNT-005 — item reward can persist before reward flags, allowing duplicate claim after GAME crash
+- Statik durum: **doğrulandı**
+- Sınıf: crash consistency / non-atomic reward claim / duplication
+
+Hunting grants race/random items and then clears their quest flags, but the two sides use independent persistence paths.
+
+Item side:
+- `CItem::Save()` -> `ITEM_MANAGER::DelayedSave`;
+- `ITEM_MANAGER::Update()` runs about every 5.08 seconds;
+- item state is written through `HEADER_GD_ITEM_SAVE`.
+
+Quest-flag side:
+- `SetQuestFlag` -> `PC::SetFlag` only queues the change in `m_FlagSaveMap`;
+- the normal character save event runs every 120 seconds;
+- `SaveReal()` eventually calls `PC::Save()`, which writes `HEADER_GD_QUEST_SAVE`.
+
+There is therefore a real persistence window where:
+1. the newly granted reward item has already been stored in DB;
+2. the old nonzero `reward_race` / `reward_rand` / `reward_cached` state is still the DB version;
+3. GAME crashes before quest flags are saved.
+
+After relog, the persisted item remains while the stale reward flags can allow the reward to be claimed again.
+
+This is not one transactional commit and is independent of the client packet bypass in BUG-HUNT-002.
+
+## Robustness findings not yet promoted to verified current-data bugs
+
+### CreateItem null handling
+`ReciveHuntingRewards()` does not check the return from `ITEM_MANAGER::CreateItem`.
+`CreateItem` can return `nullptr` for a missing/invalid item proto or another creation failure, after which Hunting can dereference the null pointer during inventory/ground handling.
+
+Current Hunting reward VNUM reachability still requires comparison against the actual server item-proto dataset before assigning a separate verified bug ID.
+
+### Ground fallback result ignored
+When inventory is full, Hunting calls `AddToGround(...)` but ignores its boolean return value, then starts ownership/destroy handling and clears reward flags.
+If ground insertion fails, this can become reward loss. Normal-player reachability requires runtime/fault-injection confirmation.
