@@ -1007,3 +1007,45 @@ Normal MoveItem Additional Equipment source için CanUnequipNow çağırır. Bu 
 Exchange AddItem bu helperı çağırmaz. Done -> RemoveFromCharacter -> Unequip yolu da ITEM_FLAG_IRREMOVABLE kontrolü yapmaz.
 
 Sonuç: modified client ile ADDITIONAL_EQUIPMENT_1 source üzerinden normal move/unequip semantiğinin dışında equipped item transferi mümkündür.
+
+
+## Shop / Premium Private Shop — buy transaction
+
+Active premium path:
+CShopManager::Buy(ch,pos)
+-> viewing shop / owner / distance / closed checks
+-> CShop::Buy(ch,pos).
+
+CShop::Buy order:
+1. pos + guest/search validation
+2. PC-shop item ID/owner validation
+3. buyer gold/cheque sufficiency
+4. item creation/reference
+5. buyer destination GetEmptyInventory/GetEmptyDragonSoulInventory
+6. buyer PointChange(-gold/-cheque)
+7. personal_shop tax local calculation
+8. premium PC shop: RemoveFromCharacter -> AddToCharacter(buyer) -> FlushDelayedSave(item)
+9. local shop slot cleared / guests updated
+10. game sends HEADER_GD_SHOP + SHOP_SUBHEADER_GD_BUY with seller pid + display pos
+11. buyer Save() delayed.
+
+DB CClientManager::ShopSaleResult:
+- finds shop + item by display_pos
+- reads cached TShopItemTable sold
+- AlterGoldStash(sold.price,true)
+- AlterChequeStash(sold.cheque,true)
+- removes item from DB shop table
+- closes if empty
+- PutShopCache().
+
+### BUG-SHOP-001 — stash cap clipping
+Shop::AlterGoldStash and AlterChequeStash do not reject a sale that would exceed stash max. They add then clamp via minmax to GOLD_MAX/CHEQUE_MAX.
+
+Thus seller stash near cap can lose the excess while buyer transaction succeeds.
+
+### BUG-SHOP-002 — premium tax disconnect
+Game computes personal_shop tax by reducing local dwPrice after buyer debit. Premium branch does not credit seller locally; instead DB receives only pid+displayPos.
+
+DB ShopSaleResult ignores game local net dwPrice because it reconstructs sale from cached sold.price and credits that full value. Tax amount itself is not included in SHOP_SUBHEADER_GD_BUY payload.
+
+Result: premium shop seller stash receives full listed gold price despite game-side tax calculation.
