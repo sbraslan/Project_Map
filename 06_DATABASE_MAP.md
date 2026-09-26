@@ -73,3 +73,63 @@ Mode 2'de:
 - `window = 'GUILDBANK'`
 
 Bu davranış ayrıca bug adayı olarak kaydedildi.
+
+## Guild Storage — checkin persistence zinciri tamamlandı
+
+Inventory
+→ `RemoveFromCharacter()`
+→ Guild `CSafebox::Add`
+→ `SetWindow(GUILDBANK)`
+→ storage cell
+→ `CItem::Save()`
+→ `ITEM_MANAGER::DelayedSave`
+→ `FlushDelayedSave`
+→ `SaveSingleItem`
+
+`SaveSingleItem` GUILDBANK için:
+- `TPlayerItem.window = GUILDBANK`
+- `TPlayerItem.owner = item->GetOwner()->GetGuild()->GetID()`
+- `TPlayerItem.pos = guild storage slot`
+- `HEADER_GD_ITEM_SAVE`
+
+DB `QUERY_ITEM_SAVE`:
+- GUILDBANK, SAFEBOX/MALL gibi normal character item cache yolundan ayrılıyor.
+- varsa eski item cache kaydı kaldırılıyor.
+- doğrudan `REPLACE INTO item(... owner_id, window, pos ...)` çalıştırılıyor.
+
+Son DB modeli:
+- `owner_id = guild ID`
+- `window = GUILDBANK`
+- `pos = guild storage slot`
+
+## Guild Storage — checkout persistence zinciri tamamlandı
+
+GUILDBANK
+→ `CSafebox::Remove`
+→ geçici RESERVED/no-owner hali
+→ `AddToCharacter`
+→ INVENTORY / character owner
+→ `Save`
+→ `FlushDelayedSave`
+→ `HEADER_GD_ITEM_SAVE`
+→ ardından `HEADER_GD_ITEM_FLUSH (35)`
+
+DB:
+`QUERY_ITEM_FLUSH(itemID)`
+→ `GetItemCache(itemID)`
+→ varsa `CItemCache::Flush()`.
+
+### ENABLE_SAFEBOX_MONEY özel durumu
+`LoadGuildstorage`, Guild Storage `CSafebox` nesnesini **gold=0** ile oluşturuyor.
+
+`CloseGuildstorage` ise `ENABLE_SAFEBOX_MONEY` altında ortak `CSafebox::Save()` çağırıyor.
+
+Ortak `CSafebox::Save()`:
+- `dwID = opening character account ID`
+- `dwGold = m_lGold`
+- `HEADER_GD_SAFEBOX_SAVE`
+
+DB:
+`UPDATE safebox SET gold=<dwGold> WHERE account_id=<character account ID>`
+
+Guild Storage nesnesinin gold'u 0 olduğu için bu yol kişisel safebox gold alanına 0 yazabilir.
