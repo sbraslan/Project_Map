@@ -56,3 +56,16 @@ Reproduction criterion for BUG-DUNGEON-010:
 **window opens, but the dungeon list is empty/missing even though the server config contains 9 dungeons.**
 
 No source/config modification is needed for this first test.
+
+
+## Patch readiness
+First-cluster fix plan is ready at `fixes/dungeon_info.md`.
+
+Prepared without modifying source repos:
+- FIX-DUNGEON-010: correct UI list-construction control flow.
+- FIX-DUNGEON-009: repair missing whitespace before ranking LEFT JOIN.
+- FIX-DUNGEON-011: accept documented numeric `1 = GLOBAL` while retaining literal `GLOBAL` compatibility.
+- FIX-DUNGEON-012A: use signed/clamped cooldown arithmetic to eliminate uint32 wrap.
+- FIX-DUNGEON-012B: intentionally deferred data-semantics decision; current quest flags represent different timer meanings, so no guessed COOLDOWN values will be written.
+
+Important: Flame/Snow `exit_time` and Dragon `dragon_lair_time` are timestamp-style flags, but they do not all represent the same gameplay window. Arithmetic safety can be fixed generically; displayed cooldown policy must be chosen per dungeon.
