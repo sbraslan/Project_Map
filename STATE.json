@@ -16,15 +16,17 @@
       "BUG-PARTY-001",
       "BUG-PARTY-002",
       "BUG-PARTY-003",
-      "BUG-PARTY-004"
+      "BUG-PARTY-004",
+      "BUG-PARTY-005",
+      "BUG-PARTY-006"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Map near-member/role-bonus/EXP lifecycle.",
-      "Audit party map/channel position helpers across cores/channels.",
-      "Audit quest party APIs against party lifetime/delete.",
       "Separate and audit Party Match.",
-      "Continue packet/state boundaries and decide Party STATIC COMPLETE."
+      "Audit remaining quest Party APIs.",
+      "Audit party item ownership/drop rotation and EXP-centralize pointer lifecycle.",
+      "Check remaining party packet field/size consistency.",
+      "Decide whether core Party is STATIC COMPLETE."
     ]
   },
   "startup": {
@@ -113,7 +115,13 @@
     "game/src/party.cpp::SetRole",
     "game/src/party.cpp::SendPositionInfo",
     "UserInterface/PythonNetworkStreamPhaseGame.cpp::RecvPartyPositionInfo",
-    "UserInterface/PythonNetworkStream.cpp::HEADER_GC_PARTY_POSITION_INFO dynamic registration"
+    "UserInterface/PythonNetworkStream.cpp::HEADER_GC_PARTY_POSITION_INFO dynamic registration",
+    "game/src/party.cpp::Update/ComputePartyBonusExpPercent/GetExpBonusPercent/IsPositionNearLeader",
+    "game/src/char_battle.cpp::NPartyExpDistribute/TDamageInfo::Distribute/DistributeExp",
+    "db/src/ClientManager.cpp::SendPartyOnSetup",
+    "game/src/questlua_party.cpp::leave_party/delete_party/remove_player/get_near_member_pids",
+    "game/src/char.cpp::ComputePoints party bonus preservation",
+    "common/CommonDefines.h::ENABLE_PASSIVE_ATTR/ENABLE_DUNGEON_RENEWAL/ENABLE_NEWSTUFF"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
