@@ -992,3 +992,50 @@ Canonical high-confidence set:
 - OBS-SHOP-001..004
 
 Bundan sonraki Shop işi öncelikle runtime/ASan/fault-injection test matrisidir.
+
+
+## Safebox / Mall — canonical first pass (2026-09-26)
+
+### BUG-SAFEBOX-001 — Mall close overwrites persisted Safebox gold with zero
+- Statik durum: **doğrulandı**
+- Build: `ENABLE_SAFEBOX_MONEY`
+- Reachability: **normal official flow**
+- Etki: persisted personal Safebox gold kaybı
+
+`CHARACTER::LoadMall` Mall nesnesini `CSafebox(this, 3 * SAFEBOX_PAGE_SIZE, 0)` ile oluşturur. `CHARACTER::CloseMall` ise `m_pkMall->Save()` çağırır. `CSafebox::Save()` SAFEBOX/MALL ayrımı yapmadan account ID + `m_lGold` ile `HEADER_GD_SAFEBOX_SAVE` yollar. DB `QUERY_SAFEBOX_SAVE`, `safebox.gold` alanını bu değerle günceller.
+
+Sonuç: Mall açılıp normal kapatıldığında Mall instance'ın 0 gold değeri personal Safebox'ın persisted gold alanının üzerine yazılabilir.
+
+### BUG-SAFEBOX-002 — Safebox gold withdraw signed-overflow + debit-before-credit loss
+- Statik durum: **doğrulandı**
+- Build: `ENABLE_SAFEBOX_MONEY`
+
+Withdraw precheck `ch->GetGold() + static_cast<int>(p->dwMoney) >= GOLD_MAX` ifadesinde signed-int toplama kullanır. `GOLD_MAX=2,000,000,000`; ayrı ayrı valid iki değer toplamda INT_MAX'i aşabilir.
+
+Commit sırası önce `SetSafeboxMoney(current-amount)`, sonra `PointChange(POINT_GOLD,+amount)`. PointChange int64 toplamla overflow'u reddedebilir fakat void döndüğü için önceki safebox debit rollback edilmez.
+
+### BUG-SAFEBOX-003 — Safebox stack merge removes source on partial/zero transfer
+- Statik durum: **doğrulandı**
+- Reachability: crafted/modifiye client
+
+`CSafebox::MoveItem` stack branch count'u destination kapasitesine göre küçülttükten sonra `if (item->GetCount() >= count) Remove(bCell);` yapar. Bu koşul partial transferde de ve destination full olup `count=0` olduğunda da true olabilir.
+
+`Remove` source'u slot/grid'den çıkarıp owner'ı null / window RESERVED yapar. Ardından kalan count ownerless itemda kalır; delayed persistence owner-null item için ITEM_DESTROY gönderebilir.
+
+Official UI safebox->safebox MoveItem packetini yalnız empty-slot eventinde gönderir; occupied stack hedefi normal UI'den üretilmez.
+
+### BUG-SAFEBOX-004 — Safebox/Mall semantic TItemPos allowlist eksikliği
+- Statik durum: **doğrulandı**
+- Cross-reference: BUG-ITEM-006
+
+Checkin source `TItemPos` için semantic allowlist yoktur. Checkout explicit destination'da `IsEmptyItemGrid` kullanılır; bu helper SWITCHBOT ve ADDITIONAL_EQUIPMENT_1'i de kabul eder. Non-DS path INVENTORY/BELT-only allowlist uygulamaz.
+
+Modified client ile normal MoveItem guardlarını bypass eden storage <-> SWITCHBOT/Additional Equipment yolları mümkündür.
+
+### OBS-SAFEBOX-001 — CSafebox::Add grid Put sonucu kontrol edilmiyor
+`CSafebox::Add` top-left position validity sonrası `m_pkGrid->Put(...)` dönüşünü kontrol etmeden `m_pkItems[dwPos]=item` yapar. Normal checkin `IsEmpty` ile korunur; malformed/overlapping persisted DB rowlarında grid ile item array state'i ayrışabilir.
+
+### Safebox first-pass güvenli sonuçlar
+- `CreateItemTableFromRes` stale static-vector leakage üretmiyor: no-row'da clear, normal durumda resize.
+- `CSafebox::ChangeSize` shrink yapmıyor; yalnız büyütüyor.
+- SAFEBOX/MALL item persistence owner=account_id üzerinden ilerliyor.
