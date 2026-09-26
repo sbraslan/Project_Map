@@ -437,3 +437,27 @@ BUG-EXCHANGE-001 ve BUG-EXCHANGE-002 partial item transferleri FlushDelayedSave 
 
 ### Sonraki mantıklı adım
 Exchange kalan edge caller auditlerini kısa turda kapat, subsystem için statik completion checkpoint oluştur; ardından Shop/Private Shop item-transfer subsystemine geç.
+
+
+## Exchange static completion checkpoint
+
+Exchange subsystem ana statik haritası **completion** seviyesine alındı.
+
+Runtime'a bırakılanlar:
+- EX-T01 Special Inventory partial transfer
+- EX-T02 page4 partial transfer
+- EX-T03 active Switchbot source
+- EX-T04 Additional Equipment source
+- EX-T05 uninitialized packet wire observation
+- EX-T06 remote distance accept
+- EX-T07 gold cap TOCTOU
+- EX-T08 persistence
+- EX-T09 lifecycle sanity.
+
+Non-blocking observations:
+- client SendExchangeItemDelPacket assert-only; official UI item-removal akışı görünmüyor, cancel ile çıkılıyor.
+- direct WarpSet callerları yeni subsystem taramalarında karşılaşılırsa Exchange invariantı açısından tekrar işaretlenecek.
+- cheque dış mutation yolları yeni caller bulunduğunda incelenecek.
+
+### Sıradaki statik subsystem
+Shop / Private Shop: buy/sell, owner/guest state, item reservation, currency debit-credit, DB persistence ve premium private shop ayrımları.
