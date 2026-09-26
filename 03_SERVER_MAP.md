@@ -168,3 +168,26 @@ Checkout handler daha sonra:
 
 ### Container destroy
 `CSafebox::__Destroy()` mevcut storage itemlarında `SetSkipSave(true)` kullanarak in-memory container kapanışının item silme/save dönüşümüne yol açmasını önlüyor.
+
+## Guild Storage — cross-core state modeli
+
+`CGuild::SetStorageState` yalnız:
+- ilgili core'un local `m_data.guildstoragestate/guildstoragewho` alanını değiştiriyor
+- SQL `UPDATE guild...` çalıştırıyor.
+
+Guild P2P subheader'larında storage open/close state taşıyan alan bulunmadı.
+
+Mevcut Guild Storage P2P:
+- `GUILD_SUBHEADER_GG_REFRESH` → `RefreshP2P`
+- `GUILD_SUBHEADER_GG_REFRESH1` → last-checkout bilgisi
+
+Bunlar `guildstoragestate` değerini diğer core'un `CGuild::m_data` nesnesine yazmıyor.
+
+### Startup reset
+`main.cpp` içinde her non-auth game server startup:
+`guild_manager.InitializeDonate()`
+
+`CGuildManager::InitializeDonate()`:
+`UPDATE guild SET guildstoragestate = 0`
+
+Bu global reset tüm guild lock kayıtlarını temizliyor.
