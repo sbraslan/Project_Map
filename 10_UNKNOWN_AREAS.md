@@ -103,3 +103,25 @@ Bu noktadan sonra Guild Storage için ek salt-okuma getirisi düşük; runtime t
 - Switchbot move lifecycle
 - Additional Equipment Page etkileşimi
 - invalid destination / rollback davranışlarının bütün caller'larda doğrulanması
+
+## Inventory — load alanı durumu
+
+### Artık çözülen
+- DB/cache item query
+- `QID_ITEM`
+- `RESULT_ITEM_LOAD`
+- `HEADER_DG_ITEM_LOAD(42)`
+- game `ItemLoad`
+- item metadata restore
+- inventory/equipment reconstruction
+- collision recovery
+- no-space → ground recovery
+- load sırasında skip-save modeli
+
+### Sonraki açık alanlar
+- Pickup
+- Drop
+- Destroy
+- full swap edge cases
+- malformed/invalid item position davranışı
+- Special Inventory / Switchbot ayrı lifecycle detayları
