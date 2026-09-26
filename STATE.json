@@ -14,15 +14,16 @@
     "test_file": "tests/party_match.md",
     "verified_bug_ids": [
       "BUG-PMATCH-001",
-      "BUG-PMATCH-002"
+      "BUG-PMATCH-002",
+      "BUG-PMATCH-003"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Close duplicate SEARCH/PARTY_MATCH_HOLD client-state desynchronization and reachability.",
-      "Audit safebox/refine/shop/change-look item-state conflicts with Party Match consumption.",
-      "Audit success notification versus WarpSet failure/return ordering.",
-      "Audit client UI/minimap state for all Party Match result codes.",
-      "Continue Party Match closure."
+      "Audit remaining conflicting item-window interactions.",
+      "Audit Party Match success notification versus WarpSet failure/return ordering.",
+      "Audit map/core transitions while already queued.",
+      "Audit Party Match off/disable enforcement.",
+      "Decide whether Party Match is STATIC COMPLETE."
     ]
   },
   "startup": {
@@ -139,7 +140,9 @@
     "game/src/item.cpp::CItem::SetCount",
     "game/src/item_manager.cpp::ITEM_MANAGER::DestroyItem",
     "game/src/exchange.cpp::CExchange::AddItem/Cancel",
-    "game/src/char.cpp::CHARACTER::Destroy exchange cancellation"
+    "game/src/char.cpp::CHARACTER::Destroy exchange cancellation",
+    "root/uipartymatch.py::PartyMatchResult/__SetInfo/__PartyMatchMsg/__PartyMatchMinimapButton",
+    "UserInterface/PythonNetworkStreamPhaseGame.cpp::RecvPartyMatch result argument bridge"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
