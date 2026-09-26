@@ -1,6 +1,6 @@
 # dungeon info
 
-**Status:** STATIC MAPPED
+**Status:** PARTIAL — ACTIVE
 
 > Canonical subsystem history split from legacy `00_PROGRESS.md`. Read this file only when this subsystem is active or explicitly revisited.
 
@@ -87,3 +87,21 @@ Doğrulanan ilk buglar:
 - Bugs: `../bugs/dungeon_info.md`
 - Runtime tests: `../tests/dungeon_info.md`
 - Full legacy archive: `../archive/00_PROGRESS.md`
+
+
+## Active checkpoint — Dungeon Info static close audit started
+
+**Tarih:** 2026-09-26
+
+Ticket System STATIC COMPLETE sonrasında Dungeon Info aktif subsystem oldu.
+
+### Already verified
+- core server/client/network flow mapped;
+- BUG-DUNGEON-001..006 recorded.
+
+### Exact next audit
+1. validate CG/GC packet-info size/sequence and all dungeon index boundaries;
+2. audit config parser invariants and fixed-array capacities;
+3. audit ranking query/result lifecycle and Python binding boundaries;
+4. close client clear/reload/state lifecycle;
+5. decide Dungeon Info STATIC COMPLETE and refresh tests.
