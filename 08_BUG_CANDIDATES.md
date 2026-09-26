@@ -255,3 +255,42 @@ Trigger düşük frekanslı olabilir; `AddToGround` başarısızlığı map inde
 
 Şimdilik yalnız gözlem:
 Network transport'ın mevcut davranışında bunun gerçek paket kaybı/flush problemi oluşturup oluşturmadığı runtime/transport incelemesi gerektiriyor.
+
+### BUG-ITEM-004 — AddToCharacter yanlış değişkenle target-cell bounds check yapıyor
+- Statik durum: **doğrulandı**
+- Etki: internal/DB-corruption kaynaklı crash veya inconsistent item state
+
+`CItem::AddToCharacter(ch, Cell)`:
+`pos = Cell.cell` alıyor ancak tüm overflow kontrollerinde `pos` yerine **`m_wCell`** kontrol ediyor.
+
+Fresh/detached itemlarda `m_wCell=0` olduğu için invalid target kolayca ilk doğrulamayı geçebilir.
+
+İkinci katman `CHARACTER::SetItem`:
+- BELT: `pBeltItems[wCell]` bounds check öncesi erişiliyor.
+- Dragon Soul: `pDSItems[wCell]` bounds check öncesi erişiliyor.
+
+Bu iki window için invalid persisted target OOB erişim/core crash üretebilir.
+
+INVENTORY gibi erken-return yapan windowlarda ise başka problem oluşur:
+`SetItem` başarısızlığı AddToCharacter tarafından görülemez (void), fakat fonksiyon sonrasında `m_pOwner=ch`, `Save()`, `return true` yapar.
+
+Güvenlik sınırı:
+Normal client `CHARACTER::MoveItem` destination'ı önceden doğrular; doğrudan ITEM_MOVE exploit'i olarak işaretlenmemeli. En güçlü mevcut trigger bozuk DB item position veya yanlış internal caller'dır.
+
+### BUG-CANDIDATE-ITEM-005 — Additional Equipment SwapItem variable shadowing
+- Statik durum: **kod kusuru doğrulandı**, runtime etkisi henüz sınıflandırılmadı.
+- Build: `ENABLE_ADDITIONAL_EQUIPMENT_PAGE`
+
+`SwapItem` önce:
+`TItemPos srcCell(INVENTORY,...), destCell(EQUIPMENT,...)`
+
+oluşturuyor.
+
+Ardından if/else içinde tekrar:
+`TItemPos srcCell(...), destCell(...)`
+tanımlanıyor.
+
+Bunlar yeni inner-scope değişkenler; outer `srcCell/destCell` değişmiyor.
+Dolayısıyla Additional Equipment seçimi için yazılmış görünen branch outer destination window'u hiçbir zaman `ADDITIONAL_EQUIPMENT_1` yapmıyor.
+
+Fonksiyonun ilerleyen kısımlarında ayrı `CheckAdditionalEquipment` kontrolleri bulunduğundan gerçek oyuncu etkisi runtime testiyle doğrulanmalı.
