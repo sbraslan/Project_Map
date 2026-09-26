@@ -77,3 +77,13 @@ Future validation for BUG-BFIELD-010:
 - expected defect: generic Battle Field open state changes, event-open state remains false and event-specific visual is not selected.
 
 Do not execute during the current detection/mapping phase.
+
+
+## BFIELD-T11 — reconnect resets anti-abuse session state
+Future validation for BUG-BFIELD-011:
+- enter Battle Field while open;
+- kill victim A once, then reconnect before 60 seconds expires;
+- verify the same victim can score again because the kill map was reinitialized;
+- separately accumulate several deaths, reconnect, die once more and compare restart wait against pre-reconnect accumulated penalty.
+
+Do not execute during the current detection/mapping phase.
