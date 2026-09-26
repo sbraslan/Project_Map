@@ -11,29 +11,27 @@
 Only `sbraslan/Project_Map` is writable. All source/game repositories remain read-only.
 
 ## Dungeon Core checkpoint
-Mapped:
-- CDungeonManager create/destroy;
-- CHARACTER::SetDungeon enter/leave bookkeeping;
-- IncMember/DecMember;
-- IncPartyMember/DecPartyMember/QuitParty;
-- party destruction ordering against dungeon raw party keys;
-- warp/login destination SetDungeon binding;
-- quest new_jump/new_jump_all/new_jump_party/join entry flows;
-- dead/exit/jump event cancellation basics.
-
 Verified bugs:
-- `BUG-DUNGEON-001` — `d.join` / `d.new_jump_guild` can create a private dungeon before rejecting caller eligibility, leaving a memberless dungeon with no dead-event cleanup.
+- `BUG-DUNGEON-001` — rejected `d.join` / `d.new_jump_guild` entry can orphan an empty private dungeon without dead-event cleanup.
 
-## Closed candidates
-- normal party destruction cleans dungeon `m_map_pkParty` before CParty deletion;
-- JoinParty map-null ordering lacks a normal live-dungeon/missing-map path;
-- exit/jump event null ordering remains incorrect but destructor event cancellation currently prevents promotion.
+Newly closed:
+- party/dungeon member counters and raw party-key cleanup;
+- destination SetDungeon binding;
+- participant registry uses PID/name, not raw character pointers;
+- unique mob raw pointers are erased on normal death and manager destruction paths;
+- all 98 source quest files checked for suspicious kill/potion/revive getters: no current callers;
+- Devil Catacomb item-group path adds live reachability to existing `BUG-PARTY-001`.
+
+Not promoted:
+- eliminate event null-ordering: destructor cancellation still closes normal stale-event path;
+- nested JumpParty ownership: semantic weakness, no mapped live nested caller;
+- item-group exchange risk: specific Reaper's Credit item anti-flags unavailable.
 
 ## Exact next work
-1. Audit JumpParty one-party ownership across nested dungeon creation.
-2. Close event lifetime/ID reuse.
-3. Audit participant registration across warp/core transition.
-4. Audit dungeon item-group lifecycle.
-5. Audit spawn/unique/regen pointers.
+1. Audit regen lifetime.
+2. Audit bulk purge/kill pending-destroy behavior.
+3. Audit unique alias edge cases.
+4. Revisit nested JumpParty reachability.
+5. Continue Dungeon Core closure.
 
 GitHub state is canonical.
