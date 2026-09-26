@@ -1132,3 +1132,72 @@ Normal checkin `IsEmpty(pos,size)` ile korunduğundan ana trigger persisted inva
 Build-dependent dormant:
 - BUG-SAFEBOX-001
 - BUG-SAFEBOX-002
+
+
+## Safebox / Mall — final static pass (2026-09-26)
+
+### OBS-SAFEBOX-002 — DB load failure can leave personal Safebox request stuck
+`ReqSafeboxLoad` request öncesi `m_bOpeningSafebox=true` yapar.
+
+Flag şu normal yollarda temizlenir:
+- wrong password -> `SafeboxWrongPassword -> CancelSafeboxLoad`
+- DB response geldiğinde conflicting window tespit edilirse -> `CancelSafeboxLoad`
+- başarılı açılıştan sonra kullanıcı `CloseSafebox` yaparsa -> false.
+
+DB `RESULT_SAFEBOX_LOAD` ikinci item sorgusunda SQL result yoksa DB yalnız log + local request context cleanup yapıp GAME'e success/failure packet göndermeden return eder. GAME tarafında flag'i sıfırlayacak response oluşmaz.
+
+Sonuç: geçici DB/query failure sonrası aynı character session'ında yeni safebox load isteği `m_bOpeningSafebox` nedeniyle sürekli reddedilebilir; relog/character teardown recovery gerektirebilir.
+
+Sınıf: availability/reliability, security exploit değil.
+
+### OBS-SAFEBOX-003 — Mall open trust boundary Safebox'tan daha gevşek
+`do_mall_password`:
+- password length
+- existing Mall instance
+- 10-second request throttle
+kontrollerini yapar.
+
+Fakat personal Safebox `ReqSafeboxLoad` yolundaki NPC/open-position distance ve pending-opening state modelini kullanmaz.
+`CInputDB::MallLoad` da Exchange/Shop/Cube/open-window conflict kontrolü yapmadan `LoadMall` çağırır.
+
+Mall item checkout yine `SafeboxCheckout(..., bMall=1)` üzerinden ve item-placement kontrolleriyle ilerler. Password DB tarafında doğrulanmaya devam eder.
+
+Bu nedenle bunu doğrudan ownership exploit olarak değil, **server-side access-policy / remote Mall access observation** olarak sınıflandırıyoruz. Dungeon/warp/other-window gameplay policy runtime'da ayrıca denenebilir.
+
+### OBS-SAFEBOX-004 — personal Safebox cross-session lock yok, global login invariantına bağımlı
+Personal Safebox state/lock `m_bOpeningSafebox` ve `m_pkSafebox` ile CHARACTER-local tutulur.
+DB tarafında account_id bazlı SAFEBOX rows için Guild Storage'daki gibi explicit storage-open lock bulunmaz.
+
+Normal mimaride aynı account'ın iki aktif character session'ına izin verilmemesi beklenen üst seviye invarianttır. Bu invariant herhangi reconnect/multi-core edge'de kırılırsa iki game process aynı account SAFEBOX item state'ini bağımsız load edebilir.
+
+Mevcut statik taramada normal login yolundan bu invariantı kıran trigger doğrulanmadığı için bug değil, architecture dependency olarak tutulur.
+
+### Safebox/Mall STATIC COMPLETE
+Kapatılan ana alanlar:
+- UI + Python/C++ send bindings
+- password/load/close
+- SAFEBOX/MALL DB load
+- checkin/checkout
+- in-storage move/stack
+- Special Inventory routing
+- Switchbot / Additional Equipment trust boundary
+- item save/flush
+- malformed DB reconstruction
+- item award domain routing
+- expiry/delete
+- disconnect/logout
+- packet slot width
+- money feature compile-state
+- Mall access-policy differences.
+
+Aktif build canonical bugs:
+- BUG-SAFEBOX-003
+- BUG-SAFEBOX-004
+- BUG-SAFEBOX-005
+
+Dormant feature bugs:
+- BUG-SAFEBOX-001
+- BUG-SAFEBOX-002
+
+Observations:
+- OBS-SAFEBOX-002..004
