@@ -327,3 +327,94 @@ Sonra:
 Son:
 - points refresh
 - `SetItemLoaded()`.
+
+## Inventory — Pickup
+
+`CInputMain::ItemPickup`
+→ `CHARACTER::PickupItem(vid)`.
+
+Temel kontroller:
+- PC dead değil
+- item VID bulunuyor
+- observer mode değil
+- item sectree içinde
+- `DistanceValid(this)`
+- ownership
+- bazı quest/pet itemlarında aktif quest kontrolü
+
+`CItem::DistanceValid`:
+- character + sectree gerekli
+- approximate distance `RANGE_PICK` üstüyse false.
+
+`CItem::IsOwnership`:
+- ownership event yoksa herkes alabilir
+- event varsa yalnız recorded PID.
+
+Normal pickup:
+- stackable ise belt/inventory/special-inventory mevcut stacklere birleştirme denenir
+- remainder için boş DS/inventory slotu aranır
+- `RemoveFromGround()`
+- `AddToCharacter()`
+- GET log
+- quest pickup callback.
+
+Party dağıtımında ownership sahibi on-map party member bulunup onun inventory'sine verme deneniyor; yer yoksa mevcut picker fallback olabiliyor.
+
+## Inventory — Drop
+
+`CInputMain::ItemDrop2`
+→ gold > 0: `DropGold`
+→ aksi: `DropItem(Cell,count)`.
+
+`DropItem` kontrolleri:
+- `CanHandleItem`
+- rate/drop cooldown
+- alive
+- valid cell/item
+- not exchanging
+- not locked
+- not sealed
+- basic-item restriction
+- no running quest
+- no ANTI_DROP / ANTI_GIVE
+- optional GM restriction
+
+Full stack:
+`RemoveFromCharacter()`
+→ mevcut item ground adayı.
+
+Partial:
+- source `SetCount(old-count)`
+- source forced flush
+- new item created
+- sockets copied.
+
+Son:
+`AddToGround(currentMap,currentPos)`
+→ destroy event
+→ dropped item forced save/flush
+→ DROP log.
+
+## Inventory — Destroy
+
+`CInputMain::ItemDestroy`
+→ `CHARACTER::RemoveItem(Cell,count)`.
+
+Kontroller:
+- CanHandleItem
+- alive
+- valid item
+- not exchanging
+- not locked
+- not sealed
+- optional basic-item block
+- quest not running
+- count > 0
+
+Ardından:
+`ITEM_MANAGER::RemoveItem / DestroyItem`
+→ owner/container cleanup
+→ delayed-save entry erase
+→ DB destroy packet
+→ ID/VID maps erase
+→ `M2_DELETE(item)`.
