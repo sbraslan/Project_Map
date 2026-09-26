@@ -59,3 +59,16 @@
 - Cross-core/channel lock için repo-geneli son P2P taraması.
 - Guild üyeliği/rank değişimi sırasında açık/pending storage davranışı.
 - Sonra Guild Storage haritasını “tamamlandı / oyun içi test bekliyor” durumuna geçirmek.
+
+## Checkpoint — cross-core lock taraması tamamlandı
+
+### Sonuç
+Guild Storage open/close lock için repo-geneli P2P taramasında `guildstoragestate/guildstoragewho` değerlerini diğer game core'lara taşıyan bir mesaj bulunmadı.
+
+Bulunan `GUILD_SUBHEADER_GG_REFRESH/REFRESH1` akışları guild UI / son checkout bilgilerini yeniliyor; storage lock state'ini kopyalamıyor.
+
+Ayrıca her non-auth game core başlangıcında `CGuildManager::InitializeDonate()` çağrılıp:
+`UPDATE guild SET guildstoragestate = 0`
+çalıştırıldığı doğrulandı.
+
+Bu nedenle stale-lock reset mekanizması var; fakat çalışan başka core'daki aktif storage kilidini DB seviyesinde de sıfırlayabildiği için ayrı concurrency riski oluşturuyor.
