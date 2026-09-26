@@ -720,3 +720,29 @@ Beklenen güvenli şekil:
 - veya C++11+ `vec.data()` kullan ve transport'ın zero-length semantics'ini açık tut.
 
 Runtime/ASan testi boş search result ile yapılmalı.
+
+
+### BUG-SHOP-001 — Premium Private Shop stash cap silently clips sale proceeds
+- Statik durum: **doğrulandı**
+- Build: ENABLE_PREMIUM_PRIVATE_SHOP
+- Sınıf: currency cap / asymmetric sale commit
+
+DB ShopSaleResult credits sold.price/sold.cheque through AlterGoldStash/AlterChequeStash. Those functions add then clamp to GOLD_MAX/CHEQUE_MAX.
+
+There is no sale precheck ensuring stash + sale <= cap.
+
+Buyer has already been charged and item ownership already transferred before DB stash credit. Therefore seller can receive only part of the proceeds while sale still completes.
+
+### BUG-SHOP-002 — personal_shop tax not applied to premium private shop stash
+- Statik durum: **doğrulandı**
+- Build: ENABLE_PREMIUM_PRIVATE_SHOP
+- Sınıf: cross-layer accounting mismatch
+
+CShop::Buy computes tax and reduces local dwPrice after buyer was charged. In premium branch seller is not credited from this local dwPrice.
+
+Game sends DB only seller pid + display pos. DB ShopSaleResult reloads cached sold entry and executes AlterGoldStash(sold.price,true), so full listed price enters stash. Net price/tax is absent from packet.
+
+Effect: game-side personal_shop tax calculation does not reduce premium seller stash proceeds.
+
+### OBS-SHOP-001 — item/currency/shop-cache persistence is non-atomic
+Premium sale ordering spans three save domains: item FlushDelayedSave, DB shop sale/cache mutation, buyer character delayed Save. A process/connection failure between stages can produce divergent persisted state. Runtime fault-injection is required before classifying a concrete crash-recovery outcome.
