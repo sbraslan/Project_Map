@@ -193,3 +193,37 @@ Yeni item `AddToCharacter` sonunda `Save()` ile destination state'i kaydeder.
 
 ### Equip
 `CItem::EquipTo` sonunda `Save()`; window/cell equipment state'i persistence'a gider.
+
+## Character item login load
+
+DB sorgusu player ID üzerinden yalnız character-owned windowları seçer:
+
+`owner_id = playerID`
+
+Window listesi:
+- INVENTORY
+- EQUIPMENT
+- DRAGON_SOUL_INVENTORY
+- BELT_INVENTORY
+- opsiyonel SWITCHBOT
+- opsiyonel NPC_STORAGE
+- opsiyonel PREMIUM_PRIVATE_SHOP
+- opsiyonel ADDITIONAL_EQUIPMENT_1
+
+SAFEBOX / MALL / GUILDBANK bu player item load sorgusunda yoktur; kendi ayrı loader'ları vardır.
+
+### DB cache hit
+Player item cache set mevcutsa:
+- cache entry'leri `TPlayerItem` dizisine kopyalanır
+- `HEADER_DG_ITEM_LOAD` doğrudan gönderilir.
+
+### DB query
+Cache yoksa:
+`QID_ITEM`
+→ `RESULT_ITEM_LOAD`
+→ `CreateItemTableFromRes`
+→ her item için `owner = dwPID`
+→ `HEADER_DG_ITEM_LOAD`
+→ ardından `PutItemCache(item, true)`.
+
+`true` loaded itemın hemen DB'ye tekrar yazılmasını engelleyen skip-query davranışıdır.
