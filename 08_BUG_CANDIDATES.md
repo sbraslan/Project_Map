@@ -1201,3 +1201,148 @@ Dormant feature bugs:
 
 Observations:
 - OBS-SAFEBOX-002..004
+
+
+## Mailbox — canonical first pass (2026-09-26)
+
+Active build: `ENABLE_MAILBOX` ON.
+
+### BUG-MAIL-001 — negative Yang/Won in write packet can mint sender currency
+- Statik durum: **doğrulandı**
+- Reachability: modified/crafted client
+- Sınıf: server-side signed input validation / economy integrity
+
+`TPacketCGMailboxWrite` carries:
+- `int iYang`
+- `int iWon`
+
+`CInputMain::MailboxWrite` forwards them directly to `CMailBox::Write`.
+
+`Write` checks only:
+- `TotalYang = iYang + MAILBOX_PRICE_YANG`
+- `TotalYang > Owner->GetGold()`
+- `iWon > Owner->GetCheque()`
+
+There is no `iYang >= 0` / `iWon >= 0` guard.
+
+Then:
+- `PointChange(POINT_GOLD, -TotalYang)`
+- `PointChange(POINT_CHEQUE, -iWon)`
+
+Negative attachment values therefore turn the debit into a positive credit. DB `QUERY_MAILBOX_WRITE` performs no secondary amount validation and stores the packet as-is in `m_map_mailbox`.
+
+`bIsItemExist` uses `iYang > 0 || iWon > 0`, so negative values are not even marked as attachments.
+
+### BUG-MAIL-002 — write-confirm protocol is not an authorization boundary
+- Statik durum: **doğrulandı**
+- Reachability: modified/crafted client
+
+Intended flow:
+`MAILBOX_WRITE_CONFIRM -> DB CHECK_NAME -> CheckPlayerResult`
+validates player existence and current mail count against `MAILBOX_MAX_MAIL`.
+
+But `HEADER_CG_MAILBOX_WRITE` can be sent directly.
+`CMailBox::Write` does not revalidate:
+- recipient exists,
+- recipient mailbox count < max,
+- any prior successful confirm state.
+
+DB `QUERY_MAILBOX_WRITE` simply:
+`m_map_mailbox[p->szName].emplace_back(*p)`.
+
+Consequences:
+- mail can be written to nonexistent arbitrary names,
+- target max-mail limit can be bypassed,
+- DB mailbox map can be grown beyond intended 90-mail domain,
+- BUG-MAIL-001 does not require a valid recipient.
+
+### BUG-MAIL-003 — sender attachment/currency commits before mailbox DB acknowledgement
+- Statik durum: **doğrulandı**
+- Sınıf: cross-process atomicity / persistence loss
+
+`CMailBox::Write` order:
+1. optional source item `RemoveFromCharacter`
+2. `ITEM_MANAGER::DestroyItem` -> DB item destroy packet
+3. sender Yang/Won debit
+4. `HEADER_GD_MAILBOX_WRITE`
+5. immediate client `POST_WRITE_OK`.
+
+No DB acknowledgement or rollback exists.
+
+DB `QUERY_MAILBOX_WRITE` only mutates in-memory `m_map_mailbox`; it does not immediately persist SQL.
+
+Game/DB peer failure or DB-process crash can therefore preserve sender-side debit/item destruction while the mail is absent.
+
+### BUG-MAIL-004 — mailbox DB persistence is delayed RAM-only until periodic backup
+- Statik durum: **doğrulandı**
+- Default backup interval: 3600 seconds
+
+New writes/deletes/gets modify only `m_map_mailbox`.
+SQL persistence occurs in `MAILBOX_BACKUP()`.
+
+A DB process crash before the next backup can lose mailbox mutations that the game already reported as successful.
+
+This amplifies BUG-MAIL-003 and receiver-side get/delete consistency issues.
+
+### BUG-MAIL-005 — index identity drift between GAME snapshot and DB vector can clear the wrong mail
+- Statik durum: **doğrulandı**
+- Sınıf: mutable-vector index used as persistent transaction identity
+
+GAME `CMailBox` holds a snapshot `vecMailBox`.
+All mutations sent to DB identify a mail only by:
+`name + uint8 Index`.
+
+DB holds its independent `m_map_mailbox[name]` vector.
+
+`MAILBOX_BACKUP()`:
+- erases deleted/expired entries,
+- sorts the DB vector by SendTime descending.
+
+New mail can also be appended while the recipient keeps an existing mailbox window open.
+
+Therefore the same numeric index can stop referring to the same logical mail.
+
+Example effect class:
+- GAME grants attachment from local index N,
+- sends MAILBOX_GET(name,N),
+- DB index N now points to a different mail after erase/sort,
+- DB clears different attachment,
+- locally granted mail can remain claimable after reload while another mail is lost/cleared.
+
+This supports both duplication and attachment-loss scenarios.
+
+### BUG-MAIL-006 — high-value receive tax/cap arithmetic uses signed int and can overflow
+- Statik durum: **doğrulandı**
+- Reachability: can occur with otherwise positive/legitimate large Yang mail
+
+`GetItem` computes:
+`const int TotalYang = mail.AddData.iYang - mail.AddData.iYang * MAILBOX_TAX / 100;`
+
+With 5% tax, `iYang * 5` can overflow signed 32-bit above roughly 429M Yang.
+
+Cap precheck also uses:
+`TotalYang + Owner->GetGold() >= GOLD_MAX`
+in signed int arithmetic.
+
+After that `Owner->GiveGold(TotalYang)` is void; its eventual PointChange can refuse the credit at GOLD_MAX, but `GetItem` still clears the mail attachment and sends MAILBOX_GET to DB.
+
+Result: wrong tax amount and/or mail Yang loss on high-value claims.
+
+### BUG-MAIL-007 — mailbox source TItemPos allows Switchbot / Additional Equipment rule bypass
+- Statik durum: **doğrulandı**
+- Reachability: modified client
+- Cross-reference: BUG-ITEM trust-boundary family
+
+`Write` accepts any `TItemPos::IsValidItemPosition()` and only rejects `pos.IsEquipPosition()`.
+
+Active `IsValidItemPosition` includes:
+- SWITCHBOT
+- ADDITIONAL_EQUIPMENT_1
+
+Additional Equipment is not included by `IsEquipPosition()`.
+The code does not call normal `MoveItem` / `CanUnequipNow` semantic guards.
+
+A source item is fetched directly and destroyed through `RemoveFromCharacter`, allowing storage/system-window semantics to be bypassed. Switchbot removal unregisters the slot; Additional Equipment can bypass normal unequip policy checks.
+
+### Mailbox first-pass persistence observation
+DB mailbox state has no immutable mail ID in the GAME<->DB mutation packets. `TMailBox` contains only recipient name + uint8 Index. This is the root cause behind index-drift sensitivity.
