@@ -608,3 +608,35 @@ Kapatılan alanlar:
 Exchange için yeni source-code taraması ancak runtime test sonucu veya yeni çapraz subsystem bulgusu gerektirirse açılacak.
 
 Sonraki subsystem: Shop / Private Shop item-transfer ve currency transaction haritası.
+
+
+## Checkpoint — Shop / Premium Private Shop audit başladı
+
+**Tarih:** 2026-09-26
+
+Exchange static completion sonrasında Shop / Premium Private Shop transaction flow açıldı.
+
+### Haritalanan
+- NPC Shop `CShop::Buy`
+- ShopEx alternate currency purchase
+- Premium Private Shop item ownership transfer
+- Premium shop stash sale notification: GAME -> DB -> seller sync
+- Private Shop Search buy path
+- NPC sell path
+- Premium shop open/add-item source-window validation
+
+### İlk sonuçlar
+- Buyer destination slot, debit öncesinde gerçek `GetEmptyInventory(item)` / DS helper ile seçiliyor; Exchange'deki CheckSpace/Done divergence burada yok.
+- Premium shop açılışı stash + tüm listing fiyatlarını `long long` ile kontrol ediyor.
+- Premium add-item source allowlist açıkça INVENTORY / DRAGON_SOUL_INVENTORY ile sınırlı.
+- `ENABLE_SHOP_BLACKLIST` bu build'de kapalı.
+
+### Yeni adaylar
+- **BUG-SHOP-001:** Premium PC shop sale, buyer debit + item transfer/flush işlemlerini DB shop-sale notification'dan önce kalıcılaştırıyor; Exchange'deki gibi DB-cache socket/ack guard yok. DB notification kaybolursa buyer itemı alıp ödeme yapmışken seller stash güncellenmeyebilir.
+- **BUG-SHOP-002:** Aktif Private Shop Search sonuç vektörü boşken `Packet(&vecPrivateShopSearchItem[0], 0)` çağrısı yapılıyor. Empty vector üzerinde `operator[]` UB.
+
+### Sıradaki
+1. BUG-SHOP-001 DB disconnect/failure sınırını ve rollback/ack olup olmadığını tamamla.
+2. Premium shop stash withdraw rollback akışını haritala.
+3. ShopEx ve NPC Sell için source/currency invariantlarını kapat.
+4. Shop subsystem completion checkpoint oluştur.
