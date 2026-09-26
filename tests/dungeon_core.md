@@ -27,3 +27,13 @@ Future ASan/debug validation for BUG-DUNGEON-003:
 - expected defect signature: stale raw pointer/UAF.
 
 A normal-death variant should use three aliases because `DeadCharacter` is reached once at death and once at later manager destruction.
+
+
+## DCORE-T04 — duplicate unique key registry divergence
+Future validation for BUG-DUNGEON-004:
+- call `d.spawn_unique("same", ...)` twice in an isolated dungeon;
+- verify two entities exist while `d.get_unique_vid("same")` identifies only the first;
+- purge/kill the key and verify the second unique-marked mob remains.
+- separately exercise `d.set_unique("same", secondVID)` after the key already points to another mob.
+
+Do not execute during the current detection/mapping phase.
