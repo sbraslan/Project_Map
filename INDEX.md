@@ -1,11 +1,12 @@
 # Project_Map — Subsystem Index
 
-This is the navigation index. Normal continuation starts at `CURRENT.md`.
+This is the navigation index. Normal continuation starts at `STATE.json`, then `CURRENT.md`.
 
 ## Core rule
 - Source repos are **read-only**: `Project_ClientSrc`, `Project_ServerSRC`, `Project_Binary`, `Project_Game`, `Project_DumpProto`.
 - Only `Project_Map` is writable for mapping/checkpoints.
 - Never load all map files into one chat.
+- Never reconstruct the active state from old chats when `STATE.json` is available.
 - Legacy monolithic files are preserved under `archive/` and are not part of normal continuation.
 
 ## Subsystems
