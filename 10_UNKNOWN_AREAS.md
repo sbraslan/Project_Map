@@ -598,3 +598,25 @@ Safebox/Mall statik keşfi kapatıldı.
 - SB-T10 same-account reconnect race only if global login layer permits duplicate active session.
 
 Money tests yalnız ENABLE_SAFEBOX_MONEY yeniden açılırsa uygulanmalı.
+
+
+## Mailbox — first pass sonrası açık alanlar
+
+### Runtime kritik
+- MAIL-T01: negative iYang packet; sender gold delta.
+- MAIL-T02: negative iWon packet; sender cheque delta.
+- MAIL-T03: direct WRITE without prior CHECK_NAME.
+- MAIL-T04: > MAILBOX_MAX_MAIL direct write flood.
+- MAIL-T05: keep mailbox open across DB backup sort/erase, then claim by old index.
+- MAIL-T06: large Yang attachment around 430M+ tax arithmetic.
+- MAIL-T07: source SWITCHBOT / ADDITIONAL_EQUIPMENT_1 send.
+- MAIL-T08: DB process crash before periodic backup after successful send.
+
+### Kalan statik
+- backup TRUNCATE/INSERT transaction safety
+- SQL string escaping for title/message/from/name
+- packet fixed-char NUL termination
+- expiry/delete/confirm index behavior
+- boot loader
+- messenger/block enforcement
+- warp/logout/system-close lifecycle.
