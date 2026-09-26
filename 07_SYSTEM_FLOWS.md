@@ -810,3 +810,45 @@ DB item-query failure GAME'e response üretmezse pending flag session boyunca ta
 
 Mall load personal Safebox gibi W_SAFEBOX/open-position/conflicting-window state'ini set/enforce etmez.
 Bu nedenle Mall access policy ayrı trust boundary olarak ele alınmalıdır.
+
+
+## Mailbox — sender transaction flow
+
+Official intended:
+WRITE_CONFIRM(name)
+→ DB CHECK_NAME
+→ existence + mail-count result
+→ client WRITE(name,title,message,itemPos,Yang,Won)
+→ GAME CMailBox::Write
+→ optional item RemoveFromCharacter + DestroyItem
+→ sender Yang/Won debit
+→ DB HEADER_GD_MAILBOX_WRITE
+→ DB m_map_mailbox[name].emplace_back
+→ client POST_WRITE_OK.
+
+Security issue: WRITE packet itself is not bound to a successful confirm transaction.
+
+## Mailbox — receiver claim flow
+
+Mailbox open
+→ DB sorts mailbox vector
+→ GAME receives snapshot vecMailBox
+→ GET_ITEMS(index)
+→ GAME uses local snapshot[index]
+→ CreateItem/AutoGiveItem
+→ GiveGold/GiveCheque
+→ clear local attachment
+→ DB MAILBOX_GET(name,index)
+→ DB clears m_map_mailbox[name][index].
+
+Identity is positional index only.
+Periodic DB erase/sort or new incoming mail can make local index and DB index refer to different logical mails.
+
+## Mailbox persistence
+
+Runtime source of truth in DB process:
+`m_map_mailbox`.
+
+Mutations do not immediately write SQL.
+Periodic `MAILBOX_BACKUP` rewrites SQL table from the entire map.
+This creates a long crash window between user-visible success and durable persistence.
