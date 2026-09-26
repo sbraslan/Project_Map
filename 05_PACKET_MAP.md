@@ -247,3 +247,25 @@ ITEM_ADD source `Pos.window_type` packetten gelir. Official UI yalnız inventory
 
 ### Initialization notu
 Client `TPacketCGExchange` yerel değişkenleri zero-init edilmiyor. Bazı subheaderlarda `arg1` dahil kullanılmayan alanlar initialize edilmeden gönderilir. Server handler switch öncesi `arg1` okuduğu için packet deterministic initialization ayrıca test edilmelidir.
+
+
+## Player Exchange packet boundary
+
+`HEADER_CG_EXCHANGE = 27`.
+
+CG subheaders:
+- START
+- ITEM_ADD
+- ITEM_DEL
+- ELK_ADD
+- ACCEPT
+- CANCEL.
+
+`TPacketCGExchange` içinde source item konumu tam `TItemPos Pos` olarak gelir; ITEM_ADD server'a `window_type + cell` taşır.
+
+Server ITEM_ADD path:
+`CInputMain::Exchange -> CExchange::AddItem(pinfo->Pos, pinfo->arg2)`.
+
+Packet boundary semantic allowlist uygulamaz. Generic `TItemPos::IsValidItemPosition()` SWITCHBOT ve ADDITIONAL_EQUIPMENT_1 gibi windowları da valid saydığı için exchange-specific source validation eksiktir.
+
+ELK_ADD ayrıca gold/cheque recipient-overflow check'ini yalnız offer packet işlendiği anda yapar; final ACCEPT öncesi aynı snapshot yeniden doğrulanmaz.
