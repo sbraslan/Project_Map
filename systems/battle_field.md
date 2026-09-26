@@ -183,3 +183,52 @@ This is a rolling 24-hour allowance rather than a calendar-day reset; no separat
 3. Audit close/open state propagation to connected clients across cores.
 4. Recheck score cash-out -> DB ranking write ordering.
 5. Decide Battle Field STATIC COMPLETE.
+
+
+## Score cash-out / persistence boundary
+
+### BUG-BFIELD-009 — cap rejection is ignored
+The exit sequence clears temporary score and writes ranking after calling the void-returning persistent Battle Point change.
+
+If the persistent balance + temporary score reaches/exceeds `BATTLE_POINT_MAX`, `PointChange` refuses the currency update, while the temporary score is still zeroed and ranking is still credited.
+
+`WarpSet` later calls `Save()`, so the normal successful path schedules player persistence after the Battle Point mutation. The ranking write itself is a separate direct SQL operation, so the overall currency/ranking update is not a single DB transaction; crash consistency remains a separate fault-injection concern and is not promoted statically.
+
+## Client event-state wiring
+
+### BUG-BFIELD-010 — generic open propagates, event-open does not
+Client command registry exposes both `battle_field_event` and `battle_field_event_open`.
+
+`OpenEnter(isEvent)` only broadcasts `battle_field_open 1` before setting local event status. It never broadcasts event=true/event-open=true.
+
+Normal channel `Connect` cannot repair this because its local Battle Field singleton has `bEventStatus=false`.
+
+The event-specific minimap branch therefore lacks the state transition it expects.
+
+Latent/non-promoted:
+- `GetBattleFieldEventEnable()` returns the event-open field instead of event-enable.
+- current minimap stores that getter result but does not use it in branching.
+
+## Disconnect/reconnect semantics — no new verified bug
+Temporary `dwBattleFieldPoints` is in-memory only and reset to zero on character initialization. `CHARACTER::Disconnect` does not execute `ExitCharacter`, so disconnecting inside Battle Field does not cash temporary points or set the 600-second exit cooldown.
+
+This creates a clear forfeit/bypass semantic, but the source does not establish whether disconnect is intentionally defined as forfeiting unbanked temporary score. It remains documented rather than promoted.
+
+## Current verified Battle Field set
+- BUG-BFIELD-001
+- BUG-BFIELD-002
+- BUG-BFIELD-003
+- BUG-BFIELD-004
+- BUG-BFIELD-005
+- BUG-BFIELD-006
+- BUG-BFIELD-007
+- BUG-BFIELD-008
+- BUG-BFIELD-009
+- BUG-BFIELD-010
+
+## Remaining before static close
+1. Recheck Battle Field open/close transition behavior for sparse multi-day schedules; keep unpromoted if DB reachability remains unknown.
+2. Verify daily-reset initialization/load path once more.
+3. Verify Battle Field death-limit use/reset consumer.
+4. Close remaining client command/state surfaces.
+5. Decide Battle Field STATIC COMPLETE.
