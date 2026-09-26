@@ -804,3 +804,33 @@ Kalan kısa statik tur:
 2. account-level same-safebox multi-character/concurrent-open davranışı
 3. channel/warp/open-window cleanup
 4. ardından Safebox/Mall STATIC COMPLETE checkpoint.
+
+
+## Checkpoint — Safebox / Mall STATIC COMPLETE
+
+**Tarih:** 2026-09-26
+
+Safebox/Mall final statik tur tamamlandı.
+
+### Son kapanan alanlar
+- password/pending-load lifecycle
+- DB failure response behavior
+- Mall request policy
+- open-window / CanWarp integration
+- disconnect close ordering
+- account-level concurrency dependency
+
+### Son sınıflandırma
+Aktif build:
+- BUG-SAFEBOX-003 — crafted partial/full stack merge source loss
+- BUG-SAFEBOX-004 — semantic TItemPos storage bypass
+- BUG-SAFEBOX-005 — malformed persisted row -> grid desync / possible OOB write
+
+`ENABLE_SAFEBOX_MONEY` kapalı:
+- BUG-SAFEBOX-001/002 dormant.
+
+### Durum
+**Safebox / Mall: STATIC COMPLETE**
+
+Yeni Safebox statik taraması yalnız runtime test sonucu yeni caller/edge çıkarırsa açılacak.
+Bir sonraki yeni transaction subsystemine geçilebilir.
