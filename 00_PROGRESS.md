@@ -400,3 +400,36 @@ Bu nedenle logout/ClearItem veya alternatif remove yolu sırasında boş event y
 - storage-window bypass runtime matrisi
 - Additional Equipment özel etkisi
 - AddToCharacter kalan internal caller sınıflandırması.
+
+
+## Checkpoint — Additional Equipment SwapItem + AddToCharacter caller audit
+
+**Tarih:** 2026-09-26
+
+### Additional Equipment SwapItem sonucu
+`CHARACTER::SwapItem(wCell, wDestCell)` başındaki `srcCell/destCell` yeniden tanımlamaları gerçekten inner-scope shadowing oluşturuyor; outer değerler `INVENTORY/EQUIPMENT` olarak kalıyor.
+
+Ancak mevcut gerçek çağrı zincirinde bu kusurun tek başına yanlış page'e item taşıdığı gösterilemedi:
+- repo içinde aktif çağrı `EquipItem/UseItem` yolundan inventory item → wear cell swap'ı,
+- gerçek occupied target seçimi `CheckAdditionalEquipment(wDestCell)` ile tekrar yapılıyor,
+- Additional page itemı `GetAdditionalEquipmentItem(wDestCell)` ile okunuyor,
+- yeni item `CItem::EquipTo` → `GetWear/SetWear` → `CheckAdditionalEquipment(bWearCell)` yoluyla aktif page'e yazılıyor.
+
+Bu nedenle eski `BUG-CANDIDATE-ITEM-005` runtime bug seviyesinden düşürüldü; kod kalitesi / gelecekte refactor riski olarak gözlem tutuluyor.
+
+### AddToCharacter caller audit
+Kalan ana caller sınıfları tekrar tarandı:
+- Dragon Soul PullOut: `IsValidCellForThisItem` + fallback `GetEmptyDragonSoulInventory`
+- refine / fishing rod / mining pick replacement: kaldırılan mevcut itemın daha önce geçerli olan hücresini reuse ediyor
+- exchange / shop: önceden hesaplanan boş inventory/DS hücresini kullanıyor
+- quest reward/create yolları: `GetEmptyInventory` sonucu kullanıyor
+- DB ItemLoad: persisted `window/pos` değerini doğrudan reconstruct ediyor → BUG-ITEM-004 için ana statik risk sınırı
+- Safebox/Mall/Guild Storage: client-controlled `TItemPos` → BUG-ITEM-006 semantic-window bypass sınırı
+
+### Sonuç
+`AddToCharacter` caller audit statik olarak büyük ölçüde kapandı. Yeni yüksek güvenli caller kaynaklı duplication/loss yolu bulunmadı.
+
+### Sıradaki
+1. Special Inventory extend-feature build kombinasyonlarını tara.
+2. Proto/data tarafında special-inventory type olup size > 1 item var mı kontrol et.
+3. Inventory/Item subsystem completion checkpoint oluştur.
