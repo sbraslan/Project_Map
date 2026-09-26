@@ -72,3 +72,12 @@ Beklenen: account safebox password'u guild storage'yı etkilememeli.
 - Personal safebox yerine önce guild storage aç.
 - Award'ın hangi window/owner'a yazıldığını kontrol et.
 Beklenen: kişisel award guild bank'a taşınmamalı.
+
+### GS-T15 — SAFEBOX_MONEY guild-close regression
+**Yalnız test DB / yedekli ortamda.**
+- `ENABLE_SAFEBOX_MONEY` aktif build kullan.
+- Kişisel safebox gold değerini test amaçlı bilinen bir değere ayarla.
+- Guild Storage aç/kapat.
+- `safebox.gold` değerini tekrar kontrol et.
+Beklenen güvenli davranış: kişisel safebox gold değişmemeli.
+Mevcut statik kod beklentisi: 0'a yazılma riski var.
