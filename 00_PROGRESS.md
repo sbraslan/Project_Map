@@ -974,3 +974,70 @@ Doğrulanan ilk buglar:
 2. Battle Pass mission create/load/save + `battlepass_playerindex` lifecycle.
 3. Event/P2P season start-stop/reload state.
 4. Bunlar kapandıktan sonra Battle Pass STATIC COMPLETE kararı.
+
+## Checkpoint — Battle Pass STATIC COMPLETE
+
+**Tarih:** 2026-09-26
+
+Recovered Battle Pass audit was completed through client actions, gameplay callers, GAME memory state, DB-process persistence, player index, Event Manager/P2P season state, Project_Game configuration and reward durability.
+
+### Complete canonical flow
+
+`CG_EXT_BATTLE_PASS_ACTION`
+- action 1 -> `BattlePassRequestOpen`
+- action 2 -> ranking SELECT / GC ranking packets
+- action 10/11/12 -> final normal/premium/event reward request
+
+Gameplay mission update:
+`gameplay caller -> CHARACTER::UpdateExtBattlePassMissionProgress -> m_listExtBattlePass -> mission reward -> GC mission update`.
+
+All configured mission families were located:
+- combat: KILL_MONSTER, KILL_PLAYER, DAMAGE_MONSTER, DAMAGE_PLAYER, EXP_COLLECT, YANG_COLLECT
+- item/economy: BP_ITEM_USE, BP_ITEM_SELL, BP_ITEM_CRAFT, BP_ITEM_REFINE, BP_ITEM_DESTROY, BP_ITEM_COLLECT
+- fishing: FISH_FISHING, FISH_GRILL, FISH_CATCH
+- guild: GUILD_PLAY_GUILDWAR, GUILD_SPENT_EXP
+- Gaya: GAYA_CRAFT_GAYA, GAYA_BUY_ITEM_GAYA_COST
+- pet: PET_ENCHANT
+- dungeon/minigame: COMPLETE_DUNGEON, COMPLETE_MINIGAME
+
+Manual setter:
+`battlepass_set_mission` -> `SetExtBattlePassMissionProgress`.
+The command is restricted to `GM_IMPLEMENTOR`; BUG-BPASS-002 is therefore an active GM/admin correctness duplication bug, not a normal-player packet exploit.
+
+### Persistence closed
+Login:
+`CClientManager::QUERY_PLAYER_LOAD -> SELECT battlepass_missions -> QID_EXT_BATTLE_PASS -> RESULT_EXT_BATTLE_PASS_LOAD -> HEADER_DG_EXT_BATTLE_PASS_LOAD -> CInputDB::ExtBattlePassLoad -> CHARACTER::LoadExtBattlePass`.
+
+Save:
+dirty `TPlayerExtBattlePassMission` objects stay only in GAME memory during play.
+On CHARACTER disconnect/logout:
+`HEADER_GD_SAVE_EXT_BATTLE_PASS -> CClientManager::QUERY_SAVE_EXT_BATTLE_PASS -> REPLACE INTO battlepass_missions`.
+
+`player.battlepass_playerindex` is a separate synchronous GAME SQL lifecycle used for registration, ranking and final-completion state.
+
+### Event / season lifecycle closed
+Event channel:
+`CEventManager::SetBattlePassEvent`
+-> game flag
+-> `TPacketGGEventBattlePass`
+-> peers
+-> `CInputP2P::BattlePassEvent`
+-> `CEventManager::BattlePassData`
+-> Battle Pass cache arrays
+-> `CheckBattlePassTimes`
+-> scalar active IDs/times.
+
+Project_Game currently configures ID 1 for normal, premium and event. Thus BUG-BPASS-007 is latent with current files but becomes functional breakage as soon as a configured BattlePassID > 1 is used.
+
+### Additional verified bugs
+- BUG-BPASS-008 mission reward and mission persistence are non-atomic; crash can re-award a mission.
+- BUG-BPASS-009 final reward completion flag is committed before reward items become durable; crash can permanently lose final reward.
+- BUG-BPASS-010 heap allocated mission state is never freed.
+- BUG-BPASS-011 ranking cooldown timestamp is never initialized.
+
+### Status
+**Battle Pass: STATIC COMPLETE.**
+Remaining work is runtime/fault-injection only.
+
+### Next static subsystem
+Move to the next unmapped gameplay subsystem; Achievement System is selected next because it has direct event hooks, player persistence and reward state similar to Battle Pass.
