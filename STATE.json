@@ -3,45 +3,34 @@
   "updated_at": "2026-09-26",
   "project": "Metin2 Project",
   "mapping_repo": "sbraslan/Project_Map",
-  "mode": "runtime_validation",
+  "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "runtime_validation",
-    "display_name": "Runtime / In-Game Validation",
+    "subsystem": "detection_mapping",
+    "display_name": "Detection / Mapping Only",
     "status": "ACTIVE",
-    "system_file": "RUNTIME.md",
+    "system_file": "CURRENT.md",
     "bug_file": null,
     "test_file": null,
     "verified_bug_ids": [],
-    "current_cluster": {
-      "subsystem": "dungeon_info",
-      "gate": "DUNGEON-T10",
-      "status": "LIVE_PENDING",
-      "blocked_after_gate": [
-        "DUNGEON-T09",
-        "DUNGEON-T11",
-        "DUNGEON-T12"
-      ]
-    },
+    "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Live-reproduce DUNGEON-T10 on the current build.",
-      "Apply FIX-DUNGEON-010 only after runtime reproduction/fix execution begins.",
-      "Then validate and fix T09 and T11.",
-      "Apply T12A signed/clamped arithmetic after reproduction; do not guess T12B cooldown policy.",
-      "Choose per-dungeon displayed cooldown semantics before adding any COOLDOWN data."
-    ],
-    "patch_plan": "fixes/dungeon_info.md",
-    "patch_status": "READY_SOURCE_UNCHANGED"
+      "Continue read-only inspection of source repositories.",
+      "Record only architecture maps, bug findings, evidence and checkpoints in Project_Map.",
+      "Do not apply fixes, patches, config changes or runtime modifications.",
+      "Keep runtime/fault-injection plans deferred until the user explicitly changes phase."
+    ]
   },
   "startup": {
     "required_files": [
       "STATE.json",
       "CURRENT.md",
-      "RUNTIME.md"
+      "WORKFLOW.md"
     ],
     "conditional_files": {
+      "selected_system_map": "systems/<selected-system>.md",
       "selected_bug_registry": "bugs/<selected-system>.md",
-      "selected_runtime_tests": "tests/<selected-system>.md"
+      "selected_test_plan": "tests/<selected-system>.md"
     },
     "forbidden_by_default": [
       "archive/",
@@ -82,5 +71,22 @@
       "update INDEX.md"
     ],
     "history_policy": "Use Git commits for fine-grained history; history/ only for major milestones."
+  },
+  "source_change_policy": {
+    "allowed_write_repository": "sbraslan/Project_Map",
+    "source_repositories_are_immutable": true,
+    "prohibited_actions": [
+      "modify C++ source",
+      "modify Python client source",
+      "modify quest files",
+      "modify game/config/data files",
+      "commit or push to source repositories"
+    ],
+    "allowed_actions": [
+      "read/search source repositories",
+      "record maps/checkpoints/findings in Project_Map",
+      "record verified bugs in Project_Map",
+      "record deferred test ideas in Project_Map"
+    ]
   }
 }
