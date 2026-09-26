@@ -1,32 +1,14 @@
-# 01 — Repo Map
+# Repository map — concise
 
-Bu dosya dört ana Metin2 reposunun yüksek seviyeli haritasını tutar.
+Read-only source repositories:
+- `Project_ClientSrc` — client C++
+- `Project_ServerSRC` — GAME/DB/common C++
+- `Project_Binary` — client Python/UI/locale/pack-side files
+- `Project_Game` — runtime quests/config/data
+- `Project_DumpProto` — DumpProto / multi-language proto tooling
 
-## Project_ClientSrc
-- Client tarafı C++ / Python entegrasyonu
-- UI → binding → network zincirleri
-- Packet gönderim/alım noktaları
+Writable mapping repository:
+- `Project_Map`
 
-## Project_ServerSRC
-- Game/server çekirdeği
-- Packet handler'lar
-- Character / item / guild / quest / DB çağrıları
-
-## Project_Binary
-- Client binary tarafı
-- Network, UI binding, packet işleme ve engine bağlantıları
-
-## Project_Game
-- Questler, game dosyaları ve runtime data içerikleri
-
-## Haritalama ilkesi
-Her sistem mümkün olduğunda şu sırayla belgelenir:
-
-UI / Script
-→ Python binding
-→ C++ client function
-→ Packet
-→ Server handler
-→ Business logic
-→ DB / persistence
-→ Response / client refresh
+Subsystem navigation is in `INDEX.md`.
+Full legacy repo-map text is preserved at `archive/01_REPO_MAP.md`.

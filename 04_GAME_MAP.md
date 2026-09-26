@@ -1,12 +1,6 @@
-# 04 — Game Map
+# Deprecated monolithic game map
 
-Quest, script, locale/data ve oyun davranışıyla ilgili dosya haritaları burada tutulur.
+Game/quest/data details are now subsystem-scoped under `systems/`.
 
-## Kayıt formatı
-- Sistem:
-- Dosya:
-- Quest / script:
-- Event:
-- Server bağı:
-- Client bağı:
-- Not:
+Full legacy file:
+`archive/04_GAME_MAP.md`
