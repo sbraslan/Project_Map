@@ -66,6 +66,41 @@ Therefore the cache reload performed at close is built from DB state that does n
 
 The immediate post-close ranking cache can be stale until a later reload occurs.
 
+### BUG-RANK-005 — malformed BattleField ranking packet size can escape the declared packet boundary
+- Statik durum: **doğrulandı**
+- Sınıf: client packet parser / dynamic-size boundary validation
+
+`HEADER_GC_BATTLE_ZONE_INFO` is registered as a dynamic packet. `CheckPacket()` only waits until the packet's declared `uint16_t size` is buffered; it does not validate a minimum base size or payload divisibility.
+
+`RecvBattleZoneInfo()` then:
+- receives `TPacketGCBattleInfo`;
+- subtracts `sizeof(TPacketGCBattleInfo)` from `wSize`;
+- while `wSize > 0`, receives a full `TBattleRankingMember` and subtracts that full struct size.
+
+Therefore:
+- a declared size smaller than the base packet can underflow the unsigned size field;
+- a payload whose length is not an exact multiple of `sizeof(TBattleRankingMember)` can make the parser request bytes beyond the declared packet boundary and desynchronize/fail the receive stream.
+
+This requires a malformed server packet; no client-to-server exploit path is asserted here.
+
+### BUG-RANK-006 — active BattleField source calls an unresolved `LoadRanking` identifier
+- Statik durum: **doğrulandı (repository source snapshot)**
+- Sınıf: C++ build blocker / call-site qualification defect
+
+Under `ENABLE_RANKING_SYSTEM`, both `CBattleField::CloseEnter()` and the scheduled weekly ranking update call:
+
+`LoadRanking(RK_CATEGORY_BF);`
+
+The mapped source shows:
+- no `CBattleField::LoadRanking` declaration;
+- no such method in `singleton<CBattleField>`;
+- no `LoadRanking` macro/alias in the checked direct/precompiled include chain;
+- the actual ranking method is `CRankingSystem::LoadRanking(uint8_t)`.
+
+`common/CommonDefines.h` enables both `ENABLE_RANKING_SYSTEM` and `ENABLE_BATTLE_FIELD`, so the two call sites are included in the mapped build configuration.
+
+Unless the real build injects an external declaration/macro that is not present in the repository snapshot, these call sites are not resolvable C++ and should block compilation of this translation unit.
+
 ## Findings awaiting reachability closure
 
 ### Generic PARTY board API gap
@@ -92,4 +127,9 @@ No verified bug ID is assigned until an active caller for those categories is ma
 
 The function itself also does not clear previous ranker flags.
 
-The online-state update gap is structurally visible, but exact old-flag lifetime/reconnect behavior still needs mapping before a verified bug ID is assigned.
+The online-state update gap is structurally visible. Additional mapping now shows the flags are set directly on `m_afAffectFlag`, while the generic reset path only resets flags belonging to `CAffect` entries. A final repo-wide search for any direct `AFF_BATTLE_RANKER_1..3` reset remains before assigning a verified bug ID.
+
+### P2P ranking reload sender gap
+`TPacketGGLoadRanking` is defined and received by `CInputP2P::LoadRanking`, but the targeted server-source scan has not found any construction/send site for that packet.
+
+The next reachability step is to map all callers of `CBattleField::OpenBattleUI` and determine whether non-BattleField channels can display stale ranking caches after weekly rollover.
