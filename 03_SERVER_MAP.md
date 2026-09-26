@@ -1049,3 +1049,41 @@ Game computes personal_shop tax by reducing local dwPrice after buyer debit. Pre
 DB ShopSaleResult ignores game local net dwPrice because it reconstructs sale from cached sold.price and credits that full value. Tax amount itself is not included in SHOP_SUBHEADER_GD_BUY payload.
 
 Result: premium shop seller stash receives full listed gold price despite game-side tax calculation.
+
+## Recovered server map — Ticket / Dungeon Info / Battle Pass
+
+### Ticket System
+Primary:
+- `game/src/input_main.cpp::CInputMain::TicketSystem`
+- `game/src/ticket.cpp/.h`
+
+Main methods:
+- `Open`
+- `Create`
+- `Reply`
+- `Action`
+- `ChangePage`
+- `SendTicketLogs`
+- `GetOwner/GetExistID/GetIsOpened/GetAccountBanned`.
+
+Persistence is synchronous DirectQuery against ticket schema.
+
+### Dungeon Info
+Primary:
+- `game/src/input_main.cpp::DungeonInfo`
+- `game/src/DungeonInfo.cpp/.h`
+
+Manager owns `s_vecDungeonProto`, loads `dungeon_info.txt`, serves SendInfo/Warp/Ranking and reloads open clients.
+
+### Battle Pass
+Primary:
+- `game/src/battle_pass.cpp/.h`
+- `game/src/char.cpp` mission state/progress
+- `game/src/input_main.cpp::ReciveExtBattlePassActions`
+- `game/src/event_manager.cpp` season/event integration
+- `game/src/main.cpp`: `CBattlePassManager battle_pass;` automatic object.
+
+Important state split:
+- legacy scalar active IDs/times: normal/premium/event.
+- Event Manager arrays: `m_dwActiveBattlePassID[3]`, start/end arrays.
+- `CheckBattlePassTimes()` bridges array state into scalar active state.
