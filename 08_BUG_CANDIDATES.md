@@ -1039,3 +1039,96 @@ Modified client ile normal MoveItem guardlarını bypass eden storage <-> SWITCH
 - `CreateItemTableFromRes` stale static-vector leakage üretmiyor: no-row'da clear, normal durumda resize.
 - `CSafebox::ChangeSize` shrink yapmıyor; yalnız büyütüyor.
 - SAFEBOX/MALL item persistence owner=account_id üzerinden ilerliyor.
+
+
+## Safebox / Mall — canonical second pass / active-build correction (2026-09-26)
+
+### Build correction
+Aktif server build:
+- `ENABLE_SAFEBOX_IMPROVING` = ON
+- `ENABLE_SPECIAL_INVENTORY` = ON
+- `ENABLE_SWITCHBOT` = ON
+- `ENABLE_ADDITIONAL_EQUIPMENT_PAGE` = ON
+- `ENABLE_SAFEBOX_MONEY` = **OFF**
+
+Bu nedenle daha önce kaydedilen:
+- BUG-SAFEBOX-001 (Mall close -> safebox.gold=0)
+- BUG-SAFEBOX-002 (gold withdraw overflow/debit-before-credit)
+
+kod seviyesinde gerçek kusurlar olmakla birlikte **mevcut build'de derlenmiyor / dormant** durumdadır. SAFEBOX_MONEY ileride açılırsa yeniden kritik hale gelirler.
+
+### BUG-SAFEBOX-003 — Safebox stack merge source-loss
+- Statik durum: **doğrulandı / aktif build**
+- Reachability: modified/crafted client
+- Etki: item remainder kaybı / DB destroy
+
+`CSafebox::MoveItem` occupied stack branch:
+1. requested count destination kapasitesine clamp edilir.
+2. ardından `if (item->GetCount() >= count) Remove(bCell);` çalışır.
+
+Clamp sonrası `count <= source count` olduğu için bu koşul partial merge'de de true olur. Destination full ise count=0 olur ve source yine Remove edilir.
+
+`Remove()` source itemı SAFEBOX runtime slot/gridinden çıkarır, `RemoveFromCharacter()` owner'ı null ve window'u RESERVED yapar. Ardından `SetCount(remainder)` ownerless itemı delayed-save kuyruğuna sokabilir. `ITEM_MANAGER::SaveSingleItem` owner yoksa ITEM_DESTROY yollar; ayrıca eventual DestroyItem da non-skip item için destroy packet üretir.
+
+Official `uisafebox.py` occupied-target safebox move packet'i üretmediği için normal UI yolu yoktur; server crafted input'a karşı korunmasızdır.
+
+### BUG-SAFEBOX-004 — Safebox/Mall semantic TItemPos bypass
+- Statik durum: **doğrulandı / aktif build**
+- Cross-reference: BUG-ITEM-006
+- Reachability: modified client
+
+Checkout non-DS yolu:
+- caller-controlled `p->ItemPos`
+- `IsEmptyItemGrid(dest,...)`
+- Special Inventory type equality
+- sonra doğrudan `AddToCharacter(dest)`.
+
+Destination için INVENTORY/BELT allowlist yoktur. `IsEmptyItemGrid` aktif build'de SWITCHBOT ve ADDITIONAL_EQUIPMENT_1 windowlarını da valid olarak kabul eder.
+
+Bu nedenle Safebox/Mall itemı normal MoveItem semantiğini atlayarak:
+- SWITCHBOT slotuna,
+- ADDITIONAL_EQUIPMENT_1 slotuna
+yerleştirilebilir.
+
+Checkin tarafı da explicit source-window allowlist kullanmaz. SWITCHBOT itemı `GetItem(TItemPos)` ile alınabilir; RemoveFromCharacter -> SetItem(SWITCHBOT,null) UnregisterItem yapar. Additional Equipment gerçek equipped item ise `IsEquipped()` guardı nedeniyle checkin'de reddedilir.
+
+### BUG-SAFEBOX-005 — persisted invalid/overlapping Safebox row -> grid desync / OOB write on removal
+- Statik durum: **doğrulandı / aktif build**
+- Reachability: malformed/legacy/corrupt DB row
+- Sınıf: persistence validation + memory safety
+
+Load:
+`CHARACTER::LoadSafebox/LoadMall`
+→ yalnız `m_pkSafebox->IsValidPosition(pItems->pos)` ile top-left slotu kontrol eder
+→ `CSafebox::Add(pos,item)`.
+
+`CSafebox::Add`:
+1. top-left `IsValidPosition`
+2. item window/cell set + save
+3. `m_pkGrid->Put(pos,1,item->GetSize())`
+4. **Put sonucunu kontrol etmez**
+5. `m_pkItems[pos]=item`.
+
+`CGrid::Put` item yüksekliği bottom boundary'yi aşarsa veya grid hücresi overlap ise false döner. Buna rağmen item pointerı safebox array'ine bağlanır.
+
+Etkiler:
+- overlap row: grid itemı reserve etmez ama slot pointerı vardır; sonraki Remove başka itemın occupied grid hücrelerini temizleyebilir.
+- duplicate top-left row: sonraki `m_pkItems[pos]` önceki runtime pointerı overwrite eder.
+- bottom-boundary multi-size row: sonraki `CSafebox::Remove -> CGrid::Get(pos,1,size)` yalnız top-left'i bounds-check eder ve yüksekliğe göre ilerler; row+h için ikinci bounds check yoktur. Bu durumda grid buffer dışına write oluşabilir.
+
+Normal checkin `IsEmpty(pos,size)` ile korunduğundan ana trigger persisted invalid state'tir.
+
+### Safebox lifecycle closure
+- Runtime item expiry/delete: ITEM_MANAGER::RemoveItem SAFEBOX/MALL windowunda ilgili CSafebox::Remove(cell) çağırır; sonra M2_DESTROY_ITEM DB destroy packetini üretir.
+- Logout/character teardown: delayed item saves flush edilir, ardından CloseSafebox/CloseMall çalışır. CSafebox destructor runtime itemları SkipSave ile unload eder; normal DB item rowları korunur.
+- ItemAward Safebox/Mall routing: personal Safebox mall-awardları, Mall non-mall awardları filtreler; bu iki domain arasında cross-routing görülmedi.
+- Packet slot widths: CG Safebox/Mall source slots uint8_t, current UI/storage domainiyle uyumlu; yeni truncation adayı bulunmadı.
+
+### Current active-build canonical set
+- BUG-SAFEBOX-003 — crafted stack partial/zero merge item loss
+- BUG-SAFEBOX-004 — semantic destination/source-window bypass
+- BUG-SAFEBOX-005 — persisted malformed row grid desync / potential OOB write
+
+Build-dependent dormant:
+- BUG-SAFEBOX-001
+- BUG-SAFEBOX-002
