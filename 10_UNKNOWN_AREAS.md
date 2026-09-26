@@ -209,3 +209,49 @@ Bu noktadan sonra Guild Storage için ek salt-okuma getirisi düşük; runtime t
 - Special Inventory exact ranges/type mapping
 - Additional Equipment runtime swap testi statik olarak açık
 - sonra Inventory/Item ana modülü completion checkpoint'e alınabilir.
+
+## Special Inventory / Switchbot — yeni durum
+
+### Special Inventory statik olarak kapatılan
+- cell range modeli
+- position → type mapping
+- item → type mapping
+- auto empty-slot search
+- size=1 kuralı
+- MoveItem type/range enforcement
+- login persistence'ın INVENTORY window içinde çalışması.
+
+### Special Inventory açık
+- yanlış special subrange persisted row runtime testi
+- extend-special-inventory feature kombinasyonlarının ayrı build testi
+- gerçek proto içinde special tip olup size>1 olan item var mı veri taraması.
+
+### Switchbot statik olarak kapatılan
+- UI item move
+- Start/Stop Python/C++ zinciri
+- CG/GC packetleri
+- server manager
+- event loop
+- item save/load
+- active move lock
+- item-type validation
+- cross-core P2P state transferi.
+
+### Yeni bulgular
+- BUG-SWITCHBOT-001: cross-core source manager pointer leak
+- BUG-CANDIDATE-SWITCHBOT-002: server START item-state revalidation eksikliği
+- OBS-SWITCHBOT-001: client slot upper-bound off-by-one
+- OBS-SWITCHBOT-002: UPDATE_ITEM vnum 8-bit fakat receiver kullanmıyor.
+
+### Switchbot açık
+- cross-core leak runtime ölçümü
+- P2PReceive ↔ EnterGame ordering testi
+- malformed/custom START resource etkisi
+- logout/reconnect ve same-core warp event davranışı.
+
+### Item subsystem sıradaki
+1. Additional Equipment SwapItem runtime etkisi
+2. AddToCharacter kullanan internal caller'ların son taraması
+3. Special Inventory extend-feature build kombinasyonu
+4. Item subsystem genel checkpoint
+5. sonra bir sonraki ana sisteme geçiş.
