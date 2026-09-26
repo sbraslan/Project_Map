@@ -16,16 +16,17 @@
       "BUG-RANK-001",
       "BUG-RANK-002",
       "BUG-RANK-003",
-      "BUG-RANK-004"
+      "BUG-RANK-004",
+      "BUG-RANK-005",
+      "BUG-RANK-006"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Resolve the unqualified LoadRanking(RK_CATEGORY_BF) declaration/linkage anomaly without assuming a wrapper exists.",
-      "Locate the exact outbound TPacketGGLoadRanking sender/broadcast path.",
-      "Close ranker-effect refresh/removal lifecycle.",
+      "Map all live callers of CBattleField::OpenBattleUI and determine whether the missing outbound TPacketGGLoadRanking sender creates stale cross-channel ranking views.",
+      "Finish the repo-wide direct-reset search for AFF_BATTLE_RANKER_1..3 and decide whether to promote the stale-ranker-effect lifecycle to a verified bug.",
       "Determine whether any active caller opens generic PARTY ranking.",
-      "Audit dynamic GC ranking packet malformed-size handling.",
-      "Audit remaining DB/result null boundaries and decide Ranking STATIC COMPLETE."
+      "Audit remaining ranking SQL/result null boundaries.",
+      "Reconcile BUG-RANK-006 against actual build entry points/configuration and decide whether Ranking is STATIC COMPLETE."
     ]
   },
   "startup": {
@@ -82,7 +83,14 @@
     "root/uibattlefield.py",
     "root/uirankingboard.py",
     "root/interfacemodule.py::OpenRankingBoardWindow",
-    "root/game.py::OpenRankingBoard"
+    "root/game.py::OpenRankingBoard",
+    "game/src/char.h::SetAffectFlag",
+    "game/src/char.cpp::m_afAffectFlag lifecycle",
+    "game/src/char_affect.cpp::ComputeAffect reset path",
+    "common/CommonDefines.h::ENABLE_RANKING_SYSTEM/ENABLE_BATTLE_FIELD",
+    "common/singleton.h",
+    "UserInterface/PythonNetworkStream.cpp::CheckPacket dynamic-size handling",
+    "UserInterface/Packet.h::TDynamicSizePacketHeader/TPacketGCBattleInfo/TBattleRankingMember"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
