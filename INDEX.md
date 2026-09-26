@@ -21,12 +21,12 @@ This is the navigation index. Normal continuation starts at `STATE.json`, then `
 | Shop / Premium Private Shop | STATIC COMPLETE | `systems/shop.md` |
 | Safebox / Mall | STATIC COMPLETE | `systems/safebox_mall.md` |
 | Mailbox | STATIC COMPLETE | `systems/mailbox.md` |
-| Ticket System | STATIC MAPPED | `systems/ticket.md` |
+| Ticket System | **PARTIAL — ACTIVE** | `systems/ticket.md` |
 | Dungeon Info | STATIC MAPPED | `systems/dungeon_info.md` |
 | Battle Pass | STATIC COMPLETE | `systems/battle_pass.md` |
 | Achievement System | STATIC COMPLETE | `systems/achievement.md` |
 | Biolog System | STATIC COMPLETE | `systems/biolog.md` |
-| Hunting System | **PARTIAL — ACTIVE** | `systems/hunting.md` |
+| Hunting System | STATIC COMPLETE | `systems/hunting.md` |
 
 ## Supporting files
 Each subsystem can have:
