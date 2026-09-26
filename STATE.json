@@ -6,36 +6,32 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "party_match",
-    "display_name": "Party Match",
+    "subsystem": "dungeon_core",
+    "display_name": "Dungeon Core",
     "status": "PARTIAL — ACTIVE",
-    "system_file": "systems/party_match.md",
-    "bug_file": "bugs/party_match.md",
-    "test_file": "tests/party_match.md",
-    "verified_bug_ids": [
-      "BUG-PMATCH-001",
-      "BUG-PMATCH-002",
-      "BUG-PMATCH-003"
-    ],
+    "system_file": "systems/dungeon_core.md",
+    "bug_file": "bugs/dungeon_core.md",
+    "test_file": "tests/dungeon_core.md",
+    "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Audit remaining conflicting item-window interactions.",
-      "Audit Party Match success notification versus WarpSet failure/return ordering.",
-      "Audit map/core transitions while already queued.",
-      "Audit Party Match off/disable enforcement.",
-      "Decide whether Party Match is STATIC COMPLETE."
+      "Map CHARACTER::SetDungeon against CDungeon::IncMember/DecMember.",
+      "Close party/dungeon pointer lifetime and member counts.",
+      "Close dungeon dead/exit/jump event lifetime and null ordering.",
+      "Map quest dungeon create/join/new_jump/new_jump_party flows.",
+      "Promote only statically verified Dungeon Core bugs."
     ]
   },
   "startup": {
     "required_files": [
       "STATE.json",
       "CURRENT.md",
-      "systems/party_match.md"
+      "systems/dungeon_core.md"
     ],
     "conditional_files": {
       "policy": "WORKFLOW.md",
-      "bugs": "bugs/party_match.md",
-      "deferred_tests": "tests/party_match.md"
+      "bugs": "bugs/dungeon_core.md",
+      "deferred_tests": "tests/dungeon_core.md"
     },
     "forbidden_by_default": [
       "archive/",
@@ -142,7 +138,12 @@
     "game/src/exchange.cpp::CExchange::AddItem/Cancel",
     "game/src/char.cpp::CHARACTER::Destroy exchange cancellation",
     "root/uipartymatch.py::PartyMatchResult/__SetInfo/__PartyMatchMsg/__PartyMatchMinimapButton",
-    "UserInterface/PythonNetworkStreamPhaseGame.cpp::RecvPartyMatch result argument bridge"
+    "UserInterface/PythonNetworkStreamPhaseGame.cpp::RecvPartyMatch result argument bridge",
+    "game/src/dungeon.h",
+    "game/src/dungeon.cpp",
+    "game/src/questlua_dungeon.cpp",
+    "game/src/char.cpp::SetDungeon",
+    "game/src/sectree_manager.*::private map lifecycle"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -175,7 +176,8 @@
   },
   "completed_subsystems": [
     "ranking",
-    "party"
+    "party",
+    "party_match"
   ],
   "ranking_closure": {
     "status": "STATIC COMPLETE",
@@ -200,6 +202,14 @@
       "BUG-PARTY-004",
       "BUG-PARTY-005",
       "BUG-PARTY-006"
+    ]
+  },
+  "party_match_closure": {
+    "status": "STATIC COMPLETE",
+    "verified_bug_ids": [
+      "BUG-PMATCH-001",
+      "BUG-PMATCH-002",
+      "BUG-PMATCH-003"
     ]
   }
 }
