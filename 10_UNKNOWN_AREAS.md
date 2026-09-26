@@ -676,3 +676,16 @@ Priority:
 7. verify mission update bMissionType bug in live UI: progress packet should be dropped/misdirected when stack byte does not equal mission type.
 8. final-reward crash test with missing index row.
 9. decide STATIC COMPLETE only after caller+persistence+season lifecycle close.
+
+## Battle Pass — closed static scope
+
+Battle Pass caller, persistence, playerindex, P2P/Event Manager and current Project_Game config audits are closed.
+
+**Status: STATIC COMPLETE.**
+
+Only runtime/fault-injection items BP-T01..BP-T14 remain. Do not re-open static Battle Pass scanning unless:
+- runtime behavior contradicts the map;
+- source commit changes;
+- a new Battle Pass feature/season implementation is added.
+
+Next static target: **Achievement System**.
