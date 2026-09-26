@@ -117,3 +117,72 @@ with no week/timestamp filter.
 Old rows can therefore be interpreted as winners of the new week and feed `GetBFRankingPosition` / winner-affect assignment.
 
 This defect is independent of the separate Ranking module bugs; it originates in Battle Field's weekly rollover writer.
+
+
+### BUG-BFIELD-006 — battle_set_event silently writes event date to the wrong core
+- Statik durum: **doğrulandı**
+- Sınıf: multi-core state / operator command routing
+
+`battle_set_event` is registered as an implementor command and validates only month/day.
+
+Unlike `battle_force_open` and `battle_force_close`, it does **not** require:
+`g_bChannel == BATTLE_FIELD_MAP_CHANNEL`.
+
+It only executes:
+`CBattleField::Instance().SetEventInfo(month - 1, day)`.
+
+The event month/day fields are process-local members of the Battle Field singleton; no P2P/state replication is performed by this command.
+
+The server heartbeat calls `CBattleField::Update()` only when:
+`g_bChannel == CHANNEL_99`.
+
+Therefore issuing `battle_set_event` from an implementor character connected to any other channel reports no error but stores the event date in a process that never evaluates the Battle Field schedule. Channel 99 retains its old/default event date, so the intended event-mode opening and score multiplier do not activate there.
+
+This is a deterministic multi-core administration/state-routing defect.
+
+### BUG-BFIELD-007 — weekly winner affect flags are not refreshed for online players
+- Statik durum: **doğrulandı**
+- Sınıf: ranking state lifecycle / stale online state
+
+Battle Field weekly winner status is applied by:
+`CBattleField::SetWeakRankingPosition(pChar)`.
+
+It:
+- looks up the player in `CRankingSystem::vecBattleFieldWeekRankingWinners`;
+- directly sets one of `AFF_BATTLE_RANKER_1..3` through `m_afAffectFlag.Set()`.
+
+This is not a normal `CAffect` object and is not represented in the affect list.
+
+The winner list is refreshed by `LoadRankingWeekWinners`, but neither that function nor the weekly rollover iterates currently online characters to:
+- remove old Battle Field rank flags;
+- assign new rank flags.
+
+`SetWeakRankingPosition` is mapped on the Battle Field `Connect`/login path, not as a post-rollover refresh.
+
+Consequences at rollover:
+- a previously ranked player who remains online can retain the old winner flag after losing its ranking;
+- a new winner who remains online does not receive the new winner flag until a later reconnect/path that calls `SetWeakRankingPosition`.
+
+The raw flag can also survive ordinary affect-list recomputation because it was not installed as a `CAffect`.
+
+### BUG-BFIELD-008 — open/close countdown arithmetic uses current seconds with the wrong sign
+- Statik durum: **doğrulandı**
+- Sınıf: schedule calculation / UI timing
+
+For a same-day target time, both `GetOpenTime` and `GetCloseTime` calculate:
+`hour_delta + minute_delta + pTimeInfo->tm_sec`.
+
+The mathematically correct remaining time to an HH:MM:00 target is:
+`hour_delta + minute_delta - current_seconds`.
+
+Therefore same-day values are overstated by:
+`2 * current_seconds`
+(0..118 seconds).
+
+The next-day branch similarly builds a day/minute offset and then **adds** current seconds. Relative to the true remaining time, its error is:
+`2 * current_seconds - 60`
+(-60..58 seconds).
+
+These functions feed Battle Field timing commands/UI and are also compared by the open/close scheduler. The defect is deterministic for any call made with nonzero seconds.
+
+A separate algorithm limitation remains unnumbered: the fallback searches only the immediate next day, so sparse schedules with a gap longer than one day can return 0. The repository does not contain the live `common.battlefield_open_info` rows, so current-data reachability for that limitation is not established.
