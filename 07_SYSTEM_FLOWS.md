@@ -247,3 +247,49 @@ DB target occupied / equip restore fail
 → restore queue
 → free inventory slot
 → yoksa ground + temporary ownership.
+
+## Inventory — Drop persistence akışı
+
+**Full stack**
+Inventory item
+→ `RemoveFromCharacter`
+→ owner null / RESERVED
+→ `AddToGround`
+→ GROUND + sectree
+→ flush
+→ `SaveSingleItem(owner=null)`
+→ `HEADER_GD_ITEM_DESTROY`
+→ DB row silinir
+→ runtime ground object yaşamaya devam eder.
+
+**Partial stack**
+source `SetCount`
+→ source DB save/flush
+→ new item(count)
+→ sockets copy
+→ `AddToGround`
+→ new ground item DB persistence'tan çıkarılır.
+
+## Inventory — Pickup persistence akışı
+
+Ground VID
+→ distance
+→ ownership
+→ stack merge veya empty slot
+→ `RemoveFromGround`
+→ `AddToCharacter`
+→ player owner/window/cell
+→ delayed save
+→ `HEADER_GD_ITEM_SAVE`
+→ player item row DB'ye geri yazılır.
+
+## Inventory — Destroy
+
+Client DESTROY packet
+→ `CInputMain::ItemDestroy`
+→ `CHARACTER::RemoveItem`
+→ `ITEM_MANAGER::RemoveItem`
+→ `DestroyItem`
+→ `HEADER_GD_ITEM_DESTROY`
+→ cache/SQL delete
+→ item C++ object delete.
