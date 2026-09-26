@@ -1,19 +1,23 @@
 # CURRENT — Canonical Active Checkpoint
 
-**Active subsystem:** Hunting System  
-**Status:** PARTIAL  
-**Checkpoint source before migration:** Project_Map commit `f154bc23dbf9d2aa45c0419fcb89f959f14f0117`  
+**Active subsystem:** Hunting System
+**Status:** PARTIAL
+**Machine state:** `STATE.json`
 **Last updated:** 2026-09-26
 
-## Read set for the next "ilerleyelim"
-Read only:
-1. `CURRENT.md`
-2. `systems/hunting.md`
-3. `bugs/hunting.md` when validating/recording a bug
-4. `tests/hunting.md` only for runtime-test work
-5. exact source snippets needed from the read-only source repos
+## Startup read set
+For a normal "ilerleyelim" turn read only:
+1. `STATE.json`
+2. `CURRENT.md`
+3. `systems/hunting.md`
 
-Do **not** read `archive/`, other subsystem files, or legacy root maps unless the active subsystem specifically depends on them.
+Conditional:
+- `bugs/hunting.md` only when validating/recording a bug.
+- `tests/hunting.md` only for runtime/fault-injection work.
+- source repos: search first, then fetch only exact files/ranges needed.
+
+Do **not** reconstruct state from old chats. GitHub state is canonical.
+Do **not** read `archive/`, completed subsystem files, or legacy root maps unless recovery is required.
 
 ## Current Hunting state
 Mapped:
@@ -24,15 +28,20 @@ Mapped:
 - client UI/send: `root/uihunting.py` + `m2netm2g.SendHuntingAction`
 - persistence: `hunting_system.*` quest flags
 
-Verified bugs currently: `BUG-HUNT-001..004`.
+Verified bugs: `BUG-HUNT-001..004`.
 
-## Next work
-1. Validate Hunting static mission/reward tables and exact dimensions.
+## Exact next work
+1. Validate all Hunting static mission/reward tables and exact dimensions.
 2. Finish client parser + packet-info/sequence audit.
 3. Audit reward item grant failure/ground fallback and claim crash atomicity.
 4. Verify quest-flag save/relogin behavior at reward boundaries.
 5. Close final mission level-90 behavior end-to-end.
-6. When complete: update `systems/hunting.md`, `bugs/hunting.md`, `tests/hunting.md`, `INDEX.md`, then overwrite this file with the next subsystem.
 
-## Write rule
-This file is **overwrite-only**. Never append historical checkpoints here.
+## End-of-turn write rule
+When meaningful progress is made:
+1. update `systems/hunting.md`;
+2. update `bugs/hunting.md` / `tests/hunting.md` only if affected;
+3. overwrite this file with the new short cursor;
+4. update `STATE.json`.
+
+Keep this file short and overwrite-only. Git history is the checkpoint history.
