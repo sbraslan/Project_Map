@@ -876,3 +876,119 @@ Premium DB seller credit'i cached original listed price üzerinden yaptığı i�
 - PrivateShopSearchBuy: shop existence + editing/closed + visibility + same-map + VIEW_RANGE checks mevcut.
 - NPC Sell: active viewed shop must be NPC shop, CanHandleItem/distance/item-lock/seal/anti-sell/gold-cap kontrolleri mevcut.
 - Last-item manual remove: TransferItemAway -> CloseMyShop -> Save() ile full closed shop table DB'ye flush ediliyor.
+
+
+## Shop canonical third-pass update — boot/reload + size-domain audit
+
+### BUG-SHOP-004 reachability refinement
+`TransferItemAway` içindeki `if (pos > m_itemVector.size())` off-by-one statik olarak gerçektir; ancak temiz/resmî client state'inde shop display slotları 0..79 olduğu için `pos == 80` bağımsız normal-flow trigger değildir.
+
+Aktif build'de `m_itemVector.size()==80`, fakat PREMIUM_PRIVATE_SHOP item window/grid 90 hücre kabul ettiği için bu bug özellikle BUG-SHOP-008 ile üretilmiş/corrupt 80..89 slot state'inde reachable olur. Bu nedenle BUG-SHOP-004 **dependent memory-safety hardening bug** olarak tutulur.
+
+### BUG-SHOP-008 — 90-slot server grid vs 80-entry shop vector → crafted display_pos OOB
+- Statik durum: **doğrulandı**
+- Trigger: modified/crafted client
+- Sınıf: server-side bounds / memory safety
+
+Aktif sabitler:
+- `SHOP_GRID_WIDTH=10`
+- `SHOP_GRID_HEIGHT=9`
+- `SHOP_INVENTORY_MAX_NUM=90`
+- `SHOP_HOST_ITEM_MAX=80`
+
+`CShop::SetShopItems` premium MYSHOP_DECO build'inde:
+`m_itemVector.resize(SHOP_HOST_ITEM_MAX)` → 80 entry.
+
+Fakat `CShop::SetShopItem`:
+1. `iPos = pTable->display_pos`
+2. `m_pGrid->IsEmpty(iPos,...)`
+3. `m_pGrid->Put(iPos,...)`
+4. `SHOP_ITEM& item = m_itemVector[iPos]`
+
+şeklinde ilerliyor ve `iPos < m_itemVector.size()` kontrolü yok.
+
+CGrid 10x9 olduğu için display_pos 80..89 grid kontrolünden geçebilir; ardından 80-entry vector OOB erişimi oluşur.
+
+**Reachability:**
+- `CInputMain::AddMyShopItem` source window için allowlist uygular, fakat `p->targetPos` için 0..79 server bound uygulamaz.
+- Packet target `int`, TShopItemTable `display_pos` uint8.
+- `TransferItems` 80..89'u 90-slot PREMIUM_PRIVATE_SHOP window'una taşıyabilir.
+- hemen sonraki `SetShopItem` vector OOB'a gider.
+- Initial MyShop table için de aynı display_pos sınıfı geçerlidir.
+
+Resmî client UI 5x8 = 40 slot/page ve 2 page kullanır; yani normal UI 0..79 üretir. Python/C++ send binding ise arbitrary int target alır ve server limiti enforce etmez.
+
+### BUG-SHOP-009 — ClosePlayerShop Special Inventory preflight/commit mismatch → partial close
+- Statik durum: **doğrulandı**
+- Build: `ENABLE_SPECIAL_INVENTORY`
+- Sınıf: preflight/commit mismatch + non-atomic item recovery
+
+`CInputMain::ClosePlayerShop` tüm non-DragonSoul shop itemlarını önce yalnız dört regular inventory `CGrid` üzerinde simüle eder.
+
+Gerçek transfer loop'unda ise:
+`ch->GetEmptyInventory(item)`
+kullanılır; Special Inventory itemları Skillbook/Stone/Material domainlerine yönlenebilir.
+
+Sonuçlar:
+- regular inventory'de yer var ama ilgili special inventory dolu/locked → preflight true, gerçek transfer daha sonra fail.
+- regular inventory dolu ama special inventory boş → false-negative close rejection.
+
+Daha kritik ilk durumda transferler sırayla `TransferItemAway` ile uygulanır ve her item save edilir / DB remove packetleri gönderilir. Sonraki item fail olursa önce taşınan itemlar rollback edilmez; shop kısmen kapanmış/boşalmış state'te kalabilir.
+
+### BUG-SHOP-010 — Shop cache persistence DELETE + INSERT non-transactional crash window
+- Statik durum: **doğrulandı**
+- Sınıf: DB persistence atomicity / crash recovery
+
+`CShopCache::OnFlush` shop item metadata için ayrı AsyncQuery'ler çalıştırır:
+1. `DELETE FROM private_shop_items WHERE pid=...`
+2. ayrı `INSERT INTO private_shop_items (...)`
+
+SQL transaction yoktur.
+
+DB process/core crash veya connection failure DELETE uygulandıktan sonra INSERT uygulanmadan gerçekleşirse:
+- actual item rows `item.window=PREMIUM_PRIVATE_SHOP` olarak kalabilir,
+- fakat fiyat/display metadata `private_shop_items` kaybolabilir.
+
+Boot loader `private_shop_items INNER JOIN item` kullandığı için bu itemlar shop cache reconstruction'a girmeyebilir. Character item load tarafında PREMIUM_PRIVATE_SHOP item row'ları mevcut kalabildiğinden inaccessible/orphan shop-item state oluşabilir.
+
+### OBS-SHOP-003 — MyShopInfoLoad position-index robustness
+DB `SendMyShopInfo` active build'de 80-entry price-info domain kullanır ve display position check'i `item.display_pos > SHOP_HOST_ITEM_MAX` şeklindedir; equality 80 reddedilmez.
+
+GAME `MyShopInfoLoad`:
+`std::array<TMyShopPriceInfo, SHOP_HOST_ITEM_MAX> info;`
+oluşturup bounds check olmadan:
+`info[p->pos] = *p`
+ve daha sonra
+`info[item.pos]`
+okur.
+
+Normal official state 0..79 ile çalışır. BUG-SHOP-008 / DB corruption / stale persisted slot 80+ sonrası OOB read/write mümkündür.
+
+Ayrıca `info` value-initialize edilmediği için metadata'sı eksik bir position okunursa POD alanları uninitialized olabilir. Bu gözlem özellikle BUG-SHOP-010 crash-recovery state'i ile birlikte runtime/ASan test edilmelidir.
+
+### OBS-SHOP-004 — Official client Won withdraw width mismatch
+Client packet `TPacketCGShopWithdraw.chequeAmount` uint32_t olmasına rağmen:
+`CPythonNetworkStream::WithdrawMyShopMoney(uint32_t goldAmount, uint8_t chequeAmount)`
+olarak tanımlı.
+
+Python binding `int chequeAmount` okur, sonra bu uint8_t parametreye daralır ve packet'e uint32 olarak yazılır.
+
+Sonuç: resmî client üzerinden 255 üstü Won/cheque withdraw miktarı modulo-256/truncate davranışı gösterebilir. Server crafted packet'te uint32 kabul eder; bu server integrity exploiti değil, client functional bugıdır.
+
+### Shop boot/expiry/static lifecycle closure
+- DB boot: `private_shop_items` ile `item(window=PREMIUM_PRIVATE_SHOP)` pid+pos üzerinden JOIN edilir.
+- GAME boot: fake CHARACTER oluşturulur, persisted itemlar fake shop window'una bağlanır, sonra `SpawnShop -> CreatePCShop` üzerinden detached shop char'a transfer edilir.
+- Expiry/delete: `ITEM_MANAGER::RemoveItem`, PREMIUM_PRIVATE_SHOP itemında `shop->RemoveItemByID` çağırır; runtime vector + owner shopItems + DB remove/closed save zinciri mevcut.
+- Last item expiry/removal `CloseMyShop -> Save()` ile full closed table flush yapar.
+- Client add/remove bindings target/slot değerlerini server limitine göre sanitize etmez; server validation bu nedenle security boundary olmalıdır.
+
+### Shop static completion note
+Premium Private Shop / NPC Shop ana statik haritası bu turla **static completion** seviyesine alınmıştır.
+
+Canonical high-confidence set:
+- BUG-SHOP-001..003
+- BUG-SHOP-005..010
+- BUG-SHOP-004 dependent hardening/reachability
+- OBS-SHOP-001..004
+
+Bundan sonraki Shop işi öncelikle runtime/ASan/fault-injection test matrisidir.
