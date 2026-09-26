@@ -190,3 +190,33 @@ ile 32-bit vnum'u 8-bit alana daraltıyor.
 
 Fakat mevcut client `RecvSwitchbotPacket/UPDATE_ITEM` bu `vnum` alanını item index set etmek için kullanmıyor; yalnız count/sockets/attrs güncelliyor.
 Bu nedenle şimdilik wire-format kusuru/ölü alan gözlemi olarak tutuluyor.
+
+
+## Extend Inventory packets
+
+### Client -> Game
+`HEADER_CG_EXTEND_INVEN_REQUEST = 140`
+
+`TPacketCGSendExtendInvenRequest`:
+- header
+- `bStepIndex`
+- `bWindow`
+- `bSpecialState`
+
+`HEADER_CG_EXTEND_INVEN_UPGRADE = 141`
+
+`TPacketCGSendExtendInvenUpgrade`:
+- header
+- `bWindow`
+- `bSpecialState`
+
+Client convention:
+- `bWindow == 10` -> normal inventory
+- otherwise -> special inventory
+
+Server dispatch trusts `bSpecialState` and forwards `bWindow` without 0..2 validation. Therefore packet-level malformed special window reaches array-indexed character state. See BUG-ITEM-007.
+
+### Game -> Client
+`HEADER_GC_EXTEND_INVEN_INFO = 177` contains normal stage/max plus `bExtendSpecialStage[3]` and `bExtendSpecialMax[3]`.
+
+`HEADER_GC_EXTEND_INVEN_RESULT = 178` reports key/result state.
