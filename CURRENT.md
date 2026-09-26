@@ -24,6 +24,7 @@ Do **not** reconstruct state from old chats. GitHub state is canonical.
 
 ## First runtime cluster
 **Gate:** DUNGEON-T10 live reproduction.
+**Patch plan:** `fixes/dungeon_info.md` READY; source repos unchanged.
 
 Preflight confirms the full normal path and the current 9-entry dataset. T10 blocks the other normal UI tests because no dungeon rows are created.
 
@@ -33,6 +34,8 @@ After T10 is reproduced and fixed/bypassed:
 3. DUNGEON-T12 — unset/expired cooldown uint32 wrap.
 
 T09/T11/T12 are code-path confirmed but not yet marked runtime PASS.
+
+Minimal fixes for T10/T09/T11/T12A are prepared. T12B cooldown-data semantics is deliberately deferred because current quest flags encode different gameplay timers.
 
 ## Write rule
 After each meaningful runtime result:
