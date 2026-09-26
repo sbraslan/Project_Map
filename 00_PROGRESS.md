@@ -249,3 +249,28 @@ Persistence:
 Her `RemoveFromCharacter()` item pointer'ını delayed-save'e sokar; sonraki `SetItem()` owner/cell/window state'ini değiştirir. Manager save cycle son yerleşimi yazar.
 
 Additional Equipment `SwapItem` shadowing adayı açık kalıyor.
+
+## Checkpoint — Switchbot item lifecycle / event / P2P haritası tamamlandı
+
+### Bu tur doğrulanan zincirler
+- Inventory ↔ SWITCHBOT item move
+- `SetItem(SWITCHBOT)` → Register/Unregister
+- DB persistence: `owner_id=playerID, window=SWITCHBOT, pos=slot`
+- login ItemLoad → AddToCharacter → RegisterItem
+- START/STOP variable packet parser
+- active-slot movement/use protections
+- 0.2s switch event
+- attribute completion / resource consumption
+- inter-core warp transfer
+- EnterGame resume
+
+### Yeni bulgular
+- **BUG-SWITCHBOT-001:** inter-core warp source tarafında `CSwitchbot*` map'ten erase ediliyor fakat delete edilmiyor.
+- **BUG-SWITCHBOT-002:** manager `Initialize()` yalnız raw-pointer map'i `clear()` ediyor; destructor da aynı yolu kullanıyor, owned objects delete edilmiyor.
+- **BUG-SWITCHBOT-003:** normal logout/disconnect'te manager cleanup yok. PID'ye ait Switchbot object/event runtime'da kalabiliyor.
+- **BUG-SWITCHBOT-004:** START server-side slot item varlığını doğrulamıyor. Empty/stale slot active yapılıp 0.2s event sonsuza kadar dönmeye bırakılabiliyor.
+- `TSwitchbotUpdateItem.vnum` server/client'ta `uint8_t`; ancak mevcut client receiver bu alanı kullanmıyor. Şimdilik observation.
+
+### Sıradaki
+- Special Inventory type/range modeli
+- sonra Item subsystem için genel completion checkpoint.
