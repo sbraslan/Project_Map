@@ -726,3 +726,53 @@ request -> signed-int cap precheck -> Safebox debit -> player PointChange credit
 
 ### Internal stack
 SAFEBOX_ITEM_MOVE -> `CSafebox::MoveItem` -> stack capacity normalization -> erroneous sourceCount>=movedCount Remove(source) -> ownerless remainder -> persistence can emit ITEM_DESTROY.
+
+
+## Safebox / Mall — item persistence ve trust boundary
+
+### Checkin
+Client Python TItemPos
+→ SendSafeBoxCheckinPacket
+→ HEADER_CG_SAFEBOX_CHECKIN
+→ CInputMain::SafeboxCheckin
+→ character GetItem(source)
+→ RemoveFromCharacter
+→ CSafebox::Add
+→ item window SAFEBOX + owner account_id
+→ Save + FlushDelayedSave.
+
+Explicit source window allowlist yoktur.
+
+### Checkout
+HEADER_CG_SAFEBOX_CHECKOUT / HEADER_CG_MALL_CHECKOUT
+→ CInputMain::SafeboxCheckout
+→ safebox Get(slot)
+→ destination IsEmptyItemGrid
+→ Remove(safebox slot)
+→ AddToCharacter(destination)
+→ FlushDelayedSave + ITEM_FLUSH.
+
+ENABLE_SAFEBOX_IMPROVING official path INVENTORY,cell=0 gönderdiğinde server GetEmptyInventory/GetEmptyDragonSoulInventory ile güvenli auto destination seçer.
+
+Crafted explicit destination path ise SWITCHBOT / ADDITIONAL_EQUIPMENT_1 gibi IsEmptyItemGrid tarafından tanınan windowlara ulaşabilir.
+
+### Crafted stack-loss flow
+SAFEBOX ITEM_MOVE source -> occupied compatible destination
+→ count clamp
+→ sourceCount >= count şartı
+→ source Remove (partial transferde bile)
+→ owner null / RESERVED
+→ source SetCount(remainder)
+→ delayed save owner-null
+→ ITEM_DESTROY
+→ remainder kaybı.
+
+### Malformed persisted-row flow
+DB item(window=SAFEBOX/MALL, invalid multi-size/overlap position)
+→ LoadSafebox/LoadMall top-left check only
+→ CSafebox::Add
+→ CGrid::Put false ignored
+→ m_pkItems[pos] still set
+→ later Remove
+→ CGrid::Get(pos,1,itemSize)
+→ invalid bottom-height state'te grid OOB write riski.
