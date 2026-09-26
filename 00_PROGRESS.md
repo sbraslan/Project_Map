@@ -705,3 +705,35 @@ Kalan kısa tur:
 3. DB SaveShop/LoadShop cache SQL persistence
 4. client packet/binding tarafında add/remove/withdraw wire doğrulaması
 5. ardından Shop static completion checkpoint.
+
+
+## Checkpoint — Shop / Premium Private Shop static completion
+
+**Tarih:** 2026-09-26
+
+Shop final static pass tamamlandı:
+- server grid/vector/display position domain
+- official client builder/editor slot domain
+- add/remove/build/withdraw wire bindings
+- bulk close/recovery flow
+- DB boot reconstruction
+- item expiry -> RemoveItemByID
+- cache SQL flush
+- player MyShopInfo reload
+
+### Final yeni bulgular
+- BUG-SHOP-008: server 90-slot grid vs 80-entry vector, crafted display_pos 80..89 OOB.
+- BUG-SHOP-009: bulk close Special Inventory preflight/commit mismatch ve partial transfer.
+- BUG-SHOP-010: private_shop_items DELETE+INSERT transaction değil; crash aralığında metadata orphan.
+- OBS-SHOP-003: MyShopInfoLoad price position indexing bounds/initialization.
+- OBS-SHOP-004: client Won withdraw uint8 parameter vs uint32 packet.
+
+### Client reachability sonucu
+Official builder: 5x8 = 40 slot/page, 2 page → 80 slot.
+Normal UI 0..79 üretir.
+Network/Python bindings arbitrary integer target/slot kabul ettiği için 80..89 memory-safety yolu modified client ile reachable.
+
+### Durum
+**Shop / Premium Private Shop: STATIC COMPLETE**
+
+Sonraki adım Project_Map açık alan/checkpoint sırasına göre bir sonraki subsystem'e geçmek; Shop için artık ana iş runtime testleridir.
