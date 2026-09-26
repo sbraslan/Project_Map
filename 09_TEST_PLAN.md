@@ -229,3 +229,54 @@ değerlerini kontrol et.
 
 Amaç:
 `SwapItem` başındaki shadowed `srcCell/destCell` kodunun runtime etkisini belirlemek.
+
+### SWITCHBOT-T01 — Cross-core warp memory leak
+- Switchbot manager oluşturmuş test karakteri.
+- İki game core/channel arasında tekrarlı warp/channel change.
+- Source core RSS/heap/LSan izle.
+- Her transfer sonrası Switchbot state target core'da doğrulanır.
+- Beklenen güvenli davranış: source object destroy edilmeli.
+- Statik beklenti: allocation birikir.
+
+### SWITCHBOT-T02 — Logout manager/event lifecycle
+1. Switchbot slotuna item koy.
+2. Aktif switch başlat.
+3. Logout ol.
+4. Server event/debug instrumentation ile PID'nin manager entry/event varlığını izle.
+5. Çok sayıda farklı test PID ile tekrarla.
+
+Kontrol:
+- map size
+- active event count
+- CPU tick
+- memory.
+
+### SWITCHBOT-T03 — Empty slot START
+Normal UI dışından kontrollü packet:
+- önce PID için Switchbot manager oluştur
+- slotu boşalt
+- START packetini boş slot için gönder
+- server manager table ve event state'ini izle.
+
+Beklenen güvenli davranış:
+START reject.
+
+Mevcut statik beklenti:
+active=true + persistent 0.2s event.
+
+### SWITCHBOT-T04 — Stale item ID
+Test instrumentation ile `table.items[slot]` runtime'da bulunmayan ID'ye ayarla ve active et.
+Eventin otomatik slot disable/cleanup yapıp yapmadığını gözle.
+Statik beklenti: sonsuz continue.
+
+### SWITCHBOT-T05 — Start/stop + movement invariants
+- active slotu ITEM_MOVE ile çıkarma → reject
+- active slotu UseItem ile çıkarma → reject
+- inactive slotu inventory'ye çıkarma → unregister
+- relog → SWITCHBOT DB item restore/RegisterItem
+- same-core warp ve cross-core warp ayrı test.
+
+### SWITCHBOT-T06 — UPDATE_ITEM vnum truncation observation
+VNUM >255 item kullan.
+Packet capture/debug ile server update.vnum truncation'ı doğrula.
+Client item index'in normal ITEM_SET state'i sayesinde doğru kalıp kalmadığını kontrol et.
