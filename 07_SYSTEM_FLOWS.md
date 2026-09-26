@@ -184,3 +184,44 @@ Disconnect:
 → `CloseGuildstorage()`
 → `GetGuild()->SetStorageState(false,0)`
 → guild pointer null ise crash riski.
+
+## Inventory / Item Move — uçtan uca
+
+`uiinventory.py`
+→ `SendItemMovePacket`
+→ `netSendItemMovePacket`
+→ `CPythonNetworkStream::SendItemMovePacket`
+→ `HEADER_CG_ITEM_MOVE(13)`
+→ `CInputMain::ItemMove`
+→ `CHARACTER::MoveItem`
+
+`MoveItem` sonucu dört ana kola ayrılıyor:
+
+**STACK**
+→ source/target `SetCount`
+→ update packet
+→ delayed save
+
+**SPLIT**
+→ source count azalt
+→ new item yarat
+→ sockets copy
+→ `AddToCharacter(dest)`
+→ delayed save
+
+**EQUIP**
+→ `EquipItem`
+→ `EquipTo`
+→ equipment state + attributes/effects
+→ delayed save
+
+**NORMAL MOVE**
+→ `RemoveFromCharacter`
+→ delayed-save pointer queue
+→ `SetItem(dest)`
+→ owner/window/cell destination state
+→ manager save cycle
+→ `HEADER_GD_ITEM_SAVE`
+→ DB cache / item table.
+
+Quickslot mapping INVENTORY↔BELT ve aynı-window taşımalarda ayrıca senkronize ediliyor.
