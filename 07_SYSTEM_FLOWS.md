@@ -111,3 +111,24 @@ Client packet
 → `HEADER_GD_ITEM_SAVE`
 → `HEADER_GD_ITEM_FLUSH`
 → DB state forced toward current inventory ownership.
+
+## Guild Storage — multi-core lock davranışı
+
+Core A:
+`ReqGuildstorageLoad`
+→ local `SetStorageState(true,pid)`
+→ SQL state=1
+
+Core B:
+- kendi `CGuild::m_data.guildstoragestate` alanı P2P ile güncellenmiyor.
+- bu nedenle daha önce false yüklediyse `IsStorageOpen()` false kalabilir.
+
+Sonuç:
+DB'de state yazılması tek başına game core B'nin runtime state'ini senkronize etmiyor.
+
+### Core startup etkisi
+Yeni/non-auth core başlarken:
+`InitializeDonate()`
+→ DB'deki **tüm** guild storage state'lerini 0 yapıyor.
+
+Bu reset crash sonrası stale lock temizlemeye yarıyor gibi görünse de başka core'da halen açık storage varsa DB lock'ını da silebilir.
