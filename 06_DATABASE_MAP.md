@@ -345,3 +345,31 @@ If first side succeeds and second side fails, no compensating DB/runtime rollbac
 If one item succeeds and a later item fails inside the same `Done()`, already flushed item ownership is not restored.
 
 This persistence shape is central to BUG-EXCHANGE-001/002/004.
+
+
+## Exchange / Trade persistence ordering
+
+Exchange item transferi DB açısından transactional değildir.
+
+CExchange::Done() her item için:
+1. item->RemoveFromCharacter()
+2. item->AddToCharacter(victim, ...)
+3. ITEM_MANAGER::FlushDelayedSave(item)
+
+RemoveFromCharacter ve AddToCharacter itemı delayed-save setine koyar. Ardından FlushDelayedSave itemı setten çıkarıp doğrudan SaveSingleItem çağırır.
+
+SaveSingleItem owner mevcutsa TPlayerItem oluşturur ve HEADER_GD_ITEM_SAVE ile yeni owner/window/pos bilgisini DB cache bağlantısına gönderir.
+
+Bu flush final exchange'in tamamının başarı durumunu beklemez.
+
+### Atomicity sonucu
+BUG-EXCHANGE-001 veya BUG-EXCHANGE-002 nedeniyle Done() ortada fail ederse, daha önce taşınmış itemların owner/position save packetleri çoktan gönderilmiş olabilir. Cancel() yalnız exchange state/flags temizler; item ownership rollback yapmaz.
+
+Dolayısıyla partial-transfer riski persistence katmanında da mevcuttur.
+
+### Currency ordering
+Gold/Cheque değişiklikleri PointChange ile memory state'i değiştirir. CExchange::Accept başarılı Done() sonrasında currency kullanan karakterler için Save() çağırır.
+
+CHARACTER::Save() -> CHARACTER_MANAGER::DelayedSave. Bu, per-item FlushDelayedSave ile aynı DB transaction değildir.
+
+Özet: item saves per-item immediate flush; player currency saves delayed character save; cross-character atomic transaction yok.
