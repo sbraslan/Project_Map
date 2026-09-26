@@ -973,3 +973,45 @@ all missions complete
 -> `BattlePassReward`.
 
 Persistence still needs complete create/load/save/caller mapping.
+
+## Battle Pass — completed caller and persistence flow
+
+Mission caller map:
+- KILL_MONSTER -> `char_battle.cpp` kill path
+- KILL_PLAYER -> `char_battle.cpp` PC death path
+- DAMAGE_MONSTER / DAMAGE_PLAYER -> `char_battle.cpp` damage path
+- EXP_COLLECT -> `char_battle.cpp` EXP distribution
+- YANG_COLLECT -> `char_battle.cpp` auto-gold + `char_item.cpp` pickup
+- BP_ITEM_USE / REFINE / DESTROY / COLLECT -> `char_item.cpp`
+- BP_ITEM_SELL -> `shop_manager.cpp`
+- BP_ITEM_CRAFT -> `cube.cpp`
+- FISH_FISHING / CATCH / GRILL -> `fishing.cpp`
+- GUILD_PLAY_GUILDWAR -> `guild_war.cpp`
+- GUILD_SPENT_EXP -> `input_main.cpp`
+- GAYA_CRAFT_GAYA / GAYA_BUY_ITEM_GAYA_COST -> `char.cpp`
+- PET_ENCHANT -> `GrowthPetSystem.cpp`
+- COMPLETE_DUNGEON -> `questlua.cpp`
+- COMPLETE_MINIGAME -> `minigame_catchking.cpp`.
+
+Manual override:
+`GM_IMPLEMENTOR battlepass_set_mission`
+-> `cmd_gm.cpp`
+-> `SetExtBattlePassMissionProgress`.
+
+Mission DB:
+login SELECT
+-> DB result
+-> DG load packet
+-> GAME list
+-> runtime mutation/reward
+-> logout-only GD save
+-> DB REPLACE.
+
+Final reward:
+CG action 10/11/12
+-> `BattlePassRequestReward`
+-> check in-memory mission completion
+-> playerindex SELECT
+-> playerindex UPDATE completed=1
+-> `BattlePassReward`
+-> AutoGiveItem.
