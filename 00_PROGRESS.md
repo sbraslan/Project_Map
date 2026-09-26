@@ -1080,3 +1080,55 @@ Next:
 3. audit force-finish/admin paths.
 4. audit achievement shop currency/inventory interaction.
 5. audit XML config constraints/reload behavior.
+
+
+## Checkpoint — Achievement System second pass
+
+**Tarih:** 2026-09-26
+
+Achievement System PARTIAL audit continued from the canonical checkpoint.
+
+### Newly closed areas
+- client -> GAME achievement action boundary:
+  - SELECT_TITLE
+  - OPEN_SHOP
+  - OPEN_RANKING
+- title ownership validation path
+- achievement reward execution
+- DB load/cache/ranking path
+- kill/death and character-update core logic
+- current achievements.xml domain sanity
+
+### Config snapshot
+Current `Project_Game/share/locale/europe/achievements.xml` contains:
+- 179 achievements
+- 578 tasks
+- 532 restriction entries
+- 248 reward entries
+- task types used: 1..32
+- no task type outside TYPE_MAX_NUM
+- no restriction type outside RESTRICTIONS_MAX_NUM
+- reward types currently used: TITLE and ACHIEVEMENT_POINTS
+- no duplicate achievement IDs
+- no zero-max task entries
+
+This means BUG-ACH-003 is primarily a config-evolution / stale-DB-state risk rather than a currently malformed XML row.
+
+### New verified trust-boundary bug
+- **BUG-ACH-004:** `HEADER_CG_OPEN_SHOP` opens shop ID 104 directly from a client packet with no NPC identity, proximity, map, quest or interaction validation in `CAchievementSystem::ProcessClientPackets`. The source even contains a commented note saying the shop should be opened from the NPC. A modified client can therefore open the achievement shop remotely.
+
+### Additional observations
+- title selection itself is server-side ownership checked against `GetAchievementTitles()`.
+- ranking data is requested server->DB and returned from the DB-owned cached ranking; the client does not submit ranking contents.
+- achievement rewards are still immediate while achievement map/points/title persistence remains logout/cache based (BUG-ACH-001).
+- current XML count 179 fits the uint8 achievement-count field used by GC_load; this becomes a protocol/config limit if the config ever exceeds 255 entries.
+
+### Status
+Achievement System remains **PARTIAL**.
+
+### Next
+1. finish gameplay `On*` caller reachability audit across the source tree.
+2. map achievement shop currency/debit path for shop 104.
+3. inspect force-finish/admin command callers.
+4. close XML reload/config-evolution behavior.
+5. decide Achievement System STATIC COMPLETE and then move to the next unmapped subsystem.
