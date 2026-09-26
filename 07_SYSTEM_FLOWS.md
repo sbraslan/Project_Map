@@ -387,3 +387,77 @@ Kaynak core'da erase edilen eski object delete edilmediği için leak oluşur.
 
 Itemların character lifecycle sırasında kaldırılması table slotlarını unregister edebilse bile manager object'in kendisini kaldıran lifecycle yok.
 Aktif stale state/event kalırsa item lookup null döndükçe event 0.2s cadence ile devam eder.
+
+## Special Inventory — move lifecycle
+
+Item
+→ `GetSpecialInventoryType()`
+→ skillbook / stone / material veya -1
+→ `GetEmptyInventory(item)`
+→ type-specific special range
+→ `IsEmptySpecialItemGrid`
+→ yalnız size 1
+→ INVENTORY-window special cell.
+
+Manual move:
+source/destination `IsValidItemPosition`
+→ normal item special destination kontrolü
+→ source INVENTORY ise item type == destination special type
+→ grid validation
+→ Remove/Set
+→ normal item save pipeline.
+
+Persisted malformed row:
+DB INVENTORY + special cell
+→ ItemLoad
+→ AddToCharacter
+→ SetItem global inventory bound
+→ item-type/subrange eşleşmesi burada yeniden doğrulanmaz.
+Bu durum crash yolundan çok yanlış-tab/data-integrity senaryosudur.
+
+## Switchbot — end-to-end lifecycle
+
+Inventory UI
+→ `SendItemMovePacket(INVENTORY,src,SWITCHBOT,slot,...)`
+→ server MoveItem
+→ type + empty-slot validation
+→ source remove
+→ `SetItem(SWITCHBOT,item)`
+→ manager RegisterItem
+→ item save `window=SWITCHBOT`.
+
+Configure UI
+→ alternatives local CPythonSwitchbot table
+→ Start packet
+→ server manager active=true
+→ switch event.
+
+Event tick
+→ item ID lookup
+→ owner lookup
+→ configured target check
+→ tamamlandıysa finished=true / active=false
+→ değilse switcher/yang kontrolü
+→ consume
+→ ChangeAttribute
+→ dedicated UPDATE_ITEM packet.
+
+Move-out:
+active ise server reddeder.
+inactive ise:
+SWITCHBOT remove
+→ manager UnregisterItem
+→ slot config/active/finished temizlenir
+→ inventory destination
+→ item save INVENTORY state.
+
+Cross-core warp:
+source manager
+→ Pause
+→ complete table P2P
+→ target manager SetTable
+→ EnterGame
+→ active slots için event restart.
+
+Known defect:
+source `P2PSendSwitchbot` manager pointer'ını map'ten erase ettikten sonra free etmiyor.
