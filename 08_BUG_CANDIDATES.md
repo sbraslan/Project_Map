@@ -746,3 +746,133 @@ Effect: game-side personal_shop tax calculation does not reduce premium seller s
 
 ### OBS-SHOP-001 — item/currency/shop-cache persistence is non-atomic
 Premium sale ordering spans three save domains: item FlushDelayedSave, DB shop sale/cache mutation, buyer character delayed Save. A process/connection failure between stages can produce divergent persisted state. Runtime fault-injection is required before classifying a concrete crash-recovery outcome.
+
+
+## Canonical Shop bug index — 2026-09-26 second pass
+
+> Bu bölüm Shop/Private Shop için canonical numaralandırmadır ve yukarıdaki provisional/çakışan BUG-SHOP numaralarını supersede eder.
+
+### BUG-SHOP-001 — Premium sale cross-process atomicity gap
+- Statik durum: **doğrulandı**
+- Build: `ENABLE_PREMIUM_PRIVATE_SHOP`
+- Sınıf: GAME item/currency commit -> DB stash commit arasında transaction/ack eksikliği
+
+Premium `CShop::Buy` buyer debit + item ownership transfer + `FlushDelayedSave` yaptıktan sonra DB'ye yalnız `pid + display_pos` sale bildirimi yollar.
+DB `ShopSaleResult` seller stash credit + shop table removal yapar.
+GAME tarafı synchronous acknowledgement/rollback beklemez.
+
+DB packet kaybı/crash/peer failure aralığında buyer debit ve item transferi persist olurken seller stash credit'i eksik kalabilir.
+
+### BUG-SHOP-002 — Empty Private Shop Search result vector[0] UB
+- Statik durum: **doğrulandı**
+- Build: `ENABLE_PRIVATESHOP_SEARCH_SYSTEM`
+
+Search sonucu boşken `&vecPrivateShopSearchItem[0]` ifadesi oluşturuluyor.
+Packet size 0 olsa bile empty vector üzerinde `operator[](0)` undefined behavior'dır.
+ASan/runtime empty-result testi gerekir.
+
+### BUG-SHOP-003 — Premium personal_shop tax accounting mismatch
+- Statik durum: **doğrulandı**
+- Build: `ENABLE_PREMIUM_PRIVATE_SHOP`
+
+GAME `CShop::Buy` buyer'dan full listed price düşer, ardından `personal_shop` tax hesaplayıp local `dwPrice` değerini net'e indirir.
+Premium seller credit bu local net değeri kullanmaz.
+DB sale packet yalnız `pid + display_pos` taşır; DB cached `sold.price` üzerinden **full listed price** seller stash'e ekler.
+
+Sonuç: premium private shop satışında GAME'de hesaplanan personal_shop tax seller proceeds'ten düşülmez.
+
+### BUG-SHOP-004 — TransferItemAway off-by-one -> vector OOB
+- Statik durum: **doğrulandı**
+- Trigger: crafted owner remove-item packet
+- Sınıf: bounds / memory safety
+
+`CShop::TransferItemAway(ch, pos, ...)` kontrolü:
+`if (pos > m_itemVector.size()) return false;`
+
+Doğru sınır `pos >= size` olmalı.
+`pos == m_itemVector.size()` geçer ve hemen ardından:
+`SHOP_ITEM& r_item = m_itemVector[pos];`
+ile out-of-bounds erişim oluşur.
+
+`TPacketMyShopRemoveItem.slot` int'tir ve caller bunu `uint8_t` olarak geçirir; aktif shop vector size 90 iken slot=90 erişilebilir crafted input'tur.
+
+### BUG-SHOP-005 — Initial MyShop bCount > host max -> transfer-before-validation orphan state
+- Statik durum: **doğrulandı**
+- Build: `ENABLE_PREMIUM_PRIVATE_SHOP + ENABLE_MYSHOP_DECO`
+- Aktif limitler: shop grid = 10x9 = 90 hücre; `SHOP_HOST_ITEM_MAX = 80`
+
+`TPacketCGMyShop.bCount` uint8_t ve `CInputMain::MyShop` / `CHARACTER::OpenMyShop` tarafında `bCount <= SHOP_HOST_ITEM_MAX` explicit guard yok.
+
+`CShopManager::CreatePCShop` sırası:
+1. `TransferItems(owner,pTable,bItemCount)`
+2. `SetShopItems(pTable,bItemCount)`
+
+`SetShopItems` ancak **transferden sonra** `bItemCount > SHOP_HOST_ITEM_MAX` deyip return eder.
+
+Crafted `bCount=81` ile source itemlar PREMIUM_PRIVATE_SHOP window'una taşınıp item save'i flush edilebilir; ardından shop listing vector/table kurulmaz.
+Bu, runtime item ile persisted shop metadata arasında orphan/inaccessible item state oluşturabilir.
+
+### BUG-SHOP-006 — Duplicate display_pos during initial shop creation can overwrite/orphan runtime item
+- Statik durum: **doğrulandı**
+- Trigger: crafted initial MyShop item table
+
+`CHARACTER::OpenMyShop` duplicate **source TItemPos** kontrol eder fakat duplicate `display_pos` kontrol etmez.
+
+Initial `TransferItems` sırasında `m_pGrid->IsEmpty(display_pos,...)` çağrılır fakat bu fonksiyon içinde grid'e `Put` yapılmaz.
+Aynı display_pos'a iki source item bu aşamadan geçebilir.
+
+İkinci item `AddToCharacter(PREMIUM_PRIVATE_SHOP, same_cell)` yaptığında `CHARACTER::SetItem` mevcut `pShopItems[cell]` pointer'ını reddetmeden yeni pointer ile overwrite eder.
+İlk item owner/window/cell state'ini koruyup runtime lookup'tan kopabilir.
+
+Ardından `SetShopItems` ilk listing sırasında aynı hücrede son overwrite edilen itemı okuyabilir ve ikinci listing grid collision nedeniyle reddedilebilir.
+Sonuç: item ownership/listing/shopItems metadata tutarsızlığı ve orphan riski.
+
+### BUG-SHOP-007 — Withdraw stash TOCTOU -> DB stash debit without player credit
+- Statik durum: **doğrulandı**
+- Build: premium private shop
+- Sınıf: async request/response + unchecked void currency mutation
+
+`CInputMain::WithdrawShopStash` request anında:
+- requested <= local shop stash
+- player gold + requested < GOLD_MAX
+- cheque + requested < CHEQUE_MAX
+kontrollerini yapar.
+
+DB `WithdrawShopGold` stash'i **önce azaltır** ve success result yollar.
+
+GAME `CInputDB::WithdrawGoldResult` success geldiğinde cap'i tekrar doğrulamaz:
+1. local shop stash azaltılır
+2. `PointChange(POINT_GOLD,+amount)`
+3. cheque için aynı
+
+Request ile response arasında player gold/cheque başka bir yoldan yükselirse `PointChange` overflow'da void early-return eder.
+DB stash debit zaten uygulanmış olduğundan ve bu branch rollback yollamadığından gelir kalıcı kaybolabilir.
+
+### OBS-SHOP-001 — stash clamp tek başına normal-flow exploit değil
+DB `AlterGoldStash/AlterChequeStash` add sonrası clamp uygular.
+Ancak normal open/add akışları `current stash + tüm listed values < cap` invariantını korur.
+Dolayısıyla önceki “her satışta cap clipping doğrudan reachable” provisional sınıflandırması **downgrade** edilmiştir.
+
+Clipping hâlâ:
+- state desync,
+- crafted count/display corruption,
+- arithmetic/config edge,
+- crash/recovery divergence
+sonrası ikincil etki olabilir.
+
+### OBS-SHOP-002 — cross-empire 3x uint32 overflow, default configte dormant
+Normal shop buy path'inde başka imparatorluk için `uint32_t dwPrice *= 3` overflow guard olmadan uygulanır.
+
+Server default:
+`g_bEmpireShopPriceTripleDisable = true`
+yani 3x fiyat varsayılan olarak kapalıdır.
+
+Runtime config ile `SHOP_PRICE_3X_TAX` açılırsa yüksek listed price ×3 32-bit wrap yapabilir.
+Premium DB seller credit'i cached original listed price üzerinden yaptığı için bu config kombinasyonu ayrıca ekonomik test gerektirir.
+
+### Shop static second-pass güvenli kapatılanlar
+- Initial source window: OpenMyShop yalnız INVENTORY / DRAGON_SOUL_INVENTORY kabul ediyor.
+- AddMyShopItem source window: explicit INVENTORY / DRAGON_SOUL_INVENTORY allowlist var.
+- PrivateShopSearchBuy: shop existence + editing/closed + visibility + same-map + VIEW_RANGE checks mevcut.
+- NPC Sell: active viewed shop must be NPC shop, CanHandleItem/distance/item-lock/seal/anti-sell/gold-cap kontrolleri mevcut.
+- Last-item manual remove: TransferItemAway -> CloseMyShop -> Save() ile full closed shop table DB'ye flush ediliyor.
