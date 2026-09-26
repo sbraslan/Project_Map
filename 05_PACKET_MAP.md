@@ -94,3 +94,17 @@ Inventory destination/source state değişimleri `CHARACTER::SetItem` üzerinden
 ile client'e yansıtılıyor.
 
 Stack count değişimleri `CItem::SetCount` → `UpdatePacket()` üzerinden güncelleniyor.
+
+## Login item load packet
+
+DB → Game:
+`HEADER_DG_ITEM_LOAD = 42`
+
+Payload:
+- önce `uint32_t itemCount`
+- ardından `TPlayerItem[itemCount]`
+
+DB `RESULT_ITEM_LOAD` bu paketi üretir.
+Game input dispatch:
+`HEADER_DG_ITEM_LOAD`
+→ `CInputDB::ItemLoad`.
