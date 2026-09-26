@@ -192,3 +192,66 @@ kullanıyor.
 
 `ENABLE_PULSE_MANAGER` aktif build'de offline member remove işlemi null dereference riski taşıyor.
 Guild Storage dışı genel guild bug'ı olarak ayrıca kaydedildi.
+
+### BUG-ITEM-001 — Destroy sonrası use-after-free
+- Statik durum: **çok yüksek güven / doğrudan kod yolu doğrulandı**
+- Build: `ENABLE_DESTROY_SYSTEM`
+
+`CHARACTER::RemoveItem`:
+1. item pointer alınır.
+2. `ITEM_MANAGER::RemoveItem(item, "DESTROY")` veya doğrudan `DestroyItem(item)`.
+3. `RemoveItem` sonunda `M2_DESTROY_ITEM(item)`.
+4. `DestroyItem` sonunda `M2_DELETE(item)`.
+5. Caller daha sonra:
+   `ChatPacket(..., item->GetName())`
+   çağırır.
+
+Sonuç:
+Silinmiş C++ nesnesine erişim. Allocator/build/timing'e göre crash, bozuk item adı veya görünürde sorunsuz davranış oluşabilir.
+
+### BUG-ITEM-002 — Destroy packetindeki count yok sayılıyor
+- Statik durum: **doğrulandı**
+
+Client:
+`SendItemDestroyPacket(Cell, ..., count)`
+
+Packet:
+`TPacketCGItemDestroy.count`
+
+Server:
+`CInputMain::ItemDestroy`
+→ `RemoveItem(Cell, count)`
+
+Ancak `CHARACTER::RemoveItem(..., uint8_t bCount)` içinde `bCount` stack azaltımı için kullanılmıyor.
+Item count yalnız `>0` kontrol ediliyor ve ardından item objesi tamamen destroy ediliyor.
+
+Sonuç:
+UI/API partial destroy count gönderse bile tüm stack silinir.
+
+### BUG-ITEM-003 — AddToGround başarısızlığında DropItem rollback yok
+- Statik durum: **yüksek güven / hata yolu doğrulandı**
+
+Full drop:
+- item önce `RemoveFromCharacter()` ile inventory'den çıkarılıyor.
+
+Partial drop:
+- source count önce azaltılıyor
+- yeni split item yaratılıyor.
+
+Sonra:
+`pkItemToDrop->AddToGround(...)`
+
+Eğer bu false dönerse:
+- source değişimi geri alınmıyor
+- full-drop item envantere geri eklenmiyor
+- partial source count geri artırılmıyor
+- yaratılan detached item cleanup/rollback yapılmıyor
+- fonksiyon sonunda yine `true` dönüyor.
+
+Trigger düşük frekanslı olabilir; `AddToGround` başarısızlığı map index 0, zaten sectree'de olma, owner pointer kalması veya geçersiz sectree/koordinat ile oluşabilir.
+
+### OBS-ITEM-001 — Destroy sender SendSequence çağırmıyor
+`SendItemDestroyPacket`, packet `Send` başarılı olduktan sonra diğer item action sender'larının aksine `SendSequence()` çağırmadan true dönüyor.
+
+Şimdilik yalnız gözlem:
+Network transport'ın mevcut davranışında bunun gerçek paket kaybı/flush problemi oluşturup oluşturmadığı runtime/transport incelemesi gerektiriyor.
