@@ -58,3 +58,13 @@ Game:
 `CInputDB::GuildstorageLoad`
 → `CHARACTER::LoadGuildstorage`
 → client `HEADER_GC_GUILDSTORAGE_OPEN`.
+
+## Item persistence packetleri — Guild Storage ile ilişkili
+
+- `HEADER_GD_ITEM_SAVE = 30`
+- `HEADER_GD_ITEM_DESTROY = 31`
+- `HEADER_GD_ITEM_FLUSH = 35`
+
+Guild Storage checkin sırasında `HEADER_GD_ITEM_SAVE` kullanılır.
+
+Checkout sırasında inventory durumuna `HEADER_GD_ITEM_SAVE` gönderildikten sonra item ID ile `HEADER_GD_ITEM_FLUSH` gönderilerek DB tarafındaki cache varsa zorla flush edilir.
