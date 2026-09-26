@@ -6,36 +6,37 @@
   "mode": "static_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "ticket",
-    "display_name": "Ticket System",
+    "subsystem": "dungeon_info",
+    "display_name": "Dungeon Info",
     "status": "PARTIAL — ACTIVE",
-    "system_file": "systems/ticket.md",
-    "bug_file": "bugs/ticket.md",
-    "test_file": "tests/ticket.md",
+    "system_file": "systems/dungeon_info.md",
+    "bug_file": "bugs/dungeon_info.md",
+    "test_file": "tests/dungeon_info.md",
     "verified_bug_ids": [
-      "BUG-TICKET-001",
-      "BUG-TICKET-002",
-      "BUG-TICKET-003",
-      "BUG-TICKET-004",
-      "BUG-TICKET-005"
+      "BUG-DUNGEON-001",
+      "BUG-DUNGEON-002",
+      "BUG-DUNGEON-003",
+      "BUG-DUNGEON-004",
+      "BUG-DUNGEON-005",
+      "BUG-DUNGEON-006"
     ],
     "next_actions": [
-      "Validate all CG Ticket subpacket length and fixed-char handling; close TICKET-T06.",
-      "Validate Ticket packet-info size/sequence and client receive framing.",
-      "Audit PAGE/ACTION/admin authorization matrix.",
-      "Audit DB result null/empty handling and ticket/reply lifecycle.",
-      "Decide Ticket STATIC COMPLETE and update runtime tests."
+      "Validate CG/GC packet-info size/sequence and dungeon index boundaries.",
+      "Audit config parser invariants and fixed packet-array capacities.",
+      "Audit ranking DB/result lifecycle and Python binding boundaries.",
+      "Close client clear/reload/state lifecycle.",
+      "Decide Dungeon Info STATIC COMPLETE and update runtime tests."
     ]
   },
   "startup": {
     "required_files": [
       "STATE.json",
       "CURRENT.md",
-      "systems/ticket.md"
+      "systems/dungeon_info.md"
     ],
     "conditional_files": {
-      "bugs": "bugs/ticket.md",
-      "runtime_tests": "tests/ticket.md"
+      "bugs": "bugs/dungeon_info.md",
+      "runtime_tests": "tests/dungeon_info.md"
     },
     "forbidden_by_default": [
       "archive/",
@@ -65,12 +66,14 @@
     }
   },
   "mapped_roots": [
-    "game/src/ticket.cpp",
-    "input_main.cpp::CInputMain::TicketSystem",
-    "game/src/packet.h Ticket packets",
-    "UserInterface/PythonTicket.cpp",
-    "UserInterface/PythonTicket.h",
-    "root/uiticket.py"
+    "game/src/DungeonInfo.cpp",
+    "game/src/DungeonInfo.h",
+    "input_main.cpp::DungeonInfo",
+    "game/src/packet.h Dungeon Info packets",
+    "UserInterface/PythonDungeonInfo.cpp",
+    "UserInterface/PythonDungeonInfo.h",
+    "UserInterface/PythonNetworkStreamPhaseGame.cpp",
+    "root/uidungeoninfo.py"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
