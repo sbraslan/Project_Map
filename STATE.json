@@ -13,15 +13,16 @@
     "bug_file": "bugs/party_match.md",
     "test_file": "tests/party_match.md",
     "verified_bug_ids": [
-      "BUG-PMATCH-001"
+      "BUG-PMATCH-001",
+      "BUG-PMATCH-002"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
       "Close duplicate SEARCH/PARTY_MATCH_HOLD client-state desynchronization and reachability.",
-      "Audit map/core changes while queued.",
-      "Audit success notification versus WarpSet failure behavior.",
-      "Audit inventory/item-removal restrictions.",
-      "Audit UI/minimap state for all Party Match result codes."
+      "Audit safebox/refine/shop/change-look item-state conflicts with Party Match consumption.",
+      "Audit success notification versus WarpSet failure/return ordering.",
+      "Audit client UI/minimap state for all Party Match result codes.",
+      "Continue Party Match closure."
     ]
   },
   "startup": {
@@ -133,7 +134,12 @@
     "game/src/input_p2p.cpp::absence of Party Match handler",
     "game/src/p2p.cpp::absence of Party Match replication",
     "game/src/char.cpp::Disconnect Party Match cleanup",
-    "game/src/char.cpp::WarpSet"
+    "game/src/char.cpp::WarpSet",
+    "game/src/char_item.cpp::CountSpecifyItem/RemoveSpecifyItem",
+    "game/src/item.cpp::CItem::SetCount",
+    "game/src/item_manager.cpp::ITEM_MANAGER::DestroyItem",
+    "game/src/exchange.cpp::CExchange::AddItem/Cancel",
+    "game/src/char.cpp::CHARACTER::Destroy exchange cancellation"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
