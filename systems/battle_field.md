@@ -100,3 +100,28 @@ Temporary Battle Field points are explicitly initialized to zero in character in
 3. Trace Battle Field connect/disconnect/party removal into existing Party invariants.
 4. Audit score cash-out/ranking update atomicity and disconnect-loss behavior.
 5. Audit daily shop-point reset state.
+
+
+## Ranking integration / rollover audit
+
+### BUG-BFIELD-004 — unresolved LoadRanking call
+The Battle Field source calls unqualified `LoadRanking(RK_CATEGORY_BF)` in:
+- `CloseEnter`;
+- scheduled weekly update inside `Update`.
+
+The current server build defines both feature macros, but the only mapped API is `CRankingSystem::LoadRanking`. No CBattleField/global wrapper is declared in the mapped include chain.
+
+### BUG-BFIELD-005 — stale weekly winner slots
+`UpdateWeekRanking` overwrites only winner positions that exist in the new top-3 result and does not clear unused `battle_week` rows.
+
+`LoadRankingWeekWinners` has no current-week filter, so stale rows survive into the winner cache whenever a rollover has fewer than three qualifying players.
+
+## Cross-system Party reachability
+Battle Field `Connect` removes an entering character from its party via:
+`party->Quit(playerID)`.
+
+The Party registry already records this as normal reachability for:
+- `BUG-PARTY-001` leader self-delete/use-after-free;
+- `BUG-PARTY-005` stale party role bonuses.
+
+No duplicate Battle Field bug ID is assigned for those underlying Party defects.
