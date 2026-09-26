@@ -1,6 +1,6 @@
 # Battle Field System
 
-**Status:** PARTIAL — ACTIVE
+**Status:** STATIC COMPLETE
 **Phase:** Detection / Mapping Only
 **Date:** 2026-09-27
 
@@ -232,3 +232,55 @@ This creates a clear forfeit/bypass semantic, but the source does not establish 
 3. Verify Battle Field death-limit use/reset consumer.
 4. Close remaining client command/state surfaces.
 5. Decide Battle Field STATIC COMPLETE.
+
+
+## Reconnect/session-state audit
+
+### BUG-BFIELD-011 — reconnect clears anti-abuse memory
+Disconnect persists current player map/position through the normal save path.
+
+The kill-cooldown map and accumulated death-limit counter are not serialized and are reset in character initialization.
+
+When the field is still open, `Connect` accepts the restored Battle Field location; the player therefore rejoins with both anti-abuse controls reset.
+
+## Death-limit consumer — CLOSED
+`IncreaseBattleDeadLimit` increments by 5 up to 30 after Battle Field death.
+
+`do_restart` uses `GetBattleDeadLimit()` when on the Battle Field map to progressively increase the wait before normal restart options are accepted.
+
+The counter is not dead code; this confirms the reconnect reset in BUG-BFIELD-011 has gameplay effect.
+
+## Daily shop allowance load/save — CLOSED
+`SetPlayerProto` restores:
+- persistent Battle Point;
+- Battle shop usable-point allowance;
+- Battle shop last-reset timestamp.
+
+`CreatePlayerProto` writes the same fields back to `TPlayerTable`.
+
+No additional load/save mismatch was found.
+
+## Final static closure — 2026-09-27
+Battle Field System is **STATIC COMPLETE** for the mapped server/client lifecycle.
+
+Verified bugs:
+- BUG-BFIELD-001 — out-of-map delayed exit command.
+- BUG-BFIELD-002 — out-of-map immediate dead-exit command.
+- BUG-BFIELD-003 — repeat-kill timestamp not renewed.
+- BUG-BFIELD-004 — unresolved unqualified LoadRanking integration call.
+- BUG-BFIELD-005 — sparse weekly rollover leaves old DB winners.
+- BUG-BFIELD-006 — battle_set_event can silently target a non-scheduler core.
+- BUG-BFIELD-007 — online winner affect flags are stale across rollover.
+- BUG-BFIELD-008 — open/close countdown second arithmetic is wrong.
+- BUG-BFIELD-009 — cap rejection clears temp score while ranking is credited.
+- BUG-BFIELD-010 — event-mode open state is not propagated to expected client event state.
+- BUG-BFIELD-011 — reconnect resets kill/death anti-abuse state.
+
+Closed/unpromoted:
+- Battle shop allowance persistence is consistent.
+- disconnect loss of unbanked temporary score may be intentional forfeit semantics.
+- sparse schedule fallback beyond immediate next day remains config-dependent because live SQL schedule rows are absent.
+- client `GetBattleFieldEventEnable` returns the wrong field, but its current minimap local is unused.
+- cash-out/ranking are separate persistence domains; crash consistency remains future fault-injection territory.
+
+Next canonical subsystem: **World Lottery System**.
