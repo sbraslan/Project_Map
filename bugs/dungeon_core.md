@@ -91,3 +91,9 @@ If a key already exists, `SpawnUnique` can still spawn a new mob, set its dungeo
 Similarly, `SetUnique` with an already-used key and another VID leaves the old mapping unchanged while still applying the unique affect to the new character.
 
 The registry and actual dungeon entities therefore diverge deterministically under duplicate-key use. Later `get/kill/purge/unique_set*` operations address only the first registered character.
+
+
+## Static closure
+Dungeon Core closed on 2026-09-27 with verified `BUG-DUNGEON-001..004`.
+
+Unnumbered defensive candidates were not promoted where normal/current-script reachability was not established.
