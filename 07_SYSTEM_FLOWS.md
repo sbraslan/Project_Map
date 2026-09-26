@@ -674,3 +674,35 @@ inventory cell item
 
 ### Premium listing source
 Initial OpenMyShop and AddMyShopItem both restrict actual listed source items to INVENTORY or DRAGON_SOUL_INVENTORY; Premium add-item packet does not inherit the Exchange unsupported-window problem.
+
+
+## Premium Private Shop — sale flow
+
+buyer Buy packet
+-> CShopManager::Buy
+-> CShop::Buy
+-> funds + destination space validation
+-> buyer debit full listed price
+-> local personal_shop tax computes net dwPrice
+-> shop item transferred to buyer
+-> item FlushDelayedSave to DB item state
+-> SHOP_SUBHEADER_GD_BUY(sellerPid, displayPos)
+-> DB looks up cached sold item
+-> DB credits sold.price / sold.cheque to stash
+-> removes shop item + cache update.
+
+### Stash-cap loss flow
+seller stash close to GOLD_MAX/CHEQUE_MAX
+-> buyer purchases another item
+-> buyer full debit + receives item
+-> DB Alter*Stash adds sale
+-> value clamped to max
+-> excess seller proceeds disappear.
+
+### Premium tax bypass flow
+personal_shop event tax > 0
+-> game buyer debit uses full price
+-> game local dwPrice reduced by tax
+-> net dwPrice is not sent to DB
+-> DB credits cached sold.price full amount
+-> seller stash receives pre-tax listed price.
