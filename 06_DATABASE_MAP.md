@@ -133,3 +133,22 @@ DB:
 `UPDATE safebox SET gold=<dwGold> WHERE account_id=<character account ID>`
 
 Guild Storage nesnesinin gold'u 0 olduğu için bu yol kişisel safebox gold alanına 0 yazabilir.
+
+## Guild disband — GUILDBANK item cleanup eksikliği
+
+DB `CClientManager::GuildDisband` şunları siliyor:
+- `guild`
+- `guild_grade`
+- `guild_member`
+- `guild_comment`
+
+Ancak:
+`DELETE FROM item WHERE owner_id=<guildID> AND window='GUILDBANK'`
+benzeri bir cleanup bulunmadı.
+
+Game tarafı `RequestDisband` sonunda açıkça:
+`//ADD_DELETE_FUNCTION_FOR_GUILD_ITEMS_IN_STORAGE`
+yorumunu taşıyor ancak implementasyon yok.
+
+Sonuç:
+Disband edilen guild ID'sine bağlı GUILDBANK item rows orphan olarak DB'de kalabilir.
