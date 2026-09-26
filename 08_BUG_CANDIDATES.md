@@ -682,3 +682,41 @@ Bu nedenle modified client, normal item-move kurallarınca çıkarılması engel
 
 ### Exchange static completion note
 BUG-EXCHANGE-001..005 ve OBS-EXCHANGE-001/002 ile ana statik risk seti çıkarıldı. Bundan sonraki Exchange işi öncelikle EX-T01..EX-T09 runtime doğrulamasıdır.
+
+
+### BUG-SHOP-001 — Premium shop sale commits before DB stash acknowledgement
+- Statik durum: **cross-process atomicity gap doğrulandı**
+- Etki koşulu: DB/cache bağlantı veya packet işleme başarısızlığı
+
+Premium `CShop::Buy` sırası:
+1. buyer gold/cheque yeterlilik kontrolü
+2. buyer destination hesaplama
+3. buyer currency debit
+4. seller-shop item `RemoveFromCharacter`
+5. buyer `AddToCharacter`
+6. item `FlushDelayedSave`
+7. local shop slot clear/broadcast
+8. GAME -> DB `HEADER_GD_SHOP / SHOP_SUBHEADER_GD_BUY(pid,pos)`
+
+Seller proceeds doğrudan GAME'de verilmez. DB `CClientManager::ShopSaleResult` ilgili DB-side shop itemını bulur, stored price/cheque değerini stash'e ekler, itemı DB shop tablosundan kaldırır ve cache'e yazar.
+
+`CShop::Buy` commit öncesinde `db_clientdesc->GetSocket()` kontrolü yapmıyor ve DB tarafında sale result için synchronous acknowledgement beklemiyor. GAME tarafında debit/item transferini geri alan rollback yolu da yok.
+
+Sonuç: DB sale notification işlenmezse item + buyer debit kalıcılaşabilirken seller stash credit'i gerçekleşmeyebilir. Bu durum normal gameplay exploitinden çok availability/persistence bütünlüğü bugıdır.
+
+### BUG-SHOP-002 — Empty Private Shop Search result uses vector[0]
+- Statik durum: **doğrulandı**
+- Build: `ENABLE_PRIVATESHOP_SEARCH_SYSTEM`
+
+Search response sonunda:
+`ch->GetDesc()->Packet(&vecPrivateShopSearchItem[0], sizeof(TPrivateShopSearchItem) * vecPrivateShopSearchItem.size());`
+
+çağrısı vektör boşken de çalışıyor.
+
+`std::vector::operator[](0)` empty vector için undefined behavior'dır; packet length 0 olsa bile pointer ifadesi güvenli değildir.
+
+Beklenen güvenli şekil:
+- empty ise yalnız header gönder,
+- veya C++11+ `vec.data()` kullan ve transport'ın zero-length semantics'ini açık tut.
+
+Runtime/ASan testi boş search result ile yapılmalı.
