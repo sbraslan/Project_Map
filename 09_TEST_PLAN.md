@@ -280,3 +280,81 @@ Statik beklenti: sonsuz continue.
 VNUM >255 item kullan.
 Packet capture/debug ile server update.vnum truncation'ı doğrula.
 Client item index'in normal ITEM_SET state'i sayesinde doğru kalıp kalmadığını kontrol et.
+
+### ITEM-T08 — Special Inventory type/range
+Kontrollü karakter üzerinde:
+- skillbook
+- metin stone
+- material/resource
+- normal item
+ile move/autogive testleri.
+
+Doğrula:
+- normal item special range'e giremez
+- special item yalnız kendi range'ine gider
+- special item size > 1 varsa special grid reddeder
+- relog sonrası window=INVENTORY ve special cell korunur.
+
+Ek corruption testi:
+DB'de special itemı yanlış special subrange pos'a koy.
+Relog sonrası restore davranışını ve manuel move ile recovery'yi izle.
+
+### SWITCHBOT-T01 — Basic lifecycle
+1. uygun item INVENTORY → SWITCHBOT
+2. alternative configure
+3. Start
+4. attribute değişimi
+5. Stop/finish
+6. SWITCHBOT → INVENTORY
+7. relog.
+
+Kontrol:
+- DB window/pos
+- manager item ID
+- active/finished
+- client refresh
+- item attrs
+- save/load.
+
+### SWITCHBOT-T02 — Active item move lock
+Switchbot active iken itemı:
+- inventory'ye
+- başka switchbot slotuna
+taşımayı dene.
+
+Beklenen:
+server reddeder, item/persistence değişmez.
+
+### SWITCHBOT-T03 — Cross-core warp leak
+Test sunucusunda core/channel port değişimi üreten warp yap.
+
+Her tekrar öncesi/sonrası:
+- process RSS/heap
+- switchbot manager object count
+- active event count
+izlenir.
+
+Beklenen mevcut statik koda göre:
+source core'da erase edilen `CSwitchbot` object free edilmez.
+
+### SWITCHBOT-T04 — P2P state resume ordering
+Active switchbot ile cross-core warp:
+- table target core'a ulaşıyor mu
+- EnterGame öncesi/sonrası arrival sırası
+- active slot event yeniden başlıyor mu
+- duplicate event oluşuyor mu
+kontrol edilir.
+
+### SWITCHBOT-T05 — Invalid/empty START hardening
+Yalnız kontrollü test clientı ile:
+- manager var fakat seçilen slot boş
+- stale item ID
+- slot out-of-range
+START senaryoları gönder.
+
+Beklenen güvenli davranış:
+START reddedilmeli ve periyodik event bırakılmamalı.
+
+### SWITCHBOT-T06 — Client boundary
+Python binding'e slot == SWITCHBOT_SLOT_COUNT ile Start/Stop çağrısı ver.
+Server'ın range check ile işlemi reddettiğini ve state değişmediğini doğrula.
