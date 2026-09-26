@@ -28,6 +28,9 @@ This is the navigation index. Normal continuation starts at `STATE.json`, then `
 | Biolog System | STATIC COMPLETE | `systems/biolog.md` |
 | Hunting System | STATIC COMPLETE | `systems/hunting.md` |
 
+## Current phase
+- Runtime / in-game validation: `RUNTIME.md`
+
 ## Supporting files
 Each subsystem can have:
 - `bugs/<system>.md`
