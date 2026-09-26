@@ -751,3 +751,24 @@ Do not reopen Biolog static scanning unless:
 - build switches to 64-bit or ENABLE_SEQUENCE_SYSTEM is enabled.
 
 Next static target: **Hunting System**.
+
+
+## Hunting System — open static work
+
+Status: **PARTIAL**.
+
+Mapped:
+- login/level-up bootstrap
+- client action protocol
+- kill progress
+- cached reward generation
+- claim state reset
+- quest-flag persistence model.
+
+Still open:
+- exact declarations/dimensions of `THuntingMissions` and `THuntingRewardItem`.
+- reward item create/add/ground failure branches.
+- claim crash ordering vs quest save/item save.
+- packet-info/sequence/client receive boundary review.
+- normal level-90 terminal behavior through UI.
+- random reward uninitialized values for unsupported mission levels.
