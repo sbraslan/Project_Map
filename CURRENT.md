@@ -1,45 +1,48 @@
 # CURRENT — Canonical Active Checkpoint
 
-**Active phase:** Runtime / In-Game Validation
+**Active phase:** Detection / Mapping Only
 **Status:** ACTIVE
 **Machine state:** `STATE.json`
-**Runtime cursor:** `RUNTIME.md`
 **Last updated:** 2026-09-26
 
-## Startup read set
-For a normal "ilerleyelim" turn read only:
-1. `STATE.json`
-2. `CURRENT.md`
-3. `RUNTIME.md`
+## Hard rule
+Only `sbraslan/Project_Map` is writable.
 
-Then read only the selected subsystem bug/test files.
-Do **not** reconstruct state from old chats. GitHub state is canonical.
+The following repositories are strictly read-only:
+- `Project_ClientSrc`
+- `Project_ServerSRC`
+- `Project_Binary`
+- `Project_Game`
+- `Project_DumpProto`
 
-## Static phase checkpoint
+No C++, Python, quest, config, game-data, source, binary or gameplay file may be edited, committed or pushed.
+
+## What we do now
+- inspect code;
+- map architecture and data flow;
+- identify bugs, security/correctness risks and edge cases;
+- record evidence in `systems/`, `bugs/`, `tests/`, `CURRENT.md` and `STATE.json`;
+- use GitHub history as the durable project memory.
+
+Runtime/fault-injection tests may be documented as future tests, but they are **not executed as part of the current phase** unless the user explicitly changes the phase later.
+
+## Static mapping checkpoint
 - Hunting System -> STATIC COMPLETE, BUG-HUNT-001..005.
 - Ticket System -> STATIC COMPLETE, BUG-TICKET-001..007.
 - Dungeon Info -> STATIC COMPLETE, BUG-DUNGEON-001..012.
-- Current `INDEX.md` has no remaining PARTIAL subsystem.
-- Guild lifecycle remains represented as `MAPPED WITH GUILD STORAGE`, not as an open PARTIAL audit.
+- Other subsystem statuses remain in `INDEX.md`.
 
-## First runtime cluster
-**Gate:** DUNGEON-T10 live reproduction.
-**Patch plan:** `fixes/dungeon_info.md` READY; source repos unchanged.
+## Current direction
+Continue read-only source inspection and improve/extend the canonical maps and bug registries.
 
-Preflight confirms the full normal path and the current 9-entry dataset. T10 blocks the other normal UI tests because no dungeon rows are created.
+The previously prepared Dungeon remediation notes are reference-only. They do not authorize source changes.
 
-After T10 is reproduced and fixed/bypassed:
-1. DUNGEON-T09 — ranking SQL failure.
-2. DUNGEON-T11 — numeric GLOBAL flag parse mismatch.
-3. DUNGEON-T12 — unset/expired cooldown uint32 wrap.
+## Startup
+For a normal "ilerleyelim" turn:
+1. read `STATE.json`;
+2. read `CURRENT.md`;
+3. read `WORKFLOW.md`;
+4. inspect only the exact source symbols needed;
+5. write findings only to `Project_Map`.
 
-T09/T11/T12 are code-path confirmed but not yet marked runtime PASS.
-
-Minimal fixes for T10/T09/T11/T12A are prepared. T12B cooldown-data semantics is deliberately deferred because current quest flags encode different gameplay timers.
-
-## Write rule
-After each meaningful runtime result:
-1. update the selected `tests/<system>.md` with PASS/FAIL/repro evidence;
-2. update `bugs/<system>.md` if severity/reachability changes;
-3. update `RUNTIME.md` cursor;
-4. overwrite this file and update `STATE.json`.
+Do not reconstruct state from old chats. GitHub state is canonical.
