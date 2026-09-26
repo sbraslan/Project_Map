@@ -669,3 +669,39 @@ CShopManager::Buy -> CShop::Buy -> buyer balance/space checks -> buyer currency 
 Buyer debit, item ownership save ve offline-shop sale/cache update tek atomic transaction değildir. Item yeni owner'a FlushDelayedSave edilir; shop sale DB packet'i bunun ardından gider; buyer CHARACTER::Save ise fonksiyon sonunda delayed save'dir. Crash/failure ordering ayrıca test edilmelidir.
 
 Sıradaki Shop adımları: listing/open validation, private-shop search buy path, withdraw/rollback, remove/close/edit ve sell-to-NPC akışları.
+
+
+## Checkpoint — Shop / Premium Private Shop second pass
+
+**Tarih:** 2026-09-26
+
+### Bu tur kapatılan alanlar
+- initial MyShop packet -> OpenMyShop -> SpawnShop -> CreatePCShop
+- open-time source window / anti-flag / lock / sealed-item validation
+- `TransferItems` ordering
+- add-item path + stash projection checks
+- owner remove-item -> `TransferItemAway`
+- Private Shop Search buy distance/map/state checks
+- stash withdraw GAME -> DB -> GAME rollback model
+- close/save + last-item behavior
+- NPC Sell basic source/currency path
+
+### Yeni yüksek güvenli bulgular
+- BUG-SHOP-004: `TransferItemAway` pos==vector.size off-by-one OOB.
+- BUG-SHOP-005: initial `bCount > 80` item transferi listing-limit check'ten önce yapılıyor.
+- BUG-SHOP-006: initial duplicate `display_pos` runtime shop slot overwrite/orphan state oluşturabiliyor.
+- BUG-SHOP-007: async stash withdraw TOCTOU -> DB debit sonrası player credit overflow ile kaybolabilir.
+
+### Düzeltme / yeniden sınıflandırma
+Önceki stash-cap clipping provisional bugı normal-flow için downgrade edildi:
+open/add akışları stash + remaining listed value invariantını koruyor.
+Tax mismatch ve cross-process sale atomicity bugları geçerliliğini koruyor.
+
+### Shop subsystem statik durum
+Ana premium/private shop transaction ve lifecycle haritası **completion'a çok yakın**.
+Kalan kısa tur:
+1. shop boot/reload reconstruction ve fake shop char item bind
+2. item expiry / RemoveItemByID lifecycle
+3. DB SaveShop/LoadShop cache SQL persistence
+4. client packet/binding tarafında add/remove/withdraw wire doğrulaması
+5. ardından Shop static completion checkpoint.
