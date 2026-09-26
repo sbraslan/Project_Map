@@ -12,14 +12,16 @@
     "system_file": "systems/party_match.md",
     "bug_file": "bugs/party_match.md",
     "test_file": "tests/party_match.md",
-    "verified_bug_ids": [],
+    "verified_bug_ids": [
+      "BUG-PMATCH-001"
+    ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Establish cross-core impact of process-local SearchMap.",
-      "Audit duplicate SEARCH/HOLD client-server state behavior and reachability.",
-      "Audit item consumption to party creation to warp atomicity.",
-      "Audit raw LPCHARACTER queue lifetime beyond normal logout.",
-      "Audit completion and failure queue cleanup."
+      "Close duplicate SEARCH/PARTY_MATCH_HOLD client-state desynchronization and reachability.",
+      "Audit map/core changes while queued.",
+      "Audit success notification versus WarpSet failure behavior.",
+      "Audit inventory/item-removal restrictions.",
+      "Audit UI/minimap state for all Party Match result codes."
     ]
   },
   "startup": {
@@ -125,7 +127,13 @@
     "UserInterface/PythonNetworkStreamPhaseGame.cpp::PartyMatch/RecvPartyMatch",
     "UserInterface/PythonNetworkStreamPhaseLoading.cpp::LoadPartyMatchInfo",
     "root/uipartymatch.py",
-    "locale/locale/common/partymatch_info.txt"
+    "locale/locale/common/partymatch_info.txt",
+    "Project_Game/chan/ch1/core1..core5/CONFIG",
+    "game/src/packet.h::absence of Party Match GG replication",
+    "game/src/input_p2p.cpp::absence of Party Match handler",
+    "game/src/p2p.cpp::absence of Party Match replication",
+    "game/src/char.cpp::Disconnect Party Match cleanup",
+    "game/src/char.cpp::WarpSet"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
