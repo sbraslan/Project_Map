@@ -1,6 +1,6 @@
 # ticket
 
-**Status:** PARTIAL — ACTIVE
+**Status:** STATIC COMPLETE
 
 > Canonical subsystem history split from legacy `00_PROGRESS.md`. Read this file only when this subsystem is active or explicitly revisited.
 
@@ -105,3 +105,69 @@ Hunting System STATIC COMPLETE sonrasında Ticket System aktif subsystem oldu.
 3. close PAGE/ACTION/admin authorization matrix;
 4. audit DB null/empty result handling and ticket/reply lifecycle;
 5. decide Ticket STATIC COMPLETE and refresh runtime tests.
+
+
+## Static close — Ticket System
+
+**Tarih:** 2026-09-26
+
+### CG framing / fixed-field audit — COMPLETE
+- Server and client Ticket packet structs match.
+- `HEADER_CG_TICKET_SYSTEM = 129`, `HEADER_GC_TICKET_SYSTEM = 148`.
+- `CPacketInfoCG` registers CG Ticket with base `sizeof(TPacketCGTicketSystem)` and sequence=true.
+- All official client Ticket send paths end in `SendSequence()`.
+- Server `CInputMain::TicketSystem` maps every CG subheader to an exact fixed subpacket size and consumes that size.
+- The fixed-size framing itself is consistent.
+- Character-array termination is not validated; this produced BUG-TICKET-006.
+
+### GC/client receive audit — COMPLETE
+- Client registers `HEADER_GC_TICKET_SYSTEM` as a dynamic-size packet with base `sizeof(TPacketGCTicketSystem)`.
+- GC LOGS and LOGS_REPLY structs match server definitions.
+- Normal log count contract does not match across layers: server=40, client cache=10, UI=20 rows/page x 10 pages. This produced BUG-TICKET-007.
+
+### Server-command bridge audit — COMPLETE
+Ticket UI/admin auxiliary data is also transported through `CHAT_TYPE_COMMAND` strings:
+- `ticket elevate ...`
+- `ticket team_logs ...`.
+
+These commands are not in Python `game.py::__ServerCommand_Build`, but this is **not** a bug:
+`PythonNetworkStreamCommand.cpp::ServerCommand` has a dedicated C++ `ENABLE_TICKET_SYSTEM` fallback for `ticket`, forwarding to:
+- `BINARY_Ticket_Sort_Admin`
+- `BINARY_Ticket_Logs_Team`.
+
+### Authorization matrix — COMPLETE
+- Create: non-staff only; account restriction/cooldown checks.
+- Reply: owner check with deliberate staff override.
+- PAGE_REPLY view: missing owner enforcement -> BUG-TICKET-001.
+- Admin actions: server-side staff gate.
+- Admin page change: server-side staff gate.
+- Admin sort: staff gate exists, but invalid sort mode remains BUG-TICKET-004.
+
+### DB/result lifecycle audit — COMPLETE
+- Existing raw SQL interpolation remains BUG-TICKET-002.
+- Ticket-ID collision generation remains BUG-TICKET-003.
+- General/reply query row counts are bounded by their server packet arrays.
+- Admin paging uses map-backed temporary storage, so its cumulative LIMIT bug does not create a direct fixed-array overflow; it remains a pagination/query correctness part of BUG-TICKET-004.
+- `GetIsOpened` has weak empty-result handling, but current normal call sites perform ticket existence checks before it; no additional verified bug ID assigned.
+- `GetAccountBanned` fetches a MYSQL_ROW before testing row count but dereferences it only when row count >0; no verified null-row dereference on that path.
+
+### Client cache audit — COMPLETE
+- `Request(id)` boundary bug remains BUG-TICKET-005.
+- Normal-user 40/10/20x10 pagination mismatch is BUG-TICKET-007.
+- `ticket.IsAdministrator()` contains legacy hard-coded names, but the active UI elevation decision is driven by server `ticket elevate` state rather than that helper; no bug is assigned from the dead/unused helper.
+
+## Static status
+Ticket System: **STATIC COMPLETE**.
+
+Verified bugs:
+- BUG-TICKET-001
+- BUG-TICKET-002
+- BUG-TICKET-003
+- BUG-TICKET-004
+- BUG-TICKET-005
+- BUG-TICKET-006
+- BUG-TICKET-007
+
+Runtime/fault-injection coverage is retained in `../tests/ticket.md`.
+
+Next canonical subsystem: **Dungeon Info**.
