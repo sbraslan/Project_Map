@@ -202,3 +202,25 @@ ground runtime item
 - `AddToCharacter` target-position validation incelemesi
 - Swap / Additional Equipment edge-case'leri
 - Special Inventory / Switchbot hareket sınırları.
+
+## Checkpoint — AddToCharacter validation ve Swap incelendi
+
+### Yeni doğrulama
+`CItem::AddToCharacter(ch, Cell)` target cell'i `pos = Cell.cell` olarak almasına rağmen bounds kontrollerinin tamamında **`pos` yerine mevcut `m_wCell`** değerini kullanıyor.
+
+Fresh item başlangıcı:
+- `m_wCell = 0`
+- `m_bWindow = RESERVED_WINDOW`
+
+Bu nedenle yeni/detached item için geçersiz destination cell çoğunlukla AddToCharacter'ın ön kontrolünden geçebilir.
+
+`CHARACTER::SetItem` sonraki katmanda çoğu window'u kontrol etse de:
+- BELT_INVENTORY: `pBeltItems[wCell]` bounds check'ten önce okunuyor
+- DRAGON_SOUL_INVENTORY: `pDSItems[wCell]` bounds check'ten önce okunuyor
+
+Dolayısıyla bozuk target cell OOB erişime dönebilir.
+
+Normal client `MoveItem` yolu `IsValidItemPosition(DestCell)` ile korunuyor. Risk daha çok DB restore / internal caller / bozuk persistence verisi.
+
+### Swap
+`ENABLE_ADDITIONAL_EQUIPMENT_PAGE` altında `SwapItem` başındaki `srcCell/destCell` yeniden tanımlamaları inner-scope shadowing nedeniyle outer değişkenleri değiştirmiyor. Bu kod kusuru ayrıca gözlem/bug adayı olarak kaydedildi.
