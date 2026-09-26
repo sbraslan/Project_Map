@@ -306,3 +306,34 @@ Bu nedenle BUG-ITEM-004 için en doğrudan crash trigger hâlâ bozuk DB/interna
 
 ### Item subsystem durumu
 Statik ana akış haritası completion'a çok yakın. Yukarıdaki Special Inventory veri/build taraması bittikten sonra Inventory/Item subsystem genel checkpoint'e alınabilir.
+
+
+## Canonical checkpoint — Special Inventory extended audit sonrası
+
+### Statik olarak kapatılan
+- Aktif Special Inventory + Extend Inventory feature kombinasyonu doğrulandı.
+- Static address range ile per-character unlocked max ayrımı haritalandı.
+- Normal MoveItem'in locked special destination'ı dynamic max ile reddettiği doğrulandı.
+- special stage load/save/client-sync zinciri doğrulandı.
+- client -> server extend inventory packet boundary haritalandı.
+- special item type source mapping kapatıldı.
+
+### Yeni doğrulanmış buglar
+- BUG-ITEM-007: unvalidated special `bWindow` -> OOB array/index access.
+- BUG-ITEM-008: persisted DB row -> locked special slot restore invariant bypass.
+
+### Veri nedeniyle açık kalan
+Gerçek `item_proto` dataset'i server repo içinde text olarak yok. Project_Binary'de locale başına compiled `item_proto` blob var.
+Bu nedenle special-type + `size > 1` gerçek veri kontrolü runtime DB veya unpacked proto export gerektiriyor.
+
+### Inventory/Item subsystem statik durum
+Ana static code-flow haritası **completion seviyesine ulaştı**.
+Kalan işler artık ağırlıklı runtime doğrulama:
+- BUG-ITEM-004 malformed target
+- BUG-ITEM-006 storage semantic-window bypass
+- BUG-ITEM-007 invalid extend window
+- BUG-ITEM-008 locked special DB restore
+- Switchbot event/lifecycle profiler testleri
+- dataset size audit.
+
+Sonraki statik haritalama turu yeni subsystem'e geçebilir; Item subsystem'e yalnız test sonuçları veya yeni cross-system caller çıktığında geri dönülmeli.
