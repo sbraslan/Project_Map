@@ -68,3 +68,29 @@ Game:
 Guild Storage checkin sırasında `HEADER_GD_ITEM_SAVE` kullanılır.
 
 Checkout sırasında inventory durumuna `HEADER_GD_ITEM_SAVE` gönderildikten sonra item ID ile `HEADER_GD_ITEM_FLUSH` gönderilerek DB tarafındaki cache varsa zorla flush edilir.
+
+## Inventory / Item Move packet
+
+### Client → Game
+`HEADER_CG_ITEM_MOVE = 13`
+
+Server struct:
+`command_item_move`
+- `uint8_t header`
+- `TItemPos Cell`
+- `TItemPos CellTo`
+- `uint8_t count`
+
+Client struct aynı wire verilerini:
+- `pos`
+- `change_pos`
+- `num`
+alanlarıyla gönderiyor.
+
+### Server → Client item state
+Inventory destination/source state değişimleri `CHARACTER::SetItem` üzerinden:
+- item varsa `HEADER_GC_ITEM_SET`
+- item kaldırıldıysa `HEADER_GC_ITEM_DEL`
+ile client'e yansıtılıyor.
+
+Stack count değişimleri `CItem::SetCount` → `UpdatePacket()` üzerinden güncelleniyor.
