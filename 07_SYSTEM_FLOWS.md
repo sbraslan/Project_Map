@@ -899,3 +899,77 @@ GET_ITEMS(index)
 → DB clears attachment.
 
 No DB ack / transaction ties character gains and mailbox mutation together.
+
+## Recovered flow — Ticket System
+
+`root/uiticket.py`
+-> PythonTicket send binding
+-> `HEADER_CG_TICKET_SYSTEM`
+-> `CInputMain::TicketSystem`
+-> subheaders OPEN / CREATE / REPLY / ADMIN / ADMIN_PAGE
+-> `CTicketSystem`
+-> synchronous SQL in `ticket.list`, `ticket.reply`, `ticket.user_restricted`
+-> `HEADER_GC_TICKET_SYSTEM`
+-> `CPythonTicketLogs/Reply`
+-> UI.
+
+Trust boundaries:
+- ticket ID is client-controlled on open/reply/admin flows.
+- title/content/reply/reason are client-controlled fixed-char strings later interpolated into SQL.
+- PAGE_REPLY open path checks existence but not owner.
+- staff sort mode is client-controlled.
+
+## Recovered flow — Dungeon Info
+
+UI/Python
+-> `CPythonDungeonInfo::Open/Warp/Close`
+-> `SendDungeonInfo(action,index,rankType)`
+-> `HEADER_CG_DUNGEON_INFO=159`
+-> `CInputMain::DungeonInfo`
+-> `CDungeonInfoManager::{SendInfo,Warp,Ranking}`
+-> config `dungeon_info.txt` + quest flags + ranking SQL
+-> `HEADER_GC_DUNGEON_INFO / HEADER_GC_DUNGEON_RANKING`
+-> `CPythonDungeonInfo::AddDungeon/AddRanking`
+-> UI.
+
+Identity hazard:
+- CG index is uint8.
+- server vector is dynamically sized.
+- GC index is uint16 but client AddDungeon narrows to uint8.
+- client storage is exactly `m_vecDungeonInfoDataMap[255]`.
+
+## Recovered flow — Battle Pass
+
+Gameplay event/caller
+-> `UpdateExtBattlePassMissionProgress(type,value,condition,isOverride)`
+-> find active normal/premium/event pass + mission index
+-> mutate/create `TPlayerExtBattlePassMission`
+-> threshold reached
+-> `BattlePassRewardMission`
+-> GC mission-update
+-> `RecvExtBattlePassMissionUpdatePacket`
+-> `game.py::BINARY_ExtBattlePassUpdate`
+-> `uibattlepass.py::UpdateMission`.
+
+Manual setter flow:
+`SetExtBattlePassMissionProgress(passType,missionIndex,missionType,value)`
+-> existing mission `bCompleted=0`
+-> set value
+-> if threshold reached mark complete + reward again.
+
+Season/Event Manager flow:
+`CEventManager::SetBattlePassEvent`
+-> P2P `TPacketGGEventBattlePass`
+-> `BattlePassData(table,type,bState)`
+-> `SetBattlePassID(bState,type)`
+-> start/end arrays
+-> `CheckBattlePassTimes`
+-> active scalar pass IDs/times.
+
+Final reward:
+all missions complete
+-> SELECT `battlepass_playerindex.battlepass_completed`
+-> UPDATE completed=1/end_time
+-> `BattlePassReward`.
+
+Persistence still needs complete create/load/save/caller mapping.
