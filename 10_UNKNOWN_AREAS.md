@@ -689,3 +689,18 @@ Only runtime/fault-injection items BP-T01..BP-T14 remain. Do not re-open static 
 - a new Battle Pass feature/season implementation is added.
 
 Next static target: **Achievement System**.
+
+## Achievement System — open static work
+
+Status: **PARTIAL**.
+
+Open:
+- enumerate all source callers for every `CAchievementSystem::On*` hook.
+- verify task type enum -> caller coverage against all 179 current achievements.
+- inspect CG packet framing/length validation before `ProcessClientPackets`.
+- audit HEADER_CG_OPEN_SHOP (shop 104) authorization, currency and remote-open semantics.
+- inspect ranking refresh cadence/cache ownership.
+- inspect GM force-finish task/achievement commands for repeat rewards.
+- inspect config reload behavior and stale achievement/task migration.
+- inspect point/title reward overflow/duplication and selected-title consistency.
+- client cache/parser boundary audit.
