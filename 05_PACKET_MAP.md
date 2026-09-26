@@ -146,3 +146,47 @@ DB:
 `QUERY_ITEM_DESTROY`
 → item cache delete veya
 → `DELETE FROM item WHERE id=<itemID>`.
+
+## Switchbot packetleri
+
+### Client → Game
+`HEADER_CG_SWITCHBOT = 171`
+
+`TPacketCGSwitchbot`:
+- uint8 header
+- int size
+- uint8 subheader
+- uint8 slot
+
+Subheader:
+- START
+- STOP
+
+START ardından sabit sayıda `TSwitchbotAttributeAlternativeTable` taşır.
+
+### Game → Client
+`HEADER_GC_SWITCHBOT = 180`
+
+Subheaders:
+- UPDATE
+- UPDATE_ITEM
+- SEND_ATTRIBUTE_INFORMATION
+
+### Game ↔ Game / P2P
+`HEADER_GG_SWITCHBOT = 31`
+
+`TPacketGGSwitchbot`:
+- header
+- target port
+- full `TSwitchbotTable`.
+
+### UPDATE_ITEM struct observation
+Server ve client'ta:
+`TSwitchbotUpdateItem.vnum` = `uint8_t`.
+
+Server:
+`update.vnum = item->GetVnum()`
+ile 32-bit vnum'u 8-bit alana daraltıyor.
+
+Fakat mevcut client `RecvSwitchbotPacket/UPDATE_ITEM` bu `vnum` alanını item index set etmek için kullanmıyor; yalnız count/sockets/attrs güncelliyor.
+Bu nedenle şimdilik wire-format kusuru/ölü alan gözlemi olarak tutuluyor.
