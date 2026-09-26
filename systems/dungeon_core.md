@@ -318,3 +318,58 @@ The semantic invariant is weak, but no current source quest nested/re-entry call
 3. Revisit dungeon manager ID wrap/stale-event identity safety.
 4. Close remaining eliminate-event null-ordering candidate.
 5. Decide Dungeon Core STATIC COMPLETE.
+
+
+## Dungeon ID / event identity audit — CLOSED
+`CDungeon::IdType` is `uint32_t`; `CDungeonManager::Create` increments `next_id_` and, after wrap, skips any ID that is still present in the live dungeon map.
+
+Mapped dungeon-owned event lifetimes:
+- `deadEvent`
+- `exit_all_event_`
+- `jump_to_event_`
+- per-REGEN dungeon events.
+
+`CDungeon::~CDungeon` cancels the three object events and `ClearRegen` cancels all regen events. `CDungeonManager::Destroy` also cancels quest server timers keyed by the private map before deleting the object.
+
+`event_cancel` marks queued elements cancelled; if cancellation occurs while an event is processing, it sets `is_force_to_end` and cancels any queued element.
+
+The dead event nulls its own dungeon event pointer before manager destruction. For exit/jump events, the callback's null-check ordering is syntactically wrong because it writes through `pDungeon` before testing it, but the mapped object lifecycle cancels those events before the dungeon can disappear from the manager. No normal stale event -> reused-ID path was established.
+
+Result: manager ID wrap/event identity is closed without a new verified bug. The incorrect null ordering remains defensive code debt only.
+
+## Duplicate unique-key audit
+
+### BUG-DUNGEON-004 — duplicate unique key silently creates/mutates an unregistered entity
+`SpawnUnique`, `SpawnMoveUnique` and `SetUnique` all register with:
+`m_map_UniqueMob.insert(make_pair(key, ch))`
+and do not test the insertion result.
+
+For `SpawnUnique`:
+1. call once with key K -> mob A is spawned and registered;
+2. call again with the same key K -> mob B is spawned;
+3. map insertion fails because K already exists;
+4. code still binds B to the dungeon and applies `AFFECT_DUNGEON_UNIQUE`;
+5. registry K still points only to A.
+
+Thus B is a live "unique"-marked dungeon mob that cannot be addressed through K. Killing/purging K operates on A only.
+
+For `SetUnique`, assigning an already-used key to a different VID likewise leaves the map pointing to the old character while still applying the unique affect to the new character.
+
+This is separate from BUG-DUNGEON-002:
+- BUG-DUNGEON-002 is one `SpawnMoveUnique` call multiplying spawns because success does not break the loop;
+- BUG-DUNGEON-004 is key-collision handling across registration attempts.
+
+The Lua surfaces `d.spawn_unique`, `d.spawn_move_unique` and `d.set_unique` are all registered.
+
+## Current Dungeon Core verified set
+- BUG-DUNGEON-001 — rejected entry orphan private dungeon.
+- BUG-DUNGEON-002 — SpawnMoveUnique success does not stop the 100-attempt loop.
+- BUG-DUNGEON-003 — multi-key alias can leave dangling raw unique pointer.
+- BUG-DUNGEON-004 — duplicate unique key creates/mutates an entity not represented by the registry.
+
+## Exact next audit
+1. Establish current quest-script reachability for unique APIs and nested `d.new_jump_party` without bulk-reading the whole quest tree.
+2. Audit remaining dungeon count/eliminate invariants around `m_iMonsterCount` and direct purge/death paths.
+3. Audit private-map destroy ordering against character `SetDungeon(nullptr)` on map teardown.
+4. Decide whether any remaining candidate is promotable.
+5. Move Dungeon Core toward STATIC COMPLETE.
