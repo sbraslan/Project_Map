@@ -18,15 +18,18 @@
       "BUG-RANK-003",
       "BUG-RANK-004",
       "BUG-RANK-005",
-      "BUG-RANK-006"
+      "BUG-RANK-007"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Map all live callers of CBattleField::OpenBattleUI and determine whether the missing outbound TPacketGGLoadRanking sender creates stale cross-channel ranking views.",
-      "Finish the repo-wide direct-reset search for AFF_BATTLE_RANKER_1..3 and decide whether to promote the stale-ranker-effect lifecycle to a verified bug.",
       "Determine whether any active caller opens generic PARTY ranking.",
+      "Determine whether any active caller opens generic SOLO categories 2..7.",
       "Audit remaining ranking SQL/result null boundaries.",
-      "Reconcile BUG-RANK-006 against actual build entry points/configuration and decide whether Ranking is STATIC COMPLETE."
+      "Check additional direct ranker-flag cleanup paths for BUG-RANK-007 lifetime.",
+      "Decide whether Ranking is STATIC COMPLETE."
+    ],
+    "retracted_bug_ids": [
+      "BUG-RANK-006"
     ]
   },
   "startup": {
@@ -90,7 +93,13 @@
     "common/CommonDefines.h::ENABLE_RANKING_SYSTEM/ENABLE_BATTLE_FIELD",
     "common/singleton.h",
     "UserInterface/PythonNetworkStream.cpp::CheckPacket dynamic-size handling",
-    "UserInterface/Packet.h::TDynamicSizePacketHeader/TPacketGCBattleInfo/TBattleRankingMember"
+    "UserInterface/Packet.h::TDynamicSizePacketHeader/TPacketGCBattleInfo/TBattleRankingMember",
+    "game/src/cmd_general.cpp::LoadRanking/do_open_battle_ui",
+    "game/src/cmd.h::LoadRanking",
+    "game/src/horse_rider.h::cmd.h transitive include",
+    "game/src/p2p.cpp::P2P_MANAGER::Send",
+    "game/src/cmd.cpp::open_battle_ui command",
+    "root/uiminimap.py::OpenbattleField"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
