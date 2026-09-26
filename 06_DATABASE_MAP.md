@@ -227,3 +227,34 @@ Cache yoksa:
 → ardından `PutItemCache(item, true)`.
 
 `true` loaded itemın hemen DB'ye tekrar yazılmasını engelleyen skip-query davranışıdır.
+
+## Ground item persistence modeli
+
+Ground item game-core runtime objesidir; DB'de kalıcı `GROUND` owner/window kaydı olarak tutulmuyor.
+
+Drop:
+1. item character'dan ayrılır veya split item yaratılır.
+2. `AddToGround` window'u `GROUND` yapar fakat owner null kalır.
+3. `Save()` / `FlushDelayedSave()`
+4. `SaveSingleItem(item)`
+5. `item->GetOwner() == nullptr`
+6. `HEADER_GD_ITEM_DESTROY`
+7. DB item row silinir/cache temizlenir.
+
+Bu yüzden yere bırakılmış itemın yaşamı game core memory/sectree + destroy event üzerinden sürer.
+
+Pickup:
+1. runtime ground item bulunur.
+2. `RemoveFromGround`.
+3. `AddToCharacter`.
+4. owner yeniden character olur; window/cell atanır.
+5. `Save()`
+6. `HEADER_GD_ITEM_SAVE`
+7. DB item row yeniden yaratılır/güncellenir.
+
+### Destroy
+`ITEM_MANAGER::DestroyItem`:
+- item delayed-save set'ten çıkarılır
+- item ID mevcut ve skip-save değilse `HEADER_GD_ITEM_DESTROY`
+- DB `QUERY_ITEM_DESTROY`
+- cache varsa silinir; yoksa SQL DELETE.
