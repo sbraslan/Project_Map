@@ -601,3 +601,34 @@ Server `CInputMain::Exchange` switch öncesinde her packet için `pinfo->arg1` c
 
 ### OBS-EXCHANGE-002 — AddGold cheque-build boolean kontrolü
 `ENABLE_CHEQUE_SYSTEM` altında offer-stage balance kontrolü gold ve cheque yetersizliğini `&&` ile birleştiriyor. Tek currency yetersizliği AddGold aşamasından geçebilir. Final `CExchange::Check()` gold ve cheque'yi ayrı kontrol ettiği için şu an doğrudan currency exploit olarak sınıflandırılmadı; UX/state inconsistency ve future-regression riski.
+
+
+### BUG-EXCHANGE-004 — Currency overflow TOCTOU can lose offered currency
+- Statik durum: **doğrulandı**
+- Sınıf: time-of-check/time-of-use + unchecked void mutation
+
+`CInputMain::Exchange(ELK_ADD)` recipient için teklif anında:
+- `recipient gold + offer < GOLD_MAX`
+- `recipient cheque + offer < CHEQUE_MAX`
+kontrolü yapar.
+
+Fakat bu yalnız offer creation anındaki snapshot'tır. Final `Accept()` içinde recipient currency overflow tekrar doğrulanmaz.
+
+`CExchange::Done()` gold transferinde:
+1. sender `PointChange(POINT_GOLD, -m_lGold)`
+2. recipient `PointChange(POINT_GOLD, +m_lGold)`
+çalıştırılır.
+
+`PointChange(POINT_GOLD)` overflow olduğunda void olarak erken `return` eder. `Done()` bunu göremez ve transferi başarılı kabul etmeye devam eder. Böylece sender'dan gold düşüp recipient'a ekleme yapılmaması mümkündür.
+
+Reachability doğrulaması: exchange açıkken `CanHandleItem()` genel exchange guard içermez; ayrıca ground `PickupItem()` exchange state kontrol etmeden ITEM_ELK için `GiveGold()` çalıştırır. Recipient offer oluşturulduktan sonra kendi gold bakiyesini artırabilir.
+
+Cheque tarafında `Done()` transferden hemen önce overflow'u tekrar kontrol eder ve false döner; ancak bu kontrol item ve gold mutationlarından **sonra** olduğu için cheque overflow da trade'i orta-commit'te durdurup önceki mutationları rollback etmez.
+
+### OBS-EXCHANGE-001 — AddGold cheque koşullarında conjunction kullanımı
+`CExchange::AddGold()` cheque build altında:
+- insufficient funds check'i `gold insufficient && cheque insufficient`
+- existing offer check'i `m_lGold > 0 && m_lCheque > 0`
+şeklinde yapıyor.
+
+Bu, tek currency yetersizken AddGold'un geçici olarak offer state yazmasına veya yalnız bir currency varken offer'ın overwrite edilmesine izin verir. Final `Check()` sender funds'ı iki currency için ayrı ayrı kontrol ettiği için tek başına completed transfer exploit'i statik olarak gösterilmedi. Şimdilik observation.
