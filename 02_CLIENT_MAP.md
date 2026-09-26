@@ -136,3 +136,52 @@ Count-aware:
 
 Not:
 Destroy sender `Send(...)` sonrası doğrudan `true` dönüyor; diğer yakın item sender'larının aksine `SendSequence()` çağırmıyor. Bu şimdilik **davranış farkı** olarak kaydedildi, tek başına bug ilan edilmedi.
+
+## Switchbot — client UI ve network
+
+### Item move
+`root/uiswitchbot.py::SelectEmptySlot`:
+- INVENTORY → SWITCHBOT:
+  `SendItemMovePacket(INVENTORY,src,SWITCHBOT,dst,count)`
+- SWITCHBOT → SWITCHBOT:
+  aynı generic move packet.
+
+`SelectItemSlot` active slot ise drag başlatmıyor.
+
+`UseItemSlot`:
+`SendItemUsePacket(SWITCHBOT,slot)`.
+Client active kontrolü burada yok; server `CHARACTER::UseItem` active Switchbot slotunu reddediyor.
+
+### Start/Stop UI
+`SwitchbotWindow::SetActive`
+→ `switchbot.Start(selectedSlot)` / `Stop`.
+
+Normal UI START butonunu:
+- slot boşsa
+- hiçbir attribute configured değilse
+disable ediyor.
+
+Bu yalnız client-side UX kontrolüdür; server packet handler aynı şartları bağımsız doğrulamıyor.
+
+### Network
+`SendSwitchbotStartPacket`:
+- `HEADER_CG_SWITCHBOT`
+- START subheader
+- slot
+- sabit `SWITCHBOT_ALTERNATIVE_COUNT` alternative table
+- `SendSequence()`
+
+STOP:
+- header/subheader/slot
+- `SendSequence()`.
+
+### UPDATE_ITEM
+Client receiver:
+`SUBHEADER_GC_SWITCHBOT_UPDATE_ITEM`
+→ count
+→ sockets
+→ attributes
+→ Yohara random attrs
+→ UI refresh.
+
+Packet struct içindeki `uint8_t vnum` alanı receiver tarafından okunmuş struct içinde bulunmasına rağmen item index güncellemesi için kullanılmıyor.
