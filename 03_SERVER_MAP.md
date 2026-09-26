@@ -293,3 +293,37 @@ Unequip:
 → `RemoveFromCharacter`
 → `AddToCharacter`
 → `Save()`.
+
+## Inventory — login ItemLoad reconstruction
+
+`CInputDB::ItemLoad`:
+1. character/descriptor doğrulaması
+2. item daha önce load edilmişse return
+3. item count + `TPlayerItem[]` decode
+4. `ITEM_MANAGER::CreateItem(vnum,count,id)`
+5. `SetSkipSave(true)`
+6. sockets/attrs/random/seal/change-look/basic/element/set/pet metadata restore
+7. `SetLastOwnerPID(owner)`
+8. slot collision kontrolü
+9. window'a göre restore:
+   - INVENTORY → `AddToCharacter`
+   - DRAGON_SOUL_INVENTORY → `AddToCharacter`
+   - BELT_INVENTORY → `AddToCharacter`
+   - SWITCHBOT → `AddToCharacter`
+   - NPC_STORAGE → `AddToCharacter`
+   - EQUIPMENT → level check → `EquipTo`
+   - ADDITIONAL_EQUIPMENT_1 → `AddToCharacter` + refresh
+10. `OnAfterCreatedItem()`
+11. `SetSkipSave(false)`
+
+### Collision recovery
+DB item hedef slotta başka item varsa veya equipment restore başarısızsa `v` restore listesine alınır.
+
+Sonra:
+- uygun boş inventory slotuna `AddToCharacter`
+- yoksa `AddToGround`
+- ground item için 180 saniye ownership + destroy event.
+
+Son:
+- points refresh
+- `SetItemLoaded()`.
