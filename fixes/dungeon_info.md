@@ -1,9 +1,9 @@
-# Dungeon Info — Fix Plan
+# Dungeon Info — Remediation Notes (REFERENCE ONLY)
 
-**Status:** PATCH PLAN READY — source repos unchanged
+**Status:** REFERENCE ONLY — DO NOT APPLY DURING DETECTION/MAPPING PHASE
 **Date:** 2026-09-26
 
-This file records the minimal fixes for the first runtime cluster. Source repositories remain read-only until live reproduction/explicit fix execution.
+This file preserves possible remediation ideas discovered during analysis. It is documentation only. The current project phase does not permit source, Python, C++, quest, config, game-data, or runtime changes. Only Project_Map may be edited.
 
 ## FIX-DUNGEON-010 — restore normal dungeon-list creation
 Source: `Project_Binary/root/uidungeoninfo.py::DungeonInfoWindow.Initialize`.
@@ -107,7 +107,7 @@ Recommended first fix sequence:
 2. validate the desired UI meaning per dungeon;
 3. then add/derive correct cooldown duration data instead of guessing.
 
-## Runtime order after patch readiness
+## Deferred order if the user explicitly changes phase in the future
 1. live reproduce T10 on current build;
 2. apply FIX-DUNGEON-010;
 3. verify 9 rows appear;
@@ -117,4 +117,4 @@ Recommended first fix sequence:
 7. decide per-dungeon cooldown semantics before any 012B data changes.
 
 ## Scope rule
-No source repository was modified while producing this plan.
+No source repository was modified while producing these notes. Do not interpret this file as authorization to make code changes. Current work is detection/mapping only.
