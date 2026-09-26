@@ -1738,3 +1738,20 @@ In `GetAchievementProgress`, when the current achievement has `max_value > 0`, c
 and immediately reads `cTask->second.type` without verifying `cTask != end()`.
 
 If an XML update removes/renumbers a task while the DB still contains that old task ID, progress evaluation can dereference end() and crash the GAME core.
+
+
+### BUG-ACH-004 — achievement shop can be opened remotely by client packet
+- Statik durum: **doğrulandı**
+- Sınıf: client trust boundary / interaction bypass
+
+`CAchievementSystem::ProcessClientPackets` handles `HEADER_CG_OPEN_SHOP` by directly resolving:
+
+`CShopManager::Instance().Get(104)`
+
+and then calling `shop->AddGuest(player, 0, false)`.
+
+There is no NPC VID validation, distance check, map check, quest state or proof that the character interacted with the intended achievement-shop NPC.
+The nearby source comment explicitly says the player should have to open it from the NPC, but that enforcement is commented out.
+
+Therefore a modified client can send the achievement OPEN_SHOP action from an arbitrary location and remotely enter shop 104.
+The economic impact still depends on shop 104's actual currency/item configuration, which remains to be mapped.
