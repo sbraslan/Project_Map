@@ -737,3 +737,36 @@ Network/Python bindings arbitrary integer target/slot kabul ettiği için 80..89
 **Shop / Premium Private Shop: STATIC COMPLETE**
 
 Sonraki adım Project_Map açık alan/checkpoint sırasına göre bir sonraki subsystem'e geçmek; Shop için artık ana iş runtime testleridir.
+
+
+## Checkpoint — Safebox / Mall static audit başladı
+
+**Tarih:** 2026-09-26
+
+Shop static completion sonrasında personal Safebox / Item Mall subsystemine geçildi.
+
+### Bu tur haritalanan
+- official Safebox UI slot events
+- Python binding / C++ send boundary
+- SAFEBOX_CHECKIN / CHECKOUT / ITEM_MOVE
+- MALL_CHECKOUT
+- Safebox money deposit/withdraw
+- CSafebox Add/Remove/MoveItem/Save/ChangeSize
+- DB safebox load/save
+- SAFEBOX/MALL account-ID item persistence
+
+### Yeni doğrulanmış buglar
+- BUG-SAFEBOX-001: Mall close, Mall gold=0 değerini generic Safebox Save ile persisted safebox.gold üzerine yazıyor.
+- BUG-SAFEBOX-002: withdraw signed-int overflow + safebox debit-before-player-credit rollback eksikliği.
+- BUG-SAFEBOX-003: crafted occupied-target stack move partial/zero transferde source itemı yanlış kaldırıyor.
+- BUG-SAFEBOX-004 / BUG-ITEM-006: semantic source/destination window allowlist eksikliği.
+
+### Official client ayrımı
+Official UI safebox->safebox MoveItem packetini boş hedefe count=0 ile yollar. Occupied target stack packetini üretmediği için BUG-SAFEBOX-003 normal UI değil modified-client/server-validation sınıfıdır.
+
+### Sıradaki
+1. malformed/overlap DB load + grid reconstruction
+2. SAFEBOX/MALL item expiration/removal
+3. ItemAward placement/account-window isolation
+4. packet width/slot boundaries
+5. logout/close persistence ordering
