@@ -49,3 +49,33 @@ Haritalama sırasında bulunan her bilinmeyen alan önce buraya yazılır; çöz
 - Guild member guild'den atılırsa/ayrılırsa açık veya pending storage nesnesi nasıl davranıyor.
 - Rank yetkisi storage açıkken kaldırılırsa mevcut session item packetleri kabul edilmeye devam ediyor mu.
 - Bu statik concurrency açıklarının oyun içi çoklu-core reprodüksiyonu.
+
+## Guild Storage statik haritalama durumu
+
+Artık kapatılan ana alanlar:
+- Client UI/binding/send/receive
+- game packet dispatch
+- open/load/close
+- guild permission
+- item checkin/checkout
+- item persistence
+- DB load/save
+- lock/state
+- cross-core davranış
+- disconnect/warp cleanup
+- member grade/auth değişimi
+- member removal
+- guild disband
+- startup state reset
+
+## Runtime doğrulama bekleyen kritik alanlar
+1. Cross-core simultaneous open
+2. Core restart while another core has storage open
+3. Permission revoke while session open
+4. Member remove/disband while session open
+5. Pending-load stuck lock
+6. SAFEBOX_MONEY overwrite
+7. ItemAward → GUILDBANK isolation
+8. Disband orphan items
+
+Bu noktadan sonra Guild Storage için ek salt-okuma getirisi düşük; runtime testleri daha değerli.
