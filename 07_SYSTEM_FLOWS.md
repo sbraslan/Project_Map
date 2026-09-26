@@ -776,3 +776,37 @@ DB item(window=SAFEBOX/MALL, invalid multi-size/overlap position)
 → later Remove
 → CGrid::Get(pos,1,itemSize)
 → invalid bottom-height state'te grid OOB write riski.
+
+
+## Safebox — load state lifecycle
+
+NPC/UI password command
+→ CHARACTER::ReqSafeboxLoad
+→ distance/rate/pending checks
+→ m_bOpeningSafebox=true
+→ HEADER_GD_SAFEBOX_LOAD
+→ DB password row
+→ DB SAFEBOX item rows
+→ HEADER_DG_SAFEBOX_LOAD
+→ CInputDB::SafeboxLoad
+→ conflicting-window recheck
+→ LoadSafebox
+→ SetOpenSafebox(true) / W_SAFEBOX
+→ user CloseSafebox
+→ SetOpenSafebox(false), m_bOpeningSafebox=false.
+
+Wrong password ve conflict response flag'i temizler.
+DB item-query failure GAME'e response üretmezse pending flag session boyunca takılabilir.
+
+## Mall — weaker load policy
+
+/mall_password
+→ only password format + existing mall + throttle
+→ HEADER_GD_MALL_LOAD
+→ same DB password validation
+→ MALL item rows
+→ CInputDB::MallLoad
+→ CHARACTER::LoadMall.
+
+Mall load personal Safebox gibi W_SAFEBOX/open-position/conflicting-window state'ini set/enforce etmez.
+Bu nedenle Mall access policy ayrı trust boundary olarak ele alınmalıdır.
