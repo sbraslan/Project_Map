@@ -145,3 +145,13 @@ No additional bug was promoted from:
 - remaining quest helpers without a verified normal gameplay failure path.
 
 Party Match continues independently under `systems/party_match.md`.
+
+
+## Additional reachability — Devil Catacomb item-group flow
+The active Devil Catacomb quest calls `d.exit_all_by_item_group("reapers_credit")`.
+
+Its server functor removes a party member without the required item by calling `pParty->Quit(pid)` when party size is greater than 2.
+
+If the affected member is the party leader, this reaches the already verified BUG-PARTY-001 leader self-delete/use-after-free path.
+
+This is additional normal gameplay reachability evidence for BUG-PARTY-001; no new bug ID is created.
