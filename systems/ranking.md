@@ -89,7 +89,7 @@ Mapped triggers:
 
 `HEADER_GG_LOAD_RANKING` is registered with exact `sizeof(TPacketGGLoadRanking)`.
 
-Targeted source scan of `ranking_system.cpp`, `battle_field.cpp`, `input_p2p.cpp`, `p2p.cpp`, `input_db.cpp`, `db.cpp`, the descriptor/P2P helpers and packet declarations found the `TPacketGGLoadRanking` struct plus the P2P receiver, but no outbound construction/send site. The receive path is therefore currently mapped as **receiver-only / sender not found**. Cross-channel impact still needs reachability closure before assigning a bug ID.
+`game/src/cmd_general.cpp` defines the global helper `LoadRanking(uint8_t)`. It constructs `TPacketGGLoadRanking`, broadcasts it to all connected P2P peers through `P2P_MANAGER::Send`, then reloads the local cache through `CRankingSystem::LoadRanking(category)`. `P2P_MANAGER::Send` iterates the peer descriptor set and sends the packet to every peer except an optional excluded descriptor. Therefore weekly/close reloads are designed to refresh every game core, not only the BattleField core.
 
 ## GC packet flow
 Server BattleField UI open:
@@ -121,6 +121,18 @@ Client header map registers `HEADER_GC_BATTLE_ZONE_INFO` as dynamic with base si
 6. calls Python `OpenRankingBoard(0, 0)`.
 
 ## Active UI path
+The live player-open chain is now mapped end-to-end:
+`root/uiminimap.py::BattleButton`
+-> `OpenbattleField()`
+-> client chat `/open_battle_ui`
+-> server command table `open_battle_ui`
+-> `do_open_battle_ui`
+-> `CBattleField::OpenBattleUI`
+-> `CRankingSystem::SendBFRanking`
+-> `HEADER_GC_BATTLE_ZONE_INFO`
+-> `RecvBattleZoneInfo`
+-> Python `OpenRankingBoard(0, 0)`.
+
 `root/interfacemodule.py::OpenRankingBoardWindow(type, category)` routes:
 - `type == 0 && category == 0` to `wndBattleField.Open()`;
 - other categories/types may route to the generic ranking board.
@@ -153,7 +165,9 @@ That function:
 
 Current mapped code does not show ranker-effect refresh being performed for already-online players when ranking data is reloaded. `SetWeakRankingPosition` sets `AFF_BATTLE_RANKER_1..3` directly through `CHARACTER::SetAffectFlag`, but does not clear an older ranker bit first.
 
-Cross-checks show `m_afAffectFlag` is initialized to zero in the `CHARACTER` constructor, while the generic reset path in `char_affect.cpp` only resets `pkAff->dwFlag` for real `CAffect` entries. The mapped BattleField ranker bits are not added through that `CAffect` path. This makes stale winner flags a high-confidence lifecycle defect, but a repo-wide direct-reset scan is still required before promotion to a verified bug ID.
+Cross-checks show `m_afAffectFlag` is initialized to zero in the `CHARACTER` constructor, while the generic reset path in `char_affect.cpp` only resets `pkAff->dwFlag` for real `CAffect` entries. The mapped BattleField ranker bits are not added through that `CAffect` path.
+
+More importantly, every mapped ranking reload path only reloads `CRankingSystem` data. Neither the local helper nor the P2P receive handler iterates online characters or calls `SetWeakRankingPosition`. Since `SetWeakRankingPosition` itself only sets the currently matched bit and never clears older ranker bits, an online player who loses a top-3 position can retain the old ranker flag, while an already-online new winner does not gain the new flag until a later reconnect/lifecycle event. This creates BUG-RANK-007.
 
 ## Dynamic packet boundary audit
 `HEADER_GC_BATTLE_ZONE_INFO` is registered as a dynamic-size packet. `CheckPacket()` waits until the declared dynamic size is buffered, but it does not validate that the declared size is at least the base packet size or that the payload length is an exact multiple of `sizeof(TBattleRankingMember)`.
@@ -161,40 +175,36 @@ Cross-checks show `m_afAffectFlag` is initialized to zero in the `CHARACTER` con
 `RecvBattleZoneInfo()` then subtracts `sizeof(TPacketGCBattleInfo)` from the `uint16_t wSize` and loops while `wSize > 0`, consuming one full ranking member each iteration. A too-small size can underflow; a non-multiple payload can cause a full member read beyond the packet's declared boundary. This creates BUG-RANK-005.
 
 ## BattleField ranking reload call-site audit
-Both `CBattleField::CloseEnter()` and the scheduled weekly update call `LoadRanking(RK_CATEGORY_BF)` unqualified under `ENABLE_RANKING_SYSTEM`.
+The previously suspected unresolved `LoadRanking(RK_CATEGORY_BF)` call is **not a bug**.
 
-The current `CBattleField` declaration contains no `LoadRanking` member, its `singleton<CBattleField>` base contains no such method, and the directly included headers/precompiled-header chain checked so far contains no `LoadRanking` macro/alias. The actual method is `CRankingSystem::LoadRanking(uint8_t)`. The active `CommonDefines.h` enables both `ENABLE_RANKING_SYSTEM` and `ENABLE_BATTLE_FIELD`, so these call sites are compiled in the mapped configuration. This creates BUG-RANK-006 as a static build blocker for the source snapshot, subject only to an external compiler-injected declaration/macro not represented in the repository.
+Resolution:
+- `cmd_general.cpp` defines the global `LoadRanking(uint8_t)` helper;
+- `cmd.h` declares it as `extern void LoadRanking(uint8_t bCategory);`;
+- `battle_field.cpp` includes `char.h`;
+- `char.h` includes `horse_rider.h`;
+- `horse_rider.h` includes `cmd.h`.
+
+Therefore the declaration is visible transitively in `battle_field.cpp`, and the call sites resolve to the intended global broadcast/reload helper. The former BUG-RANK-006 finding is retracted as a false positive and its ID is not reused.
 
 ## Verified bugs
 - BUG-RANK-001 — `SendBFRanking` takes `&vecBattleFieldRanking[0]` even when the vector is empty.
 - BUG-RANK-002 — current-player solo ranking API is a hard-coded empty stub.
 - BUG-RANK-003 — weekly winner table is not cleared, allowing stale prior-week positions.
-- BUG-RANK-004 — BattleField close reloads ranking before remaining players' final session points are committed.
+- BUG-RANK-004 — BattleField close broadcasts/reloads ranking before remaining players' final session points are committed.
 - BUG-RANK-005 — dynamic BattleField ranking packet length is not boundary/divisibility validated before fixed-record parsing.
-- BUG-RANK-006 — BattleField calls `LoadRanking(RK_CATEGORY_BF)` without a resolvable member/global declaration in the active source configuration.
+- BUG-RANK-007 — weekly/P2P ranking reload does not refresh direct ranker flags for already-online characters.
 
 ## Latent / incomplete integration findings
 Not yet promoted to verified current-path bugs:
 - Generic PARTY board calls Python APIs that are not exported by `PythonRankingModule.cpp`.
 - Generic SOLO board declares categories beyond 0/1, while its name dictionary only defines 0 and 1.
-- Ranker winner-effect state is not visibly refreshed for already-online players when ranking cache changes, and direct ranker bits are not cleared in the mapped lifecycle; repo-wide direct-reset closure is still pending.
-- `TPacketGGLoadRanking` has a mapped receiver but no sender in the targeted server-source scan; cross-channel reachability/impact remains pending.
+- Generic ranker-effect lifecycle is now promoted to BUG-RANK-007.
+- P2P sender mapping is closed: `cmd_general.cpp::LoadRanking` broadcasts `TPacketGGLoadRanking` and reloads local state.
 
 ## Exact next audit
-1. Map every live caller of `CBattleField::OpenBattleUI` and determine whether the missing outbound `TPacketGGLoadRanking` sender creates stale cross-channel ranking views.
-2. Finish the repo-wide direct-reset search for `AFF_BATTLE_RANKER_1..3` and decide whether to promote the stale-ranker-effect lifecycle to a verified bug.
-3. Determine whether any live caller opens generic PARTY ranking.
-4. Audit remaining SQL/result null boundaries.
-5. Reconcile BUG-RANK-006 against the actual build entry points/configuration and then decide whether Ranking is STATIC COMPLETE.
+1. Determine whether any live caller opens generic PARTY ranking.
+2. Determine whether generic SOLO categories 2..7 have any live opener.
+3. Audit remaining ranking SQL/result null boundaries.
+4. Check whether any additional ranker-flag cleanup path changes BUG-RANK-007 severity/lifetime (the missing reload refresh itself is already verified).
+5. Decide whether Ranking is STATIC COMPLETE.
 
-
-## Build/linkage anomaly under review
-`battle_field.cpp` contains two unqualified calls to `LoadRanking(RK_CATEGORY_BF)`.
-
-Current bounded checks found:
-- no `CBattleField::LoadRanking` declaration in `battle_field.h`;
-- no free `LoadRanking` declaration in the directly inspected BattleField includes;
-- no `LoadRanking` macro in the game Makefile flags inspected;
-- the actual implemented loader is `CRankingSystem::LoadRanking(uint8_t)`.
-
-This is **not yet assigned a bug ID**. It may represent a missing wrapper/declaration or a compile-time integration defect, but the full transitive include graph has not yet been exhausted. Keep it as an explicit next-check item rather than assuming intended behavior.
