@@ -1489,3 +1489,150 @@ BUG-MAIL-001 .. BUG-MAIL-012.
 
 Observations:
 OBS-MAIL-001 .. OBS-MAIL-003.
+
+## Ticket System — recovered canonical bugs
+
+### BUG-TICKET-001 — PAGE_REPLY does not enforce ticket ownership
+- Statik durum: **doğrulandı**
+- Sınıf: authorization / information disclosure
+
+`CTicketSystem::Open(PAGE_REPLY)` has the owner/deny check commented out and only verifies `GetExistID(ticked_id)`.
+A modified client that knows/guesses another valid ticket ID can request its reply log through `SendTicketLogs(LOGS_FROM_REPLY,...)`.
+`CTicketSystem::Reply` itself does call `GetOwner`; this bug is specifically the reply-view/open path.
+
+### BUG-TICKET-002 — ticket text is interpolated into SQL without escaping
+- Statik durum: **doğrulandı**
+- Sınıf: SQL injection / query corruption
+
+Create inserts title/content, Reply inserts reply text, staff ban inserts reason, and multiple ticket-ID/name queries use raw `%s`.
+`IsDenied` is a blacklist and explicitly does not block single quote/backslash; it is not SQL escaping.
+Server must escape/bind SQL independently of UI limits.
+
+### BUG-TICKET-003 — ticket ID collision loop never refreshes collision query
+- Statik durum: **doğrulandı**
+- Sınıf: infinite loop / resource growth
+
+Create generates strID, executes one SELECT, then:
+`while (dwExtract->Get()->uiNumRows > 0)` reseeds and appends more random chars.
+The query result is never refreshed and strID is never reset.
+If the first generated ID collides, condition remains true forever while the string grows.
+
+### BUG-TICKET-004 — admin sort accepts invalid mode and may query uninitialized buffer
+- Statik durum: **doğrulandı**
+- Sınıf: undefined behavior / DB query correctness
+
+`Open(PAGE_SORT_ADMIN)` accepts any `mode > 0`.
+`SendTicketLogs(LOGS_ADMIN,...,iSortMode)` initializes `szQuery` only for modes 1..4 and then always calls DirectQuery(szQuery).
+Additionally SQL `LIMIT offset,count` receives `iEndIdx` as count; for page >1 that value is cumulative rather than MAX_LOGS_PER_PAGE.
+
+### BUG-TICKET-005 — client ticket Request boundary check allows id == size
+- Statik durum: **doğrulandı**
+- Sınıf: client OOB read / crash
+
+Both `CPythonTicketLogs::Request` and Reply variant use:
+`if (m_vecData.size() < id)`.
+For `id == size()` the guard is false and `m_vecData[id]` is out of bounds.
+
+## Dungeon Info — recovered canonical bugs
+
+### BUG-DUNGEON-001 — server Warp/Ranking index is unchecked
+- Statik durum: **doğrulandı**
+- Sınıf: server OOB / modified-client crash surface
+
+Both `Warp` and `Ranking` access `s_vecDungeonProto[byIndex]` before validating `byIndex < size()`.
+CG packet exposes uint8 index directly.
+
+### BUG-DUNGEON-002 — client dungeon array has 255 slots but uint8 index can be 255
+- Statik durum: **doğrulandı**
+- Sınıf: client OOB
+
+`m_vecDungeonInfoDataMap[255]` valid indices are 0..254.
+`AddDungeon(uint8_t byIndex,...)` and many getters index it directly; 255 is representable by the network/Python boundary.
+
+### BUG-DUNGEON-003 — CPythonDungeonInfo::Clear clears only first dungeon vector
+- Statik durum: **doğrulandı**
+- Sınıf: stale state / reload corruption
+
+`m_vecDungeonInfoDataMap->clear()` is equivalent to clearing element 0 only.
+Slots 1..254 retain old packet data while count/load flags reset.
+
+### BUG-DUNGEON-004 — Warp couples level-limit count to entry-position vector
+- Statik durum: **doğrulandı**
+- Sınıf: server OOB / malformed-config crash
+
+Warp loops `iPos < vecLevelLimit.size()` and indexes `vecEntryPosition[iPos]`.
+No invariant check guarantees both config vectors have equal sizes.
+
+### BUG-DUNGEON-005 — variable config item vectors copied into fixed packet arrays without cap
+- Statik durum: **doğrulandı**
+- Sınıf: stack/packet memory overwrite from malformed config
+
+`SendInfo` loops full `vecRequiredItem` and `vecBossDropItem` and writes fixed `sRequiredItem[]` / `sBossDropItem[]` arrays with no size cap.
+
+### BUG-DUNGEON-006 — bonus bounds check is off by one
+- Statik durum: **doğrulandı**
+- Sınıf: packet stack OOB
+
+The loop breaks only when `iAffect > POINT_MAX_NUM`.
+Index `POINT_MAX_NUM` is already outside arrays sized `[POINT_MAX_NUM]`; guard must stop before equality.
+
+## Battle Pass — recovered canonical bugs
+
+### BUG-BPASS-001 — mission update packet sends uninitialized bMissionType
+- Statik durum: **doğrulandı**
+- Sınıf: protocol correctness / uninitialized-data leak
+
+`TPacketGCExtBattlePassMissionUpdate` contains `bMissionType`.
+Character update/set code creates non-zero-initialized packet and assigns header/passType/missionIndex/newProgress but not missionType.
+Client reads missionType and uses it in `HaveMission(...)`/UI selection.
+
+### BUG-BPASS-002 — SetExtBattlePassMissionProgress can re-award an already completed mission
+- Statik durum: **doğrulandı; caller reachability audit açık**
+- Sınıf: reward duplication
+
+Existing matched mission is forcibly changed to `bCompleted = 0`, then value is overwritten.
+If new value is at/above threshold, code marks completed and calls `BattlePassRewardMission` again.
+Any legitimate/replayable caller that sets a completed mission can duplicate mission reward.
+
+### BUG-BPASS-003 — BattlePassRequestOpen uses dangling season_name pointer
+- Statik durum: **doğrulandı**
+- Sınıf: use-after-lifetime / undefined behavior
+
+Inside each pass block:
+a local `std::string BattlePassName` is created, `season_name = BattlePassName.c_str()`, then the string is destroyed at block end.
+The pointer is used afterward to fill the packet.
+
+### BUG-BPASS-004 — unbounded strcpy into season-name packet
+- Statik durum: **doğrulandı**
+- Sınıf: stack overwrite / config-trust
+
+`strcpy(packet.szSeasonName, season_name)` has no destination-size enforcement.
+Battle-pass name comes from config loader.
+
+### BUG-BPASS-005 — final reward path dereferences MYSQL_ROW without zero-row check
+- Statik durum: **doğrulandı**
+- Sınıf: server crash on inconsistent persistence state
+
+After SELECT from `player.battlepass_playerindex`, code checks only SQL errno.
+It calls `mysql_fetch_row` then immediately reads `row[0]`.
+Missing registration row can therefore null-dereference.
+
+### BUG-BPASS-006 — Event Manager cache arrays are not initialized
+- Statik durum: **doğrulandı**
+- Sınıf: uninitialized state / season selection
+
+`CBattlePassManager` constructor initializes scalar active IDs/times but not:
+- `m_dwActiveBattlePassID[3]`
+- `m_dwBattlePassStartTime[3]`
+- `m_dwBattlePassEndTime[3]`
+
+The manager is an automatic object in main, and `InitializeBattlePass()` calls `CheckBattlePassTimes()`, which reads these arrays under ENABLE_EVENT_MANAGER.
+
+### BUG-BPASS-007 — Event Manager stores boolean state as battle-pass ID
+- Statik durum: **doğrulandı for configured IDs != 1**
+- Sınıf: season lifecycle / wrong identity
+
+`BattlePassData(const TEventTable*, uint8_t bType, bool bState)` calls:
+`SetBattlePassID(bState, bType)`.
+The setter stores that uint32 directly as active ID, so start state becomes ID 1 and stop becomes 0.
+A configured season whose real battle-pass ID is not 1 cannot be represented through this path.
