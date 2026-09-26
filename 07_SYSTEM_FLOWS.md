@@ -603,3 +603,28 @@ A iki size=1 normal item gönderir.
 → ilk transfer rollback edilmez.
 
 Bu iki yol aynı temel invariant ihlalini gösterir: **preflight placement modeli ile commit placement modeli eşdeğer değil ve commit rollback'sizdir.**
+
+
+## Exchange — distance bypass flow
+
+A ve B başlangıçta <=1000 mesafede -> ExchangeStart başarılı -> paired CExchange -> taraflardan biri normal MOVE ile uzaklaşır -> server movement exchange'i cancel etmez -> modified client official auto-CANCEL davranışını uygulamaz -> iki taraf ACCEPT -> Accept final mesafeyi yeniden ölçmez -> commit devam eder.
+
+## Exchange — gold cap TOCTOU / sender-loss flow
+
+1. Sender gold offer eder.
+2. ELK_ADD receiver mevcut gold + offer için cap kontrolü yapar.
+3. Receiver exchange açıkken ground ITEM_ELK pickup eder veya nearby party distribution ile gold kazanır.
+4. Receiver artık GOLD_MAX - offered sınırının üstündedir fakat GOLD_MAX'in altındadır.
+5. İki taraf accept eder.
+6. Final Check sender funds'i doğrular; receiver cap recheck yoktur.
+7. Done() sender -m_lGold uygular.
+8. receiver +m_lGold POINT_GOLD overflow check'te return eder.
+9. Done() void failure'ı göremez ve normal akış devam eder.
+
+Sonuç: sender gold azalır, receiver gold artmaz.
+
+## Exchange — persistence of partial item commit
+
+preflight true -> Done item #1 Remove/Add -> FlushDelayedSave(item #1) -> DB HEADER_GD_ITEM_SAVE -> item #2 placement failure -> Done false -> Cancel.
+
+Item #1 için rollback veya compensating DB save yoktur. Bu, BUG-EXCHANGE-001/002'nin reconnect/restart sonrasında da kalıcı olabilmesine neden olur.
