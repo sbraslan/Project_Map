@@ -555,3 +555,27 @@ Statik Shop keşfi için yeni açık alan kalmadı; yeni Shop çalışması bu t
 3. ItemAward full/duplicate placement and isolation
 4. packet slot/count narrowing
 5. disconnect/logout/CloseSafebox/CloseMall persistence ordering
+
+
+## Safebox / Mall — second pass sonrası kalanlar
+
+### Aktif runtime testleri
+- SAFEBOX-T03: crafted occupied-stack partial merge; source remainder DB sonucu.
+- SAFEBOX-T04: full destination stack + count=0 crafted move.
+- SAFEBOX-T05: checkout destination SWITCHBOT.
+- SAFEBOX-T06: checkout destination ADDITIONAL_EQUIPMENT_1.
+- SAFEBOX-T07: SWITCHBOT source -> safebox checkin.
+- SAFEBOX-T08: malformed persisted multi-size item bottom-boundary; open + remove under ASan.
+- SAFEBOX-T09: overlapping / duplicate persisted positions; open/close/reload consistency.
+
+### Build-dependent, şimdilik çalıştırma
+`ENABLE_SAFEBOX_MONEY` kapalı olduğu için:
+- eski SAFEBOX-T01 Mall gold overwrite
+- eski SAFEBOX-T02 gold withdraw overflow
+mevcut build'de applicable değildir. Feature açılırsa tekrar aktive edilmeli.
+
+### Kalan statik
+1. password/load request pending-state lifecycle
+2. aynı account safebox'ının iki karakter/core üzerinden concurrent open ihtimali
+3. warp/channel-change ve open safebox cleanup
+4. static completion checkpoint.
