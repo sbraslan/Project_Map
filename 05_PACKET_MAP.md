@@ -108,3 +108,41 @@ DB `RESULT_ITEM_LOAD` bu paketi üretir.
 Game input dispatch:
 `HEADER_DG_ITEM_LOAD`
 → `CInputDB::ItemLoad`.
+
+## Inventory pickup/drop/destroy packetleri
+
+Client → Game:
+- `HEADER_CG_ITEM_DROP = 12`
+- `HEADER_CG_ITEM_PICKUP = 15`
+- `HEADER_CG_ITEM_DROP2 = 20`
+- `HEADER_CG_ITEM_DESTROY = 25` (`ENABLE_DESTROY_SYSTEM`)
+
+### DROP2
+`TPacketCGItemDrop2`
+- header
+- `TItemPos Cell`
+- `uint32_t gold`
+- `uint8_t count`
+
+### DESTROY
+`TPacketCGItemDestroy`
+- header
+- `TItemPos Cell`
+- `uint32_t gold`
+- `uint8_t count`
+
+### PICKUP
+`TPacketCGItemPickup`
+- header
+- `uint32_t vid`
+
+Game → DB item deletion:
+- `HEADER_GD_ITEM_DESTROY = 31`
+Payload:
+- item ID
+- last owner PID.
+
+DB:
+`QUERY_ITEM_DESTROY`
+→ item cache delete veya
+→ `DELETE FROM item WHERE id=<itemID>`.
