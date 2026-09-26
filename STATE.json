@@ -24,11 +24,14 @@
       ]
     },
     "next_actions": [
-      "Run DUNGEON-T10 on the current client/server by opening Dungeon Info from the minimap.",
-      "Record whether the 9-entry dataset produces an empty/missing dungeon list.",
-      "After T10 reproduction, fix or bypass T10 before normal-UI T09/T11/T12.",
-      "Do not mark T09/T11/T12 runtime PASS from static evidence alone."
-    ]
+      "Live-reproduce DUNGEON-T10 on the current build.",
+      "Apply FIX-DUNGEON-010 only after runtime reproduction/fix execution begins.",
+      "Then validate and fix T09 and T11.",
+      "Apply T12A signed/clamped arithmetic after reproduction; do not guess T12B cooldown policy.",
+      "Choose per-dungeon displayed cooldown semantics before adding any COOLDOWN data."
+    ],
+    "patch_plan": "fixes/dungeon_info.md",
+    "patch_status": "READY_SOURCE_UNCHANGED"
   },
   "startup": {
     "required_files": [
