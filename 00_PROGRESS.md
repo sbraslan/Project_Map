@@ -159,3 +159,46 @@ Slot çakışması/equip başarısızlığı durumunda item restore listesine al
 - destroy event başlatılır.
 
 Bu bölümle Inventory save ↔ load çift yönlü temel persistence haritası kapanmış oldu.
+
+## Checkpoint — Inventory pickup / drop / destroy tamamlandı
+
+### Bu tur kapatılanlar
+- Client pickup/drop/destroy binding ve packet gönderimleri.
+- Server dispatch:
+  - ITEM_PICKUP
+  - ITEM_DROP / ITEM_DROP2
+  - ITEM_DESTROY
+- Ground ownership + pickup distance.
+- Stack-merge pickup.
+- Party pickup dağıtımı.
+- Full/partial drop.
+- Ground item persistence.
+- Destroy → DB item delete zinciri.
+
+### Yeni doğrulanan item bugları
+- **BUG-ITEM-001:** Destroy sonrası freed item pointer üzerinden `GetName()` çağrısı — use-after-free.
+- **BUG-ITEM-002:** Destroy packetindeki `count` server fonksiyonuna kadar geliyor fakat kullanılmıyor; tüm stack siliniyor.
+- **BUG-ITEM-003:** `DropItem` içinde `AddToGround()` başarısız olursa source item/count için rollback yok ve fonksiyon yine true dönüyor.
+
+### Persistence özeti
+Character item drop:
+`RemoveFromCharacter / split`
+→ `AddToGround`
+→ owner null
+→ delayed save / flush
+→ `SaveSingleItem`
+→ `HEADER_GD_ITEM_DESTROY`
+→ DB character item row silinir.
+
+Pickup:
+ground runtime item
+→ `RemoveFromGround`
+→ `AddToCharacter`
+→ owner/player window geri atanır
+→ `HEADER_GD_ITEM_SAVE`
+→ DB row yeniden oluşur/güncellenir.
+
+### Sıradaki
+- `AddToCharacter` target-position validation incelemesi
+- Swap / Additional Equipment edge-case'leri
+- Special Inventory / Switchbot hareket sınırları.
