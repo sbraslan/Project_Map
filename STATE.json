@@ -3,40 +3,42 @@
   "updated_at": "2026-09-26",
   "project": "Metin2 Project",
   "mapping_repo": "sbraslan/Project_Map",
-  "mode": "static_mapping",
+  "mode": "runtime_validation",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "dungeon_info",
-    "display_name": "Dungeon Info",
-    "status": "PARTIAL — ACTIVE",
-    "system_file": "systems/dungeon_info.md",
-    "bug_file": "bugs/dungeon_info.md",
-    "test_file": "tests/dungeon_info.md",
-    "verified_bug_ids": [
-      "BUG-DUNGEON-001",
-      "BUG-DUNGEON-002",
-      "BUG-DUNGEON-003",
-      "BUG-DUNGEON-004",
-      "BUG-DUNGEON-005",
-      "BUG-DUNGEON-006"
-    ],
+    "subsystem": "runtime_validation",
+    "display_name": "Runtime / In-Game Validation",
+    "status": "ACTIVE",
+    "system_file": "RUNTIME.md",
+    "bug_file": null,
+    "test_file": null,
+    "verified_bug_ids": [],
+    "current_cluster": {
+      "subsystem": "dungeon_info",
+      "tests": [
+        "DUNGEON-T10",
+        "DUNGEON-T09",
+        "DUNGEON-T11",
+        "DUNGEON-T12"
+      ]
+    },
     "next_actions": [
-      "Validate CG/GC packet-info size/sequence and dungeon index boundaries.",
-      "Audit config parser invariants and fixed packet-array capacities.",
-      "Audit ranking DB/result lifecycle and Python binding boundaries.",
-      "Close client clear/reload/state lifecycle.",
-      "Decide Dungeon Info STATIC COMPLETE and update runtime tests."
+      "Validate DUNGEON-T10 against the current 9-dungeon client UI.",
+      "Validate DUNGEON-T09 ranking SQL failure.",
+      "Validate DUNGEON-T11 numeric GLOBAL flag parsing.",
+      "Validate DUNGEON-T12 zero/expired cooldown wrap.",
+      "Record runtime evidence before moving to crafted-packet/ASan tests."
     ]
   },
   "startup": {
     "required_files": [
       "STATE.json",
       "CURRENT.md",
-      "systems/dungeon_info.md"
+      "RUNTIME.md"
     ],
     "conditional_files": {
-      "bugs": "bugs/dungeon_info.md",
-      "runtime_tests": "tests/dungeon_info.md"
+      "selected_bug_registry": "bugs/<selected-system>.md",
+      "selected_runtime_tests": "tests/<selected-system>.md"
     },
     "forbidden_by_default": [
       "archive/",
@@ -65,16 +67,7 @@
       "sbraslan/Project_DumpProto": "1066f4620af451c5f728260eb5f8a086672e6384"
     }
   },
-  "mapped_roots": [
-    "game/src/DungeonInfo.cpp",
-    "game/src/DungeonInfo.h",
-    "input_main.cpp::DungeonInfo",
-    "game/src/packet.h Dungeon Info packets",
-    "UserInterface/PythonDungeonInfo.cpp",
-    "UserInterface/PythonDungeonInfo.h",
-    "UserInterface/PythonNetworkStreamPhaseGame.cpp",
-    "root/uidungeoninfo.py"
-  ],
+  "mapped_roots": [],
   "write_protocol": {
     "every_meaningful_turn": [
       "update active systems/<name>.md",
