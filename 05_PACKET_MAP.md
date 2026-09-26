@@ -220,3 +220,30 @@ Server dispatch trusts `bSpecialState` and forwards `bWindow` without 0..2 valid
 `HEADER_GC_EXTEND_INVEN_INFO = 177` contains normal stage/max plus `bExtendSpecialStage[3]` and `bExtendSpecialMax[3]`.
 
 `HEADER_GC_EXTEND_INVEN_RESULT = 178` reports key/result state.
+
+
+## Exchange / Trade packetleri
+
+CG ana packet: `TPacketCGExchange`
+- `header = HEADER_CG_EXCHANGE`
+- `sub_header`
+- `uint32_t arg1`
+- `uint8_t arg2`
+- `TItemPos Pos`
+- cheque build'de `uint32_t cheque`.
+
+CG subheaderlar:
+- START — `arg1 = target VID`
+- ITEM_ADD — `Pos = source TItemPos`, `arg2 = exchange display slot`
+- ITEM_DEL
+- ELK_ADD — `arg1 = gold`, cheque build'de `cheque`
+- ACCEPT
+- CANCEL.
+
+GC exchange packeti offer state, item metadata, sockets/attrs ve build'e bağlı ek item verilerini iki tarafa gönderir.
+
+### Trust boundary notu
+ITEM_ADD source `Pos.window_type` packetten gelir. Official UI yalnız inventory/DS üretse de Python binding explicit window_type kabul eder ve server genel `IsValidItemPosition` dışında exchange-specific window allowlist uygulamaz. Bkz. BUG-EXCHANGE-003.
+
+### Initialization notu
+Client `TPacketCGExchange` yerel değişkenleri zero-init edilmiyor. Bazı subheaderlarda `arg1` dahil kullanılmayan alanlar initialize edilmeden gönderilir. Server handler switch öncesi `arg1` okuduğu için packet deterministic initialization ayrıca test edilmelidir.
