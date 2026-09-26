@@ -295,3 +295,104 @@ Malformed server packet sizes can cause unsigned underflow / parsing beyond the 
 3. Audit Party Match as an adjacent system and decide whether to split it into its own subsystem.
 4. Review quest party APIs for authority/lifetime interactions with `CParty::Quit/DeleteParty`.
 5. Continue remaining packet/state boundary checks.
+
+
+## Near-member / bonus / EXP lifecycle closure
+
+### Periodic party update
+`party_update_event` runs every 3 seconds while the leader is locally linked and calls `CParty::Update()`.
+
+`Update()`:
+- clears every member's cached `bNear`;
+- if the leader is in a dungeon, marks members near when they share the same dungeon;
+- if the leader is in Zodiac, marks members near when they share the same Zodiac instance;
+- otherwise uses `PARTY_DEFAULT_RANGE = 5000` around the leader;
+- collapses normal-world near state to zero when only the leader is near;
+- updates `m_iCountNearPartyMember`;
+- refreshes Leadership;
+- recomputes party EXP, attack and defense bonuses;
+- applies/removes role points according to the current `bNear`;
+- recomputes role slot maxima from Leadership;
+- drives Party Heal readiness.
+
+### Actual EXP distribution
+Monster death EXP uses a separate runtime distance filter in `char_battle.cpp`.
+
+For party damage:
+- `FPartyTotaler` counts only party members on the victim's map and within 5000 of the victim;
+- `FPartyDistributor` again checks the same 5000 radius before granting EXP;
+- party bonus percentage is applied only when the killed character is within 5000 of the party leader through `IsPositionNearLeader`;
+- the selected distribution mode comes from server-owned `CParty::GetExpDistributionMode()`.
+
+No additional verified EXP distribution authority/bounds defect was found in this path.
+
+## Channel/setup model closure
+Party persistence is intentionally channel-scoped.
+
+DB stores:
+`m_map_pkChannelParty[channel]`.
+
+When a game peer performs setup, `CClientManager::SendPartyOnSetup(peer)` rebuilds only that peer's channel parties by sending DG CREATE, ADD and member-level packets.
+
+`GetMemberChannel` / `GetMemberMapIndex` use:
+- local `CHARACTER_MANAGER` state when the member is on the same game core;
+- P2P CCI state when the member is remote.
+
+No cross-channel persistence bug is promoted from this design.
+
+## Quest Party API audit
+`ENABLE_NEWSTUFF` and `ENABLE_DUNGEON_RENEWAL` are active.
+
+Mapped mutating Lua APIs include:
+- `party.leave_party`
+- `party.delete_party`
+- `party.remove_player`
+
+`party.leave_party` directly calls `pParty->Quit(ch->GetPlayerID())` when member count is not 2. Therefore a leader invoking this API on a party with more than 2 members reaches the same self-delete/use-after-free path as BUG-PARTY-001.
+
+`party.remove_player` avoids that exact leader path by directly deleting the party when the selected character is leader.
+
+### BUG-PARTY-005 — leader Quit can leave party role bonuses on characters after party destruction
+The active build enables `ENABLE_PASSIVE_ATTR`.
+
+In `CParty::P2PQuit`, the target member is erased from `m_memberMap` before role bonus removal:
+- leader member is erased;
+- then `ComputeRolePoint(ch, GetLeaderCharacter(), bRole, false)` is called.
+
+`GetLeaderCharacter()` uses:
+`m_memberMap[GetLeaderPID()].pCharacter`.
+
+Because the leader key was just erased, `operator[]` inserts a new default/empty leader member and returns a null `pCharacter`.
+
+The active `ENABLE_PASSIVE_ATTR` overload of `ComputeRolePoint` begins:
+`if (!ch || !pkLeader) return;`
+
+Therefore the departing leader's role bonus cleanup is skipped.
+
+The ghost/default leader entry also remains in the map until `DeleteParty -> Destroy`. During `Destroy -> RemoveBonus`, each remaining member again calls `ComputeRolePoint(..., GetLeaderCharacter(), ..., false)`; `GetLeaderCharacter()` is still null, so cleanup is skipped for all remaining online members too.
+
+This is persistent beyond a normal stat recomputation: `CHARACTER::ComputePoints()` explicitly snapshots all `POINT_PARTY_*_BONUS` values and restores them after rebuilding other points.
+
+Normal reachability includes:
+- BattleField leader entry -> `party->Quit(leaderPID)`;
+- quest `party.leave_party` for a leader when party size is greater than 2.
+
+This creates BUG-PARTY-005.
+
+### BUG-PARTY-006 — quest `get_near_member_pids` does not perform a near check
+Under active `ENABLE_DUNGEON_RENEWAL`, the registered Lua API `party.get_near_member_pids` is implemented using:
+`pParty->ForEachOnMapMember(f, ch->GetMapIndex())`.
+
+It performs no distance/`bNear` filter. The source itself marks the function:
+`// Near Check missing!`
+
+Therefore callers asking for "near member PIDs" receive all currently linked party members on the same map, including members outside `PARTY_DEFAULT_RANGE`.
+
+Current Project_Game code search did not identify a concrete live caller, so impact is quest-script dependent, but the registered API implementation is incorrect as exposed.
+
+## Exact next audit
+1. Split and audit Party Match as an adjacent subsystem boundary.
+2. Audit remaining quest Party APIs for null/lifetime and stale-state hazards.
+3. Audit Party ownership/drop rotation and centralized EXP pointer lifecycle.
+4. Review remaining client/server party packet definitions for size/field mismatches.
+5. Decide whether core Party can be marked STATIC COMPLETE and Party Match opened separately.
