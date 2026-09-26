@@ -401,3 +401,35 @@ SHOP_SUBHEADER_GD_BUY contains no net price/tax. Therefore DB credits cached lis
 
 ### Cross-layer atomicity observation
 Game item owner transfer is immediately ITEM_MANAGER::FlushDelayedSave(item) before SHOP_SUBHEADER_GD_BUY is sent. Buyer currency uses CHARACTER::Save() delayed at end of Buy(). Shop stash/table is a separate DB shop cache mutation. No single commit/rollback primitive spans these three state stores.
+
+## Recovered DB map — Ticket / Dungeon Info / Battle Pass
+
+### Ticket schema
+Direct game-server SQL:
+- `ticket.list`: ticket identity, owner, title/content, priority, date, status.
+- `ticket.reply`: ticket replies.
+- `ticket.user_restricted`: account restriction + reason.
+
+No DB-process transaction layer; game server performs synchronous DirectQuery.
+User-controlled strings are currently serialized without proper SQL escaping.
+
+### Dungeon Info
+- Ranking reads `player.dungeon_ranking` joined with `player.player` and `account.account`.
+- Dungeon runtime/config metadata itself comes from locale `dungeon_info.txt` and quest/event flags rather than a DB cache.
+
+### Battle Pass
+Observed persistence:
+- `player.battlepass_playerindex`
+  - player_id
+  - player_name
+  - battlepass_type
+  - battlepass_id
+  - start_time
+  - battlepass_completed
+  - end_time
+- mission-level persistence is represented by `TPlayerExtBattlePassMission` and still requires complete load/save table mapping.
+
+Known lifecycle:
+- first mission creation can INSERT playerindex row.
+- final reward SELECTs completed flag then UPDATEs it to 1 before granting final reward.
+- zero-row SELECT is not guarded (BUG-BPASS-005).
