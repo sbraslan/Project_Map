@@ -334,3 +334,56 @@ Source item footprint S
 
 Önemli persistence detayı:
 `SetItem` explicit Save çağırmasa da her swapped item öncesinde `RemoveFromCharacter` yaptığı için delayed-save set'te bulunur.
+
+## Switchbot — full runtime flow
+
+Inventory item
+→ generic ITEM_MOVE
+→ destination SWITCHBOT
+→ `SetItem`
+→ `RegisterItem(pid,itemID,slot)`
+→ manager object gerekirse `new CSwitchbot`
+→ table.items[slot]=itemID
+→ item DB window=SWITCHBOT.
+
+START
+→ `HEADER_CG_SWITCHBOT(171)`
+→ fixed alternatives parse
+→ `Manager::Start`
+→ active=true
+→ config copy
+→ event_create(0.2s).
+
+Event
+→ `SwitchItems`
+→ item ID resolve
+→ target attributes check
+→ switcher/gold consume
+→ `ChangeAttribute`
+→ UPDATE_ITEM.
+
+Completion
+→ active=false
+→ finished=true
+→ no active slot kalırsa Stop/event_cancel.
+
+### Inter-core warp
+Character warp:
+→ `SetIsWarping(pid,true)`
+→ target port farklıysa `P2PSendSwitchbot`
+→ event Pause
+→ source manager map entry erase
+→ full table `HEADER_GG_SWITCHBOT(31)`
+→ target core `P2PReceiveSwitchbot`
+→ new/existing object SetTable
+→ EnterGame
+→ SetIsWarping(false)
+→ active slot varsa Start/resume.
+
+Kaynak core'da erase edilen eski object delete edilmediği için leak oluşur.
+
+### Normal logout
+`CHARACTER::Disconnect` içinde Switchbot manager için Stop/Pause/erase/delete çağrısı bulunmuyor.
+
+Itemların character lifecycle sırasında kaldırılması table slotlarını unregister edebilse bile manager object'in kendisini kaldıran lifecycle yok.
+Aktif stale state/event kalırsa item lookup null döndükçe event 0.2s cadence ile devam eder.
