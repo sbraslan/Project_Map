@@ -20,6 +20,7 @@
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
+      "Resolve the unqualified LoadRanking(RK_CATEGORY_BF) declaration/linkage anomaly without assuming a wrapper exists.",
       "Locate the exact outbound TPacketGGLoadRanking sender/broadcast path.",
       "Close ranker-effect refresh/removal lifecycle.",
       "Determine whether any active caller opens generic PARTY ranking.",
