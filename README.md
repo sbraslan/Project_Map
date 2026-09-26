@@ -3,21 +3,27 @@
 Metin2 projesinin salt-okuma kaynak haritası ve kalıcı teknik checkpoint deposu.
 
 ## Start here
-**Normal çalışma başlangıcı: `CURRENT.md`.**
+**Normal çalışma başlangıcı: `STATE.json` -> `CURRENT.md` -> aktif `systems/<name>.md`.**
 
-Then follow its active subsystem pointer. Do not load the legacy map set on every turn.
+Yeni sohbette geçmiş konuşmaları taşımaya gerek yok. Şu kısa komut yeterlidir:
+
+> `sbraslan/Project_Map STATE.json dosyasını oku ve aktif checkpointten WORKFLOW.md kurallarına göre ilerle.`
+
+Sonrasında aynı sohbet içinde yalnızca **"ilerleyelim"** denebilir.
 
 ## Architecture
-- `CURRENT.md` — tiny overwrite-only active checkpoint
+- `STATE.json` — machine-readable project memory, active cursor and source snapshot
+- `CURRENT.md` — tiny overwrite-only human checkpoint
 - `INDEX.md` — subsystem status/navigation
 - `WORKFLOW.md` — low-context continuation contract
 - `systems/` — one canonical map per subsystem
 - `bugs/` — subsystem-scoped bug registries
 - `tests/` — subsystem-scoped runtime/fault-injection tests
-- `archive/` — full legacy monolithic files, preserved but excluded from normal startup
+- `history/` — rare architecture/migration checkpoints; never normal startup context
+- `archive/` — legacy monolithic files; recovery only
 
 ## Safety rule
 Source repos are read-only. Mapping writes go only to `Project_Map`.
 
-## Why this layout exists
-The old monolithic progress/bug/test files became large enough that rereading them filled chat context. The pointer-based layout makes each continuation load only the active subsystem.
+## Core principle
+**Do not rebuild project state from chat history. Persist it to GitHub, then resume from GitHub.**
