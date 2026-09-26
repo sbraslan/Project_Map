@@ -502,3 +502,77 @@ Mutation sırası:
 6. quickslotlar topluca güncellenir.
 
 Bu akış rollback/transaksiyon kullanmıyor; ancak tüm temel geometry/lock kontrolleri mutation öncesinde yapılmış durumda.
+
+## Switchbot — item registration ve movement
+
+### `CHARACTER::SetItem`, SWITCHBOT
+- slot < `SWITCHBOT_SLOT_COUNT`
+- old+new aynı anda non-null ise return
+- pItem varsa:
+  `CSwitchbotManager::RegisterItem(pid,itemID,slot)`
+- null ise:
+  `UnregisterItem(pid,slot)`
+- `pSwitchbotItems[slot]` güncellenir
+- ardından item window = SWITCHBOT olur.
+
+### Move guards
+`CHARACTER::MoveItem`:
+- source SWITCHBOT + active slot → reject
+- destination SWITCHBOT + invalid item type → reject.
+
+Valid item:
+- weapon
+- armor
+- opsiyonel costume body/hair/weapon.
+
+### UseItem guard
+`CHARACTER::UseItem` SWITCHBOT source ise:
+- manager bulunur ve slot active ise false
+- boş inventory aranır
+- generic MoveItem ile inventory'ye alınır.
+
+Dolayısıyla UI'daki UseItem yolu active slot kilidini bypass etmiyor.
+
+## Switchbot packet dispatch
+
+`HEADER_CG_SWITCHBOT = 171`
+→ `CInputMain::Switchbot`.
+
+START:
+- base packet size check
+- extra payload = `sizeof(alternativeTable) * SWITCHBOT_ALTERNATIVE_COUNT`
+- uiBytes yeterli değilse reject
+- server tam sabit sayıda alternative parse eder
+- `CSwitchbotManager::Start(pid,slot,vec)`.
+
+STOP:
+→ `CSwitchbotManager::Stop(pid,slot)`.
+
+### Start server checks
+Mevcut:
+- slot range
+- switchbot object var mı
+- slot zaten active mi
+
+Eksik:
+- `m_table.items[slot] != 0`
+- item ID runtime item manager'da gerçekten var mı
+- item owner halen aynı player mı
+- item halen SWITCHBOT window/aynı slotta mı
+- en az bir alternative configured mı
+
+### Event
+`CSwitchbot::Start`
+→ 0.2s event.
+
+Her tick:
+`SwitchItems()`
+→ active slot
+→ stored item ID
+→ `ITEM_MANAGER::Find(itemID)`
+→ item bulunmazsa **continue**, active flag/event değişmez
+→ owner null ise tüm tick'ten return
+→ hedef attr tamamlandıysa slot inactive/finished
+→ kaynak yeterliyse ChangeAttribute + item update.
+
+Bu nedenle active+missing-item state kendi kendini iyileştirmiyor.
