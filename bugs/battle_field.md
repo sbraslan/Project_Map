@@ -76,3 +76,44 @@ Sequence:
 Thus the intended per-victim repeat-kill cooldown is enforced only for the first interval. After the first expiry, repeated kills can award Battle Field score without the configured spacing.
 
 The map is cleared only with the character object's lifecycle/initialization, not after each accepted post-expiry kill.
+
+
+### BUG-BFIELD-004 — Battle Field calls an unqualified/nonexistent LoadRanking symbol
+- Statik durum: **doğrulandı**
+- Sınıf: build/integration failure
+- Build koşulu: `ENABLE_BATTLE_FIELD` + `ENABLE_RANKING_SYSTEM` (both enabled in current server CommonDefines snapshot)
+
+`CBattleField::CloseEnter` and the weekly-ranking branch in `CBattleField::Update` both call:
+`LoadRanking(RK_CATEGORY_BF);`
+
+`CBattleField` declares no `LoadRanking` member.
+
+The mapped headers included by `battle_field.cpp` expose only:
+`CRankingSystem::LoadRanking(uint8_t)`.
+
+No included header declares a matching global/free `LoadRanking`, and no macro alias was found in the mapped include set.
+
+Therefore the active preprocessor path contains an unresolved unqualified function call at both reload sites. This is a Battle Field <-> Ranking integration compile defect in the checked-in source snapshot.
+
+### BUG-BFIELD-005 — weekly rollover leaves stale winners when the new week has fewer than three scorers
+- Statik durum: **doğrulandı**
+- Sınıf: ranking lifecycle / stale DB state
+
+`CBattleField::UpdateWeekRanking` selects up to three current-week players and writes:
+`REPLACE INTO log.battle_week (pos, pid, score, last_update) ...`
+only for rows actually returned.
+
+It never clears `log.battle_week` positions that are not replaced.
+
+If the new week has:
+- zero qualifying scorers -> all old winner rows remain;
+- one scorer -> previous positions 2/3 remain;
+- two scorers -> previous position 3 remains.
+
+`CRankingSystem::LoadRankingWeekWinners` later reads:
+`SELECT p.id FROM log.battle_week ... ORDER BY r.score DESC LIMIT 3`
+with no week/timestamp filter.
+
+Old rows can therefore be interpreted as winners of the new week and feed `GetBFRankingPosition` / winner-affect assignment.
+
+This defect is independent of the separate Ranking module bugs; it originates in Battle Field's weekly rollover writer.
