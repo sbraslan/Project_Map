@@ -1,34 +1,68 @@
 # Low-Context Continuation Protocol
 
-Goal: continue long Metin2 static mapping without filling chat history.
+Goal: continue the Metin2 mapping project indefinitely without depending on chat history or filling context.
+
+## Source of truth
+1. `STATE.json` — machine-readable active state and source snapshot.
+2. `CURRENT.md` — short human-readable cursor.
+3. `INDEX.md` — subsystem status/navigation.
+4. `systems/<active>.md` — canonical technical map for the active subsystem.
+
+If an old chat summary disagrees with GitHub, **GitHub wins**.
 
 ## On every "ilerleyelim"
-1. Read `CURRENT.md`.
-2. Read only the active `systems/<name>.md`.
-3. Read `bugs/<name>.md` only when checking/adding a bug.
-4. Read `tests/<name>.md` only when planning/running runtime tests.
-5. Fetch only exact source files/ranges needed from read-only source repos.
-6. Save meaningful findings to the active subsystem files.
-7. **Overwrite** `CURRENT.md` with the new short checkpoint.
+1. Read `STATE.json`.
+2. Read `CURRENT.md`.
+3. Read only the active `systems/<name>.md`.
+4. Open `bugs/<name>.md` only when a bug is being checked/added.
+5. Open `tests/<name>.md` only for runtime/fault-injection work.
+6. In source repos, search for exact symbols first; then read only exact files/ranges needed.
+7. Save meaningful findings to the active subsystem file.
+8. Overwrite `CURRENT.md` with the new short cursor.
+9. Update `STATE.json` so the next chat can resume without prior conversation.
 
-## Never do by default
-- Do not read `archive/`.
-- Do not read every subsystem.
-- Do not reread completed systems.
-- Do not append historical prose to `CURRENT.md`.
-- Do not repeat the full project recap in chat.
-- Do not modify source repos during mapping.
+## Context budget
+- Startup target: 3 files only.
+- Never bulk-read `systems/`, `bugs/`, `tests/`, or `archive/`.
+- Never reread completed subsystems unless a source change invalidates them.
+- Prefer symbol search + bounded line-range reads over loading whole large source files.
+- Chat replies should report only: what changed, new bug IDs if any, checkpoint saved, next exact target.
+
+## Repository safety
+Read-only source repositories:
+- `Project_ClientSrc`
+- `Project_ServerSRC`
+- `Project_Binary`
+- `Project_Game`
+- `Project_DumpProto`
+
+Writable mapping/checkpoint repository:
+- `Project_Map`
+
+During static mapping, never modify source repositories.
+
+## End-of-turn transaction
+Treat checkpoint writing as one logical transaction:
+- active `systems/<name>.md`
+- affected `bugs/<name>.md`
+- affected `tests/<name>.md`
+- `CURRENT.md`
+- `STATE.json`
+- `INDEX.md` only if subsystem status changed
+
+Do not append historical prose to `CURRENT.md`. Git commits already preserve history.
 
 ## Static-complete transition
 When a subsystem closes:
 1. mark it STATIC COMPLETE in its system file;
-2. update its bug/test files;
-3. change its row in `INDEX.md`;
-4. choose the next unmapped subsystem;
-5. overwrite `CURRENT.md` to point to that subsystem.
+2. update bug/test files;
+3. update its row in `INDEX.md`;
+4. choose the next subsystem;
+5. overwrite `CURRENT.md`;
+6. update `STATE.json`.
 
 ## Source-change invalidation
-If a source repo commit changes in a mapped area, reopen only the affected subsystem, not the whole project.
+`STATE.json` records source repository HEAD snapshots. If a source repo later changes, compare the new commit only against affected mapped areas and reopen only impacted subsystems.
 
-## Chat output rule
-Progress messages should be short: what closed, what new bug IDs appeared, what checkpoint was written, and the next exact target. Full detail lives in GitHub.
+## Recovery
+Use `archive/` only if the canonical active files are missing/corrupt or an old decision must be recovered. It is never normal startup context.
