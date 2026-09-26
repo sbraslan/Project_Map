@@ -1,12 +1,12 @@
 # RUNTIME — In-Game / Fault-Injection Validation
 
-**Status:** ACTIVE
+**Status:** DEFERRED — detection/mapping phase only
 **Started:** 2026-09-26
 
 Static mapping remains canonical in `INDEX.md` and per-system files. This file is the short cursor for the next phase; do not bulk-load every bug registry into one chat.
 
 ## Goal
-Validate confirmed static bugs against the running GAME/client, distinguish immediately reproducible normal-path failures from crafted-input/fault-injection issues, then fix them subsystem-by-subsystem.
+Future-only test inventory. During the current detection/mapping phase, do not execute these tests and do not modify source/game files. Keep this file only as deferred validation notes.
 
 ## Read discipline
 For each runtime turn:
@@ -69,3 +69,14 @@ Prepared without modifying source repos:
 - FIX-DUNGEON-012B: intentionally deferred data-semantics decision; current quest flags represent different timer meanings, so no guessed COOLDOWN values will be written.
 
 Important: Flame/Snow `exit_time` and Dragon `dragon_lair_time` are timestamp-style flags, but they do not all represent the same gameplay window. Arithmetic safety can be fixed generically; displayed cooldown policy must be chosen per dungeon.
+
+
+## Current phase lock
+This file is **not the active execution cursor**.
+
+Current user rule:
+- inspect only;
+- detect/map only;
+- write findings only to `Project_Map`;
+- no source, Python, C++, quest, config or game-data changes;
+- no runtime/fault-injection execution until the user explicitly changes phase.
