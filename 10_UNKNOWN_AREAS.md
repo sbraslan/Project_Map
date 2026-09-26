@@ -370,3 +370,38 @@ Inventory/Item ana statik haritası completion seviyesine alındıktan sonra Exc
 
 ### Sonraki checkpoint hedefi
 Exchange transaction/lifecycle haritasını kapat; ardından Shop/Private Shop veya bir sonraki item-transfer subsystemine geç.
+
+
+## Canonical checkpoint — Player Exchange static audit sonrası
+
+### Statik olarak kapatılan
+- client Python send boundary
+- CG exchange packet/subheader map
+- ExchangeStart session/window/distance guards
+- AddItem validation and source TItemPos semantics
+- SetExchanging offer lifecycle
+- Check + CheckSpace preflight
+- Done commit order
+- gold/cheque handling
+- Accept two-sided sequencing
+- Cancel/disconnect cleanup
+- item/currency persistence boundary.
+
+### Doğrulanmış Exchange bugları
+- BUG-EXCHANGE-001: Special Inventory CheckSpace/Done divergence + partial commit.
+- BUG-EXCHANGE-002: inventory page4 reservation control-flow bug + capacity overestimate.
+- BUG-EXCHANGE-003: exchange source window allowlist missing; SWITCHBOT/ADDITIONAL_EQUIPMENT_1 reachable by crafted client.
+- BUG-EXCHANGE-004: gold overflow TOCTOU; sender debit can survive failed recipient credit. Cheque late-overflow can abort after earlier mutations.
+
+### Observation
+- OBS-EXCHANGE-001: cheque-enabled AddGold uses `&&` in insufficient/existing-offer conditions; final Check limits completed-transfer impact.
+
+### Runtime kalan
+- EXCHANGE-T01 special inventory partial commit
+- EXCHANGE-T02 page4 reservation
+- EXCHANGE-T03 unsupported source windows
+- EXCHANGE-T04 gold overflow TOCTOU
+- EXCHANGE-T05 cheque late overflow rollback.
+
+### Exchange subsystem status
+Static code-flow map **completion seviyesinde**. Yeni statik subsystem'e geçilebilir; Exchange'e runtime test sonuçlarında geri dön.
