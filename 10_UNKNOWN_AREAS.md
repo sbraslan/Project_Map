@@ -405,3 +405,35 @@ Exchange transaction/lifecycle haritasını kapat; ardından Shop/Private Shop v
 
 ### Exchange subsystem status
 Static code-flow map **completion seviyesinde**. Yeni statik subsystem'e geçilebilir; Exchange'e runtime test sonuçlarında geri dön.
+
+
+## Exchange / Trade — lifecycle/persistence ikinci tur durumu
+
+### Yeni kapatılan statik alanlar
+- death cancellation
+- character teardown/disconnect cancellation
+- normal movement davranışı
+- final distance enforcement
+- active W_EXCHANGE / CanWarp ilişkisi
+- gold receiver-cap offer/final ordering
+- ITEM_ELK pickup sırasında exchange state davranışı
+- per-item FlushDelayedSave persistence
+- character currency delayed-save ordering.
+
+### Yeni buglar
+- BUG-EXCHANGE-004 — final distance recheck yok; official UI koruması server-side invariant değil.
+- BUG-EXCHANGE-005 — gold cap TOCTOU; sender debit receiver credit olmadan kalabilir.
+
+### Severity güncellemesi
+BUG-EXCHANGE-001 ve BUG-EXCHANGE-002 partial item transferleri FlushDelayedSave nedeniyle DB cache'e taşınabilir; persistence impact doğrulandı.
+
+### Hâlâ açık
+1. BUG-EXCHANGE-003 active Switchbot ve Additional Equipment runtime etkisi.
+2. Uninitialized CG Exchange packet alanlarının wire/runtime sonucu.
+3. SendExchangeItemDelPacket client tarafında assert-only olmasının gerçek UI/feature etkisi.
+4. Direct WarpSet çağıran ve CanWarp bypass eden özel callerların exchange açısından hızlı caller audit'i.
+5. Cheque balance'ın exchange açıkken değişebildiği tüm dış yollar.
+6. Runtime test EX-T01..EX-T09.
+
+### Sonraki mantıklı adım
+Exchange kalan edge caller auditlerini kısa turda kapat, subsystem için statik completion checkpoint oluştur; ardından Shop/Private Shop item-transfer subsystemine geç.
