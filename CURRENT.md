@@ -1,36 +1,41 @@
 # CURRENT — Canonical Active Checkpoint
 
 **Active phase:** Detection / Mapping Only
-**Active subsystem:** Dungeon Core
+**Active subsystem:** Battle Field System
 **Status:** PARTIAL — ACTIVE
 **Machine state:** `STATE.json`
-**Canonical map:** `systems/dungeon_core.md`
+**Canonical map:** `systems/battle_field.md`
 **Last updated:** 2026-09-27
 
 ## Hard rule
 Only `sbraslan/Project_Map` is writable. All source/game repositories remain read-only.
 
-## Dungeon Core checkpoint
-Verified bugs:
-- `BUG-DUNGEON-001` — rejected `d.join` / `d.new_jump_guild` can orphan an empty private dungeon.
-- `BUG-DUNGEON-002` — `SpawnMoveUnique` does not stop after success and can create up to 100 mobs while tracking one key.
-- `BUG-DUNGEON-003` — multi-key `SetUnique` aliases can survive character destruction as dangling raw pointers.
+## Just closed
+Dungeon Core -> **STATIC COMPLETE**.
 
-Closed without new bug:
-- persistent regen event/REGEN lifetime: event cancellation + dungeon-ID lookup + pointer/id validity guard closes the mapped UAF path;
-- bulk `KillAll/Purge/KillMonsters` traversal: `SECTREE_MAP::for_each` uses an entity snapshot, avoiding direct iterator invalidation;
-- normal participant and party-member bookkeeping previously closed.
+Verified Dungeon Core bugs:
+- `BUG-DUNGEON-001`
+- `BUG-DUNGEON-002`
+- `BUG-DUNGEON-003`
+- `BUG-DUNGEON-004`
 
-Still candidate / not promoted:
-- nested `JumpParty` can bypass exclusive-dungeon equality when party already has an ownership pointer, but current nested quest reachability is not yet established;
-- eliminate event null-ordering remains incorrect but no surviving-event lifecycle path is mapped;
-- lower-level stale SECTREE relationship erase has no established normal producer.
+Regen, bulk purge iteration, manager event identity, private-map teardown and remaining unpromoted lifecycle candidates were closed statically.
+
+## Active Battle Field direction
+Initial roots:
+- `game/src/battle_field.cpp/.h`
+- Battle Field commands/P2P state propagation
+- Battle Field packets
+- `root/uibattlefield.py`
+- client player/network bindings
+- Ranking integration boundaries
 
 ## Exact next work
-1. Scan current source quests for `d.spawn_move_unique`, multi-key `d.set_unique`, and nested `d.new_jump_party` reachability.
-2. Audit duplicate-key behavior in `SpawnUnique/SetUnique`.
-3. Audit dungeon manager ID wrap against event identity.
-4. Close eliminate-event null ordering.
-5. Decide Dungeon Core STATIC COMPLETE.
+1. Audit entry/exit command authorization and channel/map restrictions.
+2. Audit kill/death/score accounting and persistence.
+3. Audit schedule day/time calculations.
+4. Audit cooldown/reconnect behavior.
+5. Audit P2P state synchronization.
+6. Record only Battle Field-specific bugs; Ranking bugs stay in Ranking registry.
 
 GitHub state is canonical.
