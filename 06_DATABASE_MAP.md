@@ -320,3 +320,28 @@ Character delete item cleanup query de SWITCHBOT window'u kapsar.
 
 Switchbot'un active/finished/alternative konfigürasyonu item DB row'unda tutulmaz.
 Cross-core state `TSwitchbotTable` ile P2P üzerinden taşınır; normal login sırasında manager runtime state yoksa yalnız item slotu DB'den restore edilir.
+
+
+## Player Exchange persistence / atomicity boundary
+
+Exchange has no DB-level transaction spanning both characters.
+
+Item commit:
+`RemoveFromCharacter / AddToCharacter`
+→ item Save
+→ `ITEM_MANAGER::FlushDelayedSave(item)` per transferred item.
+
+Currency commit:
+`PointChange` mutates runtime character state;
+`Accept()` calls character `Save()` conditionally after `Done()`.
+
+Two exchange sides are committed sequentially:
+- first `Done()`
+- optional first owner Save
+- second `Done()`
+- optional second owner Save.
+
+If first side succeeds and second side fails, no compensating DB/runtime rollback exists.
+If one item succeeds and a later item fails inside the same `Done()`, already flushed item ownership is not restored.
+
+This persistence shape is central to BUG-EXCHANGE-001/002/004.
