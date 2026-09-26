@@ -450,3 +450,39 @@ Bu nedenle `slot == SWITCHBOT_SLOT_COUNT` client binding katmanından geçebilir
 Server tarafındaki `ValidPosition(slot) -> slot < SWITCHBOT_SLOT_COUNT` bunu reddettiği için mevcut server state korunuyor.
 
 Doğru client-local sınır semantiği `>=` olmalı; şimdilik server tarafından absorbe edilen boundary observation.
+
+
+### BUG-ITEM-007 — Special Inventory extend bWindow out-of-bounds
+- Statik durum: **doğrulandı**
+- Sınıf: client-controlled index / bounds validation eksikliği
+- Build: `ENABLE_EXTEND_INVEN_ITEM_UPGRADE_SPECIAL_INV`
+
+Client packet: `TPacketCGSendExtendInvenRequest/Upgrade.bWindow` = `uint8_t`.
+
+Server `CInputMain::ExtendInvenRequest/Upgrade` -> `ExtendSpecialInvenRequest/Upgrade(packet->bWindow)` öncesinde `bWindow < 3` kontrolü yapmıyor.
+
+Character helperları:
+- `GetExtendSpecialInvenStage(bPage) -> bSpecialInventoryStage[bPage]`
+- `SetExtendSpecialInvenStage(..., bPage) -> bSpecialInventoryStage[bPage] = ...`
+- `GetExtendSpecialInvenMax(bPage)` ayrıca local 3-element base array kullanıyor.
+
+Bu nedenle 3..255 special window:
+- request/upgrade yolunda OOB read,
+- sonraki index calculations'da undefined behavior,
+- upgrade başarılı path'e ulaşırsa OOB write
+riski oluşturuyor.
+
+Official UI'nin 0..2 üretmesi server trust boundary için yeterli koruma değildir; client Python binding de kendi 0..2 allowlist'ini uygulamıyor.
+
+### BUG-ITEM-008 — Locked Special Inventory slot DB restore
+- Statik durum: **doğrulandı**
+- Sınıf: persistence / unlock-state invariant bypass
+- Doğrudan normal-client trigger: bulunmadı
+
+Normal `MoveItem` locked special target'ı `IsEmptySpecialItemGrid -> GetExtendSpecialInvenMax` ile reddeder.
+
+Fakat DB load: `ItemLoad -> persisted window=INVENTORY,pos -> AddToCharacter -> SetItem` yolunda target special position için character'ın unlocked max'ı zorunlu placement guard değildir.
+
+`IsValidItemPosition(INVENTORY)` tüm static `INVENTORY_SLOT_COUNT` aralığını kabul eder. `SetItem` special branch'i target static special range içindeyse locked max üzerindeki hücreyi kesin olarak reject etmez ve item/grid pointerlarını kurabilir.
+
+Sonuç: malformed, legacy veya başka bir bug tarafından üretilmiş DB row açılmamış special slotta item restore edebilir. Bu durum görünmeyen/erişilemeyen item ve persistence tutarsızlığına dönüşebilir.
