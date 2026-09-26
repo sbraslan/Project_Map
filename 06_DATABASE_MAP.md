@@ -433,3 +433,38 @@ Known lifecycle:
 - first mission creation can INSERT playerindex row.
 - final reward SELECTs completed flag then UPDATEs it to 1 before granting final reward.
 - zero-row SELECT is not guarded (BUG-BPASS-005).
+
+## Battle Pass persistence — completed map
+
+### Mission table
+DB process login query:
+`SELECT player_id, battlepass_type+0, mission_index, mission_type+0, battle_pass_id, extra_info, completed FROM battlepass_missions WHERE player_id = ?`.
+
+Result:
+`QID_EXT_BATTLE_PASS -> RESULT_EXT_BATTLE_PASS_LOAD`
+serializes PID + count + `TPlayerExtBattlePassMission[]` in `HEADER_DG_EXT_BATTLE_PASS_LOAD`.
+
+GAME:
+`CInputDB::ExtBattlePassLoad -> CHARACTER::LoadExtBattlePass`.
+
+Dirty save:
+`CHARACTER::Disconnect`
+-> for each `bIsUpdated`
+-> `HEADER_GD_SAVE_EXT_BATTLE_PASS`
+-> DB `QUERY_SAVE_EXT_BATTLE_PASS`
+-> asynchronous:
+`REPLACE INTO battlepass_missions(player_id,battlepass_type,mission_index,mission_type,battle_pass_id,extra_info,completed)`.
+
+There is no gameplay-time mission-row write in the mapped implementation; persistence is logout-driven.
+
+### player.battlepass_playerindex
+GAME process uses direct SQL for:
+- registration existence;
+- INSERT on first mission progress;
+- ranking;
+- final reward consumed state;
+- end_time.
+
+This table and `battlepass_missions` are therefore separate durability domains.
+
+Atomicity consequences are recorded as BUG-BPASS-008 and BUG-BPASS-009.
