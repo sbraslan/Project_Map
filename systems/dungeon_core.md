@@ -1,6 +1,6 @@
 # Dungeon Core
 
-**Status:** PARTIAL — ACTIVE
+**Status:** STATIC COMPLETE
 **Phase:** Detection / Mapping Only
 **Date:** 2026-09-26
 
@@ -373,3 +373,34 @@ The Lua surfaces `d.spawn_unique`, `d.spawn_move_unique` and `d.set_unique` are 
 3. Audit private-map destroy ordering against character `SetDungeon(nullptr)` on map teardown.
 4. Decide whether any remaining candidate is promotable.
 5. Move Dungeon Core toward STATIC COMPLETE.
+
+
+## Final static closure — 2026-09-27
+Dungeon Core is **STATIC COMPLETE** for the mapped generic private-dungeon engine.
+
+Final verified bugs:
+- `BUG-DUNGEON-001`
+- `BUG-DUNGEON-002`
+- `BUG-DUNGEON-003`
+- `BUG-DUNGEON-004`
+
+Final closures:
+- regen event and REGEN pointer lifetime;
+- bulk purge/kill snapshot iteration;
+- manager ID wrap and dungeon-owned event cancellation;
+- private-map teardown -> descriptor/character destruction -> `SetDungeon(nullptr)`;
+- party/member counters;
+- participant PID/name registry;
+- eliminate-event stale-lifecycle reachability;
+- current major dungeon quest usage sampled for unique/new-jump surfaces.
+
+Targeted current quest check:
+- Devil Catacomb/Tower, Flame Dungeon and Snow Dungeon actively use `d.set_unique`, with distinct/generated keys in the inspected paths;
+- no `d.spawn_move_unique` use was found in the inspected major dungeon source quests;
+- inspected `d.new_jump_party` uses are dungeon-entry helpers, not a demonstrated nested exclusive-dungeon transition.
+
+The weak nested `JumpParty` equality invariant remains documented but is not promoted without a mapped nested caller.
+
+`CountRealMonster()` reads `m_lOrigMapIndex`, but registered `d.count_monster` uses tracked `CountMonster()`; no active mapped consumer of `CountRealMonster` was established.
+
+Next canonical subsystem: **Battle Field System**.
