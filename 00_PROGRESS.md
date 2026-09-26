@@ -870,3 +870,28 @@ Safebox/Mall STATIC COMPLETE sonrasında Mailbox subsystemine geçildi.
 5. block/messenger policy
 6. open/close/warp lifecycle
 7. Mailbox static completion.
+
+
+## Checkpoint — Mailbox STATIC COMPLETE
+
+**Tarih:** 2026-09-26
+
+Mailbox ikinci/final statik tur tamamlandı.
+
+### Final yeni kritikler
+- BUG-MAIL-008: boot loader `m_map_mailbox.empty()` iken erken return ediyor; persisted SQL mail reload edilmiyor.
+- BUG-MAIL-009: full table TRUNCATE + per-mail INSERT transaction değil.
+- BUG-MAIL-010: backup SQL string escaping yok.
+- BUG-MAIL-011: packet fixed strings için server NUL termination yok.
+- BUG-MAIL-012: receiver attachment grant DB GET ack öncesi commit.
+
+### Policy gözlemleri
+- W_MAILBOX set ediliyor fakat CanWarp opened-window maskesinde yok.
+- mailbox block-result enumları var ama Messenger/block enforcement yok.
+- client Python binding uzun stringleri strcpy ile packet array'lerine yazıyor.
+
+### Durum
+**Mailbox: STATIC COMPLETE**
+
+Mailbox için sıradaki iş runtime/fault-injection test matrisidir.
+Yeni subsystem'e geçmeye hazır.
