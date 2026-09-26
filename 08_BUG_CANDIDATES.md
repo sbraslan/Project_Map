@@ -73,3 +73,20 @@ DB request ile gerçek open arasındaki hata/iptal yolları `guildstoragestate=1
 - Insert sırasında `owner_id = guildID`, `window='GUILDBANK'`.
 - Potansiyel sonuç: oyuncunun kişisel safebox award'ı guild storage açılırken guild bank item'ına dönüşebilir.
 - Runtime testi gerekli.
+
+### BUG-GS-007 — ENABLE_SAFEBOX_MONEY altında Guild Storage kapanışı kişisel safebox gold'unu sıfırlayabilir
+- Statik durum: **kod yolu doğrulandı**
+- Build koşulu: `ENABLE_GUILDSTORAGE_SYSTEM && ENABLE_SAFEBOX_MONEY`
+
+Kanıt zinciri:
+1. `LoadGuildstorage` → `new CSafebox(this, iSize, 0)`
+2. constructor → `m_lGold = 0`
+3. `CloseGuildstorage` → `m_pkGuildstorage->Save()`
+4. ortak `CSafebox::Save()` → `dwID = character account ID`, `dwGold = 0`
+5. DB → `UPDATE safebox SET gold='0' WHERE account_id=<character account>`
+
+Sonuç:
+Guild Storage kapatmak, kişisel safebox tablosundaki gold değerini sıfırlayabilir.
+
+Not:
+Bu bug yalnız ilgili compile flag aktifse çalışır. Runtime testi veri kaybı riski nedeniyle yalnız kontrollü test DB'sinde yapılmalı.
