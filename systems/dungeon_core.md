@@ -102,3 +102,98 @@ This layer is an authority/lifetime boundary because quest code drives raw `CDun
 3. Close dungeon dead/exit/jump event lifetimes and null ordering.
 4. Map quest create/join/new_jump/new_jump_party call chains.
 5. Start verified Dungeon Core bug registry.
+
+
+## Character / party membership lifecycle closure
+
+`CHARACTER::SetDungeon(newDungeon)` is the authoritative character-side bridge.
+
+On leaving an existing dungeon:
+- PC with party -> `oldDungeon->DecPartyMember(GetParty(), this)`;
+- PC without party -> `oldDungeon->DecMember(this)`;
+- monster/stone -> `oldDungeon->DecMonster()`.
+
+On entering:
+- PC with party -> `newDungeon->IncPartyMember(GetParty(), this)`;
+- PC without party -> `newDungeon->IncMember(this)`;
+- monster/stone -> `newDungeon->IncMonster()`.
+
+Character destruction calls `SetDungeon(nullptr)` if needed.
+
+Party removal is deliberately ordered so dungeon bookkeeping sees the old party pointer:
+`CHARACTER::SetParty(nullptr)` first calls `SetDungeon(nullptr)` while `m_pkParty` is still set, then clears the party pointer.
+
+`CDungeon::IncPartyMember` increments `m_map_pkParty[pParty]` and also inserts the character into the general dungeon character set through `IncMember`.
+
+`DecPartyMember` decrements that count, and when it reaches zero calls `QuitParty(pParty)`, which clears the party's generic dungeon pointer and erases the raw party key. It then calls `DecMember(ch)`.
+
+Therefore the previously suspected normal party-destruction dangling `m_map_pkParty` key closes on the mapped online-member lifecycle: leader/member `SetParty(nullptr)` transitions decrement the dungeon party count before the `CParty` object is deleted.
+
+## Warp/login dungeon binding
+Party/single-character dungeon warp helpers do not directly call `SetDungeon(this)` before `WarpSet`.
+
+On game entry after warp, `input_login.cpp` resolves:
+`CDungeonManager::FindByMapIndex(ch->GetMapIndex())`
+and calls:
+`ch->SetDungeon(resolvedDungeon)`.
+
+That establishes the character/dungeon membership and party count on the destination game process.
+
+## Candidate closures
+### JoinParty map-existence ordering
+`JoinParty` sets party/dungeon pointers before checking `SECTREE_MANAGER::GetMap(m_lMapIndex)`.
+
+Normal manager lifecycle does not expose a live `CDungeon` without its private map:
+- `Create` constructs the dungeon only after `CreatePrivateMap` succeeds;
+- `Destroy` destroys the private map immediately before deleting the dungeon object.
+
+No normal source path was found that removes the private map while retaining the dungeon object. This remains defensive-ordering debt, not a promoted bug.
+
+### Exit/jump event lookup null ordering
+`dungeon_jump_to_event` and `dungeon_exit_all_event` assign through the manager lookup result before checking it for null.
+
+However `CDungeon::~CDungeon` cancels both `jump_to_event_` and `exit_all_event_`, and manager destruction deletes the object through that destructor. No normal lifecycle path has yet been found where one of these events survives after its dungeon is removed from the manager.
+
+The null ordering is incorrect but remains unpromoted until a live stale-event path is established.
+
+## Quest create/join lifecycle
+
+The active build enables both:
+- `D_JOIN_AS_JUMP_PARTY`;
+- `ENABLE_D_NJGUILD`.
+
+### BUG-DUNGEON-001 — quest entry APIs can orphan a newly-created private dungeon after post-create eligibility failure
+
+`dungeon_join` performs:
+1. validate Lua map argument;
+2. `CDungeonManager::Create(lMapIndex)`;
+3. obtain current character;
+4. under active `D_JOIN_AS_JUMP_PARTY`, require that character to have a party;
+5. if no party, log `cannot go to dungeon alone.` and return.
+
+Thus a solo player calling the registered `d.join(mapIndex)` API causes the private map/dungeon to be created **before** the function rejects the player.
+
+The new dungeon has:
+- empty `m_set_pkCharacter`;
+- `deadEvent == nullptr` from initialization.
+
+Automatic dead destruction is only scheduled inside `DecMember` when a previously tracked member is removed and the set becomes empty. A dungeon that never receives a member never reaches that scheduling point.
+
+Therefore the rejected call leaves an orphan private dungeon/map registered in `CDungeonManager` with no automatic destruction event.
+
+The same create-before-eligibility pattern exists in active `dungeon_new_jump_guild`:
+- creates private dungeon first;
+- then resolves current character;
+- then checks `ch->GetGuild()`;
+- a non-guild caller returns after allocation.
+
+This creates BUG-DUNGEON-001.
+
+Current source dungeon quests primarily use `d.new_jump_party` / `d.new_jump_all`, whose mapped common call paths do not demonstrate this failure. Impact of the exposed `d.join` / `d.new_jump_guild` APIs therefore depends on quest usage, but the resource leak is deterministic for the rejected invocation itself.
+
+## Exact next audit
+1. Audit `JumpParty` one-party ownership pointer across nested/repeated dungeon creation.
+2. Close dead/exit/jump event lifetime and manager-ID reuse more deeply.
+3. Audit participant registration and member sets under cross-core/private-map warp.
+4. Audit quest item-group removal and entry-item lifecycle.
+5. Continue spawn/unique/regen pointer lifecycle and promote only verified bugs.
