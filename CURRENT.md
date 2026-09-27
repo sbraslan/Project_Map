@@ -11,17 +11,15 @@
 Only `sbraslan/Project_Map` is writable. All source/game repositories remain read-only.
 
 ## Just mapped
-- `IsSungMahiDungeon()` is scoped to private instances of `MAP_SMG_DUNGEON_02`.
-- `SetDungeonMultipliers()` accepts only dungeon levels 1..50.
-- `GetSungMahiTowerDungeonValue()` still indexes its 0..50 table directly from dungeon flag `dungeonLevel` without a local bounds check.
-- No C++ writer for `dungeonLevel` was found; generic Lua dungeon flags are writable through `d.setf/CDungeon::SetFlag`.
-- The visible `quest_list` and quest source tree contain no Sung Mahi/SMH tower quest source entry, so the exact producer remains unresolved from the current source set.
-- `questmanager.cpp` confirms dedicated SQL ranking persistence in `sung_mahi_ranking`, monthly fastest-per-floor rewards, then table truncation/reset.
+- `common/length.h::ESungMahiDungeon` proves the canonical tower maximum is exactly 50.
+- The same 50-level boundary matches the 4x51 SungMa lookup table, `SetDungeonMultipliers()` 1..50 guard, and monthly ranking loop.
+- The unresolved risk is therefore specifically whether every runtime writer of dungeon flag `dungeonLevel` enforces 1..50 before the unguarded table lookup.
+- Generic server code also recognizes both `MAP_SMG_DUNGEON_01` and `MAP_SMG_DUNGEON_02` as special dungeon maps and exposes tower-specific character control flags.
 
 ## Exact next work
-1. Recover the quest/runtime producer for `dungeonLevel` and prove its 1..50 guarantee.
-2. Resolve producers for the nine Sung Mahi server-command strings and `sungMahiQuest`.
-3. Trace quest-button entry into the private tower instance.
+1. Recover the missing tower quest/runtime writer for `dungeonLevel`.
+2. Resolve the nine `cmdchat` producers and `sungMahiQuest`.
+3. Trace entry flow across `MAP_SMG_DUNGEON_01` and private `MAP_SMG_DUNGEON_02`.
 4. Continue ranking/completion/reward SQL boundary mapping.
 5. Only then promote any verified bug.
 
