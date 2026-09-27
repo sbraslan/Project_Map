@@ -99,6 +99,28 @@ The first future live gate remains **DUNGEON-T10** because it is reproducible wi
 
 **Next documentation cluster:** Ticket runtime readiness.
 
+
+## Runtime-readiness consolidation — Ticket — 2026-09-28
+**Documentation status:** READY  
+**Execution status:** LOCKED / NOT RUN
+
+Ticket now has a one-to-one bug/test map:
+- TICKET-T01 -> BUG-TICKET-001
+- TICKET-T02 -> BUG-TICKET-002
+- TICKET-T03 -> BUG-TICKET-003
+- TICKET-T04 -> BUG-TICKET-004
+- TICKET-T05 -> BUG-TICKET-005
+- TICKET-T06 -> BUG-TICKET-006
+- TICKET-T07 -> BUG-TICKET-007
+
+Execution classes:
+- **Normal-path UI validation:** TICKET-T07. This can be observed with legitimate ticket creation/UI behavior and no crafted packet.
+- **Isolated/adversarial validation:** TICKET-T01 through TICKET-T06. These require one or more of: modified client input, foreign ticket IDs, disposable DB data, controlled collision setup, invalid admin mode, ASan/UBSan, or crafted non-NUL packets.
+
+Overall runtime order remains unchanged: DUNGEON-T10 is still the first live gate. Ticket's first future normal-path test is **TICKET-T07** after the Dungeon normal-path cluster is cleared.
+
+**Next documentation cluster:** Hunting runtime readiness.
+
 ## Patch readiness
 First-cluster fix plan is ready at `fixes/dungeon_info.md`.
 
