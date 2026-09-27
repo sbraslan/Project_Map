@@ -321,3 +321,29 @@ The current World Boss vnum table contains vnum 1093. Project_Game contains exis
 - Biolog level-90 quest intentionally lists 1093 among several valid kill targets and can grant its normal quest drop when a player in the relevant quest state kills the World Boss.
 
 No World Boss-specific tier assignment or reward reset was found in the named quest/data roots. The biolog overlap is documented as integration behavior, not classified as a bug because the quest intentionally treats vnum 1093 as a general eligible target.
+
+
+## Reward command / tier provenance closure
+`get_wb_reward` is registered at `GM_PLAYER`, so ordinary players may invoke it through the command interpreter.
+
+The command gates on:
+- not observer;
+- not dead/stunned;
+- `GotWBRewards() == false`;
+- `GetTier() != 0`.
+
+However the mapped runtime provenance for tier/reward state is incomplete in the implementation itself:
+- `m_pTier` and `m_pGotRewards` are private CHARACTER members;
+- `CHARACTER::Initialize()` sets `m_pTier = 0` and `m_pGotRewards = false`;
+- neither value exists in `TPlayerTable`, so login/save does not persist or restore them;
+- the quest Lua bindings audited (`questlua_pc.cpp`, `questlua_game.cpp`, `questlua_global.cpp`) expose no World Boss tier setter;
+- login/main input paths expose no World Boss tier packet;
+- World Boss spawn, damage/ranking, death, P2P-state and event-manager paths do not assign a tier;
+- the reward command itself only reads `GetTier()` and finally sets `SetWBRewards(true)`.
+
+Therefore, in the mapped current build, a normal player starts each CHARACTER session at tier 0 and no connected World Boss lifecycle path promotes that value above zero. The reward command consequently exits before granting any reward.
+
+See BUG-WB-016.
+
+### Reward flag lifetime
+`m_pGotRewards` is also session-local and not persistent. A reconnect creates a new CHARACTER and resets it to false. This does not currently create a repeat-claim exploit by itself because tier also resets to zero and has no mapped reassignment path. If a future tier assignment is added without event-scoped/persistent claim state, reconnect semantics must be retested.
