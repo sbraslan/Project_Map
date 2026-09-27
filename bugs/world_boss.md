@@ -1,6 +1,6 @@
 # World Boss System — Bug Registry
 
-**Status:** ACTIVE — 15 verified findings
+**Status:** ACTIVE — 16 verified findings
 **Phase:** Detection / Mapping Only
 
 ### BUG-WB-001 — hour/second mix-up clears spawn state and breaks scheduled cleanup
@@ -209,3 +209,16 @@ After the user clicks X:
 4. a further toggle is required to call `Open()` and recreate visible contents.
 
 This affects both the main World Boss window and the World Boss ranking window.
+
+
+### BUG-WB-016 — Reward tier is never assigned by the mapped runtime, making `get_wb_reward` unreachable for normal players
+- Statik durum: **doğrulandı**
+- Sınıf: reward eligibility / missing state transition
+
+The reward command is intentionally available to `GM_PLAYER`, but it immediately returns when `GetTier() == 0`.
+
+`CHARACTER::Initialize()` initializes `m_pTier` to 0. The tier is not part of `TPlayerTable`, and the audited login/input, quest-Lua, World Boss spawn, damage/ranking, death, P2P and event paths contain no runtime transition that assigns a non-zero tier.
+
+As a result, the mapped production path leaves normal players at tier 0 for the whole CHARACTER session, so `do_get_wb_reward` cannot pass its own eligibility gate and cannot deliver the configured tier rewards.
+
+This is distinct from the previously recorded unbound reward-button defect: even a manually issued `/get_wb_reward` command still returns at the tier gate.
