@@ -15,10 +15,11 @@
     "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Find server producers for the Sung Mahi client command names.",
-      "Trace uisungmahi.py room/tower/reward lifecycle.",
-      "Trace SungMa map-attribute loading and combat enforcement.",
-      "Map Conqueror/tower persistence and reward boundaries."
+      "Resolve server/quest producers for the nine Sung Mahi client command strings and the source of sungMahiQuest.",
+      "Trace event.QuestButtonClick(sungMahiQuest) into the tower instance entry path.",
+      "Trace SungMa map-attribute loading and IsSungmaMap()/GetSungmaMapAttribute() enforcement.",
+      "Map Conqueror/tower persistence and reward boundaries.",
+      "Verify any visibility-gated live-command timing issue end-to-end before registering a bug."
     ]
   },
   "startup": {
@@ -97,7 +98,11 @@
     "Project_Binary/root/game.py::Sung Mahi server-command callbacks",
     "Project_Binary/root/uisungmahi.py + uiscript/sungmaheetower*.py",
     "game/src/char_battle.cpp::SungMa combat enforcement",
-    "Project_Game/*/sungma_attr.txt + smhtower_* data roots"
+    "Project_Game/*/sungma_attr.txt + smhtower_* data roots",
+    "Project_Binary/root/game.py::Sung Mahi server-command dispatcher and callbacks",
+    "Project_Binary/root/uisungmahi.py::quest-button tower entry/progression lifecycle",
+    "Project_Binary/root/interfacemodule.py::Sung Mahi live command forwarding",
+    "Project_Binary/root/uiminimap.py::SungMahiCover room/floor/timer/notice lifecycle and smhdungeon_02 activation"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
