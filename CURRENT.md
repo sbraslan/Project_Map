@@ -1,40 +1,27 @@
 # CURRENT — Canonical Active Checkpoint
 
 **Active phase:** Detection / Mapping Only
-**Active subsystem:** World Boss System
+**Active subsystem:** Sung Mahi Tower
 **Status:** PARTIAL — ACTIVE
 **Machine state:** `STATE.json`
-**Canonical map:** `systems/world_boss.md`
+**Canonical map:** `systems/sung_mahi_tower.md`
 **Last updated:** 2026-09-27
 
 ## Hard rule
 Only `sbraslan/Project_Map` is writable. All source/game repositories remain read-only.
 
 ## Just closed
-World Lottery System -> **STATIC COMPLETE** with `BUG-WLOT-001..014`.
+World Boss System -> **STATIC COMPLETE** with `BUG-WB-001..016`.
 
-## World Boss progress
-Mapped:
-- event/config constants and scheduler;
-- P2P state packet/fanout;
-- boss death/ranking path;
-- reward command/state;
-- Python World Boss state/ranking UI;
-- timeout/event-disable/login lifecycle;
-- multi-core/channel ownership;
-- ranking global-cache lifecycle.
-
-Verified:
-- `BUG-WB-001..016`.
+## Sung Mahi Tower progress
+- Feature flag confirmed enabled.
+- Initial root discovery is active.
 
 ## Exact next work
-1. Finish tier-assignment provenance with a complete caller scan if repository search becomes available.
-2. Finish reward-state reset provenance (`SetWBRewards(false)`) beyond mapped World Boss roots.
-3. Finish tier/reward provenance beyond the known World Boss roots.
-4. Audit remaining command registration / permission and reward invocation path.
-5. Check any remaining 1093-vnum integration collisions with generic systems.
-6. Decide World Boss STATIC COMPLETE only after provenance is closed.
-
-Record only findings in Project_Map. Source repositories stay immutable.
+1. Find server manager/dungeon classes and constants.
+2. Find client Python/UI roots.
+3. Trace packet/server-command flow end-to-end.
+4. Map reward/progression/persistence boundaries.
+5. Record only verified bugs after flow closure.
 
 GitHub state is canonical.
