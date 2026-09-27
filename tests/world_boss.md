@@ -38,3 +38,12 @@ Do not execute runtime/fault-injection tests unless the user explicitly changes 
 - Repeat for `wndWBRanking`.
 - Expected correct behavior: X closes/hides the owning parent and one toggle reopens it.
 - Static prediction from BUG-WB-015: X hides only the child board; the next toggle only hides the still-logically-shown parent, so another toggle is needed to reopen.
+
+
+### TEST-WB-REWARD-TIER-PROVENANCE
+- Login with a normal player before a World Boss spawn.
+- Participate in the fight through boss death using the normal client/server path.
+- Inspect `GetTier()` before fight, after qualifying damage, after boss death, and after ranking generation.
+- Invoke `/get_wb_reward` as a normal player.
+- Expected for a working reward system: participation/ranking assigns tier 1-4 and the command grants the tier bundle once.
+- Static prediction from BUG-WB-016: tier remains 0 at every mapped lifecycle point and the reward command returns without items.
