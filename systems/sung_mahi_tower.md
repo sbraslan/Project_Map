@@ -135,12 +135,38 @@ The table supports indices 0..50. No local bounds check is present in `GetSungMa
 
 Load restores these fields into real/current character points. This establishes that base Conqueror/SungMa character progression is persistent independently of tower UI state.
 
+
+## `dungeonLevel` writer investigation
+The consumer-side range is now clearer:
+- `CHARACTER::SetDungeonMultipliers(uint8_t dungeonLevel)` explicitly rejects values below 1 or above 50.
+- `GetSungMahiTowerDungeonValue()` uses the dungeon flag `"dungeonLevel"` directly as an index into a 0..50 table, but does not repeat the same bounds guard locally.
+- `CHARACTER::IsSungMahiDungeon(long)` is defined in `char.h` as the private-instance range belonging to `MAP_SMG_DUNGEON_02`; therefore this lookup is scoped to Sung Mahi Tower dungeon instances, not arbitrary Yohara maps.
+
+A direct writer for dungeon flag `"dungeonLevel"` was not found in the inspected C++ paths. Generic Lua dungeon flags are writable through `d.setf(...)` / `CDungeon::SetFlag()`, so the likely producer is quest-side tower logic.
+
+Repository state observation:
+- the active `quest_list` contains no Sung Mahi / SMH tower quest source entry;
+- no quest source path whose filename contains Sung/Mahi/SMH exists in the checked quest tree;
+- therefore the exact quest-side producer cannot yet be proven from the visible source set. This is a mapping gap, not yet a bug.
+
+Do not promote the missing local bounds check to a verified bug until the actual tower quest/runtime producer or an equivalent range guarantee is recovered.
+
+## Ranking / monthly reward persistence root
+`game/src/questmanager.cpp` contains a dedicated monthly Sung Mahi reward event:
+- iterates tower levels `1..SUNG_MAHI_MAX_LEVEL`;
+- queries `sung_mahi_ranking` for the fastest player per floor;
+- awards item `50249` via mailbox or `item_award`;
+- truncates `sung_mahi_ranking` after monthly payout;
+- stores month state in event flag `sungMahiLastMonth`.
+
+This proves tower ranking persistence exists in a dedicated SQL table and is seasonally reset independently of generic Conqueror player progression.
+
 ## Verified bugs
 None yet.
 
 ## Exact next work
-1. Find every writer of dungeon flag `dungeonLevel` and prove its runtime range (0..50).
-2. Resolve the server/quest producers for the nine server-command strings and the source of `sungMahiQuest`.
-3. Trace the quest-button entry path into the tower instance.
-4. Map tower-specific completion/rank/reward persistence boundaries; base Conqueror/SungMa persistence is now confirmed.
-5. Check visibility-gated live command timing only after producer timing is known; do not register a bug before end-to-end closure.
+1. Recover the Sung Mahi quest/runtime producer for `dungeonLevel` and prove its 1..50 range guarantee.
+2. Resolve server/quest producers for the nine client command strings and the source of `sungMahiQuest`.
+3. Trace quest-button entry into the `MAP_SMG_DUNGEON_02` private instance.
+4. Continue tower ranking/completion/reward SQL boundary mapping.
+5. Only promote the local no-bounds-check or visibility-gated command behavior after producer timing/range is proven.
