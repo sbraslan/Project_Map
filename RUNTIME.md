@@ -121,6 +121,33 @@ Overall runtime order remains unchanged: DUNGEON-T10 is still the first live gat
 
 **Next documentation cluster:** Hunting runtime readiness.
 
+
+## Runtime-readiness consolidation — Hunting — 2026-09-28
+**Documentation status:** READY  
+**Execution status:** LOCKED / NOT RUN
+
+Verified bug/test coverage:
+- HUNT-T01 -> BUG-HUNT-001
+- HUNT-T02 -> BUG-HUNT-002
+- HUNT-T03 -> BUG-HUNT-003
+- HUNT-T04 -> BUG-HUNT-004
+- HUNT-T05 -> BUG-HUNT-005 (broad crash-boundary exploration)
+- HUNT-T06 -> BUG-HUNT-005 (direct item-persisted / quest-flags-stale reproduction)
+
+Robustness-only validations:
+- HUNT-T07 -> CreateItem nullptr handling; no verified bug ID in the current data snapshot.
+- HUNT-T08 -> ignored AddToGround failure; no verified bug ID until runtime/fault-injection reachability is proven.
+
+Execution classes:
+- **Legitimate/controlled normal-path:** HUNT-T04 is the primary Hunting live candidate because mission 90 can be completed through the intended progression path. HUNT-T03 is a controlled-state reward-loss check requiring a near-cap gold setup.
+- **Modified-client / isolated:** HUNT-T01 and HUNT-T02.
+- **Crash consistency / persistence:** HUNT-T05 and HUNT-T06.
+- **Fault-injection robustness:** HUNT-T07 and HUNT-T08.
+
+The global first live gate remains **DUNGEON-T10**. Hunting does not preempt that order.
+
+**Next documentation cluster:** Battle Pass runtime readiness.
+
 ## Patch readiness
 First-cluster fix plan is ready at `fixes/dungeon_info.md`.
 
