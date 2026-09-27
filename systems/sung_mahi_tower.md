@@ -1,6 +1,6 @@
 # Sung Mahi Tower
 
-**Status:** PARTIAL — ACTIVE
+**Status:** STATIC COMPLETE
 **Phase:** Detection / Mapping Only
 **Date:** 2026-09-27
 
@@ -413,12 +413,49 @@ The monthly reward query selects column `player_login`, while the mailbox subsys
 
 Because the missing ranking writer/schema definition is not present in the tracked snapshot, it cannot be proven whether `player_login` actually stores an account login or merely uses a misleading column name for character name. Keep this as a deferred semantic check; do not promote it without the ranking producer/schema.
 
+
+## Tower consumable / item-use boundary
+A final static sweep found dedicated Sung Mahi item restrictions in `game/src/char_item.cpp`:
+- `CItemVnumHelper::IsSungMahiItem()` classifies vnums 70390–70395 and 70405 as tower-only;
+- inside a private Sung Mahi dungeon, normal potions are rejected by `IS_SUNG_MAHI_ENABLE_ITEM()`;
+- outside the private tower, those tower-only consumables are rejected;
+- both delayed and no-delay tower potion subtypes share the normal potion execution path after that gate;
+- automatic HP/SP recovery items are disabled while inside the private Sung Mahi dungeon.
+
+The tracked proto sources are incomplete for those item IDs:
+- localized item names exist for all seven vnums;
+- client `item_list.txt` icon mappings exist for all seven;
+- server helper hard-codes all seven;
+- but tracked EN/DE/TR `item_proto.txt` sources contain none of those item rows.
+
+This is recorded as verified `BUG-SMT-006`.
+
+## Sung Mahi curse enforcement
+The generic character code exposes three dungeon-flag curse modes driven by `sungMahiCurseType`:
+- type 1 suppresses poison application in `char_resist.cpp`;
+- type 2 suppresses bleeding application;
+- type 3 causes `CHARACTER::CanUseSkill()` to return false, disabling skill use.
+
+Quest Lua additionally exposes `pc.sung_mahi_curse_hp(amount)`, accepting values 1..10 and subtracting 10%..100% of max HP.
+
+No C++ writer for `sungMahiCurseType` exists in the mapped roots; the missing tower quest package is again the expected producer. Therefore curse sequencing and room assignment cannot be reconstructed beyond these consumers.
+
+## Re-entry / exit and regen roots
+Additional independent C++ hooks are now mapped:
+- `do_restart` checks private Sung Mahi dungeon membership plus dungeon flag `isSungMahiDungeon`; when set, the generic restart command warps the player to fixed staging coordinates instead of normal restart behavior. This is the server counterpart to the client's `/restart_here` exit button.
+- on `Entergame`, a character restored inside a private Sung Mahi dungeon is rebound to the dungeon instance and automatically unmounted.
+- dungeon regen spawning applies `GetDungeonDifficulty() -> SetDungeonMultipliers()` to directly spawned regen mobs; group-spawn paths also receive dungeon ownership/scaling through their own group spawn logic.
+- the tower-specific Lua `d.spawn_mob_dir_nomove()` remains a distinct direct spawn path that does not itself apply the difficulty multiplier.
+
+These hooks are internally coherent but depend on quest-owned flags/spawn orchestration that are absent under `BUG-SMT-001`.
+
 ## Verified bugs
 - `BUG-SMT-001` — Sung Mahi Tower quest runtime implementation is missing from the tracked Project_Game quest package.
 - `BUG-SMT-002` — monthly ranking reset references missing `Questlibs/dungeonInfoLibrary.lua`.
 - `BUG-SMT-003` — monthly mailbox reward uses unsafe fixed-width string copies and creates a non-NUL-terminated title.
 - `BUG-SMT-004` — monthly season marker stores only month number, not year.
 - `BUG-SMT-005` — dark elemental tower king 7591 has inconsistent `ResistDark=-1` versus the symmetric `-30` pattern.
+- `BUG-SMT-006` — tower-only potion/antidote vnums have names/icons/server handling but are missing from tracked item_proto sources.
 
 ## Exact next work
 1. Inspect any remaining independent C++ monthly-reward/mailbox edge cases not blocked by the missing quest.
