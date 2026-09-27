@@ -25,14 +25,16 @@ Mapped:
 - persistent interface windows and UIScript controls.
 
 Verified:
-- `BUG-WB-001..009`.
+- `BUG-WB-001..012`.
 
 ## Exact next work
 1. Finish tier-assignment provenance / determine whether reward tier is ever assigned.
-2. Audit damage-ranking collection against item-drop ownership iteration.
-3. Audit login/reconnect state synchronization.
-4. Audit tier/reward reset and persistence across boss cycles.
-5. Audit multi-core/channel boss ownership.
+2. Audit login/reconnect state synchronization.
+3. Audit tier/reward reset and persistence across boss cycles.
+4. Audit multi-core/channel boss ownership.
+5. Audit ranking cache reset/pagination after upstream failures.
+
+Damage-ranking ownership iteration and timeout/event-disable lifecycle are now statically mapped.
 
 Record only findings in Project_Map. Source repositories stay immutable.
 
