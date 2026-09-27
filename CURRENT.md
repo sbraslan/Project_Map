@@ -11,17 +11,17 @@
 Only `sbraslan/Project_Map` is writable. All source/game repositories remain read-only.
 
 ## Just mapped
-- All nine Sung Mahi names are client server-command callbacks registered in `game.py`.
-- Entry UI does not send a dedicated tower packet; it calls `event.QuestButtonClick(constInfo.sungMahiQuest)`.
-- Entry/progression UI and live in-tower minimap board are separate client surfaces.
-- Live room/floor/time/notice updates are forwarded through `Interface` only while `sungMahiCover` is visible.
-- `sungMahiCover` is shown for `metin2_map_smhdungeon_02`; exit uses generic `/restart_here`.
+- Sung Mahi tower maps are explicitly treated as SungMa maps by `CHARACTER::IsSungmaMap()`.
+- Tower SungMa STR/HP/MOVE/IMMUNE requirements override normal map data via `GetSungMahiTowerDungeonValue()`.
+- The tower value table is hard-coded as 4 x 51 and indexed by dungeon flag `dungeonLevel`; HIT_PCT is forced to 0 in the tower.
+- No bounds check exists at the local lookup site; bug promotion is deferred until all `dungeonLevel` writers are traced and range guarantees are proven.
+- Base Conqueror/SungMa player progression is persisted in the normal player table and restored on character load.
 
 ## Exact next work
-1. Resolve server/quest producers for the nine client command strings and the source of `sungMahiQuest`.
-2. Trace quest-button entry into the tower instance.
-3. Trace `IsSungmaMap()/GetSungmaMapAttribute()` loading/enforcement.
-4. Map Conqueror/tower persistence and reward boundaries.
-5. Only then promote any end-to-end verified bug.
+1. Find every writer of dungeon flag `dungeonLevel` and prove its runtime range (0..50).
+2. Resolve server/quest producers for the nine Sung Mahi client command strings and the source of `sungMahiQuest`.
+3. Trace quest-button entry into the tower instance.
+4. Map tower-specific completion/rank/reward persistence.
+5. Only then promote any verified bug.
 
 GitHub state is canonical.
