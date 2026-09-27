@@ -30,3 +30,11 @@
 - BP-T06 Event Manager start/stop season with configured ID >1 and inspect active ID.
 - BP-T07 process boot before Event Manager population; inspect uninitialized array values.
 - BP-T08 season rollover/reload with existing mission/playerindex rows.
+
+
+### Readiness consolidation — 2026-09-28
+- Documentation-only pass completed; no Ticket runtime test executed.
+- TICKET-T01..T07 map one-to-one to BUG-TICKET-001..007.
+- TICKET-T07 is the normal-path UI validation target.
+- TICKET-T01..T06 remain isolated/adversarial tests requiring controlled conditions.
+- Overall first live runtime gate remains DUNGEON-T10; Ticket does not preempt it.
