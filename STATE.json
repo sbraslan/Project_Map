@@ -15,9 +15,9 @@
     "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Consolidate Battle Pass runtime readiness from bugs/battle_pass.md and tests/battle_pass.md without executing tests.",
+      "Consolidate Achievement runtime readiness from bugs/achievement.md and tests/achievement.md without executing tests.",
       "Keep DUNGEON-T10 as the first future live runtime gate.",
-      "Keep TICKET-T07 and HUNT-T04 queued behind the Dungeon normal-path cluster.",
+      "Keep TICKET-T07, HUNT-T04 and BP-T02 queued behind the Dungeon normal-path cluster.",
       "Preserve all source/game repositories as read-only until the user explicitly changes phase."
     ]
   },
@@ -168,7 +168,8 @@
     "RUNTIME.md::Sung Mahi runtime readiness cluster",
     "RUNTIME.md::Dungeon Info T01-T12 readiness consolidated; execution locked",
     "RUNTIME.md::Ticket T01-T07 readiness consolidated; execution locked",
-    "RUNTIME.md::Hunting T01-T08 readiness consolidated; execution locked"
+    "RUNTIME.md::Hunting T01-T08 readiness consolidated; execution locked",
+    "RUNTIME.md::Battle Pass T01-T14 readiness classified; execution locked"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -337,11 +338,12 @@
       "SMT-T05",
       "SMT-T06"
     ],
-    "documentation_cursor": "battle_pass",
+    "documentation_cursor": "achievement",
     "completed_readiness_clusters": [
       "dungeon_info",
       "ticket",
-      "hunting"
+      "hunting",
+      "battle_pass"
     ],
     "dungeon_info": {
       "status": "DOCUMENTATION READY / NOT RUN",
@@ -396,6 +398,12 @@
         "HUNT-T07",
         "HUNT-T08"
       ]
+    },
+    "battle_pass": {
+      "status": "DOCUMENTATION READY / NOT RUN",
+      "test_range": "BP-T01..BP-T14",
+      "primary_normal_path_candidate": "BP-T02",
+      "note": "Existing test matrix classified; some bugs have complementary tests and one lifecycle regression test is broad rather than uniquely mapped."
     }
   }
 }
