@@ -279,13 +279,33 @@ Important lifecycle detail:
 
 Calling a non-static member through a null object pointer is undefined behavior in C++, even if the current function body does not dereference instance fields. However the tracked tower quest caller is missing, so the exact runtime invocation preconditions cannot be verified. Keep this as a high-priority deferred safety finding rather than a new verified bug for now.
 
+
+## Client command timing closure
+The initial map-entry timing risk is substantially closed:
+- during the client Loading phase, receipt of the main-character packet calls `Warp()`;
+- `Warp()` resolves the map name and calls Python `ShowMapName()`;
+- `game.py::ShowMapName()` calls `Interface.SetMapName()`;
+- minimap `SetMapName()` immediately calls `ShowMiniMap()`, which shows `SungMahiCover` for `metin2_map_smhdungeon_02`.
+
+On the server, quest login execution is explicitly delayed until descriptor phase `PHASE_GAME`:
+- if quest data arrives while the descriptor is in handshake/login/select/dead/loading, `quest_login_event` reschedules itself;
+- `CQuestManager::Login()` is called only once the descriptor is in `PHASE_GAME`.
+
+Therefore a normal Sung Mahi quest login/enter producer would execute after the client has already processed the loading-phase main-character/warp map setup. The previously suspected "initial tower commands arrive before the cover is shown" path is not supported by the mapped phase ordering.
+
+There is still a generic pre-game parser limitation:
+- `servercommandparser.py` does not register Sung Mahi commands and therefore does not preserve unknown Sung Mahi commands;
+- however no mapped Sung Mahi producer is able to prove such a pre-game command path, and normal quest login is phase-gated as above.
+
+No visibility-timing bug is registered from current evidence.
+
 ## Verified bugs
 - `BUG-SMT-001` — Sung Mahi Tower quest runtime implementation is missing from the tracked Project_Game quest package.
 - `BUG-SMT-002` — monthly ranking reset references missing `Questlibs/dungeonInfoLibrary.lua`.
 
 ## Exact next work
-1. Inspect client live-command visibility gating against map-load/warp timing and determine whether updates can be lost.
-2. Trace generic quest kill/leave/logout hooks that the missing tower quest would depend on for completion cleanup.
-3. Revisit `pc.mailbox_reward` null-mailbox safety only if a callable tower quest/runtime producer is recovered.
-4. Treat ranking row production and floor-state synchronization as missing-quest responsibilities unless another producer is found.
+1. Trace generic quest kill/leave/logout/dungeon-destroy hooks that the missing tower quest would depend on for room completion and cleanup.
+2. Audit monthly reward event edge cases (restart/month transition/mail write) independently of the missing quest.
+3. Revisit `pc.mailbox_reward` null-mailbox safety only if a callable tower producer is recovered.
+4. Treat ranking row production and dual floor-state synchronization as missing-quest responsibilities unless another producer is found.
 5. Keep production source immutable; record only verified findings.
