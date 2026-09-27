@@ -350,11 +350,75 @@ There are latent defensive off-by-one checks:
 
 These do not trigger with the canonical valid 1..50 floor flow and the shipped 50-row tables, so no additional bug ID is promoted from current evidence. They remain malformed-input defenses to revisit only if a producer capable of sending out-of-range progression is recovered.
 
+
+## Monster/group/map data integration closure
+The tower data layer is now statically cross-checked.
+
+Map placement:
+- `metin2_map_smhdungeon_01` and `metin2_map_smhdungeon_02` contain no `regen.txt` / `boss.txt` monster population files.
+- Tower monster composition is therefore not map-regeneration driven; it depends on runtime quest spawning.
+
+Direct Sung Mahi groups in `Project_Game/share/locale/europe/group.txt`:
+- 6077 — Fire base group
+- 6078 — Ice base group
+- 6079 — Lightning base group
+- 6080 — Wind base group
+- 6081 — Earth base group
+- 6082 — Darkness base group
+- 6083..6088 — the corresponding boss/king pairs.
+
+Every member referenced by groups 6077..6088 was cross-checked against:
+- `Project_DumpProto/tr/mob_proto.txt`
+- `Project_Binary/root/npclist.txt`
+
+No missing mob-proto or client race mapping exists for those groups.
+
+The primary tower server motion folders are also present and internally complete:
+- `smhtower_boss`
+- `smhtower_general`
+- `smhtower_king`
+- `smhtower_knight`
+- `smhtower_magic`
+- `smhtower_soldier`
+- `smhtower_soldier2`
+- `smhgate_boss`
+
+Every `.msa` file referenced by their `motlist.txt` files exists in the tracked Project_Game tree.
+
+Special tower proto roots are also present:
+- 7592–7595 and 7600 — special tower mobs/stone/archer variants;
+- 7609–7614 — higher elemental king variants;
+- 7615–7620 — chess-room variants.
+
+Their actual room placement cannot be reconstructed because the spawning quest is absent under `BUG-SMT-001`.
+
+### Deferred orphan-data candidate: smhgate_flower
+Mob proto entries 9100–9107 use folder `smhgate_flower`, and the client npclist has matching `smhgate_flower[_2.._8]` race names. The server Project_Game tree does not contain `share/data/monster/smhgate_flower/`.
+
+However no tracked map, group, questnpc, quest_list or visible quest source currently references vnums 9100–9107. Because the tower/gate quest package is already missing, runtime use cannot be proven. Record this as an orphan/incomplete-data candidate only; do not register a separate bug without a callable producer.
+
+## Elemental proto consistency
+The six-element base tower sets are intentionally symmetric in attack element and matching negative resistance. A concrete data deviation was verified for the dark king:
+- Fire king 7556: `AttFire=55`, `ResistFire=-30`
+- Ice king 7563: `AttIce=55`, `ResistIce=-30`
+- Lightning king 7570: `AttElec=55`, `ResistElect=-30`
+- Wind king 7577: `AttWind=55`, `ResistWind=-30`
+- Earth king 7584: `AttEarth=55`, `ResistEarth=-30`
+- Darkness king 7591: `AttDark=55`, but `ResistDark=-1`
+
+The rest of the darkness family uses `ResistDark=-30`, and higher dark king 7614 also uses `-30`. Since vnum 7591 is actively referenced by groups 6082 and 6088, this is recorded as verified `BUG-SMT-005`.
+
+## Deferred ranking recipient semantic check
+The monthly reward query selects column `player_login`, while the mailbox subsystem is keyed by character name (`CMailBox::Open` uses `ch->GetName()`, and DB mailbox name validation queries the player table by character `name`).
+
+Because the missing ranking writer/schema definition is not present in the tracked snapshot, it cannot be proven whether `player_login` actually stores an account login or merely uses a misleading column name for character name. Keep this as a deferred semantic check; do not promote it without the ranking producer/schema.
+
 ## Verified bugs
 - `BUG-SMT-001` — Sung Mahi Tower quest runtime implementation is missing from the tracked Project_Game quest package.
 - `BUG-SMT-002` — monthly ranking reset references missing `Questlibs/dungeonInfoLibrary.lua`.
 - `BUG-SMT-003` — monthly mailbox reward uses unsafe fixed-width string copies and creates a non-NUL-terminated title.
 - `BUG-SMT-004` — monthly season marker stores only month number, not year.
+- `BUG-SMT-005` — dark elemental tower king 7591 has inconsistent `ResistDark=-1` versus the symmetric `-30` pattern.
 
 ## Exact next work
 1. Inspect any remaining independent C++ monthly-reward/mailbox edge cases not blocked by the missing quest.
