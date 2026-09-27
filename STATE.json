@@ -15,11 +15,11 @@
     "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
+      "Find every writer of dungeon flag dungeonLevel and prove its runtime range (0..50).",
       "Resolve server/quest producers for the nine Sung Mahi client command strings and the source of sungMahiQuest.",
       "Trace event.QuestButtonClick(sungMahiQuest) into the tower instance entry path.",
-      "Trace SungMa map-attribute loading and IsSungmaMap()/GetSungmaMapAttribute() enforcement.",
-      "Map Conqueror/tower persistence and reward boundaries.",
-      "Verify any visibility-gated live-command timing issue end-to-end before registering a bug."
+      "Map tower-specific completion/rank/reward persistence boundaries.",
+      "Verify visibility-gated live-command timing only after producer timing is known."
     ]
   },
   "startup": {
@@ -102,7 +102,10 @@
     "Project_Binary/root/game.py::Sung Mahi server-command dispatcher and callbacks",
     "Project_Binary/root/uisungmahi.py::quest-button tower entry/progression lifecycle",
     "Project_Binary/root/interfacemodule.py::Sung Mahi live command forwarding",
-    "Project_Binary/root/uiminimap.py::SungMahiCover room/floor/timer/notice lifecycle and smhdungeon_02 activation"
+    "Project_Binary/root/uiminimap.py::SungMahiCover room/floor/timer/notice lifecycle and smhdungeon_02 activation",
+    "game/src/char.cpp::IsSungmaMap/GetSungmaMapAttribute tower override",
+    "game/src/char.cpp::GetSungMahiTowerDungeonValue hard-coded 4x51 table via dungeonLevel flag",
+    "game/src/char.cpp + common/tables.h::Conqueror/SungMa player persistence fields"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
