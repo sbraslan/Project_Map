@@ -12,18 +12,17 @@
 Only `sbraslan/Project_Map` is writable. All source/game repositories remain read-only.
 
 ## Just mapped
-- Maps 386/387 are loaded only on `game-ch99-core99`; the Sung Mahi monthly reward timer is also bound to that same host.
-- Map 386 contains tower NPC vnum 4020; map 387 is the private tower instance map.
-- Quest-button entry is fully traced: Python `QuestButtonClick` -> `HEADER_CG_SCRIPT_BUTTON` -> `CInputMain::ScriptButton` -> `CQuestManager::QuestButton` -> `QUEST_BUTTON_EVENT`.
-- Tower-specific Lua APIs exist, including `d.set_dungeon_difficulty`, but the tracked quest package contains no Sung Mahi tower quest source, quest_list entry, object/state entry, or object/4020 handler.
-- `m_bDungeon_Difficulty` drives mob scaling, while dungeon flag `dungeonLevel` drives player SungMa requirements; C++ does not automatically synchronize them.
-- Verified `BUG-SMT-001`: tracked Project_Game quest runtime implementation for Sung Mahi Tower is missing.
+- The monthly Sung Mahi ranking path is a reader/resetter: it selects fastest players from `sung_mahi_ranking` and later truncates the table.
+- Generic Lua `mysql_direct_query` is available, but no dedicated mapped C++ Sung Mahi ranking writer was found; the missing tower quest package remains the likely INSERT/UPDATE producer.
+- Verified `BUG-SMT-002`: monthly reset explicitly loads `Questlibs/dungeonInfoLibrary.lua`, but that file is absent from the tracked Project_Game tree.
+- Tower room activation hook is mapped: a unique-master hit triggers `AggregateMonsterByMaster()`, removes NOMOVE/NOATTACK from all monsters in the private instance map, and sets `chessWrongMonster=1`.
+- Verified bugs: `BUG-SMT-001`, `BUG-SMT-002`.
 
 ## Exact next work
-1. Find every `sung_mahi_ranking` row writer and close ranking/completion persistence.
-2. Audit `m_bDungeon_Difficulty` vs `dungeonLevel` synchronization risk.
-3. Trace tower room/monster progression hooks and unique-master kill behavior.
-4. Revisit visibility-gated live client commands after server timing is mapped.
+1. Audit `m_bDungeon_Difficulty` vs dungeon flag `dungeonLevel` for divergence paths.
+2. Trace remaining room-clear/kill/completion and reward issuance hooks.
+3. Compare client live-command visibility gating with map-load timing.
+4. Treat ranking row production as missing-quest responsibility unless another writer is found.
 5. No production source changes.
 
 GitHub state is canonical.
