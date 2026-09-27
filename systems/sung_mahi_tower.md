@@ -105,12 +105,42 @@ Known roots:
 - `Project_Game/share/data/monster/smhtower_soldier*`
 - SungMa attribute files are present on multiple Yohara maps via `sungma_attr.txt`.
 
+
+## SungMa map/tower attribute resolution
+Server-side attribute flow is now partially closed in `game/src/char.cpp`.
+
+`CHARACTER::IsSungmaMap()` returns true for normal SungMa-table maps and also explicitly for the Sung Mahi dungeon via `IsSungMahiDungeon(GetMapIndex())`.
+
+`CHARACTER::GetSungmaMapAttribute(point)` normally reads `g_map_SungmaTable[mapIndex]`, but Sung Mahi Tower overrides four requirements when inside the tower:
+- STR -> `GetSungMahiTowerDungeonValue(0)`
+- HP -> `GetSungMahiTowerDungeonValue(1)`
+- MOVE -> `GetSungMahiTowerDungeonValue(2)`
+- IMMUNE -> `GetSungMahiTowerDungeonValue(3)`
+- HIT_PCT is forced to `0` for the Sung Mahi dungeon.
+
+`CHARACTER::GetSungMahiTowerDungeonValue()` contains a hard-coded `4 x 51` table. It obtains the active floor from the current dungeon instance flag named `"dungeonLevel"` and indexes the table with that value. Therefore the runtime SungMa requirements for the tower are driven by the dungeon flag, not by the normal map `sungma_attr.txt` entry.
+
+The table supports indices 0..50. No local bounds check is present in `GetSungMahiTowerDungeonValue()`; bug status is intentionally deferred until every producer of `dungeonLevel` is traced and its range guarantee is verified.
+
+## Conqueror/SungMa persistence roots
+`game/src/char.cpp` confirms the generic Yohara player state is persisted through the normal player table:
+- `conqueror_level`
+- `conqueror_level_step`
+- `conqueror_exp`
+- `conqueror_st` -> `POINT_SUNGMA_STR`
+- `conqueror_ht` -> `POINT_SUNGMA_HP`
+- `conqueror_mov` -> `POINT_SUNGMA_MOVE`
+- `conqueror_imu` -> `POINT_SUNGMA_IMMUNE`
+- `conqueror_point`
+
+Load restores these fields into real/current character points. This establishes that base Conqueror/SungMa character progression is persistent independently of tower UI state.
+
 ## Verified bugs
 None yet.
 
 ## Exact next work
-1. Resolve the server/quest producers for the nine server-command strings and the source of `sungMahiQuest`.
-2. Trace the quest-button entry path into the tower instance.
-3. Map SungMa attribute loading and `IsSungmaMap()/GetSungmaMapAttribute()`.
-4. Map Conqueror/SungMa persistence fields and tower reward persistence.
-5. Check visibility-gated live command handling only after producer timing is known; do not register a bug before end-to-end closure.
+1. Find every writer of dungeon flag `dungeonLevel` and prove its runtime range (0..50).
+2. Resolve the server/quest producers for the nine server-command strings and the source of `sungMahiQuest`.
+3. Trace the quest-button entry path into the tower instance.
+4. Map tower-specific completion/rank/reward persistence boundaries; base Conqueror/SungMa persistence is now confirmed.
+5. Check visibility-gated live command timing only after producer timing is known; do not register a bug before end-to-end closure.
