@@ -26,14 +26,15 @@
       "BUG-WB-011",
       "BUG-WB-012",
       "BUG-WB-013",
-      "BUG-WB-014"
+      "BUG-WB-014",
+      "BUG-WB-015"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
       "Finish tier-assignment provenance beyond the known World Boss roots.",
       "Finish reward-state reset provenance (SetWBRewards(false)) beyond mapped World Boss roots.",
-      "Audit remaining client open/close/state-reset lifecycle.",
-      "Audit World Boss configuration/data roots outside C++ (event/quest/config if present)."
+      "Audit remaining command registration/permission and reward invocation path.",
+      "Check remaining vnum-1093 integration collisions with generic systems."
     ]
   },
   "startup": {
@@ -103,7 +104,9 @@
     "game/src/char_battle.cpp::damage-owner live-VID filtering at death",
     "game/src/event_manager.cpp + db/src/ClientManager.cpp + game/src/input_db.cpp::world_boss_event DB fanout",
     "game/src/char_manager.cpp::fixed UTC+2 scheduler clock and midnight/retry behavior",
-    "game/src/char_battle.cpp::Dead reward-before-WorldBoss-OnKill ordering"
+    "game/src/char_battle.cpp::Dead reward-before-WorldBoss-OnKill ordering",
+    "Project_Binary/root/ui.py + uiworldboss.py + uiworldbossranking.py + interfacemodule.py::titlebar parent/child lifecycle",
+    "Project_Game/share/locale/europe/quest::1093 kill-handler integration audit"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
