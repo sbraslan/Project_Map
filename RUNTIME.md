@@ -166,6 +166,25 @@ The global first live gate remains **DUNGEON-T10**.
 
 **Next documentation cluster:** Achievement runtime readiness.
 
+
+## Runtime-readiness consolidation — Achievement — 2026-09-28
+**Documentation status:** READY
+**Execution status:** LOCKED / NOT RUN
+
+Achievement now has deferred runtime coverage for all verified BUG-ACH-001..008. Existing ACH-T01..T08 covered all except BUG-ACH-002, so ACH-T09 was added for the non-transactional cache-rebuild persistence case.
+
+Execution classes:
+- **Normal-path gameplay candidates:** ACH-T03 and ACH-T04.
+- **Modified-client / isolated interaction:** ACH-T01.
+- **Crash consistency / persistence:** ACH-T02 and ACH-T07.
+- **Privileged/trusted force paths:** ACH-T05 and ACH-T06.
+- **Config-evolution / sanitizer:** ACH-T08.
+- **DB atomicity / disposable-data fault test:** ACH-T09.
+
+The global first live gate remains **DUNGEON-T10**.
+
+**Next documentation cluster:** Biolog runtime readiness.
+
 ## Patch readiness
 First-cluster fix plan is ready at `fixes/dungeon_info.md`.
 
