@@ -14,3 +14,7 @@ Do not execute runtime/fault-injection tests unless the user explicitly changes 
 - WB-T07 bypass the name conversion in a controlled test build and exercise the subsequent unloaded headers, list-as-function calls, and `MakeText` argument overwrite. Covers BUG-WB-007.
 - WB-T08 with a valid nonzero tier, arrange inventory so an early reward fits and a later reward does not; repeat `get_wb_reward` after freeing space and verify partial-item duplication. Covers BUG-WB-008.
 - WB-T09 open the official World Boss window and click `reward_button`; verify no handler/command is bound. Covers BUG-WB-009.
+
+- WB-T10 vary World Boss drop count across 0, 1 and 2+ items while keeping the same damage participants; compare ranking construction and verify player/damage iterator misalignment for multiple qualifying players. Covers BUG-WB-010.
+- WB-T11 force the scheduled timeout branch, then inspect `m_dwWBVID`, `pkWB`, and the next spawn attempt after `DestroyCharacter`. Covers BUG-WB-011.
+- WB-T12 disable `world_boss_event` while a boss is alive, then test both leaving it alive and killing it while disabled; re-enable the event and inspect stale manager state/spawn behavior. Covers BUG-WB-012.
