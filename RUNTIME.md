@@ -185,6 +185,34 @@ The global first live gate remains **DUNGEON-T10**.
 
 **Next documentation cluster:** Biolog runtime readiness.
 
+
+## Runtime-readiness consolidation — Biolog — 2026-09-28
+**Documentation status:** READY
+**Execution status:** LOCKED / NOT RUN
+
+Biolog verified bug coverage is complete:
+- BIO-T01..BIO-T07 -> BUG-BIO-001..BUG-BIO-007.
+
+Additional readiness:
+- BIO-T08 -> actual/live biolog DB proto audit; external data dependency.
+- BIO-T09 -> OBS-BIO-003 empty-proto boot behavior.
+- BIO-T10 -> OBS-BIO-001 client getter bounds.
+- BIO-T11 -> OBS-BIO-002 conditional sequence-system compatibility regression.
+
+Execution classes:
+- **Normal-path integration candidate:** BIO-T01.
+- **Packet/debug:** BIO-T02.
+- **Initialization/config validation:** BIO-T03/BIO-T04.
+- **Crash consistency:** BIO-T05.
+- **Trusted-script replay:** BIO-T06.
+- **Modified-client validation:** BIO-T07.
+- **External DB dependency:** BIO-T08.
+- **Observation-only / isolated:** BIO-T09..BIO-T11.
+
+The global first live gate remains **DUNGEON-T10**.
+
+**Next documentation cluster:** Inventory / Item / Special Inventory runtime readiness.
+
 ## Patch readiness
 First-cluster fix plan is ready at `fixes/dungeon_info.md`.
 
