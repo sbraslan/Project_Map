@@ -215,3 +215,34 @@ Thus the state is session-local rather than persisted. Concrete user-facing seve
 2. Audit reward-state reset semantics across successive boss cycles.
 3. Audit multi-core/channel ownership to determine whether multiple simultaneous bosses are intended or accidental.
 4. Audit ranking cache reset/pagination behavior after upstream routing/parser defects.
+
+
+## Multi-core/channel ownership closure
+World Boss scheduler/ownership state is process-local:
+- `m_dwWBVID`, `pkWB`, `m_lWBPhase`, `m_lWBCooldown`, and `m_bWBState` are members of each process-local `CHARACTER_MANAGER`;
+- `wb_Spawned` and `wblast_SpawnTime` are process-local globals in `char_manager.cpp`;
+- every game process independently runs the scheduler and independently selects a random entry from `WBMapIndexes`;
+- `map_allow_find(WB_MAP_INDEX)` only decides whether that process hosts the randomly selected map.
+
+The World Boss P2P receive handler does not update any manager ownership field. It only broadcasts a client command to PCs attached to the receiving process.
+
+Therefore there is no cross-core election/lock or authoritative World Boss owner. If multiple game processes host eligible World Boss maps, more than one process can independently satisfy its spawn condition and create a boss during the same scheduled spawn window. Each process then tracks only its own local VID/pointer.
+
+See BUG-WB-014.
+
+## Tier / reward reset audit status
+The mapped World Boss roots still show `m_pTier = 0` and `m_pGotRewards = false` only at CHARACTER construction. The live reward command reads `GetTier()` and sets `SetWBRewards(true)` after a successful bundle.
+
+No tier assignment or per-boss `SetWBRewards(false)` reset exists in the mapped World Boss lifecycle paths (spawn, death/ranking, P2P state, event toggle, reward command). Repository-wide code-search indexing is unavailable, so caller provenance is kept open rather than promoted to a verified bug without a complete negative proof.
+
+## Ranking cache/pagination audit status
+The official Python assets are located in `Project_Binary/root` (not Project_Game):
+- `constinfo.py`
+- `uiworldbossranking.py`
+- `game.py`
+- `interfacemodule.py`
+- `uiscript/worldbossrankingwindow.py`
+
+`constInfo.WB_RANKS` and the parallel `wb_*` arrays are initialized only at module load. `uiworldbossranking.MainWindow.Open()` loads/shows the window but does not clear them, and the mapped interface teardown destroys the window without resetting the module globals.
+
+There is also no mapped page/scroll/reset protocol for World Boss ranking rows. Because the current server-routing/parser defects prevent the normal ranking path from functioning, this remains a latent lifecycle/cache defect rather than a new verified user-facing bug ID in the current build.
