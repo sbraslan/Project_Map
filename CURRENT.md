@@ -25,7 +25,7 @@ Mapped:
 - ranking global-cache lifecycle.
 
 Verified:
-- `BUG-WB-001..015`.
+- `BUG-WB-001..016`.
 
 ## Exact next work
 1. Finish tier-assignment provenance with a complete caller scan if repository search becomes available.
