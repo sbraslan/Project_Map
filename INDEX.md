@@ -34,7 +34,7 @@ This is the navigation index. Normal continuation starts at `STATE.json`, then `
 | Battle Field System | STATIC COMPLETE | `systems/battle_field.md` |
 | World Lottery System | STATIC COMPLETE | `systems/world_lottery.md` |
 | World Boss System | STATIC COMPLETE | `systems/world_boss.md` |
-| Sung Mahi Tower | **PARTIAL — ACTIVE** | `systems/sung_mahi_tower.md` |
+| Sung Mahi Tower | STATIC COMPLETE | `systems/sung_mahi_tower.md` |
 
 ## Current phase
 - **Detection / mapping only.** Source and game repositories remain read-only.
