@@ -15,9 +15,9 @@
     "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Consolidate Biolog runtime readiness from bugs/biolog.md and tests/biolog.md without executing tests.",
+      "Consolidate Inventory / Item / Special Inventory runtime readiness from bugs/inventory_items.md and tests/inventory_items.md without executing tests.",
       "Keep DUNGEON-T10 as the first future live runtime gate.",
-      "Keep TICKET-T07, HUNT-T04, BP-T02 and ACH-T03/ACH-T04 queued behind the Dungeon normal-path cluster.",
+      "Keep accumulated normal-path candidates queued behind the Dungeon gate.",
       "Preserve all source/game repositories as read-only until the user explicitly changes phase."
     ]
   },
@@ -170,7 +170,8 @@
     "RUNTIME.md::Ticket T01-T07 readiness consolidated; execution locked",
     "RUNTIME.md::Hunting T01-T08 readiness consolidated; execution locked",
     "RUNTIME.md::Battle Pass T01-T14 readiness classified; execution locked",
-    "RUNTIME.md::Achievement T01-T09 readiness consolidated; execution locked"
+    "RUNTIME.md::Achievement T01-T09 readiness consolidated; execution locked",
+    "RUNTIME.md::Biolog T01-T11 readiness consolidated; execution locked"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -339,13 +340,14 @@
       "SMT-T05",
       "SMT-T06"
     ],
-    "documentation_cursor": "biolog",
+    "documentation_cursor": "inventory_items",
     "completed_readiness_clusters": [
       "dungeon_info",
       "ticket",
       "hunting",
       "battle_pass",
-      "achievement"
+      "achievement",
+      "biolog"
     ],
     "dungeon_info": {
       "status": "DOCUMENTATION READY / NOT RUN",
@@ -430,6 +432,47 @@
       "db_atomicity": [
         "ACH-T09"
       ]
+    },
+    "biolog": {
+      "status": "DOCUMENTATION READY / NOT RUN",
+      "verified_bug_tests": {
+        "BUG-BIO-001": [
+          "BIO-T01"
+        ],
+        "BUG-BIO-002": [
+          "BIO-T02"
+        ],
+        "BUG-BIO-003": [
+          "BIO-T03"
+        ],
+        "BUG-BIO-004": [
+          "BIO-T04"
+        ],
+        "BUG-BIO-005": [
+          "BIO-T05"
+        ],
+        "BUG-BIO-006": [
+          "BIO-T06"
+        ],
+        "BUG-BIO-007": [
+          "BIO-T07"
+        ]
+      },
+      "db_audit_dependency": [
+        "BIO-T08"
+      ],
+      "observation_tests": {
+        "OBS-BIO-003": [
+          "BIO-T09"
+        ],
+        "OBS-BIO-001": [
+          "BIO-T10"
+        ],
+        "OBS-BIO-002": [
+          "BIO-T11"
+        ]
+      },
+      "normal_path_candidate": "BIO-T01"
     }
   }
 }
