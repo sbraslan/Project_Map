@@ -73,3 +73,26 @@ This is required because current Git repositories do not contain these table row
 On isolated DB, temporarily empty one biolog proto table and boot DB/GAME under ASan/debug.
 Check `vector[0]` zero-size encode behavior.
 Covers OBS-BIO-003.
+
+
+### BIO-T10 — client reward-bonus getter bounds
+Isolated/debug client only. Call the Biolog reward bonus getter with valid indices and deliberately out-of-range indices while running under ASan/debug instrumentation.
+
+Purpose: validate OBS-BIO-001 without promoting it to a verified bug before runtime evidence exists.
+
+### BIO-T11 — sequence compatibility regression
+Only if ENABLE_SEQUENCE_SYSTEM is enabled in an isolated future build, exercise the Biolog action send/receive path and verify packet framing remains synchronized.
+
+Purpose: validate the dormant compatibility risk in OBS-BIO-002. This test stays conditional and must not be run in the current build merely to force the feature on.
+
+
+### Readiness consolidation — 2026-09-28
+- Documentation-only pass completed; no Biolog runtime test executed.
+- BIO-T01..BIO-T07 cover BUG-BIO-001..007 one-to-one.
+- BIO-T08 is the external/live DB proto audit required because biolog proto rows are not present in the tracked repositories.
+- BIO-T09 covers OBS-BIO-003.
+- BIO-T10 added for OBS-BIO-001; observation status is unchanged.
+- BIO-T11 added as a conditional future regression for OBS-BIO-002; observation status is unchanged.
+- Primary legitimate normal-path candidate: BIO-T01.
+- BIO-T08 remains dependency-gated on access to actual biolog DB rows.
+- Overall first live runtime gate remains DUNGEON-T10.
