@@ -1,6 +1,6 @@
 # World Boss System — Bug Registry
 
-**Status:** ACTIVE — 12 verified findings
+**Status:** ACTIVE — 13 verified findings
 **Phase:** Detection / Mapping Only
 
 ### BUG-WB-001 — hour/second mix-up clears spawn state and breaks scheduled cleanup
@@ -162,3 +162,18 @@ World Boss scheduler work is gated by `world_boss_event == 1`, so timeout manage
 The World Boss death hook is also gated by the same event flag. If the boss dies after the event has been disabled, `CHARACTER_MANAGER::OnKill` is not called and the stored World Boss VID/pointer/phase state remains stale.
 
 A later event activation can therefore inherit an unmanaged existing boss or stale nonzero `m_dwWBVID` that prevents a fresh spawn.
+
+
+### BUG-WB-013 — players joining after a transition cannot synchronize current World Boss state
+- Statik durum: **doğrulandı**
+- Sınıf: session synchronization / transient state delivery
+
+World Boss state reaches clients only through the command emitted by `CInputP2P::WorldBoss` when a peer state packet is received.
+
+No World Boss state send exists in the mapped login/input initialization paths.
+
+The persistent client World Boss window does not request state when opened; `Open()` only loads the UI script and shows the window.
+
+Consequently a player logging in or reconnecting after the last spawn/kill transition receives no current state, boss timer, or cooldown value. The window can remain at local/default/stale values until another server transition command happens.
+
+This also compounds BUG-WB-002 for players on the originating process.
