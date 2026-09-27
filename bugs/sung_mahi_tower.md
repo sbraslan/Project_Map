@@ -65,3 +65,52 @@ An externally installed `Questlibs/dungeonInfoLibrary.lua` could satisfy this re
 
 ### No source change
 Detection-only record; no production file was changed.
+
+
+## BUG-SMT-003 — Monthly mailbox reward builds malformed/unsafe fixed-size strings
+
+**Status:** VERIFIED — STATIC / MEMORY-SAFETY + SERIALIZATION  
+**Scope:** `SungMahiMonthRewardTimer` when `ENABLE_MAILBOX` is enabled
+
+### Evidence
+Both `ENABLE_MAILBOX` and `ENABLE_SUNG_MAHI_TOWER` are enabled.
+
+The monthly reward path creates an uninitialized `TMailBoxTable p;` and fills fixed-size character arrays using raw `std::memcpy(..., sizeof(destination))`:
+- `p.Message.szTitle` is `char[26]`;
+- source literal `"Sung Mahi Tower Month Reward"` is 28 characters plus NUL (29 bytes);
+- copying exactly 26 bytes therefore drops the terminator and leaves `szTitle` non-NUL-terminated.
+- `p.AddData.szFrom` is `char[49]` because `CHARACTER_NAME_MAX_LEN = 48`, but source literal `"Sung Mahi Tower"` occupies only 16 bytes including NUL; copying 49 bytes reads beyond the source literal object.
+- `p.AddData.szMessage` is `char[101]`, while source literal `""` is 1 byte including NUL; copying 101 bytes reads beyond the source literal object.
+- `p.szName` is also `char[49]`, while `player_login` is a variable-length MySQL field and account login length is bounded independently (`LOGIN_MAX_LEN = 30`).
+
+The DB mailbox cache later treats these arrays as C strings (for example mailbox backup formats title/from/message via `%s`).
+
+### Impact
+The monthly Sung Mahi reward packet contains at least one deterministically unterminated string (`szTitle`) and performs fixed-width reads beyond shorter source string objects. This is undefined behavior and can cause malformed mailbox metadata, over-read into adjacent memory, or unstable behavior during later C-string use/serialization.
+
+### Boundary
+This finding is independent of the missing tower quest package: `SungMahiMonthRewardTimer` is C++-owned and can execute directly on `game-ch99-core99`.
+
+### No source change
+Detection-only record; no production file was changed.
+
+## BUG-SMT-004 — Monthly season identity stores month only, not year
+
+**Status:** VERIFIED — STATIC / SEASON STATE  
+**Scope:** Sung Mahi monthly ranking rollover after long downtime/restart
+
+### Evidence
+- `SungMahiMonthRewardTimer` computes only `currentMonth = localtime(...)->tm_mon`, whose range is 0..11.
+- Rollover runs only when persistent event flag `sungMahiLastMonth != currentMonth`.
+- After processing, it persists only that month number through `RequestSetEventFlag("sungMahiLastMonth", currentMonth)`.
+- No year is stored or compared.
+- Event flags themselves are persisted by the DB process in the `quest` table and restored on game-peer setup, so the month-only value survives restarts.
+
+### Impact
+If the tower core is offline long enough to restart in the same calendar month number as the persisted flag (for example September of the following year), the timer treats the old month marker as current and skips rollover. Ranking rows left from the previous active season can remain and mix with the new season until a later month change.
+
+### Boundary
+Normal continuous month-to-month operation changes `tm_mon` and therefore rolls over. The defect is specifically the missing year component across long downtime/restart boundaries.
+
+### No source change
+Detection-only record; no production file was changed.
