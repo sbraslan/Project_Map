@@ -18,16 +18,21 @@
       "BUG-WLOT-003",
       "BUG-WLOT-004",
       "BUG-WLOT-005",
-      "BUG-WLOT-006"
+      "BUG-WLOT-006",
+      "BUG-WLOT-007",
+      "BUG-WLOT-008",
+      "BUG-WLOT-009",
+      "BUG-WLOT-010",
+      "BUG-WLOT-011",
+      "BUG-WLOT-012"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Finish ticket delete/claim state transitions and SQL-error/null handling.",
-      "Audit COUNT(*)-based draw-id assumptions and row continuity.",
-      "Audit multiple-jackpot accounting and next-jackpot math.",
-      "Audit log lotto_id/ticket_id mapping.",
+      "Finish ticket delete/claim SQL-error/null handling and mutation ordering.",
+      "Audit async result-update ordering versus next-draw insertion.",
       "Audit claim/withdrawal persistence and save ordering.",
-      "Audit ranking empire lookup/result safety."
+      "Check server-to-client lottery point serialization widths.",
+      "Reconcile World Lottery findings and determine STATIC COMPLETE readiness."
     ]
   },
   "startup": {
@@ -85,7 +90,9 @@
     "root/game.py::BINARY_LotterySetBaseData/BINARY_LotterySetTicketData/ranking callbacks",
     "root/constinfo.py::lottery caches",
     "root/interfacemodule.py::lottery UI bridge",
-    "root/uilottery.py::ticket-grid refresh"
+    "root/uilottery.py::ticket-grid refresh",
+    "db/src/LottoManager.cpp::COUNT draw identity/result payout/logging/scheduling",
+    "game/src/char_lottery.cpp::ranking SQL/result mapping"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
