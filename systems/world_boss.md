@@ -257,3 +257,29 @@ A damage entry contributes to the priority queue and to `total_dam` only when th
 Therefore a participant who disconnects or otherwise ceases to resolve locally before boss death is omitted entirely; that participant's accumulated damage is also removed from the denominator used by the 10% ownership threshold. This can change which remaining players qualify for ownership/ranking compared with the actual fight damage history.
 
 The behavior is now mapped, but no bug ID is assigned yet because the source does not establish whether "must still be locally present at death" is intentional eligibility policy or an unintended World Boss ranking rule.
+
+
+## Scheduler clock / event propagation closure
+The scheduler derives its hour from:
+`gmtime(system_clock::now())`
+followed by:
+`cur_hour = utc_tm.tm_hour + 2`.
+
+Consequences:
+- the value is not normalized modulo 24, so late UTC hours produce 24 and 25;
+- the spawn condition explicitly includes `cur_hour == 24` and `cur_hour == 0`, so the midnight spawn branch is intentionally compensating for one overflow case;
+- the fixed `+2` offset has no daylight-saving/timezone rule and therefore represents a fixed UTC+2 schedule, not a timezone-aware local clock.
+
+No new verified bug ID is assigned from this alone because the source does not establish whether the intended production schedule is fixed UTC+2 or civil local time. If production expects Europe/Berlin-style local time, winter schedules will shift by one hour.
+
+Event activation propagation itself is not the multi-core defect:
+- `CEventManager::UpdateGameFlag()` immediately updates the originating core's quest flag;
+- it sends `HEADER_GD_EVENT_NOTIFICATION` to DB;
+- DB `CClientManager::EventNotification()` forwards `HEADER_DG_EVENT_NOTIFICATION` to connected game peers;
+- each receiving game process calls `CQuestManager::SetEventFlag()`.
+
+Therefore `world_boss_event` is distributed across game processes. BUG-WB-014 remains specifically an ownership/scheduler coordination problem, not a missing event-flag broadcast.
+
+### Same-minute retry behavior
+The scheduler executes once per second while `cur_min == 0`.
+A successful spawn sets `m_dwWBVID`, which blocks another successful spawn on that process during the same minute. If spawning fails and `m_dwWBVID` remains zero, the code can retry on later scheduler ticks in the same minute. This is mapped behavior, not presently classified as a bug.
