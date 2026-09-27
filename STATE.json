@@ -6,45 +6,31 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "world_lottery",
-    "display_name": "World Lottery System",
+    "subsystem": "world_boss",
+    "display_name": "World Boss System",
     "status": "PARTIAL — ACTIVE",
-    "system_file": "systems/world_lottery.md",
-    "bug_file": "bugs/world_lottery.md",
-    "test_file": "tests/world_lottery.md",
-    "verified_bug_ids": [
-      "BUG-WLOT-001",
-      "BUG-WLOT-002",
-      "BUG-WLOT-003",
-      "BUG-WLOT-004",
-      "BUG-WLOT-005",
-      "BUG-WLOT-006",
-      "BUG-WLOT-007",
-      "BUG-WLOT-008",
-      "BUG-WLOT-009",
-      "BUG-WLOT-010",
-      "BUG-WLOT-011",
-      "BUG-WLOT-012",
-      "BUG-WLOT-013",
-      "BUG-WLOT-014"
-    ],
+    "system_file": "systems/world_boss.md",
+    "bug_file": "bugs/world_boss.md",
+    "test_file": "tests/world_boss.md",
+    "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Check draw refresh threshold timing (next_time - 10) against client countdown semantics.",
-      "Check ticket purchase/claim query escaping and row uniqueness assumptions.",
-      "Reconcile World Lottery findings, dependencies, and STATIC COMPLETE readiness."
+      "Trace ENABLE_WORLD_BOSS and World Boss packet definitions/handlers.",
+      "Map spawn/state/reward/ranking server ownership.",
+      "Map client receive callbacks and Python ranking/cache lifecycle.",
+      "Record verified bugs only in Project_Map."
     ]
   },
   "startup": {
     "required_files": [
       "STATE.json",
       "CURRENT.md",
-      "systems/world_lottery.md"
+      "systems/world_boss.md"
     ],
     "conditional_files": {
       "policy": "WORKFLOW.md",
-      "bugs": "bugs/world_lottery.md",
-      "deferred_tests": "tests/world_lottery.md"
+      "bugs": "bugs/world_boss.md",
+      "deferred_tests": "tests/world_boss.md"
     },
     "forbidden_by_default": [
       "archive/",
@@ -74,30 +60,10 @@
     }
   },
   "mapped_roots": [
-    "game/src/char_lottery.cpp",
-    "game/src/input_main.cpp::LottoOpenWindow/LottoBuyTicket/LottoTicketOptions/LottoPickMoney",
-    "game/src/packet.h::lottery packets",
-    "game/src/packet_info.cpp::lottery CG registrations",
-    "game/src/char.cpp::PointChange lottery/gold handling",
-    "game/src/char.h::lottery wallet accessors",
-    "db/src/LottoManager.cpp",
-    "db/src/LottoManager.h",
-    "db/src/ClientManager.cpp::lottery scheduler",
-    "common/CommonDefines.h::lottery constants",
-    "common/tables.h::TPlayerTable lottery fields",
-    "UserInterface/PythonNetworkStreamModule.cpp::lottery bindings",
-    "root/uilottery.py",
-    "root/game.py::BINARY_LotterySetBaseData/BINARY_LotterySetTicketData/ranking callbacks",
-    "root/constinfo.py::lottery caches",
-    "root/interfacemodule.py::lottery UI bridge",
-    "root/uilottery.py::ticket-grid refresh",
-    "db/src/LottoManager.cpp::COUNT draw identity/result payout/logging/scheduling",
-    "game/src/char_lottery.cpp::ranking SQL/result mapping",
-    "game/src/char.cpp::CreatePlayerProto/SendPoints/PointChange/save_event",
-    "libsql/AsyncSQL.cpp/.h::DirectQuery/AsyncQuery FIFO",
-    "UserInterface/PythonNetworkStreamPhaseLoading.cpp::__RecvPlayerPoints",
-    "UserInterface/PythonPlayer.cpp/.h::SetStatus/GetStatus",
-    "UserInterface/PythonPlayerModule.cpp::GetLottoMoney/GetLottoTotalMoney"
+    "root/uiworldboss.py",
+    "root/uiworldbossranking.py",
+    "root/uiscript/worldbosswindow.py",
+    "root/uiscript/worldbossrankingwindow.py"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -133,7 +99,8 @@
     "party",
     "party_match",
     "dungeon_core",
-    "battle_field"
+    "battle_field",
+    "world_lottery"
   ],
   "ranking_closure": {
     "status": "STATIC COMPLETE",
@@ -191,6 +158,25 @@
       "BUG-BFIELD-009",
       "BUG-BFIELD-010",
       "BUG-BFIELD-011"
+    ]
+  },
+  "world_lottery_closure": {
+    "status": "STATIC COMPLETE",
+    "verified_bug_ids": [
+      "BUG-WLOT-001",
+      "BUG-WLOT-002",
+      "BUG-WLOT-003",
+      "BUG-WLOT-004",
+      "BUG-WLOT-005",
+      "BUG-WLOT-006",
+      "BUG-WLOT-007",
+      "BUG-WLOT-008",
+      "BUG-WLOT-009",
+      "BUG-WLOT-010",
+      "BUG-WLOT-011",
+      "BUG-WLOT-012",
+      "BUG-WLOT-013",
+      "BUG-WLOT-014"
     ]
   }
 }
