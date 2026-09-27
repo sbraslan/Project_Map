@@ -57,3 +57,24 @@ Covers BUG-ACH-001.
 Copy a disposable DB state, then remove/renumber one task from a max_value achievement XML and restart.
 Load the player under ASan/debug.
 Covers BUG-ACH-003.
+
+
+### ACH-T09 — achievement cache rebuild atomicity
+Use only a disposable DB snapshot. Trigger an Achievement-state flush while simulating/intercepting a DB failure after the destructive clear phase but before the full achievement/task rebuild completes. Restart and reload the same player.
+
+Bug indicator: achievement/task rows are missing or only partially rebuilt.
+Covers BUG-ACH-002.
+
+
+### Readiness consolidation — 2026-09-28
+- Documentation-only pass completed; no Achievement runtime test executed.
+- ACH-T01 -> BUG-ACH-004.
+- ACH-T02 -> BUG-ACH-005.
+- ACH-T03 -> BUG-ACH-006.
+- ACH-T04 -> BUG-ACH-007.
+- ACH-T05/ACH-T06 -> BUG-ACH-008 through privileged/trusted surfaces.
+- ACH-T07 -> BUG-ACH-001.
+- ACH-T08 -> BUG-ACH-003.
+- ACH-T09 added to cover previously untested BUG-ACH-002.
+- Primary legitimate normal-path candidates: ACH-T03 and ACH-T04.
+- Overall first live runtime gate remains DUNGEON-T10.
