@@ -32,7 +32,8 @@ This is the navigation index. Normal continuation starts at `STATE.json`, then `
 | Party Match | STATIC COMPLETE | `systems/party_match.md` |
 | Dungeon Core | STATIC COMPLETE | `systems/dungeon_core.md` |
 | Battle Field System | STATIC COMPLETE | `systems/battle_field.md` |
-| World Lottery System | **PARTIAL — ACTIVE** | `systems/world_lottery.md` |
+| World Lottery System | STATIC COMPLETE | `systems/world_lottery.md` |
+| World Boss System | **PARTIAL — ACTIVE** | `systems/world_boss.md` |
 
 ## Current phase
 - **Detection / mapping only.** Source and game repositories remain read-only.
