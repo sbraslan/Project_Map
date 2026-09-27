@@ -21,14 +21,53 @@ Map the full Sung Mahi Tower path across:
 - multi-core/channel behavior.
 
 ## Initial roots
-Pending first source sweep.
+### Client
+- `Project_Binary/root/game.py` — Sung Mahi server-command callbacks:
+  - `ClearSungMahiInfo`
+  - `SetSungMahiQuest`
+  - `UpdateSungMahiInfo`
+  - `OpenSungMahiWindow`
+  - `UpdateSungMahiNotice`
+  - `SungMahiClearNotice`
+  - `UpdateRoomLevel`
+  - `UpdateTowerLevel`
+  - `UpdateRoomTime`
+- `Project_Binary/root/uisungmahi.py` — main Sung Mahi UI/controller.
+- `Project_Binary/root/uiscript/sungmaheetowerenter.py` — entry window.
+- `Project_Binary/root/uiscript/sungmaheetowerinformationboard.py` — in-tower information board.
+- `Project_Binary/root/constinfo.py` — `sungMahiInfo`, `sungMahiLevelInfo`, `sungMahiQuest` client cache.
+- locale data:
+  - `locale/locale/common/sungmahee_tower/standard/sungmahee_tower_element.txt`
+  - `locale/locale/common/sungmahee_tower/standard/sungmahee_tower_reward.txt`
+
+### Server / generic Yohara integration
+No dedicated `SungMahi*.cpp` file was found by filename. Tower/Yohara behavior is embedded in generic character/battle/map paths.
+
+Known roots:
+- `game/src/char_battle.cpp` — SungMa map combat restrictions:
+  - player damage on SungMa maps is halved when `POINT_SUNGMA_STR` is below the map requirement;
+  - non-Conqueror characters deal zero damage to non-PC targets on SungMa maps;
+  - precision/block logic uses the SungMa map attribute `POINT_HIT_PCT`.
+- `game/src/char.cpp/.h` — SungMa map/attribute and conqueror-player state roots (next sweep).
+- `common/tables.h` / player persistence — Conqueror/SungMa player fields (next sweep).
+- map data in Project_Game uses `sungma_attr.txt` across Yohara maps.
+- Sung Mahi monster data exists under `share/data/monster/smhtower_*`.
+
+### Data/map roots
+- `Project_Game/share/data/monster/smhtower_boss`
+- `Project_Game/share/data/monster/smhtower_general`
+- `Project_Game/share/data/monster/smhtower_king`
+- `Project_Game/share/data/monster/smhtower_knight`
+- `Project_Game/share/data/monster/smhtower_magic`
+- `Project_Game/share/data/monster/smhtower_soldier*`
+- SungMa attribute files are present on multiple Yohara maps via `sungma_attr.txt`.
 
 ## Verified bugs
 None yet.
 
 ## Exact next work
-1. Discover server files/classes for Sung Mahi Tower.
-2. Discover client Python/UI roots.
-3. Map packet/server-command interfaces.
-4. Map persistence/config/quest roots.
+1. Trace the server producers of the nine Sung Mahi client commands.
+2. Map `uisungmahi.py` entry/reward/room/tower state transitions.
+3. Map SungMa attribute loading and `IsSungmaMap()/GetSungmaMapAttribute()`.
+4. Map Conqueror/SungMa persistence fields and tower reward persistence.
 5. Begin verified bug detection only after end-to-end flow is established.
