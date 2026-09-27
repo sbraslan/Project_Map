@@ -12,14 +12,16 @@
     "system_file": "systems/sung_mahi_tower.md",
     "bug_file": "bugs/sung_mahi_tower.md",
     "test_file": "tests/sung_mahi_tower.md",
-    "verified_bug_ids": [],
+    "verified_bug_ids": [
+      "BUG-SMT-001"
+    ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Recover the missing Sung Mahi tower quest/runtime writer for dungeonLevel; canonical max is proven as 50.",
-      "Resolve the nine cmdchat producers and the source of sungMahiQuest.",
-      "Trace tower entry across MAP_SMG_DUNGEON_01 and private MAP_SMG_DUNGEON_02.",
-      "Continue tower ranking/completion/reward SQL boundary mapping.",
-      "Only promote bounds/visibility findings after writer and timing guarantees are proven."
+      "Find every sung_mahi_ranking row writer and close tower ranking/completion persistence.",
+      "Audit synchronization between CDungeon::m_bDungeon_Difficulty and dungeon flag dungeonLevel.",
+      "Trace tower room/monster progression hooks including unique-master and no-move/no-attack behavior.",
+      "Revisit visibility-gated live client command timing after server producer timing is mapped.",
+      "Do not modify production source during detection phase."
     ]
   },
   "startup": {
@@ -112,7 +114,17 @@
     "Project_Game/share/locale/europe/quest/quest_list::no visible Sung Mahi tower quest source entry",
     "common/length.h::ESungMahiDungeon canonical max level 50 and tower multipliers",
     "game/src/char.cpp::MAP_SMG_DUNGEON_01/02 generic special-map handling",
-    "game/src/char.h::tower-specific no-move/no-attack/unique-master character controls"
+    "game/src/char.h::tower-specific no-move/no-attack/unique-master character controls",
+    "Project_Game/chan/ch99/core99/CONFIG::maps 386/387 hosted on game-ch99-core99",
+    "Project_Game/share/locale/europe/map/metin2_map_smhdungeon_01/npc.txt::tower NPC 4020 and exit 10126",
+    "Project_ClientSrc/UserInterface/PythonEventManagerMoudle.cpp::QuestButtonClick",
+    "Project_ClientSrc/UserInterface/PythonNetworkStreamPhaseGame.cpp::SendScriptButtonPacket HEADER_CG_SCRIPT_BUTTON",
+    "game/src/input_main.cpp::CInputMain::ScriptButton -> CQuestManager::QuestButton",
+    "game/src/questnpc.cpp::NPC::OnButton QUEST_BUTTON_EVENT",
+    "game/src/questlua_dungeon.cpp::Sung Mahi-specific Lua dungeon API bindings",
+    "game/src/char_manager.cpp::SpawnGroup applies CDungeon difficulty via SetDungeonMultipliers",
+    "Project_Game quest source/list/object audit::missing Sung Mahi tower runtime quest package",
+    "BUG-SMT-001::missing tracked Sung Mahi Tower quest runtime implementation"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
