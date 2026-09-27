@@ -54,3 +54,13 @@ This validates the robustness finding; do not run against production data.
 Fill inventory, then fault-inject `AddToGround == false` for a Hunting item reward.
 Verify whether reward flags are still cleared and whether the created item survives anywhere.
 This determines whether the ignored ground-insertion result is a reachable reward-loss bug.
+
+
+### Readiness consolidation — 2026-09-28
+- Documentation-only pass completed; no Hunting runtime test executed.
+- HUNT-T01..T04 map to BUG-HUNT-001..004.
+- HUNT-T05 and HUNT-T06 both exercise BUG-HUNT-005 at different crash-consistency depths.
+- HUNT-T07 and HUNT-T08 remain robustness validations without promoted bug IDs.
+- Primary legitimate Hunting live candidate: HUNT-T04.
+- Crash/persistence validation remains deferred until runtime execution is explicitly enabled.
+- Overall first live runtime gate remains DUNGEON-T10.
