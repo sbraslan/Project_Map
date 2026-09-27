@@ -40,15 +40,15 @@ Initial roots to map:
 - `BUG-WLOT-010` — recurring draw schedule hardcodes 30s instead of configured 2 minutes.
 - `BUG-WLOT-011` — dormant ranking path sends ticket id as lottoID.
 - `BUG-WLOT-012` — dormant ranking path can null-dereference a missing empire row.
+- `BUG-WLOT-013` — claim state can commit before winnings are durably saved, creating a crash-window prize loss.
+- `BUG-WLOT-014` — unchecked lottery DirectQuery errors can feed null results into mysql_fetch_row.
 
 ## Exact next work
-1. Finish ticket delete/claim SQL-error/null handling and mutation ordering.
-2. Audit async result-update ordering versus next-draw insertion.
-3. Audit claim/withdrawal persistence and save ordering.
-4. Check server->client lottery point serialization widths.
-5. Reconcile World Lottery and determine STATIC COMPLETE readiness.
+1. Check draw refresh threshold timing (`next_time - 10`) against client countdown semantics.
+2. Check ticket purchase/claim query escaping and row uniqueness assumptions.
+3. Reconcile World Lottery findings, dependencies, and STATIC COMPLETE readiness.
 
-Client cache, draw-id, jackpot, log mapping, scheduling, and ranking safety are now statically mapped.
+Client cache, draw-id, jackpot, log mapping, scheduling, ranking safety, persistence, SQL-result handling, and point-width transport are now statically mapped.
 
 Record only findings in Project_Map.
 
