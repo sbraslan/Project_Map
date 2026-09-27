@@ -23,13 +23,13 @@
   "startup": {
     "required_files": [
       "STATE.json",
-      "CURRENT.md",
-      "systems/sung_mahi_tower.md"
+      "CURRENT.md"
     ],
     "conditional_files": {
       "policy": "WORKFLOW.md",
-      "bugs": "bugs/sung_mahi_tower.md",
-      "deferred_tests": "tests/sung_mahi_tower.md"
+      "runtime_readiness": "RUNTIME.md",
+      "bugs_index": "bugs/INDEX.md",
+      "subsystem_maps": "open only when a specific bug/test requires evidence"
     },
     "forbidden_by_default": [
       "archive/",
@@ -37,7 +37,7 @@
       "legacy monolithic root maps",
       "bulk reads of systems/, bugs/, tests/"
     ],
-    "source_read_strategy": "search exact symbols first, then fetch exact files/ranges only"
+    "source_read_strategy": "Static subsystem mapping is complete. For runtime-readiness documentation, start from bugs/INDEX.md and open only the specific bug/system evidence needed."
   },
   "repositories": {
     "writable": [
