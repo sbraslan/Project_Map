@@ -1,6 +1,6 @@
 # World Boss System
 
-**Status:** PARTIAL — ACTIVE
+**Status:** STATIC COMPLETE
 **Phase:** Detection / Mapping Only
 **Date:** 2026-09-27
 
@@ -347,3 +347,26 @@ See BUG-WB-016.
 
 ### Reward flag lifetime
 `m_pGotRewards` is also session-local and not persistent. A reconnect creates a new CHARACTER and resets it to false. This does not currently create a repeat-claim exploit by itself because tier also resets to zero and has no mapped reassignment path. If a future tier assignment is added without event-scoped/persistent claim state, reconnect semantics must be retested.
+
+
+## Static closure
+World Boss static mapping is complete for the current source snapshots.
+
+Closed roots include:
+- scheduler/spawn/despawn;
+- event flag propagation;
+- process-local multi-core ownership;
+- P2P state transport and local delivery;
+- login/reconnect synchronization;
+- death/reward ordering;
+- damage/ranking ownership;
+- reward command registration and eligibility;
+- session/persistence provenance for tier/reward state;
+- client command parsing and UI lifecycle;
+- ranking cache/window lifecycle;
+- titlebar close behavior;
+- World Boss vnum integration with current quest data.
+
+Verified registry: `BUG-WB-001..016`.
+
+Runtime/fault-injection validation remains deferred to `tests/world_boss.md`; source/game repositories remain unchanged.
