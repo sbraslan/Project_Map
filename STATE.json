@@ -6,48 +6,31 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "world_boss",
-    "display_name": "World Boss System",
+    "subsystem": "sung_mahi_tower",
+    "display_name": "Sung Mahi Tower",
     "status": "PARTIAL — ACTIVE",
-    "system_file": "systems/world_boss.md",
-    "bug_file": "bugs/world_boss.md",
-    "test_file": "tests/world_boss.md",
-    "verified_bug_ids": [
-      "BUG-WB-001",
-      "BUG-WB-002",
-      "BUG-WB-003",
-      "BUG-WB-004",
-      "BUG-WB-005",
-      "BUG-WB-006",
-      "BUG-WB-007",
-      "BUG-WB-008",
-      "BUG-WB-009",
-      "BUG-WB-010",
-      "BUG-WB-011",
-      "BUG-WB-012",
-      "BUG-WB-013",
-      "BUG-WB-014",
-      "BUG-WB-015",
-      "BUG-WB-016"
-    ],
+    "system_file": "systems/sung_mahi_tower.md",
+    "bug_file": "bugs/sung_mahi_tower.md",
+    "test_file": "tests/sung_mahi_tower.md",
+    "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Audit remaining generic systems that key directly on World Boss vnums (1093/other WBVnums).",
-      "Reconcile BUG-WB-016 with the unbound reward-button/client command path and ensure no hidden invocation root remains.",
-      "Run final static consistency pass across packet/state/reward/ranking roots.",
-      "Decide World Boss STATIC COMPLETE and advance to the next subsystem."
+      "Discover server files/classes for Sung Mahi Tower.",
+      "Discover client Python/UI roots.",
+      "Map packet/server-command interfaces.",
+      "Map persistence/config/quest roots."
     ]
   },
   "startup": {
     "required_files": [
       "STATE.json",
       "CURRENT.md",
-      "systems/world_boss.md"
+      "systems/sung_mahi_tower.md"
     ],
     "conditional_files": {
       "policy": "WORKFLOW.md",
-      "bugs": "bugs/world_boss.md",
-      "deferred_tests": "tests/world_boss.md"
+      "bugs": "bugs/sung_mahi_tower.md",
+      "deferred_tests": "tests/sung_mahi_tower.md"
     },
     "forbidden_by_default": [
       "archive/",
@@ -147,7 +130,8 @@
     "party_match",
     "dungeon_core",
     "battle_field",
-    "world_lottery"
+    "world_lottery",
+    "world_boss"
   ],
   "ranking_closure": {
     "status": "STATIC COMPLETE",
@@ -224,6 +208,27 @@
       "BUG-WLOT-012",
       "BUG-WLOT-013",
       "BUG-WLOT-014"
+    ]
+  },
+  "world_boss_closure": {
+    "status": "STATIC COMPLETE",
+    "verified_bug_ids": [
+      "BUG-WB-001",
+      "BUG-WB-002",
+      "BUG-WB-003",
+      "BUG-WB-004",
+      "BUG-WB-005",
+      "BUG-WB-006",
+      "BUG-WB-007",
+      "BUG-WB-008",
+      "BUG-WB-009",
+      "BUG-WB-010",
+      "BUG-WB-011",
+      "BUG-WB-012",
+      "BUG-WB-013",
+      "BUG-WB-014",
+      "BUG-WB-015",
+      "BUG-WB-016"
     ]
   }
 }
