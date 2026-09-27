@@ -40,3 +40,28 @@ This bug is verified against the tracked repository snapshot. If the live server
 
 ### No source change
 No production source, Python, quest, map, config, or game data was modified. This record is detection-only.
+
+
+## BUG-SMT-002 — Monthly Sung Mahi ranking reset references a missing Lua library
+
+**Status:** VERIFIED — STATIC / REPOSITORY INTEGRATION  
+**Scope:** Monthly ranking season reset on `game-ch99-core99`
+
+### Evidence
+- `game/src/questmanager.cpp::SungMahiMonthRewardTimer` truncates `sung_mahi_ranking`, updates `sungMahiLastMonth`, then explicitly executes:
+  `<quest path>/Questlibs/dungeonInfoLibrary.lua`.
+- The adjacent source comment states this `dofile` is intended to "clear the set".
+- `Project_Game/share/locale/europe/quest/Questlibs/` does not contain `dungeonInfoLibrary.lua`.
+- A recursive Project_Game tree check also finds no file named `dungeonInfoLibrary.lua`.
+- The `lua_dofile(...)` return value is not checked in this timer path.
+
+### Impact
+In the tracked deployment snapshot, the DB ranking table is still truncated, but the intended Lua-side post-reset hook cannot be loaded from the referenced path. Any cache/set reset implemented by that library therefore cannot execute from the repository contents as shipped.
+
+This is distinct from `BUG-SMT-001`: BUG-SMT-001 covers the missing tower runtime quest package; BUG-SMT-002 covers an explicit C++ runtime reference to a specific Lua file that is absent.
+
+### Boundary / caveat
+An externally installed `Questlibs/dungeonInfoLibrary.lua` could satisfy this reference on a live deployment, but no such file exists in the tracked Project_Game snapshot.
+
+### No source change
+Detection-only record; no production file was changed.
