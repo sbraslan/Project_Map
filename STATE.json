@@ -15,9 +15,10 @@
     "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Consolidate verified bug inventory across completed subsystems into a runtime-test readiness queue without executing tests.",
-      "Preserve all source/game repositories as read-only until the user explicitly changes phase.",
-      "Use RUNTIME.md only for documenting later game/runtime validation targets."
+      "Continue consolidating completed-subsystem bug/test readiness from RUNTIME.md without executing tests.",
+      "Keep DUNGEON-T10 as the first future live runtime gate unless the user explicitly chooses another cluster.",
+      "Use tests/sung_mahi_tower.md for SMT-T01 through SMT-T06 when runtime execution is explicitly enabled.",
+      "Preserve all source/game repositories as read-only until the user explicitly changes phase."
     ]
   },
   "startup": {
@@ -162,7 +163,9 @@
     "game/src/input_login.cpp::Sung Mahi instance rebind/dismount",
     "game/src/regen.cpp::dungeon regen difficulty scaling",
     "BUG-SMT-006::tower-only consumables missing tracked item_proto definitions",
-    "Sung Mahi Tower::STATIC COMPLETE"
+    "Sung Mahi Tower::STATIC COMPLETE",
+    "tests/sung_mahi_tower.md::SMT-T01..SMT-T06 deferred validation plan",
+    "RUNTIME.md::Sung Mahi runtime readiness cluster"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -317,6 +320,19 @@
       "sung_mahi_ranking player_login versus character-name mailbox recipient semantics",
       "malformed/out-of-range quest-produced floor/dungeonLevel values",
       "m_bDungeon_Difficulty versus dungeonLevel synchronization depends on missing quest runtime"
+    ]
+  },
+  "runtime_readiness": {
+    "status": "DOCUMENTATION READY — EXECUTION LOCKED",
+    "current_first_live_gate": "DUNGEON-T10",
+    "sung_mahi_test_file": "tests/sung_mahi_tower.md",
+    "sung_mahi_test_ids": [
+      "SMT-T01",
+      "SMT-T02",
+      "SMT-T03",
+      "SMT-T04",
+      "SMT-T05",
+      "SMT-T06"
     ]
   }
 }
