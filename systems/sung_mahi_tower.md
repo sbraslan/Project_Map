@@ -224,12 +224,34 @@ This promotes the prior mapping gap to verified repository-integration bug `BUG-
 
 Caveat: an untracked external quest package installed only on a live deployment could change runtime behavior; such a package is absent from this repository snapshot.
 
+
+## Tower ranking writer / reset boundary
+The mapped C++ ranking path contains a consumer/resetter but no dedicated Sung Mahi row-writer:
+- monthly timer reads `sung_mahi_ranking` with `SELECT player_login ... WHERE tower_level = ? ORDER BY tower_time ASC LIMIT 1`;
+- after rewards, it executes `TRUNCATE TABLE sung_mahi_ranking`.
+
+No Sung Mahi-specific C++ INSERT/UPDATE API was found in the mapped quest/game roots. However, `questlua_global.cpp` exposes generic `mysql_direct_query` to Lua, and `quest_functions` exports that symbol. This makes the missing tower quest package the most likely owner of the ranking INSERT/UPDATE statements and completion-time bookkeeping.
+
+This reinforces `BUG-SMT-001`: the tracked snapshot has the monthly reward consumer but not the quest-side producer that would populate the ranking table.
+
+The monthly reset path also calls `Questlibs/dungeonInfoLibrary.lua` after truncation to "clear the set". That exact file is absent from the entire tracked Project_Game tree, producing verified `BUG-SMT-002`.
+
+## Tower room activation / unique-master hook
+Sung Mahi-specific combat orchestration is embedded in generic battle code:
+- `d.spawn_mob_dir_nomove(...)` spawns a monster with `NOMOVE` + `NOATTACK`;
+- `d.set_unique_master(key)` marks a selected unique monster as the master;
+- when a PC attacks a character marked unique-master and dungeon flag `chessWrongMonster` is still clear, `CHARACTER::Damage()` calls `AggregateMonsterByMaster()`, clears the target's master flag and sets `chessWrongMonster=1`;
+- `AggregateMonsterByMaster()` iterates the current private map, removes `NOMOVE/NOATTACK` from all monsters, clears their victim and starts combat against the triggering player when possible.
+
+Because private dungeon map indices are instance-specific, the aggregate pass is scoped to that tower instance map rather than all instances globally.
+
 ## Verified bugs
 - `BUG-SMT-001` — Sung Mahi Tower quest runtime implementation is missing from the tracked Project_Game quest package.
+- `BUG-SMT-002` — monthly ranking reset references missing `Questlibs/dungeonInfoLibrary.lua`.
 
 ## Exact next work
-1. Map all remaining server-side Sung Mahi persistence/reward SQL paths and determine where `sung_mahi_ranking` rows are written.
-2. Audit the two unsynchronized level states: `m_bDungeon_Difficulty` versus dungeon flag `dungeonLevel`.
-3. Trace tower-specific monster/room progression hooks (`unique master`, no-move/no-attack, kill handling).
-4. Revisit the visibility-gated client live commands after server timing is mapped.
-5. Keep missing quest runtime as BUG-SMT-001; do not patch source during detection phase.
+1. Continue the `m_bDungeon_Difficulty` versus `dungeonLevel` synchronization audit and determine whether any visible runtime path can diverge them.
+2. Trace remaining tower kill/completion hooks around room-clear transitions and reward issuance.
+3. Inspect client live-command visibility gating against map-load timing.
+4. Treat ranking INSERT/UPDATE production as part of the missing quest package unless a separate writer is found.
+5. Keep production source immutable; record only verified findings.
