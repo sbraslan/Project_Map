@@ -24,15 +24,15 @@
       "BUG-WLOT-009",
       "BUG-WLOT-010",
       "BUG-WLOT-011",
-      "BUG-WLOT-012"
+      "BUG-WLOT-012",
+      "BUG-WLOT-013",
+      "BUG-WLOT-014"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Finish ticket delete/claim SQL-error/null handling and mutation ordering.",
-      "Audit async result-update ordering versus next-draw insertion.",
-      "Audit claim/withdrawal persistence and save ordering.",
-      "Check server-to-client lottery point serialization widths.",
-      "Reconcile World Lottery findings and determine STATIC COMPLETE readiness."
+      "Check draw refresh threshold timing (next_time - 10) against client countdown semantics.",
+      "Check ticket purchase/claim query escaping and row uniqueness assumptions.",
+      "Reconcile World Lottery findings, dependencies, and STATIC COMPLETE readiness."
     ]
   },
   "startup": {
@@ -92,7 +92,12 @@
     "root/interfacemodule.py::lottery UI bridge",
     "root/uilottery.py::ticket-grid refresh",
     "db/src/LottoManager.cpp::COUNT draw identity/result payout/logging/scheduling",
-    "game/src/char_lottery.cpp::ranking SQL/result mapping"
+    "game/src/char_lottery.cpp::ranking SQL/result mapping",
+    "game/src/char.cpp::CreatePlayerProto/SendPoints/PointChange/save_event",
+    "libsql/AsyncSQL.cpp/.h::DirectQuery/AsyncQuery FIFO",
+    "UserInterface/PythonNetworkStreamPhaseLoading.cpp::__RecvPlayerPoints",
+    "UserInterface/PythonPlayer.cpp/.h::SetStatus/GetStatus",
+    "UserInterface/PythonPlayerModule.cpp::GetLottoMoney/GetLottoTotalMoney"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
