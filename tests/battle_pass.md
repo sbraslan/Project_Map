@@ -38,3 +38,12 @@
 - BP-T12: fresh CHARACTER first ranking request before any setter; instrument/read `m_dwLastExtBattlePassOpenRankingTime`. Covers BUG-BPASS-011.
 - BP-T13: run `battlepass_set_mission` as GM_IMPLEMENTOR twice on an already completed mission with value >= target; verify duplicate mission reward. Covers BUG-BPASS-002.
 - BP-T14: temporarily configure BattlePassID 2 in isolated environment, start through Event Manager and verify active ID remains 1. Covers BUG-BPASS-007.
+
+
+### Readiness consolidation — 2026-09-28
+- Documentation-only classification completed; no Battle Pass runtime test executed.
+- BP-T01..BP-T14 are now treated as the canonical deferred Battle Pass validation set.
+- Multiple tests may cover the same verified bug from different angles.
+- BP-T08 remains a broad lifecycle/regression check rather than a unique bug mapping.
+- BP-T02 is the primary normal-path observational candidate.
+- Overall first live runtime gate remains DUNGEON-T10.
