@@ -245,13 +245,47 @@ Sung Mahi-specific combat orchestration is embedded in generic battle code:
 
 Because private dungeon map indices are instance-specific, the aggregate pass is scoped to that tower instance map rather than all instances globally.
 
+
+## Dual tower-level state audit
+The two level carriers are fully independent in C++:
+- `d.set_dungeon_difficulty(value)` writes only `CDungeon::m_bDungeon_Difficulty`;
+- generic `d.setf("dungeonLevel", value)` writes only `CDungeon::m_map_Flag`;
+- `d.clear_dungeon_flags()` clears `m_map_Flag` (therefore `dungeonLevel`) but does not reset `m_bDungeon_Difficulty`;
+- no setter automatically mirrors either value into the other.
+
+Consumers are also different:
+- `m_bDungeon_Difficulty` is read during `CHARACTER_MANAGER::SpawnGroup()` and passed to `SetDungeonMultipliers()` for monster DEF/ATT/HP scaling;
+- `dungeonLevel` is read by player-side `GetSungMahiTowerDungeonValue()` for SungMa STR/HP/MOVE/IMMUNE requirements.
+
+Both Lua setters accept raw numeric input without enforcing the canonical 1..50 range at the setter boundary. `SetDungeonMultipliers()` later rejects values outside 1..50, while `GetSungMahiTowerDungeonValue()` has no equivalent local bounds check.
+
+Because the actual tower quest is absent, a concrete runtime mismatch cannot be proven from this snapshot. Record this as a verified architectural synchronization gap, not a separate bug ID yet.
+
+## Spawn-path scaling boundary
+Tower difficulty scaling is not applied uniformly to every spawn API:
+- group spawns that reach `CHARACTER_MANAGER::SpawnGroup(..., pDungeon)` apply `pDungeon->GetDungeonDifficulty()` to every spawned member;
+- tower-specific `d.spawn_mob_dir_nomove(...)` calls `CDungeon::SpawnMob(..., isNomove=true)`, which assigns dungeon ownership and NOMOVE/NOATTACK but does not call `SetDungeonMultipliers()`.
+
+Therefore the missing quest implementation determines whether individual room mobs intentionally remain proto-scaled or whether this creates a difficulty inconsistency. Without that caller, bug promotion would be speculative.
+
+## Tower reward helper boundary
+`pc.mailbox_reward(vnum, count, floor)` is clearly Sung Mahi-oriented: it builds a mail title `"Sung Mahi Tower Level <floor>"` and calls `CMailBox::WriteFromLua`.
+
+Important lifecycle detail:
+- `CHARACTER::m_pkMailBox` initializes to `nullptr`;
+- a `CMailBox` object is created only after mailbox open/load completes;
+- `pc.mailbox_reward` obtains `CMailBox* mail = ch->GetMailBox()` and calls `mail->WriteFromLua(...)` without a null guard;
+- `WriteFromLua` itself does not use instance state and only builds/sends a DB mailbox packet.
+
+Calling a non-static member through a null object pointer is undefined behavior in C++, even if the current function body does not dereference instance fields. However the tracked tower quest caller is missing, so the exact runtime invocation preconditions cannot be verified. Keep this as a high-priority deferred safety finding rather than a new verified bug for now.
+
 ## Verified bugs
 - `BUG-SMT-001` — Sung Mahi Tower quest runtime implementation is missing from the tracked Project_Game quest package.
 - `BUG-SMT-002` — monthly ranking reset references missing `Questlibs/dungeonInfoLibrary.lua`.
 
 ## Exact next work
-1. Continue the `m_bDungeon_Difficulty` versus `dungeonLevel` synchronization audit and determine whether any visible runtime path can diverge them.
-2. Trace remaining tower kill/completion hooks around room-clear transitions and reward issuance.
-3. Inspect client live-command visibility gating against map-load timing.
-4. Treat ranking INSERT/UPDATE production as part of the missing quest package unless a separate writer is found.
+1. Inspect client live-command visibility gating against map-load/warp timing and determine whether updates can be lost.
+2. Trace generic quest kill/leave/logout hooks that the missing tower quest would depend on for completion cleanup.
+3. Revisit `pc.mailbox_reward` null-mailbox safety only if a callable tower quest/runtime producer is recovered.
+4. Treat ranking row production and floor-state synchronization as missing-quest responsibilities unless another producer is found.
 5. Keep production source immutable; record only verified findings.
