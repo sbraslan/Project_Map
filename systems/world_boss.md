@@ -153,10 +153,49 @@ The official World Boss window therefore exposes a visible reward button with no
 - `BUG-WB-007` — ranking row construction is independently broken by list-as-function calls, unloaded temporary window usage, and text-argument destruction.
 - `BUG-WB-008` — reward flag is set only after all items; mid-bundle inventory failure permits repeated partial reward claims.
 - `BUG-WB-009` — official reward button is never bound to any handler/command.
+- `BUG-WB-010` — ranking generation is coupled to multi-item drops and advances character/damage iterators out of sync.
+- `BUG-WB-011` — timed boss destruction deletes the object without clearing World Boss VID/pointer state.
+- `BUG-WB-012` — disabling the event does not tear down the active boss/state, and deaths while disabled bypass `OnKill()`.
+
+## Ranking ownership-loop closure
+World Boss ranking collection is embedded inside the ordinary multi-item drop ownership loop rather than being derived independently from the damage map.
+
+It runs only when:
+- `CreateDropItem(...)` succeeds;
+- the drop vector contains more than one item;
+- at least one damage owner meets the 10% ownership threshold.
+
+Therefore a World Boss producing zero or one item generates no ranking rows at all, regardless of player damage.
+
+Inside the ranking-enabled multi-item loop, the character iterator is advanced once in the ranking block and then again later in the same item iteration, while the damage iterator is advanced only once. Character and damage vectors therefore become misaligned. With two qualifying players, the same character can be selected repeatedly while damage values alternate; with three or more players, damage can be attributed to the wrong character and some players are skipped.
+
+See BUG-WB-010.
+
+## Timed cleanup state corruption
+The scheduled timeout path calls:
+`M2_DESTROY_CHARACTER(pkWB)`
+
+and then only clears `wb_Spawned`.
+
+`M2_DESTROY_CHARACTER` maps to `CHARACTER_MANAGER::DestroyCharacter`. That function removes/deletes the character but does not invoke World Boss `OnKill()` and does not clear:
+- `m_dwWBVID`;
+- `pkWB`;
+- World Boss phase/cooldown state.
+
+So even if BUG-WB-001 were corrected and timeout cleanup executed, the boss object would be deleted while `pkWB` remains a dangling pointer and `m_dwWBVID` remains nonzero. The next scheduled spawn is then blocked by `m_dwWBVID == 0`. See BUG-WB-011.
+
+## Event-disable lifecycle
+`CEventManager::SetWorldBossEvent(false)` only changes the `world_boss_event` flag and sends a completion notice.
+
+It does not destroy an active World Boss or reset manager state.
+
+The World Boss death hook in `char_battle.cpp` is itself conditional on `world_boss_event == 1`. If a boss remains alive when the event is disabled and then dies while disabled, `OnKill()` is not called, leaving stale World Boss VID/pointer/state. If it simply remains alive, the disabled scheduler no longer manages its timeout.
+
+See BUG-WB-012.
 
 ## Open audit
 1. Finish tier-assignment provenance: identify whether `SetTier()` has any live caller.
-2. Audit damage-ranking collection against item-drop count / ownership loop.
-3. Audit World Boss state initialization and login/reconnect synchronization.
-4. Audit reward-state persistence/reset across death, relog and successive boss cycles.
-5. Audit multi-core/channel ownership to determine whether multiple simultaneous bosses are intended or accidental.
+2. Audit World Boss state initialization and login/reconnect synchronization.
+3. Audit reward-state persistence/reset across death, relog and successive boss cycles.
+4. Audit multi-core/channel ownership to determine whether multiple simultaneous bosses are intended or accidental.
+5. Audit ranking cache reset/pagination behavior after upstream routing/parser defects.
