@@ -124,3 +124,94 @@ The `POINT_GOLD` branch checks only the upper GOLD_MAX boundary. It has no lower
 A client can therefore use the withdrawal endpoint in the opposite direction and push character gold below zero while increasing the lottery wallet. This violates both currency invariants and endpoint semantics.
 
 Because the packet is long long while `PointChange` accepts int, very large negative values also cross BUG-WLOT-003's narrowing boundary and may invert/truncate the effective mutations depending on the target compiler conversion behavior.
+
+
+### BUG-WLOT-007 — COUNT(*) is treated as the current draw id
+- Statik durum: **doğrulandı**
+- Sınıf: draw identity / database continuity invariant
+
+Both the scheduler and ticket-purchase path derive draw identity from `COUNT(*)`.
+
+The scheduler queries the supposed current row with:
+`WHERE lotto_id = COUNT(*)`
+
+and future tickets are assigned to:
+`COUNT(*) + 1`.
+
+This is valid only if every historical id from 1 through the maximum id exists forever. If any row is removed or an auto-increment gap exists, row count and maximum/current id diverge.
+
+A missing current-count id makes the scheduler's info query return zero rows and the function returns, so new draws can stop. Even when a row happens to exist, `COUNT+1` can identify the wrong target draw.
+
+The purchase path simultaneously updates jackpot contribution using `MAX(lotto_id)`, proving the implementation mixes MAX-id and row-count semantics.
+
+### BUG-WLOT-008 — result log stores the previous draw id
+- Statik durum: **doğrulandı**
+- Sınıf: audit-log integrity / off-by-one draw mapping
+
+During refresh, the evaluator selects tickets with:
+`for_lotto_id = COUNT(*) + 1`.
+
+Those tickets are evaluated against the newly generated numbers that are inserted as the next draw row.
+
+But each result log writes:
+`lotto_id = COUNT(*)`.
+
+In the normal contiguous case the ticket belongs to draw N+1 while the log records draw N. Jackpot/history records are therefore attached to the previous draw id.
+
+### BUG-WLOT-009 — multiple jackpot winners each receive the entire jackpot
+- Statik durum: **doğrulandı**
+- Sınıf: jackpot accounting / over-allocation
+
+For every ticket with four matches the evaluator independently sets:
+`win_money = jackpot`.
+
+There is no pre-count of jackpot winners and no division of the pot.
+
+Two 4/4 tickets therefore create `2 * jackpot` in promised prizes; N winners create `N * jackpot`.
+
+All payouts are accumulated into `new_jackpot_wins` and subtracted from `next_jackpot`. The subsequent minimum-jackpot floor can mask a negative/overdrawn intermediate balance but does not make the original allocation conserved.
+
+### BUG-WLOT-010 — recurring draw interval ignores configured generation period
+- Statik durum: **doğrulandı**
+- Sınıf: scheduling/configuration drift
+
+`GENERATE_NEW_LOTTO_NUMBERS_PULSE_MIN` is configured as 2 minutes.
+
+The initial-row path schedules 120 seconds, consistent with that setting.
+
+The recurring path contains the configured calculation only as a comment and instead executes:
+`int next_refresh = 30;`
+
+Thus after initialization, draws are scheduled every 30 seconds instead of the configured two minutes.
+
+### BUG-WLOT-011 — jackpot ranking sends ticket id as lottoID
+- Statik durum: **doğrulandı — dormant official UI path**
+- Sınıf: ranking semantic mapping
+
+The jackpot ranking query selects:
+`player_name, lotto_ticket_id, money_win, date`.
+
+The second column is assigned to:
+`TPacketGCSendRankingJackpotInfo.lottoID`.
+
+The client then stores/deduplicates that value as `lottoID`.
+
+So the transport labels a ticket id as a draw/lottery id. This corrupts ranking draw identity whenever the ranking endpoint is invoked. The shipped lottery UI currently contains no ranking caller, although the Python binding and server handler exist.
+
+### BUG-WLOT-012 — missing player_index row can crash lottery ranking request
+- Statik durum: **doğrulandı — dormant official UI path**
+- Sınıf: SQL result safety / null dereference
+
+For each total-money ranking row, the server queries:
+`SELECT empire FROM player.player_index WHERE id = account_id`.
+
+It checks only `uiSQLErrno`.
+
+Then:
+`MYSQL_ROW row_empire = mysql_fetch_row(...)`
+is followed unconditionally by:
+`atoi(row_empire[0])`.
+
+If the query succeeds but returns zero rows, `row_empire` is null and the code dereferences it. A ranking request can therefore crash the game process for inconsistent/orphaned player data.
+
+The current shipped lottery UI does not expose the ranking request, so this path is dormant for normal UI use, but it is reachable through the existing network handler/binding.
