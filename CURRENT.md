@@ -10,20 +10,18 @@
 ## Hard rule
 Only `sbraslan/Project_Map` is writable. All source/game repositories remain read-only.
 
-## Just closed
-World Boss System -> **STATIC COMPLETE** with `BUG-WB-001..016`.
-
-## Sung Mahi Tower progress
-- Feature flag confirmed enabled.
-- Client command/UI roots found in `Project_Binary/root/game.py`, `uisungmahi.py`, and two UIScript files.
-- Server behavior is embedded in generic Yohara/character/battle code rather than a dedicated tower source file.
-- Initial combat/map-data roots are mapped; server command producers remain next.
+## Just mapped
+- All nine Sung Mahi names are client server-command callbacks registered in `game.py`.
+- Entry UI does not send a dedicated tower packet; it calls `event.QuestButtonClick(constInfo.sungMahiQuest)`.
+- Entry/progression UI and live in-tower minimap board are separate client surfaces.
+- Live room/floor/time/notice updates are forwarded through `Interface` only while `sungMahiCover` is visible.
+- `sungMahiCover` is shown for `metin2_map_smhdungeon_02`; exit uses generic `/restart_here`.
 
 ## Exact next work
-1. Find server producers for the Sung Mahi client command names.
-2. Trace `uisungmahi.py` room/tower/reward lifecycle.
-3. Trace SungMa map-attribute loading and combat enforcement.
+1. Resolve server/quest producers for the nine client command strings and the source of `sungMahiQuest`.
+2. Trace quest-button entry into the tower instance.
+3. Trace `IsSungmaMap()/GetSungmaMapAttribute()` loading/enforcement.
 4. Map Conqueror/tower persistence and reward boundaries.
-5. Record only verified bugs after end-to-end flow closure.
+5. Only then promote any end-to-end verified bug.
 
 GitHub state is canonical.
