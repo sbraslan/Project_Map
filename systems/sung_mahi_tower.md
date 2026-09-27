@@ -331,6 +331,25 @@ The `ENABLE_MAILBOX` monthly reward path contains verified fixed-buffer string d
 
 Later mailbox code treats these fields as C strings. This monthly C++ path is independent of the missing quest runtime and is directly reachable by the monthly timer.
 
+
+## Client 1..50 floor-model audit
+The entry/progression UI and shipped locale data are aligned on the canonical 50-floor model:
+- `uisungmahi.py::MAX_LEVEL_COUNT = 50`;
+- the floor list is constructed for exactly levels 50..1 then reversed to zero-based UI indices 0..49;
+- reward table contains exactly floor rows 1..50;
+- element table contains exactly floor rows 1..50.
+
+For valid progression values 0..50, the main selection semantics are internally consistent:
+- `sungMahiLevelInfo` behaves as the number of completed floors;
+- selected UI floor is stored zero-based in `previousListItem`;
+- entry accepts only when `sungMahiLevelInfo == previousListItem`, which maps 0 completed -> floor 1, 49 completed -> floor 50, and blocks entry after all 50 floors are complete.
+
+There are latent defensive off-by-one checks:
+- `__LoadLevelInfo()` subtracts one, then rejects only `levelIndex > MAX_LEVEL_COUNT`; a post-subtraction value of exactly 50 would still index a 50-element list out of range;
+- `SetLevelElement()` and `SetLevelRewards()` use `len(list) < levelIndex` rather than a `<=` style guard before indexing.
+
+These do not trigger with the canonical valid 1..50 floor flow and the shipped 50-row tables, so no additional bug ID is promoted from current evidence. They remain malformed-input defenses to revisit only if a producer capable of sending out-of-range progression is recovered.
+
 ## Verified bugs
 - `BUG-SMT-001` — Sung Mahi Tower quest runtime implementation is missing from the tracked Project_Game quest package.
 - `BUG-SMT-002` — monthly ranking reset references missing `Questlibs/dungeonInfoLibrary.lua`.
@@ -338,8 +357,8 @@ Later mailbox code treats these fields as C strings. This monthly C++ path is in
 - `BUG-SMT-004` — monthly season marker stores only month number, not year.
 
 ## Exact next work
-1. Audit the client entry/progression data model for static off-by-one/range inconsistencies now that the canonical 1..50 floor boundary is proven.
-2. Inspect Sung Mahi reward/element locale tables against UI indexing and 50-floor assumptions.
+1. Inspect any remaining independent C++ monthly-reward/mailbox edge cases not blocked by the missing quest.
+2. Review map/data integration around `smhtower_*` monster groups and floor-room composition for static mismatches.
 3. Revisit `pc.mailbox_reward` null-mailbox safety only if a callable tower producer is recovered.
-4. Decide whether remaining unresolved behavior is entirely blocked by BUG-SMT-001 or whether additional independent static paths remain.
+4. Decide whether Sung Mahi Tower can be marked STATIC COMPLETE with unresolved runtime behavior explicitly attributed to BUG-SMT-001.
 5. Keep production source immutable; record only verified findings.
