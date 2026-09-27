@@ -15,25 +15,24 @@ World Lottery System -> **STATIC COMPLETE** with `BUG-WLOT-001..014`.
 
 ## World Boss progress
 Mapped:
-- event/config constants;
-- spawn/kill scheduler;
+- event/config constants and scheduler;
 - P2P state packet/fanout;
-- boss death hook;
-- server damage-ranking emission;
-- normal-player reward command;
-- Python World Boss state/ranking callbacks;
-- persistent interface windows and UIScript controls.
+- boss death/ranking path;
+- reward command/state;
+- Python World Boss state/ranking UI;
+- timeout/event-disable/login lifecycle;
+- multi-core/channel ownership;
+- ranking global-cache lifecycle.
 
 Verified:
-- `BUG-WB-001..013`.
+- `BUG-WB-001..014`.
 
 ## Exact next work
-1. Finish tier-assignment provenance / determine whether reward tier is ever assigned.
-2. Audit reward-state reset semantics across boss cycles.
-3. Audit multi-core/channel boss ownership.
-4. Audit ranking cache reset/pagination after upstream failures.
-
-Damage-ranking ownership, timeout/event-disable lifecycle, and login/reconnect state synchronization are now statically mapped.
+1. Finish tier-assignment provenance with a complete caller scan if repository search becomes available.
+2. Finish reward-state reset provenance (`SetWBRewards(false)`) beyond mapped World Boss roots.
+3. Audit damage-owner lifetime/disconnect behavior around boss death.
+4. Audit map/time scheduling edge cases and channel topology assumptions.
+5. Decide World Boss STATIC COMPLETE only after the provenance items are closed.
 
 Record only findings in Project_Map. Source repositories stay immutable.
 
