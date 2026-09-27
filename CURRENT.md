@@ -15,13 +15,15 @@ World Boss System -> **STATIC COMPLETE** with `BUG-WB-001..016`.
 
 ## Sung Mahi Tower progress
 - Feature flag confirmed enabled.
-- Initial root discovery is active.
+- Client command/UI roots found in `Project_Binary/root/game.py`, `uisungmahi.py`, and two UIScript files.
+- Server behavior is embedded in generic Yohara/character/battle code rather than a dedicated tower source file.
+- Initial combat/map-data roots are mapped; server command producers remain next.
 
 ## Exact next work
-1. Find server manager/dungeon classes and constants.
-2. Find client Python/UI roots.
-3. Trace packet/server-command flow end-to-end.
-4. Map reward/progression/persistence boundaries.
-5. Record only verified bugs after flow closure.
+1. Find server producers for the Sung Mahi client command names.
+2. Trace `uisungmahi.py` room/tower/reward lifecycle.
+3. Trace SungMa map-attribute loading and combat enforcement.
+4. Map Conqueror/tower persistence and reward boundaries.
+5. Record only verified bugs after end-to-end flow closure.
 
 GitHub state is canonical.
