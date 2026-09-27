@@ -1,9 +1,9 @@
 # RUNTIME — In-Game / Fault-Injection Validation
 
-**Status:** DEFERRED — detection/mapping phase only
+**Status:** DEFERRED — static mapping complete; runtime execution still locked
 **Started:** 2026-09-26
 
-Static mapping remains canonical in `INDEX.md` and per-system files. This file is the short cursor for the next phase; do not bulk-load every bug registry into one chat.
+Static mapping is now complete across the subsystem index. This file is the short cursor for the next phase; do not bulk-load every bug registry into one chat.
 
 ## Goal
 Future-only test inventory. During the current detection/mapping phase, do not execute these tests and do not modify source/game files. Keep this file only as deferred validation notes.
@@ -31,6 +31,19 @@ Start with defects that should reproduce using current checked-in data/UI:
 ### Stage C — crash consistency / persistence
 - Hunting item-vs-quest reward commit window.
 - other subsystem persistence tests already recorded in their individual test files.
+
+### Sung Mahi Tower — prepared cluster
+Detailed deferred plan: `tests/sung_mahi_tower.md`.
+
+Prepared validations:
+- SMT-T01 — missing tower quest runtime normal path (BUG-SMT-001)
+- SMT-T02 — missing monthly reset Lua library (BUG-SMT-002)
+- SMT-T03 — monthly mailbox memcpy / unterminated-string ASan check (BUG-SMT-003)
+- SMT-T04 — cross-year same-month rollover simulation (BUG-SMT-004)
+- SMT-T05 — dark king 7591 resistance comparison (BUG-SMT-005)
+- SMT-T06 — tower-only item proto availability (BUG-SMT-006)
+
+Do not run this cluster until runtime execution is explicitly enabled.
 
 ## Current next target
 **DUNGEON-T10 live reproduction is the gate.**
