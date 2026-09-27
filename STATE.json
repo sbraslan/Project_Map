@@ -6,25 +6,18 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "sung_mahi_tower",
-    "display_name": "Sung Mahi Tower",
-    "status": "PARTIAL — ACTIVE",
-    "system_file": "systems/sung_mahi_tower.md",
-    "bug_file": "bugs/sung_mahi_tower.md",
-    "test_file": "tests/sung_mahi_tower.md",
-    "verified_bug_ids": [
-      "BUG-SMT-001",
-      "BUG-SMT-002",
-      "BUG-SMT-003",
-      "BUG-SMT-004",
-      "BUG-SMT-005"
-    ],
+    "subsystem": "static_mapping_closure",
+    "display_name": "Static Mapping Closure",
+    "status": "STATIC MAPPING COMPLETE",
+    "system_file": null,
+    "bug_file": null,
+    "test_file": "RUNTIME.md",
+    "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Perform one final independent static sweep for Sung Mahi-only C++/data roots not yet represented in the map.",
-      "If no unexamined independent path remains, close Sung Mahi Tower as STATIC COMPLETE with missing runtime quest behavior represented by BUG-SMT-001.",
-      "Preserve deferred pc.mailbox_reward, smhgate_flower and player_login/mailbox semantic candidates unless a producer or schema is recovered.",
-      "Do not modify production source during detection phase."
+      "Consolidate verified bug inventory across completed subsystems into a runtime-test readiness queue without executing tests.",
+      "Preserve all source/game repositories as read-only until the user explicitly changes phase.",
+      "Use RUNTIME.md only for documenting later game/runtime validation targets."
     ]
   },
   "startup": {
@@ -157,7 +150,19 @@
     "Project_Game maps 386/387::no monster regen files; quest-driven spawn boundary",
     "Project_Game/share/data/monster/smhgate_flower::missing folder deferred without tracked producer",
     "BUG-SMT-005::dark king 7591 ResistDark=-1 elemental data mismatch",
-    "monthly ranking player_login vs character-name mailbox key::deferred semantic check"
+    "monthly ranking player_login vs character-name mailbox key::deferred semantic check",
+    "game/src/char_item.cpp::Sung Mahi-only item gating and automatic recovery disable",
+    "common/VnumHelper.h::Sung Mahi item vnums 70390-70395 and 70405",
+    "common/item_length.h::tower potion/use subtypes",
+    "game/src/char_resist.cpp::sungMahiCurseType poison/bleeding suppression",
+    "game/src/char_skill.cpp::sungMahiCurseType skill suppression",
+    "game/src/questlua_affect.cpp::tower affect add/remove helpers",
+    "game/src/questlua_pc.cpp::pc.sung_mahi_curse_hp",
+    "game/src/cmd_general.cpp::Sung Mahi /restart_here staging warp",
+    "game/src/input_login.cpp::Sung Mahi instance rebind/dismount",
+    "game/src/regen.cpp::dungeon regen difficulty scaling",
+    "BUG-SMT-006::tower-only consumables missing tracked item_proto definitions",
+    "Sung Mahi Tower::STATIC COMPLETE"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -195,7 +200,8 @@
     "dungeon_core",
     "battle_field",
     "world_lottery",
-    "world_boss"
+    "world_boss",
+    "sung_mahi_tower"
   ],
   "ranking_closure": {
     "status": "STATIC COMPLETE",
@@ -293,6 +299,24 @@
       "BUG-WB-014",
       "BUG-WB-015",
       "BUG-WB-016"
+    ]
+  },
+  "sung_mahi_tower_closure": {
+    "status": "STATIC COMPLETE",
+    "verified_bug_ids": [
+      "BUG-SMT-001",
+      "BUG-SMT-002",
+      "BUG-SMT-003",
+      "BUG-SMT-004",
+      "BUG-SMT-005",
+      "BUG-SMT-006"
+    ],
+    "deferred_findings": [
+      "pc.mailbox_reward nullable mailbox pointer precondition",
+      "smhgate_flower 9100-9107 missing server monster folder without tracked runtime producer",
+      "sung_mahi_ranking player_login versus character-name mailbox recipient semantics",
+      "malformed/out-of-range quest-produced floor/dungeonLevel values",
+      "m_bDungeon_Difficulty versus dungeonLevel synchronization depends on missing quest runtime"
     ]
   }
 }
