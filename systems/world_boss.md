@@ -246,3 +246,14 @@ The official Python assets are located in `Project_Binary/root` (not Project_Gam
 `constInfo.WB_RANKS` and the parallel `wb_*` arrays are initialized only at module load. `uiworldbossranking.MainWindow.Open()` loads/shows the window but does not clear them, and the mapped interface teardown destroys the window without resetting the module globals.
 
 There is also no mapped page/scroll/reset protocol for World Boss ranking rows. Because the current server-routing/parser defects prevent the normal ranking path from functioning, this remains a latent lifecycle/cache defect rather than a new verified user-facing bug ID in the current build.
+
+
+## Damage-owner lifetime / disconnect audit
+At death/reward time the ordinary damage map is converted back to live character pointers with:
+`CHARACTER_MANAGER::Instance().Find(it->first)`.
+
+A damage entry contributes to the priority queue and to `total_dam` only when that VID still resolves to a live character on the local process.
+
+Therefore a participant who disconnects or otherwise ceases to resolve locally before boss death is omitted entirely; that participant's accumulated damage is also removed from the denominator used by the 10% ownership threshold. This can change which remaining players qualify for ownership/ranking compared with the actual fight damage history.
+
+The behavior is now mapped, but no bug ID is assigned yet because the source does not establish whether "must still be locally present at death" is intentional eligibility policy or an unintended World Boss ranking rule.
