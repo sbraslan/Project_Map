@@ -148,6 +148,24 @@ The global first live gate remains **DUNGEON-T10**. Hunting does not preempt tha
 
 **Next documentation cluster:** Battle Pass runtime readiness.
 
+
+## Runtime-readiness consolidation — Battle Pass — 2026-09-28
+**Documentation status:** READY
+**Execution status:** LOCKED / NOT RUN
+
+The existing BP-T01..BP-T14 matrix has been classified against the verified Battle Pass bug registry.
+
+Summary:
+- several bugs have more than one complementary validation;
+- one test remains a broad lifecycle/regression check rather than a unique one-to-one mapping;
+- BP-T02 is retained as the primary normal-path observational candidate;
+- crash-consistency, leak/instrumentation, and controlled-state cases remain deferred;
+- no Battle Pass runtime test has been executed.
+
+The global first live gate remains **DUNGEON-T10**.
+
+**Next documentation cluster:** Achievement runtime readiness.
+
 ## Patch readiness
 First-cluster fix plan is ready at `fixes/dungeon_info.md`.
 
