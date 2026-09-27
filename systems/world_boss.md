@@ -297,3 +297,27 @@ Relevant order:
 No new race/lifetime defect was found from this ordering itself: the boss object and damage map are still available while `Reward()` runs, and manager ownership is cleared afterwards.
 
 This audit also confirms that no World Boss tier assignment or reward-eligibility reset is performed in the death callback path itself. The tier/reward provenance question therefore remains isolated outside the mapped spawn/death/reward lifecycle.
+
+
+## Client titlebar parent/child visibility mismatch
+Both World Boss UI scripts use a `board_with_titlebar` child inside a parent `ui.ScriptWindow`:
+- `uiworldboss.MainBoard`
+- `uiworldbossranking.MainWindow`
+
+Neither class rebinds the board close event to the parent window and neither defines a dedicated `Close()` / Escape handler.
+
+Framework behavior in `ui.BoardWithTitleBar.__init__()` is:
+`self.SetCloseEvent(self.Hide)`
+
+That callback belongs to the BoardWithTitleBar child itself, so clicking the titlebar X hides only the board child, not the owning ScriptWindow.
+
+The interface toggles, however, test `wndWorldBoss.IsShow()` / `wndWBRanking.IsShow()` on the parent ScriptWindow. This creates a parent/child visibility mismatch: after clicking X, the visible content disappears while the parent can remain logically shown. The next toggle action therefore hides the already-invisible parent; only a subsequent toggle reopens/reloads it.
+
+See BUG-WB-015.
+
+## External quest/data root audit
+The current World Boss vnum table contains vnum 1093. Project_Game contains existing `1093.kill` quest handlers:
+- Devil Tower 1093 handler is guarded by dungeon/map 660000-669999 and therefore does not trigger on World Boss maps 61-64.
+- Biolog level-90 quest intentionally lists 1093 among several valid kill targets and can grant its normal quest drop when a player in the relevant quest state kills the World Boss.
+
+No World Boss-specific tier assignment or reward reset was found in the named quest/data roots. The biolog overlap is documented as integration behavior, not classified as a bug because the quest intentionally treats vnum 1093 as a general eligible target.
