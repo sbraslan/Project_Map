@@ -156,6 +156,7 @@ The official World Boss window therefore exposes a visible reward button with no
 - `BUG-WB-010` — ranking generation is coupled to multi-item drops and advances character/damage iterators out of sync.
 - `BUG-WB-011` — timed boss destruction deletes the object without clearing World Boss VID/pointer state.
 - `BUG-WB-012` — disabling the event does not tear down the active boss/state, and deaths while disabled bypass `OnKill()`.
+- `BUG-WB-013` — login/reconnect has no current-state synchronization; players joining mid-cycle can remain permanently stale until another transition.
 
 ## Ranking ownership-loop closure
 World Boss ranking collection is embedded inside the ordinary multi-item drop ownership loop rather than being derived independently from the damage map.
@@ -193,9 +194,24 @@ The World Boss death hook in `char_battle.cpp` is itself conditional on `world_b
 
 See BUG-WB-012.
 
+## Login / reconnect state synchronization
+The World Boss client has no request/response path for current state.
+
+Mapped login/input paths contain no World Boss state sync, and opening `wndWorldBoss` only loads/shows the local Python UI; it does not send a network request.
+
+The only mapped server-to-client state command is produced by the P2P receive handler when it receives a spawn/kill state packet.
+
+Therefore a player who logs in after the last spawn/kill transition, reconnects mid-cycle, or otherwise misses that transient command has no way to reconstruct current boss state/timers until a later transition occurs. See BUG-WB-013.
+
+## Tier/reward persistence note
+`m_pTier` and `m_pGotRewards` are plain CHARACTER members initialized on character construction to 0 / false.
+
+No corresponding fields exist in the mapped `TPlayerTable` or player DB load/save path.
+
+Thus the state is session-local rather than persisted. Concrete user-facing severity depends on where/when `SetTier()` is called; tier-assignment provenance remains open, so no separate bug ID is assigned yet.
+
 ## Open audit
 1. Finish tier-assignment provenance: identify whether `SetTier()` has any live caller.
-2. Audit World Boss state initialization and login/reconnect synchronization.
-3. Audit reward-state persistence/reset across death, relog and successive boss cycles.
-4. Audit multi-core/channel ownership to determine whether multiple simultaneous bosses are intended or accidental.
-5. Audit ranking cache reset/pagination behavior after upstream routing/parser defects.
+2. Audit reward-state reset semantics across successive boss cycles.
+3. Audit multi-core/channel ownership to determine whether multiple simultaneous bosses are intended or accidental.
+4. Audit ranking cache reset/pagination behavior after upstream routing/parser defects.
