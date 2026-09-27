@@ -19,3 +19,7 @@ Do not execute runtime/fault-injection tests unless the user explicitly changes 
 - WLOT-T10 compare the configured 2-minute generation constant against recurring inserted `next_numbers`; verify recurring rows use 30 seconds. Covers BUG-WLOT-010.
 - WLOT-T11 invoke ranking data and compare packet/client `lottoID` against `lotto_log.lotto_ticket_id` and `lotto_id`. Covers BUG-WLOT-011.
 - WLOT-T12 with an otherwise valid total-money ranking player whose `player_index` row is absent, invoke ranking and observe the null-row dereference path. Covers BUG-WLOT-012. Do not execute until runtime-testing phase is explicitly enabled.
+
+- WLOT-T13 claim a winning ticket, confirm ticket state becomes 2, then terminate the game process before the next character save; after restart compare ticket state against persisted `lotto_moneypool` / `lotto_totalmoneywin`. Covers BUG-WLOT-013.
+- WLOT-T14 in a controlled test environment, force a lottery DirectQuery failure before its unchecked `mysql_fetch_row` path and verify null-result handling/crash behavior. Covers BUG-WLOT-014.
+- WLOT-T15 persist lottery wallet/total-win above INT_MAX, relog, and compare DB `long long` values with the full `TPacketGCPoints`/client status values. Extends BUG-WLOT-003 coverage.
