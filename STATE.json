@@ -16,16 +16,17 @@
       "BUG-WLOT-001",
       "BUG-WLOT-002",
       "BUG-WLOT-003",
-      "BUG-WLOT-004"
+      "BUG-WLOT-004",
+      "BUG-WLOT-005",
+      "BUG-WLOT-006"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Close client receive/cache/reset behavior for lottery base info, tickets and rankings.",
-      "Audit ticket delete/claim state transitions and SQL/null handling.",
+      "Finish ticket delete/claim state transitions and SQL-error/null handling.",
       "Audit COUNT(*)-based draw-id assumptions and row continuity.",
       "Audit multiple-jackpot accounting and next-jackpot math.",
       "Audit log lotto_id/ticket_id mapping.",
-      "Audit negative/zero withdrawal inputs and persistence/save ordering.",
+      "Audit claim/withdrawal persistence and save ordering.",
       "Audit ranking empire lookup/result safety."
     ]
   },
@@ -80,7 +81,11 @@
     "common/CommonDefines.h::lottery constants",
     "common/tables.h::TPlayerTable lottery fields",
     "UserInterface/PythonNetworkStreamModule.cpp::lottery bindings",
-    "root/uilottery.py"
+    "root/uilottery.py",
+    "root/game.py::BINARY_LotterySetBaseData/BINARY_LotterySetTicketData/ranking callbacks",
+    "root/constinfo.py::lottery caches",
+    "root/interfacemodule.py::lottery UI bridge",
+    "root/uilottery.py::ticket-grid refresh"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
