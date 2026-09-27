@@ -25,9 +25,15 @@ These remain intentionally unpromoted until missing runtime producer/schema evid
 - malformed/out-of-range quest-produced floor values;
 - `m_bDungeon_Difficulty` versus `dungeonLevel` synchronization.
 
+## Runtime readiness prepared
+- `tests/sung_mahi_tower.md` now defines SMT-T01..SMT-T06 for BUG-SMT-001..006.
+- `RUNTIME.md` now includes the Sung Mahi validation cluster.
+- Existing global first runtime gate remains Dungeon T10 once runtime execution is explicitly enabled.
+- No runtime test has been executed.
+
 ## Exact next work
-1. Consolidate verified bugs across completed subsystems into a runtime-test readiness queue.
-2. Document test order/prerequisites in `RUNTIME.md` only; do not execute game/runtime tests yet.
+1. Continue consolidating completed-subsystem bug/test readiness from the existing runtime cursor without executing tests.
+2. Keep the existing DUNGEON-T10 normal-path reproduction as the first live gate for a future runtime phase.
 3. Keep every source/game repository immutable until the phase is explicitly changed.
 
 GitHub state is canonical.
