@@ -11,24 +11,29 @@
 Only `sbraslan/Project_Map` is writable. All source/game repositories remain read-only.
 
 ## Just closed
-World Lottery System -> **STATIC COMPLETE**.
+World Lottery System -> **STATIC COMPLETE** with `BUG-WLOT-001..014`.
 
-Verified World Lottery bugs:
-- `BUG-WLOT-001..014`
+## World Boss progress
+Mapped:
+- event/config constants;
+- spawn/kill scheduler;
+- P2P state packet/fanout;
+- boss death hook;
+- server damage-ranking emission;
+- normal-player reward command;
+- Python World Boss state/ranking callbacks;
+- persistent interface windows and UIScript controls.
 
-## Active World Boss direction
-Initial client roots:
-- `root/uiworldboss.py`
-- `root/uiworldbossranking.py`
-- `root/uiscript/worldbosswindow.py`
-- `root/uiscript/worldbossrankingwindow.py`
-
-Server-side World Boss logic is not stored in a dedicated filename. Trace exact feature flags, packets and callbacks from generic server/client files.
+Verified:
+- `BUG-WB-001..009`.
 
 ## Exact next work
-1. Trace `ENABLE_WORLD_BOSS` and World Boss packet definitions/handlers.
-2. Map spawn/state/reward/ranking server ownership.
-3. Map client receive callbacks and Python ranking/cache lifecycle.
-4. Record verified bugs only in Project_Map.
+1. Finish tier-assignment provenance / determine whether reward tier is ever assigned.
+2. Audit damage-ranking collection against item-drop ownership iteration.
+3. Audit login/reconnect state synchronization.
+4. Audit tier/reward reset and persistence across boss cycles.
+5. Audit multi-core/channel boss ownership.
+
+Record only findings in Project_Map. Source repositories stay immutable.
 
 GitHub state is canonical.
