@@ -196,9 +196,56 @@ The code checks only SQL error, not whether a row exists. It then unconditionall
 - `BUG-WLOT-011` — jackpot ranking labels/keys `lotto_ticket_id` as `lottoID`, so ranking draw identity is semantically wrong when used.
 - `BUG-WLOT-012` — ranking empire lookup dereferences a missing player_index row without a row-count/null check.
 
+## Persistence / SQL safety closure
+Lottery point persistence itself is 64-bit in `TPlayerTable` and `CreatePlayerProto()`, but lottery mutations do not call `Save()` directly.
+
+Prize claim performs a synchronous ticket update first:
+`UPDATE lotto_tickets SET state=2 ...`
+
+and only afterwards mutates the in-memory lottery wallet and lifetime-win points. Those point mutations do not schedule an immediate character save. The normal character save event defaults to 120 seconds.
+
+Therefore a game-process crash after the ticket state commits but before the next character save can leave the ticket permanently marked collected while the wallet/lifetime winnings roll back to their previous persisted values. See BUG-WLOT-013.
+
+Withdrawal changes both gold and lottery wallet only in character memory. Those fields are later persisted together through `TPlayerTable`; no separate DB ticket state is committed, so the same asymmetric claim-loss window is not present there. Its already-verified validation/order bugs remain WLOT-003/004/006.
+
+Several lottery synchronous SELECT paths do not check `uiSQLErrno` before calling `mysql_fetch_row`:
+- scheduler initial `COUNT(*)`;
+- ticket purchase `COUNT(*)`;
+- ticket delete/claim lookup.
+
+`DirectQuery` stores SQL errors with a null `pSQLResult` and `uiNumRows = 0`. Calling `mysql_fetch_row` on that null result pointer is invalid. A database/query error can therefore turn into a game/DB-core crash instead of a handled failure. See BUG-WLOT-014.
+
+The draw-result UPDATE/log/next-row async statements use the same per-slot async SQL queue. `CAsyncSQL` pushes and consumes them FIFO on one worker connection, so no independent async reordering defect was found in this path.
+
+## 64-bit persistence vs 32-bit client-point transport
+The persisted player fields are `long long`, but both game and DB are explicitly built with `-m32`.
+
+The full player-points packet uses:
+`long points[POINT_MAX_NUM]`
+
+and the game assigns `GetLottoMoney()` / `GetLottoTotalMoney()` directly into those 32-bit `long` entries.
+
+The Windows client packet also uses `long`; `CPythonPlayer::SetStatus` accepts `long`, and `GetStatus` returns `int`. The Python getters wrap that already-32-bit result in `PyLong_FromLongLong`; they do not restore lost upper bits.
+
+Thus WLOT-003 is broader than the `PointChange(int)` mutation boundary: a valid persisted 64-bit lottery balance above signed 32-bit range is also narrowed/corrupted during full login/status synchronization and in client status storage.
+
+## Verified bugs
+- `BUG-WLOT-001` — no server slot bound; arbitrary slot values bypass the intended three-ticket limit.
+- `BUG-WLOT-002` — duplicate ticket numbers can turn one winning number into a 4/4 jackpot match.
+- `BUG-WLOT-003` — 64-bit lottery balances/prizes cross multiple 32-bit boundaries: PointChange, full points packet, and client status storage.
+- `BUG-WLOT-004` — wallet is deducted before gold overflow rejection, causing deterministic withdrawal loss.
+- `BUG-WLOT-005` — out-of-range stored ticket numbers are used as unchecked 1..30 UI-grid indexes and can break the official lottery client refresh.
+- `BUG-WLOT-006` — negative withdrawal amounts are accepted and can drive gold negative while increasing lottery wallet.
+- `BUG-WLOT-007` — COUNT(*) is treated as the current draw id; any row/id gap can stall or desynchronize draw scheduling and ticket targeting.
+- `BUG-WLOT-008` — result logging writes the previous draw id instead of the evaluated next draw id.
+- `BUG-WLOT-009` — every 4/4 winner receives the full jackpot independently, so multiple jackpot winners overdraw the pot instead of sharing it.
+- `BUG-WLOT-010` — recurring draws hardcode 30 seconds and ignore the configured two-minute generation interval.
+- `BUG-WLOT-011` — jackpot ranking labels/keys `lotto_ticket_id` as `lottoID`.
+- `BUG-WLOT-012` — ranking empire lookup dereferences a missing player_index row without a row-count/null check.
+- `BUG-WLOT-013` — claim commits ticket state before the player lottery balance is durably saved, creating a crash-window permanent prize loss.
+- `BUG-WLOT-014` — multiple lottery SELECT paths dereference SQL results without checking query errors, allowing DB errors to become null-result crashes.
+
 ## Next audit
-1. Finish ticket delete/claim SQL-error/null handling and mutation ordering.
-2. Audit async DB update ordering around draw result rows versus next-draw insertion.
-3. Audit claim/withdrawal persistence and save ordering.
-4. Check lottery point serialization widths from server player points through client storage.
-5. Reconcile all World Lottery findings and decide STATIC COMPLETE readiness.
+1. Check draw refresh threshold timing (`next_time - 10`) against client countdown semantics.
+2. Check ticket purchase/claim query escaping and row uniqueness assumptions.
+3. Reconcile all World Lottery findings, map dependencies, and determine STATIC COMPLETE readiness.
