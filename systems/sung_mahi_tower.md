@@ -181,12 +181,55 @@ Therefore 50 is the canonical server-side maximum tower level. The remaining unr
 
 This indicates the missing tower runtime logic likely orchestrates generic character flags and dungeon flags rather than living in a dedicated `SungMahi*.cpp` manager.
 
+
+## Quest runtime integration closure
+The quest-button transport is now end-to-end mapped:
+`uisungmahi.py -> event.QuestButtonClick(index) -> CPythonNetworkStream::SendScriptButtonPacket() -> HEADER_CG_SCRIPT_BUTTON -> CInputMain::ScriptButton() -> CQuestManager::QuestButton() -> NPC::OnButton(..., QUEST_BUTTON_EVENT)`.
+
+Therefore `sungMahiQuest` must be a real loaded quest index with a button event handler.
+
+The server also exposes tower-specific Lua APIs:
+- `d.set_dungeon_difficulty`
+- `d.spawn_mob_dir_nomove`
+- `d.set_unique_master`
+- `d.clear_dungeon_flags`
+- `pc.sung_mahi_curse_hp`
+
+`d.set_dungeon_difficulty` writes `CDungeon::m_bDungeon_Difficulty`. Group-spawned mobs then read that value in `CHARACTER_MANAGER::SpawnGroup()` and apply `SetDungeonMultipliers()`.
+
+This is separate from dungeon flag `"dungeonLevel"`, which drives `GetSungMahiTowerDungeonValue()`. The two tower level states are not automatically linked in C++; quest logic must keep them synchronized.
+
+## Channel/map placement
+`Project_Game` channel configs show:
+- maps 386 and 387 are absent from normal ch1/ch2 cores;
+- both are loaded on `game-ch99-core99`;
+- the monthly Sung Mahi reward timer is also explicitly created only on hostname `game-ch99-core99`.
+
+Map 386 (`metin2_map_smhdungeon_01`) contains:
+- vnum 4020 — `Sung Mahis Höllenturm`
+- vnum 10126 — exit
+- mailbox and merchant NPCs.
+
+Map 387 is the private Sung Mahi tower map used by `IsSungMahiDungeon()`.
+
+## Repository quest-package gap
+The quest package was checked at source, active-list, and compiled-object levels:
+- no Sung Mahi/SMH tower quest exists in `quest_list`;
+- no Sung Mahi/SMH tower quest source exists among the tracked `.quest` files;
+- no tower state exists in `quest/object/state`;
+- no `quest/object/4020/` handler exists for the tower NPC;
+- the visible dungeon quest sources do not call the tower-specific Lua APIs.
+
+This promotes the prior mapping gap to verified repository-integration bug `BUG-SMT-001`: the enabled maps/client/server hooks have no tracked quest runtime implementation to drive entry, floor state, command producers, or the tower Lua API orchestration.
+
+Caveat: an untracked external quest package installed only on a live deployment could change runtime behavior; such a package is absent from this repository snapshot.
+
 ## Verified bugs
-None yet.
+- `BUG-SMT-001` — Sung Mahi Tower quest runtime implementation is missing from the tracked Project_Game quest package.
 
 ## Exact next work
-1. Recover the missing tower quest/runtime logic that writes `dungeonLevel`; canonical max is now proven as 50.
-2. Resolve the nine `cmdchat` producers and the source of `sungMahiQuest`.
-3. Trace quest-button entry across `MAP_SMG_DUNGEON_01` -> private `MAP_SMG_DUNGEON_02` flow if present.
-4. Continue ranking/completion/reward SQL boundary mapping.
-5. Only promote the local no-bounds-check or visibility-gated command behavior after writer/timing guarantees are proven.
+1. Map all remaining server-side Sung Mahi persistence/reward SQL paths and determine where `sung_mahi_ranking` rows are written.
+2. Audit the two unsynchronized level states: `m_bDungeon_Difficulty` versus dungeon flag `dungeonLevel`.
+3. Trace tower-specific monster/room progression hooks (`unique master`, no-move/no-attack, kill handling).
+4. Revisit the visibility-gated client live commands after server timing is mapped.
+5. Keep missing quest runtime as BUG-SMT-001; do not patch source during detection phase.
