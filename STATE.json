@@ -30,10 +30,10 @@
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Finish tier-assignment provenance with a complete caller scan if repository search becomes available.",
+      "Finish tier-assignment provenance beyond the known World Boss roots.",
       "Finish reward-state reset provenance (SetWBRewards(false)) beyond mapped World Boss roots.",
-      "Audit map/time scheduling edge cases (UTC+2 handling, spawn minute repetition, midnight branch).",
-      "Audit channel topology assumptions and event-flag propagation."
+      "Audit kill/reward ordering around CHARACTER::Dead -> Reward -> CHARACTER_MANAGER::OnKill.",
+      "Audit remaining client open/close/state-reset lifecycle."
     ]
   },
   "startup": {
@@ -100,7 +100,9 @@
     "common/tables.h/db/src/ClientManagerPlayer.cpp::no World Boss tier/reward persistence",
     "game/src/char_manager.cpp/.h::process-local multi-core World Boss ownership",
     "Project_Binary/root/constinfo.py + uiworldbossranking.py::ranking global cache lifecycle",
-    "game/src/char_battle.cpp::damage-owner live-VID filtering at death"
+    "game/src/char_battle.cpp::damage-owner live-VID filtering at death",
+    "game/src/event_manager.cpp + db/src/ClientManager.cpp + game/src/input_db.cpp::world_boss_event DB fanout",
+    "game/src/char_manager.cpp::fixed UTC+2 scheduler clock and midnight/retry behavior"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
