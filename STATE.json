@@ -15,11 +15,11 @@
     "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Find every writer of dungeon flag dungeonLevel and prove its runtime range (0..50).",
+      "Recover the Sung Mahi quest/runtime producer for dungeonLevel and prove its 1..50 range guarantee.",
       "Resolve server/quest producers for the nine Sung Mahi client command strings and the source of sungMahiQuest.",
-      "Trace event.QuestButtonClick(sungMahiQuest) into the tower instance entry path.",
-      "Map tower-specific completion/rank/reward persistence boundaries.",
-      "Verify visibility-gated live-command timing only after producer timing is known."
+      "Trace event.QuestButtonClick(sungMahiQuest) into the MAP_SMG_DUNGEON_02 private instance.",
+      "Continue tower ranking/completion/reward SQL boundary mapping.",
+      "Only promote local bounds/visibility findings after end-to-end producer timing and range are proven."
     ]
   },
   "startup": {
@@ -105,7 +105,11 @@
     "Project_Binary/root/uiminimap.py::SungMahiCover room/floor/timer/notice lifecycle and smhdungeon_02 activation",
     "game/src/char.cpp::IsSungmaMap/GetSungmaMapAttribute tower override",
     "game/src/char.cpp::GetSungMahiTowerDungeonValue hard-coded 4x51 table via dungeonLevel flag",
-    "game/src/char.cpp + common/tables.h::Conqueror/SungMa player persistence fields"
+    "game/src/char.cpp + common/tables.h::Conqueror/SungMa player persistence fields",
+    "game/src/char.h::IsSungMahiDungeon MAP_SMG_DUNGEON_02 private-instance range",
+    "game/src/char.cpp::SetDungeonMultipliers 1..50 guard",
+    "game/src/questmanager.cpp::sung_mahi_ranking monthly reward/reset flow",
+    "Project_Game/share/locale/europe/quest/quest_list::no visible Sung Mahi tower quest source entry"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
