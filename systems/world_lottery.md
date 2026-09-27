@@ -119,17 +119,35 @@ CG lottery packets are registered with their exact fixed struct sizes and sequen
 
 Python bindings accept raw integers/long-long and do not add security validation; server-side validation is therefore required.
 
+## Client receive/cache closure
+- Base-info packets are received into `constInfo.lotto_number_infos[lottoSlot]`. The server numbers each transmitted row from slot 0 upward and sends at most the latest 50 rows. Existing higher cache slots are not cleared before a new snapshot; normal append-only history stays coherent, but DB row deletion/reset can leave stale higher entries. This remains a mapping note until a normal runtime trigger is found.
+- Ticket slots are cleaner: the server always sends slots 1..3, including an explicit `tID = 0` packet for an empty slot, and `game.py` resets every cached ticket field when that packet arrives.
+- Ranking packets are received into two append-only dictionaries. Existing jackpot entries are suppressed by `lottoID`; money-ranking entries are suppressed by `playername`. Existing values are never overwritten and neither dictionary is cleared before a fresh server top-10 snapshot, so a repeated ranking request can retain stale values and stale entries.
+- The ranking transport is present (`LottoOpenRanking` Python binding -> C++ send -> server `SendLottoRankingInfo`), but no caller/button or ranking window was found in the shipped `uilottery.py` / `LotteryMainWindow.py`. For now this is recorded as a dormant client defect, not promoted to a verified user-facing bug.
+- Ticket numbers are copied from server cache directly into a fixed 1..30 UI grid without bounds checks. Because the server accepts arbitrary ticket numbers, a stored out-of-range number can raise a Python index error on ticket refresh; see BUG-WLOT-005.
+
+## Negative withdrawal boundary
+`TPacketCGSendLottoPickMoney.amount` is signed `long long`, but the handler does not require `amount > 0`.
+
+For a simple negative request such as `-100`:
+- `GetLottoMoney() >= amount` is true for a normal non-negative wallet;
+- `PointChange(POINT_LOTTO_MONEY, -amount)` adds 100 to the lottery wallet;
+- `PointChange(POINT_GOLD, amount)` subtracts 100 gold.
+
+The gold branch has no lower-bound guard and `SetGold(int)` accepts negative values. Thus the withdrawal endpoint can create negative gold while increasing the lottery wallet. Larger negative long-long values also cross the existing long-long -> int narrowing boundary and can produce implementation-dependent sign/value inversions. See BUG-WLOT-006.
+
 ## Verified bugs
 - `BUG-WLOT-001` — no server slot bound; arbitrary slot values bypass the intended three-ticket limit.
 - `BUG-WLOT-002` — duplicate ticket numbers can turn one winning number into a 4/4 jackpot match.
 - `BUG-WLOT-003` — lottery balances/prizes are long long but PointChange takes int, causing narrowing/corruption for large values.
 - `BUG-WLOT-004` — wallet is deducted before gold overflow rejection, causing deterministic withdrawal loss.
+- `BUG-WLOT-005` — out-of-range stored ticket numbers are used as unchecked 1..30 UI-grid indexes and can break the official lottery client refresh.
+- `BUG-WLOT-006` — negative withdrawal amounts are accepted and can drive gold negative while increasing lottery wallet; large negatives also interact with the narrowing boundary.
 
 ## Next audit
-1. Close exact client receive/cache/reset behavior for base info, tickets and rankings.
-2. Audit ticket delete/claim slot/state transitions and SQL error/null handling.
-3. Audit draw-id logic based on COUNT(*) and row continuity.
-4. Audit jackpot accounting when multiple jackpot winners exist.
-5. Audit log lotto_id/ticket_id mapping.
-6. Audit negative/zero withdrawal inputs and persistence/save timing.
-7. Audit ranking result row/empire lookup safety.
+1. Finish ticket delete/claim state transitions plus SQL-error/null handling.
+2. Audit draw-id logic based on COUNT(*) and row continuity.
+3. Audit jackpot accounting when multiple jackpot winners exist.
+4. Audit log lotto_id/ticket_id mapping.
+5. Audit persistence/save ordering around claim/withdrawal mutations.
+6. Audit ranking result row/empire lookup safety.
