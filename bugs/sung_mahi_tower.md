@@ -143,3 +143,39 @@ The `-1` value is therefore a verified static data inconsistency and is strongly
 
 ### No source change
 Detection-only record; mob proto/game data was not modified.
+
+
+## BUG-SMT-006 — Tower-only potion/antidote items are missing from tracked item_proto sources
+
+**Status:** VERIFIED — STATIC / PROTO INTEGRATION  
+**Scope:** Sung Mahi tower item restrictions and Project_DumpProto source data
+
+### Evidence
+Server code explicitly classifies these item vnums as Sung Mahi-only through `CItemVnumHelper::IsSungMahiItem()`:
+- 70390–70395
+- 70405
+
+`char_item.cpp::IS_SUNG_MAHI_ENABLE_ITEM()` uses that classification to:
+- reject normal potions inside the private Sung Mahi dungeon;
+- reject Sung Mahi-only items outside the dungeon;
+- handle tower-specific potion subtypes alongside normal potion use.
+
+The content layer also expects these items:
+- `Project_DumpProto/tr/item_names.txt` contains names for all seven vnums;
+- `Project_Binary/locale/locale/common/item_list.txt` contains icon entries for all seven vnums.
+
+However the tracked proto definition sources do not contain the items:
+- `Project_DumpProto/tr/item_proto.txt`: none of 70390–70395 / 70405
+- `Project_DumpProto/de/item_proto.txt`: none
+- `Project_DumpProto/en/item_proto.txt`: none
+
+### Impact
+The tracked project contains server behavior, localized names and client icon mappings for Sung Mahi-specific consumables, but no corresponding item-proto rows in the source proto inputs. Rebuilding the item proto from the tracked text sources cannot produce usable definitions for those tower-only items.
+
+This leaves the tower potion/antidote feature incomplete at the proto-source layer independently of the missing tower quest package.
+
+### Boundary / caveat
+A prebuilt/stale binary item_proto from another source may still contain these rows on a particular deployment, but such definitions are not reproducible from the tracked Project_DumpProto text sources.
+
+### No source change
+Detection-only record; no item proto or production data was modified.
