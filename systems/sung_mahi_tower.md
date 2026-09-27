@@ -161,12 +161,32 @@ Do not promote the missing local bounds check to a verified bug until the actual
 
 This proves tower ranking persistence exists in a dedicated SQL table and is seasonally reset independently of generic Conqueror player progression.
 
+
+## Canonical tower level limit
+`common/length.h::ESungMahiDungeon` defines:
+- `SUNG_MAHI_MAX_LEVEL = 50`
+- damage multiplier = 5
+- defence multiplier = 5
+- HP multiplier = 250
+
+This matches both:
+- the `GetSungMahiTowerDungeonValue()` 0..50 lookup table;
+- the `SetDungeonMultipliers()` explicit 1..50 guard;
+- the monthly ranking loop in `questmanager.cpp`, which iterates levels 1 through `SUNG_MAHI_MAX_LEVEL`.
+
+Therefore 50 is the canonical server-side maximum tower level. The remaining unresolved question is not the intended range, but whether every runtime writer of dungeon flag `dungeonLevel` enforces that intended range before `GetSungMahiTowerDungeonValue()` consumes it.
+
+## Additional server behavior roots
+`game/src/char.cpp` also treats both `MAP_SMG_DUNGEON_01` and `MAP_SMG_DUNGEON_02` as special dungeon maps in generic map restrictions. Character state includes tower-specific no-move/no-attack/unique-master support under `ENABLE_SUNG_MAHI_TOWER`.
+
+This indicates the missing tower runtime logic likely orchestrates generic character flags and dungeon flags rather than living in a dedicated `SungMahi*.cpp` manager.
+
 ## Verified bugs
 None yet.
 
 ## Exact next work
-1. Recover the Sung Mahi quest/runtime producer for `dungeonLevel` and prove its 1..50 range guarantee.
-2. Resolve server/quest producers for the nine client command strings and the source of `sungMahiQuest`.
-3. Trace quest-button entry into the `MAP_SMG_DUNGEON_02` private instance.
-4. Continue tower ranking/completion/reward SQL boundary mapping.
-5. Only promote the local no-bounds-check or visibility-gated command behavior after producer timing/range is proven.
+1. Recover the missing tower quest/runtime logic that writes `dungeonLevel`; canonical max is now proven as 50.
+2. Resolve the nine `cmdchat` producers and the source of `sungMahiQuest`.
+3. Trace quest-button entry across `MAP_SMG_DUNGEON_01` -> private `MAP_SMG_DUNGEON_02` flow if present.
+4. Continue ranking/completion/reward SQL boundary mapping.
+5. Only promote the local no-bounds-check or visibility-gated command behavior after writer/timing guarantees are proven.
