@@ -6,36 +6,32 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "battle_field",
-    "display_name": "Battle Field System",
+    "subsystem": "world_lottery",
+    "display_name": "World Lottery System",
     "status": "PARTIAL — ACTIVE",
-    "system_file": "systems/battle_field.md",
-    "bug_file": "bugs/battle_field.md",
-    "test_file": "tests/battle_field.md",
-    "verified_bug_ids": [
-      "BUG-BFIELD-001",
-      "BUG-BFIELD-002",
-      "BUG-BFIELD-003"
-    ],
+    "system_file": "systems/world_lottery.md",
+    "bug_file": "bugs/world_lottery.md",
+    "test_file": "tests/world_lottery.md",
+    "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Finish Battle Field schedule/open-close resolver correctness.",
-      "Audit event-mode and P2P synchronization across cores.",
-      "Trace Battle Field party removal into existing Party invariants.",
-      "Audit score cash-out/ranking persistence and disconnect behavior.",
-      "Audit daily Battle shop-point reset."
+      "Locate all World Lottery server/client roots and packet headers.",
+      "Map ticket purchase, persistence, draw and reward flow.",
+      "Audit client-controlled number/count/price inputs.",
+      "Audit jackpot/money caps and winner payout ordering.",
+      "Audit ranking packet sizes, array/count boundaries and stale-state resets."
     ]
   },
   "startup": {
     "required_files": [
       "STATE.json",
       "CURRENT.md",
-      "systems/battle_field.md"
+      "systems/world_lottery.md"
     ],
     "conditional_files": {
       "policy": "WORKFLOW.md",
-      "bugs": "bugs/battle_field.md",
-      "deferred_tests": "tests/battle_field.md"
+      "bugs": "bugs/world_lottery.md",
+      "deferred_tests": "tests/world_lottery.md"
     },
     "forbidden_by_default": [
       "archive/",
@@ -209,7 +205,8 @@
     "ranking",
     "party",
     "party_match",
-    "dungeon_core"
+    "dungeon_core",
+    "battle_field"
   ],
   "ranking_closure": {
     "status": "STATIC COMPLETE",
@@ -251,6 +248,22 @@
       "BUG-DUNGEON-002",
       "BUG-DUNGEON-003",
       "BUG-DUNGEON-004"
+    ]
+  },
+  "battle_field_closure": {
+    "status": "STATIC COMPLETE",
+    "verified_bug_ids": [
+      "BUG-BFIELD-001",
+      "BUG-BFIELD-002",
+      "BUG-BFIELD-003",
+      "BUG-BFIELD-004",
+      "BUG-BFIELD-005",
+      "BUG-BFIELD-006",
+      "BUG-BFIELD-007",
+      "BUG-BFIELD-008",
+      "BUG-BFIELD-009",
+      "BUG-BFIELD-010",
+      "BUG-BFIELD-011"
     ]
   }
 }
