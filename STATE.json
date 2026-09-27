@@ -14,14 +14,16 @@
     "test_file": "tests/sung_mahi_tower.md",
     "verified_bug_ids": [
       "BUG-SMT-001",
-      "BUG-SMT-002"
+      "BUG-SMT-002",
+      "BUG-SMT-003",
+      "BUG-SMT-004"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Trace generic quest kill/leave/logout/dungeon-destroy hooks used for Sung Mahi room completion and cleanup.",
-      "Audit monthly Sung Mahi reward event restart/month-transition/mail-write edge cases.",
+      "Inspect remaining independent Sung Mahi monthly-reward/mailbox edge cases.",
+      "Review smhtower_* monster/group and map data integration for static mismatches.",
       "Revisit pc.mailbox_reward null-mailbox safety only if a callable tower producer is recovered.",
-      "Treat ranking row production and dual floor-state synchronization as missing-quest responsibilities unless another producer is found.",
+      "Decide whether Sung Mahi Tower is ready for STATIC COMPLETE with missing runtime behavior explicitly represented by BUG-SMT-001.",
       "Do not modify production source during detection phase."
     ]
   },
@@ -139,7 +141,15 @@
     "game/src/input_db.cpp::quest login deferred until PHASE_GAME",
     "Project_ClientSrc/PythonNetworkStreamPhaseLoading.cpp::Warp/ShowMapName during loading",
     "Project_Binary/root/servercommandparser.py::no Sung Mahi pre-game command registration",
-    "Sung Mahi client initial command timing::no verified visibility bug"
+    "Sung Mahi client initial command timing::no verified visibility bug",
+    "game/src/questmanager.cpp + questnpc.cpp::generic kill/logout quest dispatch for tower runtime",
+    "game/src/char.cpp::LogoutPC occurs before character destruction and dungeon detach",
+    "game/src/char.cpp::SetDungeon PC/member and monster-count teardown",
+    "game/src/dungeon.cpp::last-member delayed destroy and private-map server-timer cancellation",
+    "BUG-SMT-003::monthly mailbox reward unsafe fixed-width string serialization",
+    "db/src/ClientManagerEventFlag.cpp::event flags persisted/restored on peer setup",
+    "BUG-SMT-004::month-only Sung Mahi season identity",
+    "Project_Binary/root/uisungmahi.py + reward/element tables::valid 1..50 model alignment"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
