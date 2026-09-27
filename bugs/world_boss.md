@@ -1,6 +1,6 @@
 # World Boss System — Bug Registry
 
-**Status:** ACTIVE — 9 verified findings
+**Status:** ACTIVE — 12 verified findings
 **Phase:** Detection / Mapping Only
 
 ### BUG-WB-001 — hour/second mix-up clears spawn state and breaks scheduled cleanup
@@ -110,3 +110,55 @@ This bug is reachable whenever the character has a nonzero World Boss tier; tier
 `uiworldboss.py::__LoadScript()` binds the page and ranking buttons but never retrieves or binds `reward_button`.
 
 The visible official reward control therefore does nothing when clicked.
+
+
+### BUG-WB-010 — ranking generation depends on item drops and misaligns player/damage iterators
+- Statik durum: **doğrulandı**
+- Sınıf: ranking integrity / iterator logic
+
+Ranking construction exists only inside the branch for more than one generated drop item. A World Boss with zero or one item drop never builds ranking data.
+
+In the ranking-enabled multi-item loop:
+- `it` points to the qualifying character vector;
+- `it2` points to the parallel damage vector;
+- both are advanced once in the ranking block;
+- `it` is then advanced a second time later in the same item iteration;
+- `it2` is not.
+
+The two parallel vectors therefore lose alignment. Damage can be attached to the wrong player, players can be skipped, and with two qualifying players one player can repeatedly occupy the ranking slot while the damage iterator alternates.
+
+The number of ranking candidates processed is also bounded/cycled by the number of dropped items rather than by the damage participant set.
+
+### BUG-WB-011 — timed cleanup deletes boss but leaves stale VID and dangling pointer
+- Statik durum: **doğrulandı**
+- Sınıf: object lifetime / scheduler state
+
+The scheduled World Boss timeout executes:
+`M2_DESTROY_CHARACTER(pkWB)`
+
+and only sets `wb_Spawned = false`.
+
+`M2_DESTROY_CHARACTER` calls `CHARACTER_MANAGER::DestroyCharacter`, which removes and deletes the character but does not invoke World Boss `OnKill()`.
+
+Consequently:
+- `m_dwWBVID` remains nonzero;
+- `pkWB` still points to the deleted object;
+- World Boss phase/cooldown state is not transitioned.
+
+The next spawn path requires `m_dwWBVID == 0`, so scheduled spawning can remain permanently blocked. The stale `pkWB` is also a dangling pointer.
+
+This defect is independent of BUG-WB-001: BUG-WB-001 usually prevents the timeout branch; BUG-WB-011 describes the broken state transition if that branch does execute.
+
+### BUG-WB-012 — disabling the event leaves active/stale World Boss state unmanaged
+- Statik durum: **doğrulandı**
+- Sınıf: event lifecycle / stale manager state
+
+`CEventManager::SetWorldBossEvent(false)` only updates the event flag and broadcasts an event-completed notice.
+
+It does not destroy an active World Boss and does not clear manager state.
+
+World Boss scheduler work is gated by `world_boss_event == 1`, so timeout management stops while the event is disabled.
+
+The World Boss death hook is also gated by the same event flag. If the boss dies after the event has been disabled, `CHARACTER_MANAGER::OnKill` is not called and the stored World Boss VID/pointer/phase state remains stale.
+
+A later event activation can therefore inherit an unmanaged existing boss or stale nonzero `m_dwWBVID` that prevents a fresh spawn.
