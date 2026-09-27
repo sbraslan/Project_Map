@@ -30,9 +30,10 @@ Verified:
 ## Exact next work
 1. Finish tier-assignment provenance with a complete caller scan if repository search becomes available.
 2. Finish reward-state reset provenance (`SetWBRewards(false)`) beyond mapped World Boss roots.
-3. Audit map/time scheduling edge cases (UTC+2 handling, spawn minute repetition, midnight branch).
-4. Audit channel topology assumptions and event-flag propagation.
-5. Decide World Boss STATIC COMPLETE only after the provenance items are closed.
+3. Finish tier/reward provenance beyond the known World Boss roots.
+4. Audit kill/reward ordering around CHARACTER::Dead -> Reward -> OnKill.
+5. Audit any remaining client open/close/state-reset lifecycle.
+6. Decide World Boss STATIC COMPLETE only after provenance is closed.
 
 Record only findings in Project_Map. Source repositories stay immutable.
 
