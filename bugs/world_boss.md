@@ -1,6 +1,6 @@
 # World Boss System — Bug Registry
 
-**Status:** ACTIVE — 16 verified findings
+**Status:** STATIC COMPLETE — 16 verified findings
 **Phase:** Detection / Mapping Only
 
 ### BUG-WB-001 — hour/second mix-up clears spawn state and breaks scheduled cleanup
