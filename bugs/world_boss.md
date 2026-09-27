@@ -1,6 +1,6 @@
 # World Boss System — Bug Registry
 
-**Status:** ACTIVE — 14 verified findings
+**Status:** ACTIVE — 15 verified findings
 **Phase:** Detection / Mapping Only
 
 ### BUG-WB-001 — hour/second mix-up clears spawn state and breaks scheduled cleanup
@@ -190,3 +190,22 @@ Every process runs the World Boss scheduler itself and randomly selects a candid
 The World Boss P2P receive path does not copy remote ownership state into the local manager and provides no election, lock, or "boss already exists elsewhere" guard; it only forwards the received state to local PCs.
 
 Consequently, in a multi-core/channel topology where different game processes host eligible World Boss maps, two or more processes can independently pass their local `m_dwWBVID == 0` check and spawn separate World Boss instances during the same scheduled window.
+
+
+### BUG-WB-015 — Titlebar X hides only the child board, leaving the World Boss parent window logically shown
+- Statik durum: **doğrulandı**
+- Sınıf: client UI lifecycle / parent-child visibility mismatch
+
+Both World Boss windows are parent `ui.ScriptWindow` objects whose loaded UI contains a `board_with_titlebar` child.
+
+The generic `BoardWithTitleBar` constructor binds the titlebar X to `self.Hide`, i.e. the board child's own Hide method. The World Boss window classes do not override/rebind that close event to the parent ScriptWindow.
+
+Meanwhile `Interface.OpenWBRanking()` and `Interface.ToggleWorldBoss()` make their open/close decision from the parent window's `IsShow()` state.
+
+After the user clicks X:
+1. the board child becomes hidden;
+2. the parent ScriptWindow can remain shown;
+3. the next interface toggle sees the parent as shown and hides it rather than reopening;
+4. a further toggle is required to call `Open()` and recreate visible contents.
+
+This affects both the main World Boss window and the World Boss ranking window.
