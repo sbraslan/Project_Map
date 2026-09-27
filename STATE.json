@@ -15,9 +15,9 @@
     "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Consolidate Achievement runtime readiness from bugs/achievement.md and tests/achievement.md without executing tests.",
+      "Consolidate Biolog runtime readiness from bugs/biolog.md and tests/biolog.md without executing tests.",
       "Keep DUNGEON-T10 as the first future live runtime gate.",
-      "Keep TICKET-T07, HUNT-T04 and BP-T02 queued behind the Dungeon normal-path cluster.",
+      "Keep TICKET-T07, HUNT-T04, BP-T02 and ACH-T03/ACH-T04 queued behind the Dungeon normal-path cluster.",
       "Preserve all source/game repositories as read-only until the user explicitly changes phase."
     ]
   },
@@ -169,7 +169,8 @@
     "RUNTIME.md::Dungeon Info T01-T12 readiness consolidated; execution locked",
     "RUNTIME.md::Ticket T01-T07 readiness consolidated; execution locked",
     "RUNTIME.md::Hunting T01-T08 readiness consolidated; execution locked",
-    "RUNTIME.md::Battle Pass T01-T14 readiness classified; execution locked"
+    "RUNTIME.md::Battle Pass T01-T14 readiness classified; execution locked",
+    "RUNTIME.md::Achievement T01-T09 readiness consolidated; execution locked"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -338,12 +339,13 @@
       "SMT-T05",
       "SMT-T06"
     ],
-    "documentation_cursor": "achievement",
+    "documentation_cursor": "biolog",
     "completed_readiness_clusters": [
       "dungeon_info",
       "ticket",
       "hunting",
-      "battle_pass"
+      "battle_pass",
+      "achievement"
     ],
     "dungeon_info": {
       "status": "DOCUMENTATION READY / NOT RUN",
@@ -404,6 +406,30 @@
       "test_range": "BP-T01..BP-T14",
       "primary_normal_path_candidate": "BP-T02",
       "note": "Existing test matrix classified; some bugs have complementary tests and one lifecycle regression test is broad rather than uniquely mapped."
+    },
+    "achievement": {
+      "status": "DOCUMENTATION READY / NOT RUN",
+      "test_range": "ACH-T01..ACH-T09",
+      "coverage": "BUG-ACH-001..BUG-ACH-008",
+      "added_test": "ACH-T09 for BUG-ACH-002",
+      "normal_path_candidates": [
+        "ACH-T03",
+        "ACH-T04"
+      ],
+      "crash_consistency": [
+        "ACH-T02",
+        "ACH-T07"
+      ],
+      "privileged_trusted": [
+        "ACH-T05",
+        "ACH-T06"
+      ],
+      "config_evolution": [
+        "ACH-T08"
+      ],
+      "db_atomicity": [
+        "ACH-T09"
+      ]
     }
   }
 }
