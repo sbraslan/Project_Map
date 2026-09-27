@@ -12,19 +12,18 @@
 Only `sbraslan/Project_Map` is writable. All source/game repositories remain read-only.
 
 ## Just mapped
-- Generic completion/cleanup lifecycle is closed: quest kill/logout hooks, dungeon membership teardown, delayed destroy, private-map server-timer cancellation.
-- No dedicated C++ Sung Mahi room-completion controller exists; floor progression/reward/ranking orchestration is expected from the missing quest runtime.
-- Verified `BUG-SMT-003`: monthly mailbox reward uses unsafe fixed-width memcpy; title is deterministically non-NUL-terminated and shorter literals are over-read.
-- Verified `BUG-SMT-004`: persistent season marker stores only `tm_mon` (0..11), so long downtime ending in the same month number in a later year skips rollover.
-- DB event flags are persisted/restored correctly for normal restarts; the defect is specifically month-only season identity.
-- Client floor model and shipped reward/element tables align on valid floors 1..50; latent malformed-input off-by-one guards were found but are not promoted as valid-flow bugs.
-- Verified bugs: `BUG-SMT-001`, `BUG-SMT-002`, `BUG-SMT-003`, `BUG-SMT-004`.
+- Map 386/387 have no monster regen files; tower population is quest/runtime-spawned.
+- Direct Sung Mahi groups 6077..6088 are present and every referenced member exists in both mob_proto and client npclist.
+- Primary `smhtower_*` / `smhgate_boss` server motion folders have no missing motlist -> MSA references.
+- Special tower proto ranges 7592–7600, 7609–7614 and 7615–7620 are present; room placement is blocked by the missing quest runtime.
+- `smhgate_flower` folder for proto 9100–9107 is absent, but no tracked producer/reference proves runtime use; deferred only.
+- Verified `BUG-SMT-005`: dark king 7591 has `ResistDark=-1` while the symmetric elemental design, its own dark family, and higher dark king use `-30`.
+- Verified bugs: `BUG-SMT-001` through `BUG-SMT-005`.
 
 ## Exact next work
-1. Inspect remaining independent monthly-reward/mailbox edge cases.
-2. Review `smhtower_*` monster/group and map data integration for static mismatches.
-3. Revisit `pc.mailbox_reward` null-mailbox safety only if a callable tower producer is recovered.
-4. Decide whether the subsystem is ready for STATIC COMPLETE with missing runtime behavior explicitly represented by BUG-SMT-001.
-5. No production source changes.
+1. Run one final independent Sung Mahi static sweep.
+2. If no unexamined independent path remains, mark Sung Mahi Tower STATIC COMPLETE while explicitly retaining BUG-SMT-001 as the reason runtime quest behavior cannot be reconstructed.
+3. Preserve deferred candidates without promotion unless a producer/schema is recovered.
+4. No production source changes.
 
 GitHub state is canonical.
