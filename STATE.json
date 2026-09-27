@@ -32,8 +32,8 @@
     "next_actions": [
       "Finish tier-assignment provenance beyond the known World Boss roots.",
       "Finish reward-state reset provenance (SetWBRewards(false)) beyond mapped World Boss roots.",
-      "Audit kill/reward ordering around CHARACTER::Dead -> Reward -> CHARACTER_MANAGER::OnKill.",
-      "Audit remaining client open/close/state-reset lifecycle."
+      "Audit remaining client open/close/state-reset lifecycle.",
+      "Audit World Boss configuration/data roots outside C++ (event/quest/config if present)."
     ]
   },
   "startup": {
@@ -102,7 +102,8 @@
     "Project_Binary/root/constinfo.py + uiworldbossranking.py::ranking global cache lifecycle",
     "game/src/char_battle.cpp::damage-owner live-VID filtering at death",
     "game/src/event_manager.cpp + db/src/ClientManager.cpp + game/src/input_db.cpp::world_boss_event DB fanout",
-    "game/src/char_manager.cpp::fixed UTC+2 scheduler clock and midnight/retry behavior"
+    "game/src/char_manager.cpp::fixed UTC+2 scheduler clock and midnight/retry behavior",
+    "game/src/char_battle.cpp::Dead reward-before-WorldBoss-OnKill ordering"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
