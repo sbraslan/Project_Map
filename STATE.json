@@ -13,14 +13,15 @@
     "bug_file": "bugs/sung_mahi_tower.md",
     "test_file": "tests/sung_mahi_tower.md",
     "verified_bug_ids": [
-      "BUG-SMT-001"
+      "BUG-SMT-001",
+      "BUG-SMT-002"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Find every sung_mahi_ranking row writer and close tower ranking/completion persistence.",
-      "Audit synchronization between CDungeon::m_bDungeon_Difficulty and dungeon flag dungeonLevel.",
-      "Trace tower room/monster progression hooks including unique-master and no-move/no-attack behavior.",
-      "Revisit visibility-gated live client command timing after server producer timing is mapped.",
+      "Audit divergence paths between CDungeon::m_bDungeon_Difficulty and dungeon flag dungeonLevel.",
+      "Trace remaining tower room-clear/kill/completion hooks and reward issuance.",
+      "Compare client live-command visibility gating against map-load timing.",
+      "Treat sung_mahi_ranking row production as missing-quest responsibility unless another writer is found.",
       "Do not modify production source during detection phase."
     ]
   },
@@ -124,7 +125,12 @@
     "game/src/questlua_dungeon.cpp::Sung Mahi-specific Lua dungeon API bindings",
     "game/src/char_manager.cpp::SpawnGroup applies CDungeon difficulty via SetDungeonMultipliers",
     "Project_Game quest source/list/object audit::missing Sung Mahi tower runtime quest package",
-    "BUG-SMT-001::missing tracked Sung Mahi Tower quest runtime implementation"
+    "BUG-SMT-001::missing tracked Sung Mahi Tower quest runtime implementation",
+    "game/src/questlua_global.cpp::mysql_direct_query generic Lua SQL bridge",
+    "game/src/questmanager.cpp::Sung Mahi ranking SELECT/TRUNCATE and missing dungeonInfoLibrary.lua reset hook",
+    "BUG-SMT-002::missing Questlibs/dungeonInfoLibrary.lua referenced by monthly reset",
+    "game/src/char_battle.cpp::unique-master hit -> AggregateMonsterByMaster -> chessWrongMonster",
+    "game/src/char_battle.cpp::FuncAggregateByMaster unlocks NOMOVE/NOATTACK monsters in private instance"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
