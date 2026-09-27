@@ -6,29 +6,157 @@
 
 > Source/game repositories are read-only. Only Project_Map is writable.
 
-## Initial client roots
+## Feature/config
+`ENABLE_WORLD_BOSS` and `ENABLE_WB_RANKING` are enabled.
+
+Configured constants:
+- `WORLD_BOSS_PHASE = 6`
+- `BATTLE_PHASE = 4`
+- `COOLDOWN_PHASE = 2`
+- `WB_MIN_DMG = 60000`
+
+World Boss event activation is owned by `CEventManager::SetWorldBossEvent()` through quest flag `world_boss_event`.
+
+## Server roots
+- `game/src/char_manager.cpp/.h` — spawn/despawn state, World Boss VID, map/vnum lists, P2P state emission.
+- `game/src/char_battle.cpp` — World Boss death hook and damage/ranking generation.
+- `game/src/input_p2p.cpp` — received World Boss P2P state -> client command fanout.
+- `game/src/p2p.cpp/.h` — peer-only P2P transmission.
+- `game/src/packet.h` — `HEADER_GG_WORLD_BOSS` / `TPacketGGSendWorldBossStates`.
+- `game/src/cmd_general.cpp::do_get_wb_reward` — tier reward claim.
+- `game/src/cmd.cpp` — `get_wb_reward` registered for `GM_PLAYER`.
+- `game/src/char.h` — per-character tier and reward flag.
+- `game/src/char.cpp::ChatPacket` — descriptor-gated command delivery.
+- `game/src/event_manager.cpp` — event activation flag.
+
+## Client roots
+- `root/game.py` — `worldboss` and `worldboss_ranking` server-command callbacks.
+- `root/interfacemodule.py` — persistent World Boss / ranking windows.
 - `root/uiworldboss.py`
 - `root/uiworldbossranking.py`
+- `root/constinfo.py` — global ranking arrays.
 - `root/uiscript/worldbosswindow.py`
 - `root/uiscript/worldbossrankingwindow.py`
-- `root/interfacemodule.py` World Boss window/ranking bridge
-- `root/game.py` World Boss callbacks
 
-## Initial server/client-C++ direction
-Dedicated World Boss filenames were not found in the server tree. Continue by exact symbol/feature-flag tracing:
-- `ENABLE_WORLD_BOSS`
-- packet headers / packet structs
-- game-server input/character/manager handlers
-- DB/ranking storage paths
-- spawn/despawn lifecycle
-- reward/damage/ranking lifecycle
-- client receive callbacks and UI refresh.
+## Spawn / state lifecycle
+World Boss candidate maps are 61, 62, 63 and 64. Current vnum list contains five entries, all 1093.
 
-## Current status
-Only initial roots are established. No World Boss bug is verified yet.
+Each game process checks the active event once per second. At configured spawn hours it can spawn a boss on an allowed randomly selected World Boss map.
 
-## Exact next work
-1. Trace `ENABLE_WORLD_BOSS` and all World Boss packet symbols through ClientSrc and ServerSRC.
-2. Map server spawn/state/reward/ranking ownership.
-3. Map Python UI callbacks and ranking cache/reset behavior.
-4. Record verified findings only.
+After spawn:
+- `m_dwWBVID` stores the boss VID;
+- `m_lWBPhase` is set to now + 4 hours;
+- state becomes `WORLD_BOSS_STATE_BOSS_SPAWNED`;
+- a `HEADER_GG_WORLD_BOSS` packet is sent to P2P peers.
+
+### Spawn-state timer defect
+`wblast_SpawnTime` is assigned `cur_hour` at spawn.
+
+On later updates the code compares that stored hour against `cur_sec`:
+`if (wblast_SpawnTime != cur_sec) wb_Spawned = false;`
+
+This normally clears `wb_Spawned` immediately after the spawn minute. The scheduled 4-hour cleanup branch requires `wb_Spawned == true`; therefore an unkilled boss can survive past its intended battle window, and `m_dwWBVID != 0` then blocks the next scheduled spawn. See BUG-WB-001.
+
+## P2P state delivery
+Spawn and kill paths call only:
+`P2P_MANAGER::Instance().Send(&pack, sizeof(pack))`.
+
+`P2P_MANAGER::Send` iterates `m_set_pkPeers` and writes the packet only to peer descriptors. It has no local loopback.
+
+Only the receiving peer's `CInputP2P::WorldBoss` fans state out to that process's PCs using:
+`worldboss update|state|timer|cooldown`.
+
+Therefore PCs attached to the game process that originated the spawn/kill state do not receive that state command. On a one-process setup, no PC receives it at all. See BUG-WB-002.
+
+## Server ranking generation
+World Boss ranking data is built in `CHARACTER::Reward()` from damage ownership data.
+
+The server formats:
+`worldboss_ranking update|<playerName>|<damage>`.
+
+However the call is unqualified:
+`ChatPacket(...)`
+
+inside the dead monster's member function. It therefore executes on `this` (the World Boss), not on `xch`.
+
+`CHARACTER::ChatPacket` immediately returns when `GetDesc()` is null. Monsters do not own a player descriptor, so the ranking command is discarded. See BUG-WB-003.
+
+## Client state command path
+`root/game.py` registers:
+- `worldboss` -> `__WorldbossUpdate`
+- `worldboss_ranking` -> `__WorldbossRanking`.
+
+The interface module already owns persistent windows:
+- `self.wndWorldBoss`
+- `self.wndWBRanking`.
+
+But each server-command callback creates a new temporary window instance instead of updating those interface windows.
+
+For state updates, `MainBoard()` is constructed and `Handle()` is called without `Open()` / `__LoadScript()`. Widget members such as `self.State`, `self.runTime`, and `self.breakTime` are assigned only by `__LoadScript()`. A normal state command therefore reaches `AddWBState()` with missing widgets and can raise `AttributeError`; it also never updates the visible persistent window. See BUG-WB-004.
+
+The state parser also receives:
+`update|state|timer|cooldown`
+
+but forwards:
+`input[2:]` and `input[3:]`
+
+instead of scalar `input[2]` and `input[3]`. Even after the unloaded-window defect is corrected, timer/cooldown become list values and render as list-string representations. See BUG-WB-005.
+
+## Client ranking path
+The server format is:
+`update|<playerName>|<damage>`.
+
+The client immediately executes:
+`int(input[1])`.
+
+Normal alphabetic character names therefore raise `ValueError` before a row can be created. See BUG-WB-006.
+
+Additional independent ranking renderer defects remain behind that first failure:
+- `wb_guild_names`, `wb_empire`, and `wb_tier` are lists in `constInfo`, but `AddPlayer()` calls them as functions, causing `TypeError`.
+- `MakeText(parent, text, ...)` immediately replaces its `text` argument with a `ui.TextLine` object and then calls `SetText(text)`, discarding the supplied row value.
+- `game.py::__WorldbossRanking` also creates a fresh window and calls `Handle()` without `Open()`, so ranking headers are not initialized and the persistent interface ranking window is not updated.
+
+These independent rendering failures are grouped under BUG-WB-007 because they are successive failures in the same row-construction path.
+
+The global ranking arrays and `WB_RANKS` counter are not reset by `Open()`, `__LoadScript()`, or destruction. If the upstream ranking path is repaired, later boss results can accumulate stale prior rows. This remains a mapped latent cache issue pending ranking-lifecycle closure.
+
+## Reward claim
+`get_wb_reward` is registered as a normal-player command (`GM_PLAYER`).
+
+The command blocks:
+- observer mode;
+- dead/stunned characters;
+- already-rewarded characters;
+- tier 0.
+
+Each tier currently contains three reward item vnums: 19, 29 and 39.
+
+### Partial-grant duplication window
+Items are created and granted one by one. If an early item is successfully granted but a later item finds no empty inventory slot, the function returns immediately.
+
+`SetWBRewards(true)` runs only after the whole item loop succeeds.
+
+Thus a character with just enough space for an early item can receive it, fail on a later item, keep `GotWBRewards() == false`, free space and call the command again to receive the early item again. See BUG-WB-008.
+
+## Client reward button
+The UI script defines `reward_button`, but `uiworldboss.py::__LoadScript()` never retrieves it and never binds an event to `get_wb_reward`.
+
+The official World Boss window therefore exposes a visible reward button with no functional click handler. See BUG-WB-009.
+
+## Verified bugs
+- `BUG-WB-001` — spawn hour is stored but compared to current second, clearing `wb_Spawned` and breaking timed cleanup / future spawn progression for an unkilled boss.
+- `BUG-WB-002` — World Boss P2P state emission has no local loopback; players on the originating game process miss spawn/kill state updates.
+- `BUG-WB-003` — ranking command is sent through the dead boss's `ChatPacket`, whose null descriptor drops the command.
+- `BUG-WB-004` — state callback creates an unloaded throwaway UI window, causing missing-widget failure and leaving the persistent World Boss window stale.
+- `BUG-WB-005` — state parser passes timer/cooldown slices instead of scalar fields.
+- `BUG-WB-006` — ranking parser casts normal player names to `int`, causing `ValueError`.
+- `BUG-WB-007` — ranking row construction is independently broken by list-as-function calls, unloaded temporary window usage, and text-argument destruction.
+- `BUG-WB-008` — reward flag is set only after all items; mid-bundle inventory failure permits repeated partial reward claims.
+- `BUG-WB-009` — official reward button is never bound to any handler/command.
+
+## Open audit
+1. Finish tier-assignment provenance: identify whether `SetTier()` has any live caller.
+2. Audit damage-ranking collection against item-drop count / ownership loop.
+3. Audit World Boss state initialization and login/reconnect synchronization.
+4. Audit reward-state persistence/reset across death, relog and successive boss cycles.
+5. Audit multi-core/channel ownership to determine whether multiple simultaneous bosses are intended or accidental.
