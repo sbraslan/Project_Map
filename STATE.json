@@ -15,11 +15,11 @@
     "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Recover the Sung Mahi quest/runtime producer for dungeonLevel and prove its 1..50 range guarantee.",
-      "Resolve server/quest producers for the nine Sung Mahi client command strings and the source of sungMahiQuest.",
-      "Trace event.QuestButtonClick(sungMahiQuest) into the MAP_SMG_DUNGEON_02 private instance.",
+      "Recover the missing Sung Mahi tower quest/runtime writer for dungeonLevel; canonical max is proven as 50.",
+      "Resolve the nine cmdchat producers and the source of sungMahiQuest.",
+      "Trace tower entry across MAP_SMG_DUNGEON_01 and private MAP_SMG_DUNGEON_02.",
       "Continue tower ranking/completion/reward SQL boundary mapping.",
-      "Only promote local bounds/visibility findings after end-to-end producer timing and range are proven."
+      "Only promote bounds/visibility findings after writer and timing guarantees are proven."
     ]
   },
   "startup": {
@@ -109,7 +109,10 @@
     "game/src/char.h::IsSungMahiDungeon MAP_SMG_DUNGEON_02 private-instance range",
     "game/src/char.cpp::SetDungeonMultipliers 1..50 guard",
     "game/src/questmanager.cpp::sung_mahi_ranking monthly reward/reset flow",
-    "Project_Game/share/locale/europe/quest/quest_list::no visible Sung Mahi tower quest source entry"
+    "Project_Game/share/locale/europe/quest/quest_list::no visible Sung Mahi tower quest source entry",
+    "common/length.h::ESungMahiDungeon canonical max level 50 and tower multipliers",
+    "game/src/char.cpp::MAP_SMG_DUNGEON_01/02 generic special-map handling",
+    "game/src/char.h::tower-specific no-move/no-attack/unique-master character controls"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
