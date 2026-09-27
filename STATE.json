@@ -16,14 +16,14 @@
       "BUG-SMT-001",
       "BUG-SMT-002",
       "BUG-SMT-003",
-      "BUG-SMT-004"
+      "BUG-SMT-004",
+      "BUG-SMT-005"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Inspect remaining independent Sung Mahi monthly-reward/mailbox edge cases.",
-      "Review smhtower_* monster/group and map data integration for static mismatches.",
-      "Revisit pc.mailbox_reward null-mailbox safety only if a callable tower producer is recovered.",
-      "Decide whether Sung Mahi Tower is ready for STATIC COMPLETE with missing runtime behavior explicitly represented by BUG-SMT-001.",
+      "Perform one final independent static sweep for Sung Mahi-only C++/data roots not yet represented in the map.",
+      "If no unexamined independent path remains, close Sung Mahi Tower as STATIC COMPLETE with missing runtime quest behavior represented by BUG-SMT-001.",
+      "Preserve deferred pc.mailbox_reward, smhgate_flower and player_login/mailbox semantic candidates unless a producer or schema is recovered.",
       "Do not modify production source during detection phase."
     ]
   },
@@ -149,7 +149,15 @@
     "BUG-SMT-003::monthly mailbox reward unsafe fixed-width string serialization",
     "db/src/ClientManagerEventFlag.cpp::event flags persisted/restored on peer setup",
     "BUG-SMT-004::month-only Sung Mahi season identity",
-    "Project_Binary/root/uisungmahi.py + reward/element tables::valid 1..50 model alignment"
+    "Project_Binary/root/uisungmahi.py + reward/element tables::valid 1..50 model alignment",
+    "Project_Game/share/locale/europe/group.txt::Sung Mahi direct groups 6077-6088",
+    "Project_DumpProto/tr/mob_proto.txt::Sung Mahi elemental and special mob proto ranges",
+    "Project_Binary/root/npclist.txt::Sung Mahi 7550-7620 client race mappings",
+    "Project_Game/share/data/monster/smhtower_*::motlist-to-MSA integrity verified",
+    "Project_Game maps 386/387::no monster regen files; quest-driven spawn boundary",
+    "Project_Game/share/data/monster/smhgate_flower::missing folder deferred without tracked producer",
+    "BUG-SMT-005::dark king 7591 ResistDark=-1 elemental data mismatch",
+    "monthly ranking player_login vs character-name mailbox key::deferred semantic check"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
