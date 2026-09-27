@@ -114,3 +114,32 @@ Normal continuous month-to-month operation changes `tm_mon` and therefore rolls 
 
 ### No source change
 Detection-only record; no production file was changed.
+
+
+## BUG-SMT-005 — Dark elemental tower king 7591 has inconsistent dark resistance
+
+**Status:** VERIFIED — STATIC / DATA CONSISTENCY  
+**Scope:** `Project_DumpProto/tr/mob_proto.txt`, Sung Mahi elemental monster set
+
+### Evidence
+The six base elemental tower KING mobs follow a repeated element template:
+- 7556 Fire: `AttFire=55`, `ResistFire=-30`
+- 7563 Ice: `AttIce=55`, `ResistIce=-30`
+- 7570 Lightning: `AttElec=55`, `ResistElect=-30`
+- 7577 Wind: `AttWind=55`, `ResistWind=-30`
+- 7584 Earth: `AttEarth=55`, `ResistEarth=-30`
+- 7591 Darkness: `AttDark=55`, but `ResistDark=-1`
+
+The rest of the dark elemental base set (7585–7590) uses `ResistDark=-30`, and the later higher dark tower boss 7614 also uses `ResistDark=-30`.
+
+Vnum 7591 is not orphaned data:
+- group 6082 (`SungMahi_1_Darkness`) uses 7591 as its leader;
+- group 6088 also includes 7591.
+
+### Impact
+Vnum 7591 has materially different dark-element resistance from the otherwise symmetric six-element tower design. Any room spawning the darkness group receives a king whose dark resistance differs from the matching fire/ice/lightning/wind/earth king pattern and from the rest of its own dark family.
+
+The `-1` value is therefore a verified static data inconsistency and is strongly indicative of a mistyped `-30`.
+
+### No source change
+Detection-only record; mob proto/game data was not modified.
