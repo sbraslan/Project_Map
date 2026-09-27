@@ -96,3 +96,11 @@ Runtime order is now:
 4. T11/T12 live cooldown-source/value reproduction.
 
 Do not mark T09/T11/T12 runtime PASS before the client/server is actually run; current status is code-path preflight confirmed only.
+
+
+### Readiness consolidation — 2026-09-28
+- Documentation-only pass completed; no runtime test executed.
+- Normal-path order is fixed as T10 -> T09 -> T11 -> T12.
+- Isolated ASan/debug order is T01 -> T08.
+- T10 remains the first live gate for the entire runtime phase.
+- This cluster is ready to resume without rereading unrelated subsystem files.
