@@ -18,10 +18,10 @@
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Audit divergence paths between CDungeon::m_bDungeon_Difficulty and dungeon flag dungeonLevel.",
-      "Trace remaining tower room-clear/kill/completion hooks and reward issuance.",
-      "Compare client live-command visibility gating against map-load timing.",
-      "Treat sung_mahi_ranking row production as missing-quest responsibility unless another writer is found.",
+      "Trace generic quest kill/leave/logout/dungeon-destroy hooks used for Sung Mahi room completion and cleanup.",
+      "Audit monthly Sung Mahi reward event restart/month-transition/mail-write edge cases.",
+      "Revisit pc.mailbox_reward null-mailbox safety only if a callable tower producer is recovered.",
+      "Treat ranking row production and dual floor-state synchronization as missing-quest responsibilities unless another producer is found.",
       "Do not modify production source during detection phase."
     ]
   },
@@ -130,7 +130,16 @@
     "game/src/questmanager.cpp::Sung Mahi ranking SELECT/TRUNCATE and missing dungeonInfoLibrary.lua reset hook",
     "BUG-SMT-002::missing Questlibs/dungeonInfoLibrary.lua referenced by monthly reset",
     "game/src/char_battle.cpp::unique-master hit -> AggregateMonsterByMaster -> chessWrongMonster",
-    "game/src/char_battle.cpp::FuncAggregateByMaster unlocks NOMOVE/NOATTACK monsters in private instance"
+    "game/src/char_battle.cpp::FuncAggregateByMaster unlocks NOMOVE/NOATTACK monsters in private instance",
+    "game/src/questlua_dungeon.cpp::d.setf and d.set_dungeon_difficulty independent state writers",
+    "game/src/dungeon.h::ClearDungeonFlags clears flag map but not m_bDungeon_Difficulty",
+    "game/src/char_manager.cpp::tower difficulty applies on SpawnGroup only",
+    "game/src/dungeon.cpp::spawn_mob_dir_nomove path lacks SetDungeonMultipliers",
+    "game/src/questlua_pc.cpp::pc.mailbox_reward nullable GetMailBox call boundary",
+    "game/src/input_db.cpp::quest login deferred until PHASE_GAME",
+    "Project_ClientSrc/PythonNetworkStreamPhaseLoading.cpp::Warp/ShowMapName during loading",
+    "Project_Binary/root/servercommandparser.py::no Sung Mahi pre-game command registration",
+    "Sung Mahi client initial command timing::no verified visibility bug"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
