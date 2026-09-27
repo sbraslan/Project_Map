@@ -283,3 +283,17 @@ Therefore `world_boss_event` is distributed across game processes. BUG-WB-014 re
 ### Same-minute retry behavior
 The scheduler executes once per second while `cur_min == 0`.
 A successful spawn sets `m_dwWBVID`, which blocks another successful spawn on that process during the same minute. If spawning fails and `m_dwWBVID` remains zero, the code can retry on later scheduler ticks in the same minute. This is mapped behavior, not presently classified as a bug.
+
+
+## Death / reward / manager-state ordering
+The World Boss death path in `CHARACTER::Dead()` processes ordinary monster reward logic before the World Boss manager callback.
+
+Relevant order:
+1. monster death state is entered;
+2. if rewards are allowed, `Reward(true)` executes and builds item ownership / World Boss ranking data;
+3. later in the same `Dead()` function, the `ENABLE_WORLD_BOSS` block checks the event flag and race vnum;
+4. only then does `CHARACTER_MANAGER::OnKill(GetVID())` clear `m_dwWBVID/pkWB` and publish killed/cooldown state.
+
+No new race/lifetime defect was found from this ordering itself: the boss object and damage map are still available while `Reward()` runs, and manager ownership is cleared afterwards.
+
+This audit also confirms that no World Boss tier assignment or reward-eligibility reset is performed in the death callback path itself. The tier/reward provenance question therefore remains isolated outside the mapped spawn/death/reward lifecycle.
