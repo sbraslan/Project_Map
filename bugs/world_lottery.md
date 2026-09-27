@@ -85,3 +85,42 @@ Therefore a request can pass the initial checks, successfully deduct the lottery
 Result: the withdrawn amount disappears from the lottery wallet without being added to inventory gold.
 
 This is separate from BUG-WLOT-003 and occurs even with ordinary int-range amounts.
+
+
+### BUG-WLOT-005 — out-of-range ticket numbers can break the official client lottery refresh
+- Statik durum: **doğrulandı**
+- Sınıf: server input validation / persistent client-side failure
+
+The server accepts the four client-controlled ticket numbers without enforcing the intended range 1..30.
+
+Those values are stored unchanged and later returned by `SendLottoTicketInfo()`.
+
+The official client builds each ticket grid as indices 1..30 and then executes the equivalent of:
+`NumberGrids[row][ticket_number].SetCheckNumber(True)`
+
+without validating the received ticket number.
+
+Therefore a crafted stored value such as 100 is outside the 31-entry grid and raises a Python indexing error when that ticket is refreshed. The malformed value persists in SQL, so the failure survives reopening/relogin until the ticket row is removed or corrected.
+
+This is a separate consequence from BUG-WLOT-002: duplicate values corrupt jackpot matching, while out-of-range values can poison the official client's own lottery refresh path.
+
+### BUG-WLOT-006 — negative withdrawal amounts can create invalid negative gold and inflate the lottery wallet
+- Statik durum: **doğrulandı**
+- Sınıf: signed-input validation / currency invariant violation
+
+`TPacketCGSendLottoPickMoney.amount` is a client-controlled signed `long long`.
+
+`CInputMain::LottoPickMoney` does not require the amount to be positive. Its wallet check is only:
+`GetLottoMoney() >= amount`
+
+For a normal non-negative wallet, any modest negative amount passes.
+
+Example with `amount = -100`:
+1. `PointChange(POINT_LOTTO_MONEY, -amount)` adds 100 to the lottery wallet.
+2. `PointChange(POINT_GOLD, amount)` subtracts 100 from gold.
+
+The `POINT_GOLD` branch checks only the upper GOLD_MAX boundary. It has no lower-bound rejection, and `SetGold(int)` stores the resulting negative value directly.
+
+A client can therefore use the withdrawal endpoint in the opposite direction and push character gold below zero while increasing the lottery wallet. This violates both currency invariants and endpoint semantics.
+
+Because the packet is long long while `PointChange` accepts int, very large negative values also cross BUG-WLOT-003's narrowing boundary and may invert/truncate the effective mutations depending on the target compiler conversion behavior.
