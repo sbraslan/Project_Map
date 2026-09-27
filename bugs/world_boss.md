@@ -1,6 +1,6 @@
 # World Boss System — Bug Registry
 
-**Status:** ACTIVE — 13 verified findings
+**Status:** ACTIVE — 14 verified findings
 **Phase:** Detection / Mapping Only
 
 ### BUG-WB-001 — hour/second mix-up clears spawn state and breaks scheduled cleanup
@@ -177,3 +177,16 @@ The persistent client World Boss window does not request state when opened; `Ope
 Consequently a player logging in or reconnecting after the last spawn/kill transition receives no current state, boss timer, or cooldown value. The window can remain at local/default/stale values until another server transition command happens.
 
 This also compounds BUG-WB-002 for players on the originating process.
+
+
+### BUG-WB-014 — World Boss ownership is process-local, allowing duplicate simultaneous bosses across cores
+- Statik durum: **doğrulandı**
+- Sınıf: multi-core ownership / scheduler coordination
+
+Each game process owns an independent `CHARACTER_MANAGER` and independent World Boss state (`m_dwWBVID`, `pkWB`, phase/state/cooldown), plus process-local `wb_Spawned` / `wblast_SpawnTime`.
+
+Every process runs the World Boss scheduler itself and randomly selects a candidate map. `map_allow_find` only filters whether that selected map is hosted by the local process.
+
+The World Boss P2P receive path does not copy remote ownership state into the local manager and provides no election, lock, or "boss already exists elsewhere" guard; it only forwards the received state to local PCs.
+
+Consequently, in a multi-core/channel topology where different game processes host eligible World Boss maps, two or more processes can independently pass their local `m_dwWBVID == 0` check and spawn separate World Boss instances during the same scheduled window.
