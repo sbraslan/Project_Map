@@ -20,3 +20,12 @@ Do not execute runtime/fault-injection tests unless the user explicitly changes 
 - WB-T12 disable `world_boss_event` while a boss is alive, then test both leaving it alive and killing it while disabled; re-enable the event and inspect stale manager state/spawn behavior. Covers BUG-WB-012.
 
 - WB-T13 log in/reconnect after a World Boss has already spawned and before any later transition; open the World Boss window and verify no current-state request or sync packet/command occurs. Covers BUG-WB-013.
+
+
+### TEST-WB-MULTICORE-OWNERSHIP
+- Start at least two game processes/cores, each hosting at least one map from 61-64.
+- Enable `world_boss_event`.
+- Observe one scheduled spawn window.
+- Record boss VID/map/core on every process.
+- Expected for a globally single World Boss design: exactly one boss across the topology.
+- Static prediction from BUG-WB-014: more than one process can independently spawn and own a World Boss.
