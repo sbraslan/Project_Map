@@ -15,9 +15,9 @@
     "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Consolidate Hunting runtime readiness from bugs/hunting.md and tests/hunting.md without executing tests.",
+      "Consolidate Battle Pass runtime readiness from bugs/battle_pass.md and tests/battle_pass.md without executing tests.",
       "Keep DUNGEON-T10 as the first future live runtime gate.",
-      "Keep TICKET-T07 queued as the first Ticket normal-path validation.",
+      "Keep TICKET-T07 and HUNT-T04 queued behind the Dungeon normal-path cluster.",
       "Preserve all source/game repositories as read-only until the user explicitly changes phase."
     ]
   },
@@ -167,7 +167,8 @@
     "tests/sung_mahi_tower.md::SMT-T01..SMT-T06 deferred validation plan",
     "RUNTIME.md::Sung Mahi runtime readiness cluster",
     "RUNTIME.md::Dungeon Info T01-T12 readiness consolidated; execution locked",
-    "RUNTIME.md::Ticket T01-T07 readiness consolidated; execution locked"
+    "RUNTIME.md::Ticket T01-T07 readiness consolidated; execution locked",
+    "RUNTIME.md::Hunting T01-T08 readiness consolidated; execution locked"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -336,10 +337,11 @@
       "SMT-T05",
       "SMT-T06"
     ],
-    "documentation_cursor": "hunting",
+    "documentation_cursor": "battle_pass",
     "completed_readiness_clusters": [
       "dungeon_info",
-      "ticket"
+      "ticket",
+      "hunting"
     ],
     "dungeon_info": {
       "status": "DOCUMENTATION READY / NOT RUN",
@@ -359,6 +361,41 @@
       ],
       "isolated_adversarial_range": "TICKET-T01..TICKET-T06",
       "first_ticket_live_gate": "TICKET-T07"
+    },
+    "hunting": {
+      "status": "DOCUMENTATION READY / NOT RUN",
+      "verified_bug_tests": {
+        "BUG-HUNT-001": [
+          "HUNT-T01"
+        ],
+        "BUG-HUNT-002": [
+          "HUNT-T02"
+        ],
+        "BUG-HUNT-003": [
+          "HUNT-T03"
+        ],
+        "BUG-HUNT-004": [
+          "HUNT-T04"
+        ],
+        "BUG-HUNT-005": [
+          "HUNT-T05",
+          "HUNT-T06"
+        ]
+      },
+      "normal_path_candidate": "HUNT-T04",
+      "controlled_state_candidate": "HUNT-T03",
+      "isolated_modified_client": [
+        "HUNT-T01",
+        "HUNT-T02"
+      ],
+      "crash_consistency": [
+        "HUNT-T05",
+        "HUNT-T06"
+      ],
+      "robustness_unpromoted": [
+        "HUNT-T07",
+        "HUNT-T08"
+      ]
     }
   }
 }
