@@ -12,19 +12,19 @@
 Only `sbraslan/Project_Map` is writable. All source/game repositories remain read-only.
 
 ## Just mapped
-- `m_bDungeon_Difficulty` and dungeon flag `dungeonLevel` are fully independent C++ states; no automatic synchronization exists.
-- `d.clear_dungeon_flags()` clears `dungeonLevel` but does not reset `m_bDungeon_Difficulty`.
-- Group-spawned monsters receive `SetDungeonMultipliers()`; tower-specific `d.spawn_mob_dir_nomove()` individual spawns do not.
-- `pc.mailbox_reward` calls through `ch->GetMailBox()` without a null guard; this remains deferred because the tracked tower quest caller is missing.
-- Initial client command timing is now closed as non-bug: tower cover is shown during Loading-phase Warp/map setup, while quest login execution is server-gated until `PHASE_GAME`.
-- Pre-game `servercommandparser.py` does not know Sung Mahi commands, but no mapped normal quest producer can send them before PHASE_GAME.
-- Verified bugs remain: `BUG-SMT-001`, `BUG-SMT-002`.
+- Generic completion/cleanup lifecycle is closed: quest kill/logout hooks, dungeon membership teardown, delayed destroy, private-map server-timer cancellation.
+- No dedicated C++ Sung Mahi room-completion controller exists; floor progression/reward/ranking orchestration is expected from the missing quest runtime.
+- Verified `BUG-SMT-003`: monthly mailbox reward uses unsafe fixed-width memcpy; title is deterministically non-NUL-terminated and shorter literals are over-read.
+- Verified `BUG-SMT-004`: persistent season marker stores only `tm_mon` (0..11), so long downtime ending in the same month number in a later year skips rollover.
+- DB event flags are persisted/restored correctly for normal restarts; the defect is specifically month-only season identity.
+- Client floor model and shipped reward/element tables align on valid floors 1..50; latent malformed-input off-by-one guards were found but are not promoted as valid-flow bugs.
+- Verified bugs: `BUG-SMT-001`, `BUG-SMT-002`, `BUG-SMT-003`, `BUG-SMT-004`.
 
 ## Exact next work
-1. Trace generic quest kill/leave/logout/dungeon-destroy hooks used for tower room completion and cleanup.
-2. Audit monthly reward event restart/month-transition/mail-write edge cases.
+1. Inspect remaining independent monthly-reward/mailbox edge cases.
+2. Review `smhtower_*` monster/group and map data integration for static mismatches.
 3. Revisit `pc.mailbox_reward` null-mailbox safety only if a callable tower producer is recovered.
-4. Treat ranking row production and dual floor-state synchronization as missing-quest responsibilities unless another producer is found.
+4. Decide whether the subsystem is ready for STATIC COMPLETE with missing runtime behavior explicitly represented by BUG-SMT-001.
 5. No production source changes.
 
 GitHub state is canonical.
