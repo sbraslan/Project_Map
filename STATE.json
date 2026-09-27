@@ -27,14 +27,15 @@
       "BUG-WB-012",
       "BUG-WB-013",
       "BUG-WB-014",
-      "BUG-WB-015"
+      "BUG-WB-015",
+      "BUG-WB-016"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Finish tier-assignment provenance beyond the known World Boss roots.",
-      "Finish reward-state reset provenance (SetWBRewards(false)) beyond mapped World Boss roots.",
-      "Audit remaining command registration/permission and reward invocation path.",
-      "Check remaining vnum-1093 integration collisions with generic systems."
+      "Audit remaining generic systems that key directly on World Boss vnums (1093/other WBVnums).",
+      "Reconcile BUG-WB-016 with the unbound reward-button/client command path and ensure no hidden invocation root remains.",
+      "Run final static consistency pass across packet/state/reward/ranking roots.",
+      "Decide World Boss STATIC COMPLETE and advance to the next subsystem."
     ]
   },
   "startup": {
@@ -106,7 +107,10 @@
     "game/src/char_manager.cpp::fixed UTC+2 scheduler clock and midnight/retry behavior",
     "game/src/char_battle.cpp::Dead reward-before-WorldBoss-OnKill ordering",
     "Project_Binary/root/ui.py + uiworldboss.py + uiworldbossranking.py + interfacemodule.py::titlebar parent/child lifecycle",
-    "Project_Game/share/locale/europe/quest::1093 kill-handler integration audit"
+    "Project_Game/share/locale/europe/quest::1093 kill-handler integration audit",
+    "game/src/cmd.cpp + cmd_general.cpp::GM_PLAYER get_wb_reward registration and eligibility",
+    "game/src/char.cpp + char.h + common/tables.h::session-local World Boss tier/reward state",
+    "game/src/questlua_pc.cpp + questlua_game.cpp + questlua_global.cpp::no World Boss tier Lua binding"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
