@@ -18,3 +18,5 @@ Do not execute runtime/fault-injection tests unless the user explicitly changes 
 - WB-T10 vary World Boss drop count across 0, 1 and 2+ items while keeping the same damage participants; compare ranking construction and verify player/damage iterator misalignment for multiple qualifying players. Covers BUG-WB-010.
 - WB-T11 force the scheduled timeout branch, then inspect `m_dwWBVID`, `pkWB`, and the next spawn attempt after `DestroyCharacter`. Covers BUG-WB-011.
 - WB-T12 disable `world_boss_event` while a boss is alive, then test both leaving it alive and killing it while disabled; re-enable the event and inspect stale manager state/spawn behavior. Covers BUG-WB-012.
+
+- WB-T13 log in/reconnect after a World Boss has already spawned and before any later transition; open the World Boss window and verify no current-state request or sync packet/command occurs. Covers BUG-WB-013.
