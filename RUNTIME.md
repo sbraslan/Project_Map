@@ -71,6 +71,34 @@ Reproduction criterion for BUG-DUNGEON-010:
 No source/config modification is needed for this first test.
 
 
+
+## Runtime-readiness consolidation — Dungeon Info — 2026-09-28
+**Documentation status:** READY  
+**Execution status:** LOCKED / NOT RUN
+
+The Dungeon Info cluster is now normalized into two execution classes without changing any source or game data:
+
+- **Normal-path chain:** DUNGEON-T10 -> DUNGEON-T09 -> DUNGEON-T11 -> DUNGEON-T12.
+- **Isolated ASan/debug chain:** DUNGEON-T01 through DUNGEON-T08.
+
+Bug/test mapping:
+- T01 -> BUG-DUNGEON-001
+- T02 -> BUG-DUNGEON-002
+- T03 -> BUG-DUNGEON-003
+- T04 -> BUG-DUNGEON-004
+- T05 -> BUG-DUNGEON-005
+- T06 -> BUG-DUNGEON-006
+- T07 -> BUG-DUNGEON-007
+- T08 -> BUG-DUNGEON-008
+- T09 -> BUG-DUNGEON-009
+- T10 -> BUG-DUNGEON-010
+- T11 -> BUG-DUNGEON-011
+- T12 -> BUG-DUNGEON-012
+
+The first future live gate remains **DUNGEON-T10** because it is reproducible with the current checked-in 9-dungeon configuration and no crafted packet/config change. T09/T11/T12 remain live-pending behind T10. T01-T08 remain isolated/debug-only and must not be executed during the current detection-only phase.
+
+**Next documentation cluster:** Ticket runtime readiness.
+
 ## Patch readiness
 First-cluster fix plan is ready at `fixes/dungeon_info.md`.
 
