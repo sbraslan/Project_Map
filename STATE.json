@@ -25,14 +25,15 @@
       "BUG-WB-010",
       "BUG-WB-011",
       "BUG-WB-012",
-      "BUG-WB-013"
+      "BUG-WB-013",
+      "BUG-WB-014"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Finish tier-assignment provenance and determine whether reward tier is ever assigned.",
-      "Audit reward-state reset semantics across boss cycles.",
-      "Audit multi-core/channel boss ownership.",
-      "Audit ranking cache reset/pagination after upstream failures."
+      "Finish tier-assignment provenance with a complete caller scan if repository search becomes available.",
+      "Finish reward-state reset provenance (SetWBRewards(false)) beyond mapped World Boss roots.",
+      "Audit damage-owner lifetime/disconnect behavior around boss death.",
+      "Audit map/time scheduling edge cases and channel topology assumptions."
     ]
   },
   "startup": {
@@ -96,7 +97,9 @@
     "game/src/char_manager.cpp::DestroyCharacter vs World Boss timed cleanup",
     "game/src/input_login.cpp/input_db.cpp/input_main.cpp::no World Boss login sync",
     "root/uiworldboss.py::Open has no server state request",
-    "common/tables.h/db/src/ClientManagerPlayer.cpp::no World Boss tier/reward persistence"
+    "common/tables.h/db/src/ClientManagerPlayer.cpp::no World Boss tier/reward persistence",
+    "game/src/char_manager.cpp/.h::process-local multi-core World Boss ownership",
+    "Project_Binary/root/constinfo.py + uiworldbossranking.py::ranking global cache lifecycle"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
