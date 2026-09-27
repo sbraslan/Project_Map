@@ -25,14 +25,14 @@ Mapped:
 - ranking global-cache lifecycle.
 
 Verified:
-- `BUG-WB-001..014`.
+- `BUG-WB-001..015`.
 
 ## Exact next work
 1. Finish tier-assignment provenance with a complete caller scan if repository search becomes available.
 2. Finish reward-state reset provenance (`SetWBRewards(false)`) beyond mapped World Boss roots.
 3. Finish tier/reward provenance beyond the known World Boss roots.
-4. Audit remaining client open/close/state-reset lifecycle.
-5. Audit World Boss configuration/data roots outside C++ (event/quest/config if present).
+4. Audit remaining command registration / permission and reward invocation path.
+5. Check any remaining 1093-vnum integration collisions with generic systems.
 6. Decide World Boss STATIC COMPLETE only after provenance is closed.
 
 Record only findings in Project_Map. Source repositories stay immutable.
