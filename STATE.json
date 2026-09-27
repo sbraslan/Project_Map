@@ -1,23 +1,23 @@
 {
   "schema_version": 2,
-  "updated_at": "2026-09-27",
+  "updated_at": "2026-09-28",
   "project": "Metin2 Project",
   "mapping_repo": "sbraslan/Project_Map",
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "static_mapping_closure",
-    "display_name": "Static Mapping Closure",
-    "status": "STATIC MAPPING COMPLETE",
+    "subsystem": "runtime_readiness_consolidation",
+    "display_name": "Runtime Readiness Consolidation",
+    "status": "STATIC MAPPING COMPLETE / EXECUTION LOCKED",
     "system_file": null,
     "bug_file": null,
     "test_file": "RUNTIME.md",
     "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Continue consolidating completed-subsystem bug/test readiness from RUNTIME.md without executing tests.",
-      "Keep DUNGEON-T10 as the first future live runtime gate unless the user explicitly chooses another cluster.",
-      "Use tests/sung_mahi_tower.md for SMT-T01 through SMT-T06 when runtime execution is explicitly enabled.",
+      "Consolidate Ticket runtime readiness from bugs/ticket.md and tests/ticket.md without executing tests.",
+      "Then consolidate Hunting runtime readiness without executing tests.",
+      "Keep DUNGEON-T10 as the first future live runtime gate unless the user explicitly changes the order.",
       "Preserve all source/game repositories as read-only until the user explicitly changes phase."
     ]
   },
@@ -165,7 +165,8 @@
     "BUG-SMT-006::tower-only consumables missing tracked item_proto definitions",
     "Sung Mahi Tower::STATIC COMPLETE",
     "tests/sung_mahi_tower.md::SMT-T01..SMT-T06 deferred validation plan",
-    "RUNTIME.md::Sung Mahi runtime readiness cluster"
+    "RUNTIME.md::Sung Mahi runtime readiness cluster",
+    "RUNTIME.md::Dungeon Info T01-T12 readiness consolidated; execution locked"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -333,6 +334,21 @@
       "SMT-T04",
       "SMT-T05",
       "SMT-T06"
-    ]
+    ],
+    "documentation_cursor": "ticket",
+    "completed_readiness_clusters": [
+      "dungeon_info"
+    ],
+    "dungeon_info": {
+      "status": "DOCUMENTATION READY / NOT RUN",
+      "normal_path_order": [
+        "DUNGEON-T10",
+        "DUNGEON-T09",
+        "DUNGEON-T11",
+        "DUNGEON-T12"
+      ],
+      "isolated_debug_range": "DUNGEON-T01..DUNGEON-T08",
+      "first_live_gate": "DUNGEON-T10"
+    }
   }
 }
