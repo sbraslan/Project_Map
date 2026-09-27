@@ -21,15 +21,18 @@
       "BUG-WB-006",
       "BUG-WB-007",
       "BUG-WB-008",
-      "BUG-WB-009"
+      "BUG-WB-009",
+      "BUG-WB-010",
+      "BUG-WB-011",
+      "BUG-WB-012"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
       "Finish tier-assignment provenance and determine whether reward tier is ever assigned.",
-      "Audit damage-ranking collection against item-drop ownership iteration.",
       "Audit login/reconnect World Boss state synchronization.",
       "Audit tier/reward reset and persistence across boss cycles.",
-      "Audit multi-core/channel boss ownership."
+      "Audit multi-core/channel boss ownership.",
+      "Audit ranking cache reset/pagination after upstream failures."
     ]
   },
   "startup": {
@@ -88,7 +91,9 @@
     "root/uiworldbossranking.py",
     "root/constinfo.py::World Boss ranking cache",
     "root/uiscript/worldbosswindow.py",
-    "root/uiscript/worldbossrankingwindow.py"
+    "root/uiscript/worldbossrankingwindow.py",
+    "game/src/char_battle.cpp::multi-item ownership/ranking iterator lifecycle",
+    "game/src/char_manager.cpp::DestroyCharacter vs World Boss timed cleanup"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
