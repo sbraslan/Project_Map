@@ -32,8 +32,8 @@
     "next_actions": [
       "Finish tier-assignment provenance with a complete caller scan if repository search becomes available.",
       "Finish reward-state reset provenance (SetWBRewards(false)) beyond mapped World Boss roots.",
-      "Audit damage-owner lifetime/disconnect behavior around boss death.",
-      "Audit map/time scheduling edge cases and channel topology assumptions."
+      "Audit map/time scheduling edge cases (UTC+2 handling, spawn minute repetition, midnight branch).",
+      "Audit channel topology assumptions and event-flag propagation."
     ]
   },
   "startup": {
@@ -99,7 +99,8 @@
     "root/uiworldboss.py::Open has no server state request",
     "common/tables.h/db/src/ClientManagerPlayer.cpp::no World Boss tier/reward persistence",
     "game/src/char_manager.cpp/.h::process-local multi-core World Boss ownership",
-    "Project_Binary/root/constinfo.py + uiworldbossranking.py::ranking global cache lifecycle"
+    "Project_Binary/root/constinfo.py + uiworldbossranking.py::ranking global cache lifecycle",
+    "game/src/char_battle.cpp::damage-owner live-VID filtering at death"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
