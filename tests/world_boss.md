@@ -29,3 +29,12 @@ Do not execute runtime/fault-injection tests unless the user explicitly changes 
 - Record boss VID/map/core on every process.
 - Expected for a globally single World Boss design: exactly one boss across the topology.
 - Static prediction from BUG-WB-014: more than one process can independently spawn and own a World Boss.
+
+
+### TEST-WB-TITLEBAR-PARENT-STATE
+- Open the World Boss main window through the normal interface toggle.
+- Click the titlebar X.
+- Query/observe the parent `wndWorldBoss.IsShow()` state and then press the normal World Boss toggle once.
+- Repeat for `wndWBRanking`.
+- Expected correct behavior: X closes/hides the owning parent and one toggle reopens it.
+- Static prediction from BUG-WB-015: X hides only the child board; the next toggle only hides the still-logically-shown parent, so another toggle is needed to reopen.
