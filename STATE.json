@@ -24,13 +24,13 @@
       "BUG-WB-009",
       "BUG-WB-010",
       "BUG-WB-011",
-      "BUG-WB-012"
+      "BUG-WB-012",
+      "BUG-WB-013"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
       "Finish tier-assignment provenance and determine whether reward tier is ever assigned.",
-      "Audit login/reconnect World Boss state synchronization.",
-      "Audit tier/reward reset and persistence across boss cycles.",
+      "Audit reward-state reset semantics across boss cycles.",
       "Audit multi-core/channel boss ownership.",
       "Audit ranking cache reset/pagination after upstream failures."
     ]
@@ -93,7 +93,10 @@
     "root/uiscript/worldbosswindow.py",
     "root/uiscript/worldbossrankingwindow.py",
     "game/src/char_battle.cpp::multi-item ownership/ranking iterator lifecycle",
-    "game/src/char_manager.cpp::DestroyCharacter vs World Boss timed cleanup"
+    "game/src/char_manager.cpp::DestroyCharacter vs World Boss timed cleanup",
+    "game/src/input_login.cpp/input_db.cpp/input_main.cpp::no World Boss login sync",
+    "root/uiworldboss.py::Open has no server state request",
+    "common/tables.h/db/src/ClientManagerPlayer.cpp::no World Boss tier/reward persistence"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
