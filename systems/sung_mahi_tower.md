@@ -299,13 +299,47 @@ There is still a generic pre-game parser limitation:
 
 No visibility-timing bug is registered from current evidence.
 
+
+## Generic completion / cleanup lifecycle
+The remaining generic quest/dungeon lifecycle used by the missing tower quest is now mapped:
+- monster kills dispatch `CQuestManager::Kill(playerPID, mobVnum)`, which runs both vnum-specific and global `QUEST_KILL_EVENT` handlers; party-kill handlers are also dispatched when enabled;
+- player logout calls `CQuestManager::LogoutPC()`, which dispatches global `QUEST_LOGOUT_EVENT` before the character is destroyed;
+- at that point the character still retains its dungeon pointer, so a logout quest handler can inspect/clean dungeon state before destruction;
+- `M2_DESTROY_CHARACTER` eventually reaches `CHARACTER::Destroy() -> SetDungeon(nullptr)`;
+- for PCs, `SetDungeon(nullptr)` decrements dungeon membership; when the last member leaves, `CDungeon::DecMember()` schedules the dungeon dead/destroy event (default 10 seconds unless overridden);
+- for monsters/stones, `SetDungeon(nullptr)` calls `DecMonster()`, which invokes `CheckEliminated()` and can trigger generic exit/warp-on-eliminate behavior if quest logic configured it;
+- `CDungeonManager::Destroy()` removes the private dungeon, cancels quest server timers keyed by private map index, and destroys the private map.
+
+No dedicated C++ Sung Mahi room-completion state machine exists beyond these generic hooks and the previously mapped unique-master helper. Therefore floor/room advancement, ranking writes, reward issuance, timers and cleanup are all expected to be quest-driven; that orchestration is absent under `BUG-SMT-001`.
+
+## Monthly reward restart/state audit
+Event-flag persistence itself is wired correctly:
+- DB process loads `dwPID=0` quest event flags at startup;
+- `SendEventFlagsOnSetup()` sends persisted values to each game peer;
+- game receives `HEADER_DG_SET_EVENT_FLAG` and updates `CQuestManager::m_mapEventFlag`.
+
+This means ordinary same-month restarts can preserve `sungMahiLastMonth` and avoid duplicate rollover.
+
+However the season marker stores only `tm_mon` (0..11), not year. That produces verified `BUG-SMT-004`: after a long downtime ending in the same month number in a later year, stale rankings can be treated as belonging to the current season and rollover is skipped.
+
+## Monthly mailbox serialization safety
+The `ENABLE_MAILBOX` monthly reward path contains verified fixed-buffer string defects (`BUG-SMT-003`):
+- mailbox title buffer is 26 bytes but the 28-character title literal is copied with exactly 26 bytes, so no NUL terminator is written;
+- `szFrom[49]` copies 49 bytes from the 16-byte `"Sung Mahi Tower"` literal;
+- `szMessage[101]` copies 101 bytes from the 1-byte empty-string literal;
+- recipient `szName[49]` is likewise filled by fixed-width memcpy from variable-length SQL text.
+
+Later mailbox code treats these fields as C strings. This monthly C++ path is independent of the missing quest runtime and is directly reachable by the monthly timer.
+
 ## Verified bugs
 - `BUG-SMT-001` — Sung Mahi Tower quest runtime implementation is missing from the tracked Project_Game quest package.
 - `BUG-SMT-002` — monthly ranking reset references missing `Questlibs/dungeonInfoLibrary.lua`.
+- `BUG-SMT-003` — monthly mailbox reward uses unsafe fixed-width string copies and creates a non-NUL-terminated title.
+- `BUG-SMT-004` — monthly season marker stores only month number, not year.
 
 ## Exact next work
-1. Trace generic quest kill/leave/logout/dungeon-destroy hooks that the missing tower quest would depend on for room completion and cleanup.
-2. Audit monthly reward event edge cases (restart/month transition/mail write) independently of the missing quest.
+1. Audit the client entry/progression data model for static off-by-one/range inconsistencies now that the canonical 1..50 floor boundary is proven.
+2. Inspect Sung Mahi reward/element locale tables against UI indexing and 50-floor assumptions.
 3. Revisit `pc.mailbox_reward` null-mailbox safety only if a callable tower producer is recovered.
-4. Treat ranking row production and dual floor-state synchronization as missing-quest responsibilities unless another producer is found.
+4. Decide whether remaining unresolved behavior is entirely blocked by BUG-SMT-001 or whether additional independent static paths remain.
 5. Keep production source immutable; record only verified findings.
