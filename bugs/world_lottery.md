@@ -39,7 +39,7 @@ and the code executes:
 
 This allows one actual matched draw number to be interpreted as a 4/4 jackpot match.
 
-### BUG-WLOT-003 — long long lottery values are narrowed through PointChange(int)
+### BUG-WLOT-003 — long long lottery values cross multiple 32-bit point/status boundaries
 - Statik durum: **doğrulandı**
 - Sınıf: numeric truncation / currency corruption
 
@@ -61,7 +61,9 @@ Wallet withdrawal also passes signed `long long amount` through the same int par
 
 Any lottery value outside the signed-int range is narrowed before the point mutation. The jackpot has no matching int-range cap and can grow through ticket contributions, so the type mismatch is reachable by system design.
 
-Consequences include wrong-sign/wrong-value wallet and lifetime-win updates while the ticket can already be marked collected.
+The same width mismatch also exists on full player-status synchronization. Both server binaries are built with `-m32`; `TPacketGCPoints.points[]` is `long`, therefore 32-bit, while the persisted lottery fields are `long long`. The client stores the received value through `SetStatus(long)` and exposes it through `GetStatus()` returning `int`. The Python getter's `PyLong_FromLongLong` only widens the already-truncated client value.
+
+Consequences include wrong-sign/wrong-value wallet and lifetime-win updates, plus corrupted client-visible balances after login/full status refresh, while the DB can still contain the original 64-bit value.
 
 ### BUG-WLOT-004 — lottery wallet is deducted before gold-cap rejection
 - Statik durum: **doğrulandı**
@@ -215,3 +217,38 @@ is followed unconditionally by:
 If the query succeeds but returns zero rows, `row_empire` is null and the code dereferences it. A ranking request can therefore crash the game process for inconsistent/orphaned player data.
 
 The current shipped lottery UI does not expose the ranking request, so this path is dormant for normal UI use, but it is reachable through the existing network handler/binding.
+
+
+### BUG-WLOT-013 — prize claim can be permanently consumed before the winnings are durably saved
+- Statik durum: **doğrulandı**
+- Sınıf: transaction durability / cross-table crash consistency
+
+Prize claim first performs a synchronous database update:
+`UPDATE player.lotto_tickets SET state=2 ...`.
+
+Only after that commit does it call:
+- `PointChange(POINT_LOTTO_MONEY, ...)`
+- `PointChange(POINT_LOTTO_TOTAL_MONEY, ...)`.
+
+Those point branches mutate in-memory character fields but do not call `Save()`.
+
+The fields are persisted later through `CreatePlayerProto()` during the normal character save cycle. The default save event interval is 120 seconds.
+
+If the game process terminates after the ticket state has been committed as collected but before the next player save reaches DB, the ticket remains state 2 after restart while the lottery wallet and total-win values can reload from the older persisted player row.
+
+Result: the prize can be permanently unclaimable/lost due to a crash window between two persistence domains.
+
+### BUG-WLOT-014 — unchecked DirectQuery errors can become null-result crashes in lottery paths
+- Statik durum: **doğrulandı**
+- Sınıf: SQL error handling / null result dereference
+
+`CAsyncSQL::DirectQuery` records MySQL failure in `uiSQLErrno`, then stores a result object whose `pSQLResult` is null and `uiNumRows` is zero.
+
+Several World Lottery paths call `mysql_fetch_row(pMsg->Get()->pSQLResult)` without first checking `uiSQLErrno`, including:
+- the DB-core scheduler's initial `COUNT(*)`;
+- ticket purchase's lottery-row `COUNT(*)`;
+- ticket delete/claim's ticket lookup.
+
+A SQL failure therefore feeds a null MYSQL_RES pointer into `mysql_fetch_row` instead of returning safely.
+
+This is distinct from an ordinary zero-row SELECT: a successful zero-row result has a valid MYSQL_RES and is handled in some paths. The bug is the missing query-error guard before the fetch.
