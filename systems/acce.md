@@ -107,6 +107,7 @@ Acce reversal items clear socket 0 and clear attributes on the target sash.
 - `BUG-ACCE-002` — sash type/subtype checks use an incorrect AND predicate, permitting wrong ITEM_COSTUME subtypes when other conditions line up.
 - `BUG-ACCE-003` — absorption material validation compares item type against `ARMOR_BODY` and therefore accepts every ITEM_ARMOR subtype rather than body armor only.
 - `BUG-ACCE-004` — combine accepts identical primary/material inventory cells; failure can consume the primary sash and success reaches a stale-pointer/double-remove path.
+- `BUG-ACCE-005` — reversal clears absorbed attributes after the only target update packet, leaving stale client attribute/tool-tip state.
 
 ## Mapping next
 
