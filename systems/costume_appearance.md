@@ -1,6 +1,6 @@
 # Costume / Appearance / ChangeLook — Static Map
 
-**Status:** MAPPING IN PROGRESS  
+**Status:** STATIC COMPLETE  
 **Phase:** Detection / Mapping Only  
 **Source/Game repos:** read-only  
 **Opened:** 2026-09-28
@@ -378,3 +378,34 @@ For future `item ekleyeceğiz` automation, ChangeLook compatibility must be trea
 - body ShapeIndex must exist in every race/sex MSM that is allowed by the generated ANTI_FLAG set;
 - if a GR2/MSM mapping is intentionally absent for a race/sex, generated restrictions must prevent that race/sex from equipping the item;
 - item_list/icon and item_names records remain companion outputs.
+
+
+## Static closure — 2026-09-28
+
+**Status:** STATIC COMPLETE  
+**Verified bugs:** BUG-LOOK-001..BUG-LOOK-007  
+**Deferred tests:** LOOK-T01..LOOK-T07  
+**Execution:** LOCKED / NOT RUN
+
+Mapped and closed:
+- costume body/hair/weapon/acce/aura visual routing;
+- item VNUM -> VALUE3 -> MSM ShapeIndex -> GR2/DDS body path;
+- ChangeLook client/server packet and transaction flow;
+- persistence/load/save/reversal;
+- hide-costume interaction;
+- mount appearance resolution;
+- slot-state compatibility;
+- checked-in raw-item lifetime;
+- renewed open-window overlap;
+- cross-type client rendering;
+- item-creation compatibility constraints.
+
+### Deferred / unpromoted
+The following remain observations/candidates and are **not verified bugs**:
+- mount ChangeLook expiry helpers are partially disconnected from the mapped Accept path; intended time-transfer semantics are not sufficiently proven;
+- `IsExpireTimeItem()` has a broad type/subtype predicate but no proven live caller impact;
+- Aura + ChangeLook overlap exists, but a distinct corruption path beyond the documented window inconsistency was not proven;
+- GuildStorage/Roulette/Switchbot are omitted from `CTransmutation::Open()`, but no additional ChangeLook-specific corruption was proven;
+- free-ticket pointer alias: `m_FreeItem` is not explicitly required to differ from LEFT/RIGHT. Combined with BUG-LOOK-002, a RIGHT/FREE same-pointer double-remove path is plausible **only if** a free-ticket proto is accepted as the mount RIGHT material. The current static evidence did not close the ticket proto type, so this remains a candidate and is not promoted.
+
+No source/game file was modified and no runtime test was executed.
