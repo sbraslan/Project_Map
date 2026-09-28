@@ -70,3 +70,57 @@ On Accept:
 
 - Raw LPITEM references in CTransmutation are not themselves locked. Normal MoveItem/DropItem paths are blocked by `CanHandleItem()` while the window is open, so this is not yet promoted as a lifetime bug.
 - Exact equality of anti flags for normal item transmutation may be intentional compatibility policy; not a bug.
+
+
+## BUG-LOOK-003 — ChangeLook open state is omitted from CanWarp
+
+**Status:** VERIFIED STATIC
+
+With `ENABLE_CHECK_WINDOW_RENEWAL`, `CHARACTER::SetTransmutation()` sets:
+`W_CHANGELOOK`.
+
+But `CHARACTER::CanWarp()` checks an open-window mask containing exchange, safebox, cube, shop, skillbook/attr, aura and switchbot states while omitting `W_CHANGELOOK`.
+
+`CHARACTER::WarpSet()` also does not call `SetTransmutation(nullptr)`.
+
+Consequences established statically for a same-character warp:
+- server permits the warp while the ChangeLook object is active;
+- `m_pkTransmutation` remains non-null;
+- checked-in `LPITEM` pointers remain owned by that object;
+- `CanHandleItem()` continues to reject normal item handling while the object remains active.
+
+The Python ChangeLook window has a local 500-distance auto-close, but this is client-side behavior and does not repair the missing server-side warp/window invariant.
+
+**Impact:** ChangeLook state can survive a server-authorized warp; depending on client phase/UI cleanup this can leave stale transmutation state/raw references and/or item-handling lock until CANCEL or character destruction.
+
+**Runtime:** deferred. Prefer controlled same-core warp observation first; no crafted packet is required if a normal warp path can be invoked while the window is open.
+
+## BUG-LOOK-004 — Server does not reject sealed right-side ChangeLook material
+
+**Status:** VERIFIED STATIC
+
+Feature state:
+- server `ENABLE_SEALBIND_SYSTEM` is enabled;
+- client ChangeLook UI has an explicit seal check for the **right/material** slot.
+
+Client `root/uichangelook.py` refuses the right item when its seal date is not the default timestamp.
+
+Server `CTransmutation::ItemCheckIn()` checks:
+- default inventory position;
+- item existence;
+- `isLocked()`;
+- slot/type compatibility.
+
+Server `CheckOtherItem()` checks type/subtype/anti-flags but does **not** check `IsSealed()`.
+
+A modified client can therefore check in a sealed right material. `Accept()` then uses its VNUM as the new appearance and removes the right item.
+
+**Impact:** server-side policy can consume a sealed/bound item as ChangeLook material despite the official client explicitly forbidding the operation.
+
+**Runtime:** deferred modified-client/isolation test only.
+
+## Deferred observations — not promoted
+
+- Mount expiry helpers appear partially disconnected from the mapped Transmutation Accept path.
+- `IsExpireTimeItem()` has an overly broad boolean predicate, but no live caller/impact has yet been closed.
+- Normal item movement/drop paths are blocked by `CanHandleItem()` while ChangeLook is active; alternate mutation paths still require audit.
