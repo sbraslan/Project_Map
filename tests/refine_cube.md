@@ -33,3 +33,48 @@ availability/currency follow multiplier 2, but removable materials and created r
 Safety class: **Stage A/B controlled disposable recipe**.
 
 Global execution remains locked; `DUNGEON-T10` is still the first future live gate.
+
+
+## REFCUBE-T03 — Craft after Cube close / out of NPC range
+Covers `BUG-REFCUBE-003`.
+
+Future isolated modified-client test:
+1. legitimately open a Cube Renewal NPC;
+2. close the Cube window and/or move clearly outside NPC interaction range;
+3. retain a disposable valid recipe for that NPC;
+4. submit one MAKE packet without reopening Cube;
+5. record whether the recipe executes.
+
+Static prediction:
+the server uses stale `tempCubeNPC` and does not require open state or distance.
+
+Safety class: **Stage B isolated authorization / disposable recipe**.
+
+## REFCUBE-T04 — Direct /cube without quest NPC
+Covers `BUG-REFCUBE-004`.
+
+Future isolated debug/sanitizer test:
+1. use a test character with no current quest NPC;
+2. invoke the player-level `/cube` command once;
+3. observe the `GetQuestNPC()->GetRaceNum()` path under debugger/sanitizer.
+
+Static prediction:
+null pointer dereference before a Cube open packet is built.
+
+Safety class: **Stage C crash/sanitizer only**.
+Never run on production.
+
+## REFCUBE-T05 — Improve-item loss on no reward space
+Covers `BUG-REFCUBE-005`.
+
+Future controlled disposable-data test:
+1. prepare a valid <100% Cube recipe;
+2. attach disposable VNUM 79605 improve items;
+3. ensure no valid reward destination slot exists;
+4. submit one normal craft attempt;
+5. compare improve-item, recipe-material and currency deltas.
+
+Static prediction:
+improve items decrease first; reward-space check then aborts; base materials/currency remain unchanged.
+
+Safety class: **Stage A controlled disposable-item data-integrity test**.
