@@ -104,3 +104,18 @@ Do not mark T09/T11/T12 runtime PASS before the client/server is actually run; c
 - Isolated ASan/debug order is T01 -> T08.
 - T10 remains the first live gate for the entire runtime phase.
 - This cluster is ready to resume without rereading unrelated subsystem files.
+
+
+### DUNGEON-T10 canonical handoff — 2026-09-28
+Full future execution checklist: `../DUNGEON_T10_HANDOFF.md`.
+
+Current status:
+- preflight/documentation: **COMPLETE**;
+- runtime execution: **LOCKED / NOT RUN**;
+- canonical bug: `DINFO::BUG-DUNGEON-010`;
+- expected current snapshot: 9 configured dungeons;
+- allowed future trigger: normal login + minimap Dungeon Info button only;
+- result classes: `REPRODUCED | NOT REPRODUCED | INCONCLUSIVE`;
+- mandatory stop: after first evidence capture, before any fix/bypass.
+
+No later Dungeon Info live test may be marked executed before the DUNGEON-T10 result is recorded.
