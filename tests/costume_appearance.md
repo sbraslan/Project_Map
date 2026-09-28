@@ -70,3 +70,37 @@ Static prediction: server accepts because no `IsSealed()` validation exists in t
 Safety class: **Stage B isolated / modified client**.
 
 No test executed.
+
+
+## LOOK-T05 — LEFT replacement compatibility bypass
+Covers `BUG-LOOK-005`.
+
+Future isolated modified-client sequence:
+1. open item ChangeLook;
+2. check in target A;
+3. check in compatible material B;
+4. send LEFT checkout while RIGHT remains;
+5. check in target C of another allowed ChangeLook class/subtype;
+6. verify server accepts C without revalidating B;
+7. only with disposable data, Accept and inspect stored transmutation VNUM.
+
+Static prediction: final incompatible pair is accepted.
+
+Safety class: **Stage B isolated / modified client**.
+
+## LOOK-T06 — Checked-in real-time item expires
+Covers `BUG-LOOK-006`.
+
+Future sanitizer/debug-only test:
+1. prepare a disposable ChangeLook-eligible item with a very short real-time expiry;
+2. check it into LEFT or RIGHT;
+3. keep the window open through expiry;
+4. confirm item destruction;
+5. trigger checkout/accept only under ASan/debug instrumentation.
+
+Static prediction: CTransmutation retains a stale raw pointer after item deletion.
+
+Safety class: **Stage B/C crash / lifetime / sanitizer**.
+Do not run on production.
+
+No test executed.
