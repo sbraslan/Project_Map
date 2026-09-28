@@ -1,36 +1,57 @@
 # CURRENT — Canonical Active Checkpoint
 
 **Active phase:** Detection / Mapping Only
-**Active subsystem:** Dragon Soul / Alchemy
-**Status:** STATIC MAPPING IN PROGRESS
+**Active state:** Acce / Sash Static Mapping
+**Status:** STATIC MAPPING IN PROGRESS / 4 VERIFIED STATIC BUGS / EXECUTION LOCKED
 **Machine state:** `STATE.json`
-**System:** `systems/dragon_soul.md`
-**Bugs:** `bugs/dragon_soul.md`
-**Tests:** `tests/dragon_soul.md`
+**Active subsystem:** Acce / Sash
+**Last completed subsystem:** Costume / Appearance / ChangeLook
+**Completed/readiness-covered subsystems:** 22
+**Item workflow:** `ITEM_CREATION_AUTOMATION.md`
+**First future live gate:** `DUNGEON-T10`
 **Last updated:** 2026-09-28
 
 ## Hard rule
-Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-only. Runtime, crafted-packet, crash, sanitizer and fault-injection execution remains locked.
+Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-only. Runtime, crafted-packet, crash, sanitizer and fault-injection execution remains locked until an explicit phase change.
 
-## Verified this opening pass
-- `BUG-DS-001`: breaking an active complete DS set can leave stale set-bonus stats because cleanup returns on the first missing slot.
-- `BUG-DS-002`: Dragon Heart extraction destroys count-1 source DS, then passes the dangling pointer to `ItemLog()`.
-- `BUG-DS-003`: strength-refine success removes source from character before SetCount(0), leaving an ownerless zero-count CItem registered in memory while DB deletion is merely queued.
+## Active Acce / Sash mapping
 
-## Candidate / not promoted
-- step refine first std::set item skips equipped-state validation;
-- GetBasePosition grade == max boundary;
-- change-attr step index lacks explicit bound.
+New canonical files:
+- `systems/acce.md`
+- `bugs/acce.md`
+- `tests/acce.md`
 
-## Next static work
-1. material-count/stack semantics across all refine modes;
-2. server/client dragon_soul_table dimension parity;
-3. set-bonus reactivation/relog cleanup;
-4. extraction aliasing and window/warp state;
-5. qualification/daily quest lifecycle.
+Verified static findings:
+- `BUG-ACCE-001` — final Acce transaction is not bound to an active server-side Acce window/mode.
+- `BUG-ACCE-002` — wrong ITEM_COSTUME subtypes can pass the server sash type/subtype predicate because it uses `&&`.
+- `BUG-ACCE-003` — absorb material validation accepts every ITEM_ARMOR subtype; `ARMOR_BODY` is incorrectly compared as an item type.
+- `BUG-ACCE-004` — combine allows the same inventory cell as both inputs; failure can consume the primary sash and success reaches a stale-pointer/double-remove path.
 
-No runtime test executed.
+Key architecture:
+- Acce check-in/check-out is client-local bookkeeping.
+- Only final accept sends `HEADER_CG_ACCE_REFINE_REQUEST`.
+- Server therefore owns full validation responsibility for mode, cells, type/subtype and transaction invariants.
 
-Global first future live gate remains `DUNGEON-T10`; opening Dragon Soul static mapping does not authorize or reorder runtime execution.
+## Global state
+The 22 previously completed subsystems remain STATIC COMPLETE with runtime-readiness ownership, plus folded Guild lifecycle coverage.
+
+Acce / Sash is the next deliberately opened subsystem and is **not yet counted as STATIC COMPLETE**.
+
+No runtime test has been executed.
+
+## Item workflow
+When the user says `item ekleyeceğiz`, use `ITEM_CREATION_AUTOMATION.md`:
+reference VNUM -> compatible template -> unused VNUM/ShapeIndex proposal -> item_proto + companion item/MSM records.
+
+## Next
+Continue Acce static mapping:
+1. absorbed-stat math and special apply behavior;
+2. socket/attribute persistence and reversal/reset;
+3. proto/data and client visual dependencies;
+4. open-window/warp/item-mutation lifecycle;
+5. combine grade/refine-chain and output-placement edge cases.
+
+Do not execute ACCE-T01..T04.
+The prepared first future runtime gate remains `DUNGEON-T10`.
 
 GitHub state is canonical.
