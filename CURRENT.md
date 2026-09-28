@@ -2,7 +2,7 @@
 
 **Active phase:** Detection / Mapping Only  
 **Active state:** Horse / Mount / Riding Static Mapping  
-**Status:** STATIC MAPPING IN PROGRESS / 1 PROMOTED HORSE-MOUNT BUG / EXECUTION LOCKED  
+**Status:** STATIC MAPPING IN PROGRESS / 2 PROMOTED HORSE-MOUNT BUGS / EXECUTION LOCKED  
 **Machine state:** `STATE.json`  
 **Active subsystem:** Horse / Mount / Riding  
 **System:** `systems/horse_mount.md`  
@@ -16,31 +16,24 @@
 ## Hard rule
 Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-only. Runtime/fault-injection execution remains locked until an explicit phase change.
 
-## Horse / Mount progress this turn
-Promoted:
-- `BUG-HORSE-001` — active `horse_ride.quest -> pc.mount()` changes `POINT_MOUNT` through an affect but does not synchronize `MountVnum`; `PointChange(POINT_MOUNT)` has its `MountVnum(val)` call commented out.
+## Horse / Mount verified bugs
+- `BUG-HORSE-001` — active `horse_ride.quest -> pc.mount()` changes `POINT_MOUNT` but does not synchronize `MountVnum`.
+- `BUG-HORSE-002` — tracked quest deployment has horse level/grade consumers but no normal-player horse-level progression producer.
 
-Deferred test:
-- `HORSE-T01` — POINT_MOUNT / MountVnum / client-render parity.
+Deferred tests:
+- `HORSE-T01` — POINT_MOUNT / MountVnum parity.
+- `HORSE-T02` — zero-level horse progression reachability.
 
-Also closed:
-- eight current h_horse quest sources are active in `quest_list`;
-- normal equipped mount item/costume add/remove explicitly synchronizes `MountVnum`;
-- death cleanup covers special ride unique items and costume mount;
-- restricted-map post-warp EnterGame calls `Unmount()`.
-
-Strong open candidate:
-- mount ChangeLook transaction stores only donor VNUM and destroys donor; lifetime/socket2/event transfer is missing. Verify a deployed time-limited COSTUME_MOUNT before promotion.
-
-Deployment candidate:
-- active h_horse scripts use horse-level gates but contain no horse-level advancement producer.
+## Closed this turn
+- real-time/timer-on-wear mount expiry reaches `RemoveFromCharacter -> Unequip` and synchronizes mount cleanup; no stale-expiry bug.
+- Achievement `TYPE_SUMMON_MOUNT` gap is already owned by `BUG-ACH-006`; no duplicate Horse bug.
+- ChangeLook mount lifetime transfer remains a strong candidate, but current connector cannot prove a concrete time-limited COSTUME_MOUNT row from the encoded DumpProto item_proto snapshot, so it remains unpromoted.
 
 ## Exact next work
-1. verify deployed time-limited COSTUME_MOUNT data and close ChangeLook lifetime candidate;
-2. locate/exclude non-h_horse horse-level progression producers;
-3. close real-time/timer-based mount expiry;
-4. resolve Achievement SUMMON_MOUNT producer gap;
-5. close client race/proto/horse-appearance coverage.
+1. close Additional Equipment Page interaction with UNIQUE ride items;
+2. close client mount packet/race/assets and horse appearance;
+3. audit horse-name/appearance persistence and ChangeLook interaction;
+4. decide Horse/Mount STATIC COMPLETE.
 
-Do not execute `HORSE-T01`.
+Do not execute `HORSE-T01` or `HORSE-T02`.
 GitHub state is canonical.
