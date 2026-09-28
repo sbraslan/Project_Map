@@ -85,3 +85,41 @@ That predicate is broader than the apparent intended exact type/subtype check. I
 9. create bugs/tests only for verified reachable paths.
 
 No Horse/Mount runtime test is authorized. Global first future live gate remains `DUNGEON-T10`.
+
+
+## Checkpoint — persistence/login + stamina/health event lifecycle closed
+
+### Persistence / login
+- `TPlayerTable::horse` persists level, riding, stamina, health and health-drop timestamp.
+- DB save/load covers `horse_level`, `horse_riding`, `horse_hp`, `horse_hp_droptime` and `horse_stamina`.
+- `CHARACTER::SetPlayerProto()` restores the raw `THorseInfo` and applies offline stamina regeneration through `UpdateHorseDataByLogoff()`.
+- Enter-game then calls `EnterHorse()`; when persisted `bRiding` is true, `EnterHorse()` normalizes the flag and re-enters `StartRiding()`, recreating the consume-event side of the state machine.
+- `SetHorseLevel()` clamps API-driven horse levels to `0..HORSE_MAX_LEVEL` (30).
+- DB-loaded `THorseInfo::bLevel` itself is copied without a clamp before horse-stat table access. No tracked in-repository malformed producer was established, so this remains a persistence-integrity candidate rather than a promoted bug.
+
+### Current-build health/stamina semantics
+- `ENABLE_INFINITE_HORSE_HEALTH_STAMINA` is enabled in the active common defines.
+- In this build, `GetHorseHealth()` and `GetHorseStamina()` always return the level maximum.
+- Therefore classic consume/drop exhaustion is intentionally masked at the public accessor layer; the stamina consume event continues scheduling while riding, but cannot force a zero-stamina dismount through the accessor in the current build.
+- Regen/consume event switching is single-owner: starting one cancels the opposite event, and `CHorseRider::Destroy()` cancels both.
+- No duplicate-event or lifetime bug was verified in the current build.
+
+### Login normalization note
+- Later login setup calls `SetHorseLevel(GetHorseLevel())`, which resets underlying horse HP/stamina/drop-time to level maxima/new drop time.
+- With infinite horse health/stamina enabled this has no distinct current gameplay consequence; if that feature is disabled later, this path must be reopened because persisted HP/stamina semantics would change materially.
+
+### ChangeLook mount follow-up
+- `StartChangeLookExpireEvent()` supports both costume mounts and horse-summon items.
+- Current automatic event-start sites found in `ITEM_MANAGER::CreateItem()` and `CItem::OnAfterCreatedItem()` only start it for `IsHorseSummonItem()`.
+- This is now the lead ChangeLook-mount candidate. It is not promoted until the socket2 producer/load path and a reachable costume-mount consequence are closed.
+
+## Exact next work
+1. audit quest horse API authorization/range handling and current quest producers;
+2. trace mount item/costume -> affect -> `MountVnum` lifecycle;
+3. trace expiry/unequip/death/warp cleanup;
+4. close ChangeLook mount socket2 producer + automatic event-start caller graph;
+5. resolve Achievement SUMMON_MOUNT producer gap;
+6. close client race/proto/appearance asset coverage;
+7. create bugs/tests only for verified reachable paths.
+
+No Horse/Mount runtime test is authorized. Global first future live gate remains `DUNGEON-T10`.
