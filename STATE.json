@@ -15,8 +15,8 @@
     "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Consolidate World Lottery runtime readiness from bugs/world_lottery.md and tests/world_lottery.md without executing tests.",
-      "Preserve verified, observation and deferred ownership exactly.",
+      "Consolidate World Boss runtime readiness from bugs/world_boss.md and tests/world_boss.md without executing tests.",
+      "Preserve server, client, session and persistence ownership without inventing duplicate bug IDs.",
       "Keep DUNGEON-T10 as the first future live runtime gate.",
       "Preserve all source/game repositories as read-only until the user explicitly changes phase."
     ]
@@ -183,7 +183,8 @@
     "RUNTIME.md::Party PARTY-T01-T06 readiness consolidated; execution locked",
     "RUNTIME.md::Party Match PMATCH-T01-T05 readiness consolidated; execution locked",
     "RUNTIME.md::Dungeon Core DCORE-T01-T04 readiness consolidated; execution locked",
-    "RUNTIME.md::Battle Field readiness consolidated; BFIELD-004 retracted; BFIELD-005/007 normalized to Ranking ownership"
+    "RUNTIME.md::Battle Field readiness consolidated; BFIELD-004 retracted; BFIELD-005/007 normalized to Ranking ownership",
+    "RUNTIME.md::World Lottery WLOT-T01-T15 readiness consolidated; execution locked"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -356,7 +357,7 @@
       "SMT-T05",
       "SMT-T06"
     ],
-    "documentation_cursor": "world_lottery",
+    "documentation_cursor": "world_boss",
     "completed_readiness_clusters": [
       "dungeon_info",
       "ticket",
@@ -375,7 +376,8 @@
       "party",
       "party_match",
       "dungeon_core",
-      "battle_field"
+      "battle_field",
+      "world_lottery"
     ],
     "dungeon_info": {
       "status": "DOCUMENTATION READY / NOT RUN",
@@ -1142,6 +1144,100 @@
       ],
       "deterministic_arithmetic_tests": [
         "BFIELD-T08"
+      ]
+    },
+    "world_lottery": {
+      "status": "DOCUMENTATION READY / NOT RUN",
+      "canonical_test_ids": [
+        "WLOT-T01",
+        "WLOT-T02",
+        "WLOT-T03",
+        "WLOT-T04",
+        "WLOT-T05",
+        "WLOT-T06",
+        "WLOT-T07",
+        "WLOT-T08",
+        "WLOT-T09",
+        "WLOT-T10",
+        "WLOT-T11",
+        "WLOT-T12",
+        "WLOT-T13",
+        "WLOT-T14",
+        "WLOT-T15"
+      ],
+      "verified_bug_tests": {
+        "BUG-WLOT-001": [
+          "WLOT-T01"
+        ],
+        "BUG-WLOT-002": [
+          "WLOT-T02"
+        ],
+        "BUG-WLOT-003": [
+          "WLOT-T03",
+          "WLOT-T15"
+        ],
+        "BUG-WLOT-004": [
+          "WLOT-T04"
+        ],
+        "BUG-WLOT-005": [
+          "WLOT-T05"
+        ],
+        "BUG-WLOT-006": [
+          "WLOT-T06"
+        ],
+        "BUG-WLOT-007": [
+          "WLOT-T07"
+        ],
+        "BUG-WLOT-008": [
+          "WLOT-T08"
+        ],
+        "BUG-WLOT-009": [
+          "WLOT-T09"
+        ],
+        "BUG-WLOT-010": [
+          "WLOT-T10"
+        ],
+        "BUG-WLOT-011": [
+          "WLOT-T11"
+        ],
+        "BUG-WLOT-012": [
+          "WLOT-T12"
+        ],
+        "BUG-WLOT-013": [
+          "WLOT-T13"
+        ],
+        "BUG-WLOT-014": [
+          "WLOT-T14"
+        ]
+      },
+      "modified_client_tests": [
+        "WLOT-T01",
+        "WLOT-T02",
+        "WLOT-T05",
+        "WLOT-T06"
+      ],
+      "numeric_boundary_tests": [
+        "WLOT-T03",
+        "WLOT-T04",
+        "WLOT-T15"
+      ],
+      "db_state_tests": [
+        "WLOT-T07",
+        "WLOT-T08",
+        "WLOT-T09",
+        "WLOT-T10"
+      ],
+      "dormant_ranking_tests": [
+        "WLOT-T11",
+        "WLOT-T12"
+      ],
+      "crash_fault_tests": [
+        "WLOT-T13",
+        "WLOT-T14"
+      ],
+      "normal_path_candidates": [
+        "WLOT-T04",
+        "WLOT-T10"
       ]
     }
   }
