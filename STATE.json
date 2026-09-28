@@ -6,35 +6,36 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "refine_cube",
-    "display_name": "Refine / Cube / Crafting",
+    "subsystem": "growth_pet",
+    "display_name": "Growth Pet System",
     "status": "STATIC MAPPING IN PROGRESS / 11 VERIFIED STATIC BUGS / EXECUTION LOCKED",
-    "system_file": "systems/refine_cube.md",
-    "bug_file": "bugs/refine_cube.md",
-    "test_file": "tests/refine_cube.md",
+    "system_file": "systems/growth_pet.md",
+    "bug_file": "bugs/growth_pet.md",
+    "test_file": "tests/growth_pet.md",
     "verified_bug_ids": [
-      "BUG-REFCUBE-001",
-      "BUG-REFCUBE-002",
-      "BUG-REFCUBE-003",
-      "BUG-REFCUBE-004",
-      "BUG-REFCUBE-005",
-      "BUG-REFCUBE-006",
-      "BUG-REFCUBE-007",
-      "BUG-REFCUBE-008",
-      "BUG-REFCUBE-009",
-      "BUG-REFCUBE-010",
-      "BUG-REFCUBE-011"
+      "BUG-GPET-001",
+      "BUG-GPET-002",
+      "BUG-GPET-003",
+      "BUG-GPET-004",
+      "BUG-GPET-005",
+      "BUG-GPET-006",
+      "BUG-GPET-007",
+      "BUG-GPET-008",
+      "BUG-GPET-009",
+      "BUG-GPET-010",
+      "BUG-GPET-011"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Map DB/refine-table deployment source and validate recipe probability/material bounds.",
-      "Audit random-default / set / transmutation metadata semantics where current refine data makes them reachable.",
-      "Close scroll failure/downgrade consumption and item-creation-failure ordering.",
-      "Audit Devil Tower / money-only / Serpent authorization lifetime.",
-      "Audit over-9 refine path and current deployment reachability.",
-      "Close client uirefine.py session/presentation lifecycle.",
-      "Consolidate Refine/Cube runtime ownership and decide STATIC COMPLETE.",
-      "Do not execute REFCUBE-T01..REFCUBE-T11 or any runtime test without an explicit phase change."
+      "Finish summon/dismiss/death/real-time expiry/rewarp lifetime.",
+      "Audit EXP table and item/mob EXP arithmetic through level 105.",
+      "Audit active/passive skill execution beyond HEAL.",
+      "Audit name-change normal unsummoned branch.",
+      "Audit attribute determine/change state and material consumption beyond the 55713 OOB.",
+      "Close DB pet-table save/load/delete ownership and orphan lifecycle.",
+      "Close current 55701..55713 proto/race/client asset coverage.",
+      "Consolidate Growth Pet runtime ownership and decide STATIC COMPLETE.",
+      "Do not execute GPET-T01..GPET-T11 or any runtime test without an explicit phase change."
     ]
   },
   "startup": {
@@ -268,7 +269,22 @@
     "tests/acce.md::ACCE-T01..ACCE-T08 readiness consolidated; execution locked",
     "RUNTIME.md::Acce post-audit readiness extension",
     "BUG-DS-008::DoRefineStep skips IsEquipped for std::set begin pointer and can consume an equipped Dragon Soul",
-    "tests/dragon_soul.md::DS-T08 equipped-first step refine deferred"
+    "tests/dragon_soul.md::DS-T08 equipped-first step refine deferred",
+    "db/src/ClientManagerBoot.cpp::refine_proto deployment loader",
+    "game/src/refine.cpp/.h::CRefineManager",
+    "game/src/char_item.cpp::DoRefine/DoRefineWithScroll/DoRefineSerpent/RefineInformation",
+    "game/src/input_main.cpp::HEADER_CG_REFINE dispatch and money-only authorization",
+    "game/src/CubeManager.cpp/.h::Cube Renewal transaction and recipe parser",
+    "Project_Game/share/locale/europe/cube.txt::3327 current recipe sections",
+    "game/src/item_manager.cpp::CopyAllAttrTo refine metadata matrix",
+    "Project_Binary/root/uirefine.py::RefineDialogNew preview/session lifecycle",
+    "game/src/over9refine.cpp + questlua_item.cpp::dormant Over9 exposure",
+    "BUG-REFCUBE-012::wrong set-value preview binding arguments",
+    "BUG-REFCUBE-013::ChangeLook lost on refine transform",
+    "BUG-REFCUBE-014::set_value lost on refine transform",
+    "BUG-REFCUBE-015::Serpent random-default values lost on refine",
+    "BUG-REFCUBE-016::Basic starter flag stripped by refine",
+    "Refine / Cube / Crafting::STATIC COMPLETE"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -324,7 +340,8 @@
     "costume_appearance",
     "acce_sash",
     "dragon_soul",
-    "aura"
+    "aura",
+    "refine_cube"
   ],
   "ranking_closure": {
     "status": "STATIC COMPLETE",
@@ -1729,8 +1746,8 @@
       "execution_priority": "Does not supersede DUNGEON-T10"
     },
     "coverage": {
-      "static_complete_subsystems": 25,
-      "readiness_owned_subsystems": 25,
+      "static_complete_subsystems": 26,
+      "readiness_owned_subsystems": 26,
       "folded_companions": [
         "guild"
       ]
@@ -1813,6 +1830,49 @@
         "AURA-T04",
         "AURA-T05",
         "AURA-T06"
+      ],
+      "first_live_gate": "DUNGEON-T10"
+    },
+    "refine_cube": {
+      "status": "READY / EXECUTION LOCKED / NOT RUN",
+      "system_file": "systems/refine_cube.md",
+      "bug_file": "bugs/refine_cube.md",
+      "test_file": "tests/refine_cube.md",
+      "verified_bug_ids": [
+        "BUG-REFCUBE-001",
+        "BUG-REFCUBE-002",
+        "BUG-REFCUBE-003",
+        "BUG-REFCUBE-004",
+        "BUG-REFCUBE-005",
+        "BUG-REFCUBE-006",
+        "BUG-REFCUBE-007",
+        "BUG-REFCUBE-008",
+        "BUG-REFCUBE-009",
+        "BUG-REFCUBE-010",
+        "BUG-REFCUBE-011",
+        "BUG-REFCUBE-012",
+        "BUG-REFCUBE-013",
+        "BUG-REFCUBE-014",
+        "BUG-REFCUBE-015",
+        "BUG-REFCUBE-016"
+      ],
+      "canonical_test_ids": [
+        "REFCUBE-T01",
+        "REFCUBE-T02",
+        "REFCUBE-T03",
+        "REFCUBE-T04",
+        "REFCUBE-T05",
+        "REFCUBE-T06",
+        "REFCUBE-T07",
+        "REFCUBE-T08",
+        "REFCUBE-T09",
+        "REFCUBE-T10",
+        "REFCUBE-T11",
+        "REFCUBE-T12",
+        "REFCUBE-T13",
+        "REFCUBE-T14",
+        "REFCUBE-T15",
+        "REFCUBE-T16"
       ],
       "first_live_gate": "DUNGEON-T10"
     }
@@ -2106,7 +2166,17 @@
   "growth_pet_mapping": {
     "status": "STATIC MAPPING IN PROGRESS",
     "verified_bug_ids": [
-      "BUG-GPET-001"
+      "BUG-GPET-001",
+      "BUG-GPET-002",
+      "BUG-GPET-003",
+      "BUG-GPET-004",
+      "BUG-GPET-005",
+      "BUG-GPET-006",
+      "BUG-GPET-007",
+      "BUG-GPET-008",
+      "BUG-GPET-009",
+      "BUG-GPET-010",
+      "BUG-GPET-011"
     ],
     "canonical_files": {
       "system": "systems/growth_pet.md",
@@ -2114,21 +2184,36 @@
       "tests": "tests/growth_pet.md"
     },
     "mapped_flows": [
-      "initial GrowthPetSystem architecture",
-      "PET_EGG Value0 -> PET_UPBRINGING hatch target",
-      "PET_HATCH_INFO_RANGE current-data boundary",
-      "PET_ATTR_DETERMINE shared hatch-info indexing"
+      "PET_EGG Value0 -> PET_UPBRINGING hatch target and hatch-info table",
+      "feed request fixed-slot packet boundary",
+      "three-slot persistent pet skill state and learn/upgrade/delete packet trust",
+      "premium revive material/count and structured-state lifecycle",
+      "evolution requirement/material validation",
+      "specialist skill-table lookup shape",
+      "HEAL auto-skill delta semantics",
+      "pet-name fixed packet strings",
+      "hatch birthday/duration/socket final-evolution age semantics"
     ],
     "runtime_tests": {
       "status": "NOT RUN / EXECUTION LOCKED",
       "canonical_test_ids": [
-        "GPET-T01"
+        "GPET-T01",
+        "GPET-T02",
+        "GPET-T03",
+        "GPET-T04",
+        "GPET-T05",
+        "GPET-T06",
+        "GPET-T07",
+        "GPET-T08",
+        "GPET-T09",
+        "GPET-T10",
+        "GPET-T11"
       ],
       "first_live_gate_unchanged": "DUNGEON-T10"
     }
   },
   "refine_cube_mapping": {
-    "status": "STATIC MAPPING IN PROGRESS",
+    "status": "STATIC COMPLETE",
     "canonical_files": {
       "system": "systems/refine_cube.md",
       "bugs": "bugs/refine_cube.md",
@@ -2145,7 +2230,12 @@
       "BUG-REFCUBE-008",
       "BUG-REFCUBE-009",
       "BUG-REFCUBE-010",
-      "BUG-REFCUBE-011"
+      "BUG-REFCUBE-011",
+      "BUG-REFCUBE-012",
+      "BUG-REFCUBE-013",
+      "BUG-REFCUBE-014",
+      "BUG-REFCUBE-015",
+      "BUG-REFCUBE-016"
     ],
     "mapped_flows": [
       "Python Cube Renewal UI -> signed multiplier/client material VNUM list -> MAKE packet",
@@ -2171,10 +2261,15 @@
       "REFCUBE-T08",
       "REFCUBE-T09",
       "REFCUBE-T10",
-      "REFCUBE-T11"
+      "REFCUBE-T11",
+      "REFCUBE-T12",
+      "REFCUBE-T13",
+      "REFCUBE-T14",
+      "REFCUBE-T15",
+      "REFCUBE-T16"
     ],
     "runtime_tests": {
-      "status": "NOT RUN / EXECUTION LOCKED",
+      "status": "READY / EXECUTION LOCKED / NOT RUN",
       "canonical_test_ids": [
         "REFCUBE-T01",
         "REFCUBE-T02",
@@ -2186,18 +2281,23 @@
         "REFCUBE-T08",
         "REFCUBE-T09",
         "REFCUBE-T10",
-        "REFCUBE-T11"
+        "REFCUBE-T11",
+        "REFCUBE-T12",
+        "REFCUBE-T13",
+        "REFCUBE-T14",
+        "REFCUBE-T15",
+        "REFCUBE-T16"
       ],
       "first_live_gate_unchanged": "DUNGEON-T10"
     },
-    "next": [
-      "DB/refine-table deployment source and recipe bounds",
-      "reachable metadata semantics",
-      "scroll failure/downgrade and creation-failure ordering",
-      "money-only/Devil Tower/Serpent authorization lifetime",
-      "over-9 refine deployment reachability",
-      "client uirefine lifecycle",
-      "STATIC COMPLETE decision"
+    "next": [],
+    "closure_notes": [
+      "Classic refine recipe deployment is DB refine_proto; current live DB rows are not versioned in tracked repositories.",
+      "Tracked cube.txt has 3327 sections with percent 2..100, nonnegative gold/gem, positive material/reward counts.",
+      "MONEY_ONLY Devil Tower and Serpent authorization is rechecked at packet execution time.",
+      "Over9 Lua API is compiled/exposed but no tracked current quest/config populates the mapping or calls the path.",
+      "CopyAllAttrTo omits ChangeLook, set_value, random-default values and Basic flag; verified reachable defects are REFCUBE-013..016.",
+      "No Refine/Cube runtime test has been executed."
     ]
   }
 }
