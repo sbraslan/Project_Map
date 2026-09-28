@@ -109,3 +109,18 @@ Static prediction:
 `RemoveItem()` destroys the source CItem before later announcement/Yohara/Battle-Pass code dereferences the stale pointer.
 
 Safety class: **Stage C crash/lifetime/sanitizer only**.
+
+
+## REFCUBE-T08 — Sessionless / remote normal refine
+Covers `BUG-REFCUBE-008`.
+
+Future isolated modified-client test:
+1. use a disposable refinable inventory item with required materials/currency;
+2. ensure no refine dialog is open and no blacksmith is nearby;
+3. submit one `HEADER_CG_REFINE` request with `REFINE_TYPE_NORMAL`;
+4. capture HackLog plus item/material/currency result.
+
+Static prediction:
+the missing blacksmith is logged but does not abort; the normal refine transaction proceeds if its economic/item checks pass.
+
+Safety class: **Stage B isolated modified-client / disposable refinement**.
