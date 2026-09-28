@@ -2,18 +2,19 @@
 
 **Execution status:** LOCKED / NOT RUN
 
-## REFCUBE-T01 — Negative Cube Renewal multiplier
+## REFCUBE-T01 — Non-positive Cube Renewal multiplier
 Covers `BUG-REFCUBE-001`.
 
 Future isolated modified-client test:
 1. use a disposable recipe with a nonzero Yang and/or Gem cost;
 2. record currency and required materials;
-3. submit the normal recipe VNUM/material list with a negative multiplier;
+3. in separate isolated cases submit the normal recipe VNUM/material list with multiplier 0 and with a negative multiplier;
 4. record material, reward and currency deltas;
 5. stop after one request.
 
 Static prediction:
-server-side requirement checks pass the negative products and currency mutation becomes a positive credit.
+- zero multiplier collapses multiplied requirements/costs to zero and can still reach reward creation;
+- negative multiplier passes negative requirement products and reverses currency mutation into a credit.
 
 Safety class: **Stage B isolated modified-client / economy mutation**.
 Never run against production economy.
