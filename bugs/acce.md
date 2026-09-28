@@ -131,6 +131,7 @@ Verified static bugs:
 - BUG-ACCE-002
 - BUG-ACCE-003
 - BUG-ACCE-004
+- BUG-ACCE-005
 
 No runtime reproduction has been performed.
 
