@@ -1,6 +1,6 @@
 # Growth Pet System — Static Map
 
-**Status:** STATIC MAPPING IN PROGRESS  
+**Status:** STATIC COMPLETE  
 **Phase:** Detection / Mapping Only  
 **Source policy:** read-only source repos; only Project_Map may be edited.
 
@@ -129,15 +129,85 @@ Hatching stores the pet's duration seconds in socket1. The final-evolution helpe
 
 See `BUG-GPET-011`.
 
-## Current verified findings
-`BUG-GPET-001..BUG-GPET-011`.
+## Closure pass — summon / expiry / EXP / warp / assets / transport box
 
-## Remaining static work
-1. finish summon/dismiss/death/real-time expiry/rewarp lifetime;
-2. audit EXP table and item/mob EXP arithmetic to level 105;
-3. audit active/passive skill execution beyond HEAL;
-4. audit name-change normal unsummoned branch;
-5. audit attribute determine/change state and material consumption beyond the 55713 OOB;
-6. close DB pet-table save/load/delete ownership and orphan lifecycle;
-7. close current pet race/proto/client asset coverage;
-8. consolidate runtime readiness and decide STATIC COMPLETE.
+### Summon, dismiss and expiry lifetime
+`CGrowthPetSystemActor::Summon()` retains the active PET_UPBRINGING seal in `m_pkPetSeal`, copies its structured state, marks it summoned and locks the seal.
+
+`Dismiss()` is the canonical release path:
+- clears the Growth Pet buff;
+- marks actor state unsummoned;
+- unlocks the retained seal;
+- writes actor `m_PetInfo` back to that seal;
+- saves it;
+- nulls `m_pkPetSeal`;
+- destroys the spawned pet character.
+
+Growth Pet/PET_BAG real-time expiry is special-cased in `real_time_expire_event`: the item is not removed when socket0 expires. The actor's periodic `Update()` then detects the dead seal and calls `Dismiss()`. Character destruction also destroys the GrowthPetSystem.
+
+No additional expiration-driven retained-item UAF was promoted from this lifecycle.
+
+### EXP boundary through level 105
+The tracked `exp_pet_table_common` has entries 0..105. `GetNextExpFromTable()` indexes it only for levels <=105, and `SetExp()` rejects new EXP once `GetPetLevel() >= PET_MAX_LEVEL`.
+
+Thus 104->105 is valid and the next EXP transaction is stopped before a level-106 table access.
+
+The monster/item requirement relation is internally coherent:
+- monster portion uses the table value;
+- item portion is table/9;
+- together this implements the expected 90/10 split.
+
+No level-105 EXP OOB or arithmetic defect was promoted.
+
+### Rewarp / owner lifecycle
+`ENABLE_PET_SUMMON_AFTER_REWARP` is not enabled in the tracked build.
+
+For a surviving same-core owner transition, follow AI relocates a pet that becomes distant by calling `Show(owner map, owner position...)`. Cross-core/logout destruction tears down GrowthPetSystem and dismisses active actor state.
+
+No additional rewarp lifetime defect was promoted.
+
+### Current item/race/client coverage
+Tracked item-name data contains the current 13-family sequence:
+- eggs `55401..55413`;
+- upbringing seals `55701..55713`.
+
+Client `npclist.txt` contains the mapped young/hero race pairs for the established families, including monkey, spider, Razador, Nemere, blue/red dragon, Azrael, executioner, Exedyar, Alastor/white-dragon, Baashido and Nessie families.
+
+The 13th family is already proven current by `BUG-GPET-001`: VNUM 55713 reaches the hatch/determine table while the table has only 12 rows.
+
+No separate asset-path defect was promoted beyond that current-data mismatch.
+
+### Transport Box
+PET_BAG handling adds two independent defects:
+- `BUG-GPET-019`: successful bagging removes/destroys the target seal then reads `item2->GetName()`;
+- `BUG-GPET-020`: bagging accepts an already dead Growth Pet and unbagging creates a new seal with `now + pet_max_time`, bypassing the revive path.
+
+### Cross-system ownership
+The generic player item-destroy path also dereferences a destroyed item name. That is already canonical `BUG-ITEM-001` and is not duplicated in Growth Pet ownership.
+
+## Current verified findings
+`BUG-GPET-001..BUG-GPET-020`.
+
+## Runtime ownership
+`GPET-T01..GPET-T20` are canonical deferred tests.
+
+**Execution state:** READY / EXECUTION LOCKED / NOT RUN.
+
+The global first future live gate remains `DUNGEON-T10`; Growth Pet runtime tests do not change that ordering.
+
+## Static closure
+Growth Pet System is **STATIC COMPLETE** for the tracked source/data snapshot.
+
+Closure includes:
+- hatch and name packet boundaries;
+- feed/evolution packet shape and material identity;
+- skill index/table/formula execution;
+- attribute determine/change state;
+- revive and lifetime persistence;
+- summon/dismiss/death/expiry lifecycle;
+- level 1..105 EXP arithmetic;
+- Growth Pet DB row lifecycle;
+- current 55701..55713 family/data coverage;
+- PET_BAG lifecycle.
+
+No source/game repository was modified.
