@@ -14,14 +14,16 @@
     "test_file": "tests/costume_appearance.md",
     "verified_bug_ids": [
       "BUG-LOOK-001",
-      "BUG-LOOK-002"
+      "BUG-LOOK-002",
+      "BUG-LOOK-003",
+      "BUG-LOOK-004"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Close transmutation VNUM persistence through DB load/save.",
-      "Map ChangeLook clear-scroll/reset behavior.",
-      "Map mount ChangeLook use/expiry lifecycle.",
-      "Inspect window close/disconnect cleanup and alternate item-mutation paths.",
+      "Close mount ChangeLook use/expiry intent and call-chain without promoting dead helpers prematurely.",
+      "Map hide-costume plus ChangeLook interaction.",
+      "Audit weapon/body/job/gender ChangeLook eligibility edge cases.",
+      "Audit alternate item mutation paths against CTransmutation raw pointers.",
       "Keep source/game repositories read-only and runtime execution locked."
     ]
   },
@@ -200,7 +202,12 @@
     "Project_ClientSrc/UserInterface/PythonItem.cpp::ChangeLook eligibility mirror",
     "Project_Binary/root/uichangelook.py::ChangeLook UI lifecycle",
     "BUG-LOOK-001::right-slot-before-left null dereference",
-    "BUG-LOOK-002::quest mount accepts arbitrary non-costume material"
+    "BUG-LOOK-002::quest mount accepts arbitrary non-costume material",
+    "db/src/Cache.cpp + ClientManagerPlayer.cpp + game/input_db.cpp::transmutation DB persistence closed",
+    "game/src/char_item.cpp::TRANSMUTATION_REVERSAL clear-scroll persistent reset",
+    "BUG-LOOK-003::CanWarp omits W_CHANGELOOK while WarpSet preserves transmutation",
+    "BUG-LOOK-004::sealed right ChangeLook material lacks server validation",
+    "game/src/item.cpp::mount ChangeLook expiry helpers deferred pending live call-chain"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -1661,7 +1668,9 @@
     "status": "STATIC MAPPING IN PROGRESS",
     "verified_bug_ids": [
       "BUG-LOOK-001",
-      "BUG-LOOK-002"
+      "BUG-LOOK-002",
+      "BUG-LOOK-003",
+      "BUG-LOOK-004"
     ],
     "mapped_flows": [
       "COSTUME_BODY item VNUM -> client VALUE3 -> MSM ShapeIndex -> GR2/DDS",
@@ -1669,6 +1678,16 @@
       "ChangeLook HEADER_CG_CHANGE_LOOK -> CInputMain::Transmutation -> CTransmutation",
       "Accept -> SetChangeLookVnum(material VNUM) -> material consumption",
       "client/server eligibility predicate comparison"
+    ],
+    "persistence": {
+      "status": "STATIC CLOSED / NO BUG VERIFIED",
+      "chain": "TPlayerItem.dwTransmutationVnum -> item.transmutation DB column -> login restore -> CItem::SetChangeLookVnum",
+      "clear_scroll": "SetChangeLookVnum(0) -> Save -> UpdatePacket"
+    },
+    "deferred_findings": [
+      "Mount ChangeLook expiry helpers appear partially disconnected from CTransmutation::Accept.",
+      "CItem::IsExpireTimeItem uses an overly broad && type/subtype guard; live impact not yet closed.",
+      "Alternate item-mutation paths while CTransmutation stores raw LPITEM references remain under audit."
     ]
   }
 }
