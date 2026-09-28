@@ -25,8 +25,9 @@ Important global ID rules:
 
 
 ## Dragon Soul ownership — 2026-09-28
-- `BUG-DS-001..003` -> `dragon_soul.md`
-- Step-refine equipped-first, malformed grade bound and change-attr step bound remain candidate/unpromoted.
+- `BUG-DS-001..008` -> `dragon_soul.md`
+- Malformed grade bound and change-attr step bound remain candidate/unpromoted.
+- Step-refine equipped-first validation is now promoted as `BUG-DS-008`.
 
 
 ## Active subsystem ownership — Acce / Sash — 2026-09-28
