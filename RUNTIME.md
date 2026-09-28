@@ -291,6 +291,30 @@ The global first live gate remains **DUNGEON-T10**.
 
 **Next documentation cluster:** Exchange / Trade runtime readiness.
 
+
+## Runtime-readiness consolidation — Exchange / Trade — 2026-09-28
+**Documentation status:** READY
+**Execution status:** LOCKED / NOT RUN
+
+Canonical runtime IDs are now EXC-T01..EXC-T10. Legacy EX-Txx and EXCHANGE-Txx entries remain historical only.
+
+Coverage:
+- EXC-T01 -> BUG-EXCHANGE-001
+- EXC-T02 -> BUG-EXCHANGE-002
+- EXC-T03 / EXC-T04 -> BUG-EXCHANGE-003
+- EXC-T06 -> currency-atomicity BUG-EXCHANGE-004 + BUG-EXCHANGE-005 specialization
+- EXC-T07 -> distinct final-distance finding also historically labeled BUG-EXCHANGE-004
+- EXC-T08 -> persistence severity for BUG-EXCHANGE-001/002
+- EXC-T05 / EXC-T10 -> observation-only validation
+- EXC-T09 -> lifecycle regression/sanity
+
+Important registry condition: BUG-EXCHANGE-004 is duplicated across two different verified findings. The ID collision is documented but not renumbered during the current detection-only phase.
+
+Primary normal-path candidates: **EXC-T01** and **EXC-T02**.
+The global first live gate remains **DUNGEON-T10**.
+
+**Next documentation cluster:** Shop / Premium Private Shop runtime readiness.
+
 ## Patch readiness
 First-cluster fix plan is ready at `fixes/dungeon_info.md`.
 
