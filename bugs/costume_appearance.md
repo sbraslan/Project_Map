@@ -1,6 +1,6 @@
 # Costume / Appearance / ChangeLook — Bug Registry
 
-**Status:** ACTIVE STATIC MAPPING  
+**Status:** STATIC COMPLETE  
 **Execution:** NOT RUN
 
 ## BUG-LOOK-001 — Right-slot ChangeLook check-in can null-deref when left slot is empty
@@ -227,3 +227,26 @@ This is related to BUG-LOOK-006 but has a distinct root cause: **missing cross-w
 
 ### Aura note
 Aura can also be opened concurrently with ChangeLook. Aura's own lock semantics reduce direct equivalence with Acce, so it remains a documented cross-window consistency issue rather than a separate verified bug in this pass.
+
+
+## Closure / unpromoted candidates
+
+**Static registry closed:** 2026-09-28
+
+Verified set:
+- BUG-LOOK-001
+- BUG-LOOK-002
+- BUG-LOOK-003
+- BUG-LOOK-004
+- BUG-LOOK-005
+- BUG-LOOK-006
+- BUG-LOOK-007
+
+Not promoted:
+- mount ChangeLook expiry helper disconnect;
+- broad `IsExpireTimeItem()` predicate without a closed live caller;
+- Aura/ChangeLook overlap without a distinct proven destructive path;
+- GuildStorage/Roulette/Switchbot window omissions without ChangeLook-specific corruption;
+- conditional free-ticket RIGHT/FREE pointer alias. `FreeItemCheckIn()` does not reject a pointer already stored in LEFT/RIGHT and `Accept()` independently removes RIGHT then FREE. A concrete double-remove requires proof that a ticket VNUM can also pass RIGHT eligibility in the relevant mode; that proto-type precondition is not closed, so this stays candidate-only.
+
+No runtime validation has been performed.
