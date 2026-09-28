@@ -567,3 +567,31 @@ Covered surfaces:
 - PART_AURA/MSE/item_list/item_scale visual chain.
 
 Future execution remains deferred to the global runtime phase.
+
+
+## EVOLVE Yohara preservation pass — 2026-09-29
+
+Aura ABSORB persists two distinct bonus families:
+- normal attributes via `CopyAttributeTo()`;
+- Yohara random applies via `CopyApplyRandomTo()`.
+
+Equipped Aura stat application in `CItem::ModifyPoints()` consumes both families and scales them with the Aura drain rate.
+
+Successful EVOLVE replaces the Aura object with a newly created refined item. The migration copies sockets and normal attributes, but not the separate Yohara random-apply array.
+
+Result:
+- absorbed item VNUM socket survives;
+- Aura level/booster sockets survive;
+- normal attributes survive;
+- Yohara random applies are dropped on successful grade evolution.
+
+See `BUG-AURA-004`.
+
+### Yohara random-default values
+ABSORB preview packets also expose the source item's `alRandomValues`, but the accepted Aura object does not copy those random-default values. Current mapped Aura combat logic derives absorbed base armor contribution from the drained item's proto VNUM rather than from Aura-owned `alRandomValues`. This remains a semantic/data-model observation rather than a second promoted bug until a current reachable item proves a distinct expected bonus loss.
+
+## Current verified findings
+- `BUG-AURA-001` — post-open opener-distance gate bypass.
+- `BUG-AURA-002` — EVOLVE global-count/local-stack material underpayment.
+- `BUG-AURA-003` — Aura Eraser can zero socket2 on non-Aura items.
+- `BUG-AURA-004` — successful EVOLVE drops absorbed Yohara random applies.
