@@ -415,3 +415,155 @@ Runtime execution:
 - **LOCKED / NOT RUN**
 
 No source repository was modified. Global first future live gate remains `DUNGEON-T10`.
+
+
+## Closure pass — booster, lifecycle, proto and visual surfaces
+
+### Booster lifecycle
+Timed Aura boosters use socket 2 as:
+`boostIndex * 100000000 + remainingSeconds`.
+
+The attachment path is server-gated to:
+- destination COSTUME_AURA;
+- empty Aura booster socket;
+- compatible `USE_PUT_INTO_AURA_SOCKET` item;
+- unequipped destination.
+
+The generic item-use gate rejects equipped destinations before the Aura-booster switch branch, so a timed booster cannot normally be attached to an already-equipped Aura and bypass event startup.
+
+On equip:
+`StartAuraBoosterSocketExpireEvent()` starts the countdown.
+
+On unequip:
+`StopAuraBoosterSocketExpireEvent()` writes elapsed time back into socket 2, cancels the event and saves the item.
+
+On expiry:
+the event removes old Aura points, clears socket 2, reapplies Aura points, recomputes battle points and updates the character.
+
+No additional booster timer/persistence bug was promoted.
+
+### Disconnect / locked-item cleanup
+Normal player logout executes `AuraRefineWindowClose()` while the descriptor is still bound.
+
+That close path:
+- clears opener/type/open state;
+- clears `W_AURA`;
+- resolves every stored Aura slot;
+- unlocks any still-present item;
+- resets stored positions.
+
+Therefore normal disconnect/relog does not preserve Aura-window item locks.
+
+`CanWarp()` / generic renewed-window checks include `W_AURA`, so ordinary warp/item-move paths are blocked while Aura is open.
+
+Direct script `WarpSet()` calls can bypass the generic `CanWarp()` policy, but no independent destructive Aura consequence beyond the already-mapped post-open authorization defect (`BUG-AURA-001`) was promoted in this pass.
+
+### Opener and cross-window state
+Aura stores a raw `LPENTITY` opener.
+
+Because `BUG-AURA-001` causes `IsAuraRefineWindowCanRefine()` to return before its distance dereference, normal mapped transaction handlers only test the opener for non-null in their fallback. No independent opener-dereference UAF was proven from the current transaction path.
+
+Aura open itself does not establish a universal mutex with every subsystem, but all mapped Aura item mutation is still constrained by type/mode checks and the generic window state. No new cross-system destructive alias was promoted.
+
+### Wedding-item policy
+The stock client carries an additional wedding-item rejection policy for ABSORB.
+
+Server-side ABSORB SUB eligibility is already restricted to:
+- ARMOR_SHIELD;
+- ARMOR_WRIST;
+- ARMOR_NECK;
+- ARMOR_EAR.
+
+Tracked wedding costume/body/hair classes do not satisfy that server predicate, so the missing explicit `IsWeddingItem` mirror does not create an additional reachable acceptance path in the current data set.
+
+### Aura item creation and refine families
+New COSTUME_AURA creation initializes socket 1 (`ITEM_SOCKET_AURA_CURRENT_LEVEL`) from the Aura grade encoded by the VNUM last digit:
+
+`grade = OriginalVnum % 10`
+-> `GetAuraRefineInfo(grade, LEVEL_MIN)`
+-> socket value `(1000 + baseLevel) * 100000`.
+
+Tracked Aura families:
+- `49001..49006`;
+- `49011..49016`;
+- `49021..49026`;
+- `49031..49036`.
+
+All nonterminal family members use:
+- `RefineSet = 409`;
+- `RefinedVnum = next grade`.
+
+Terminal grade 6 has no next refined VNUM.
+
+Current refine table:
+- grade 1: level 1..49, EXP 1000, material 30617 x10, cost 5,000,000, success 100%;
+- grade 2: 50..99, EXP 2000, material 31136 x10, cost 5,000,000, success 100%;
+- grade 3: 100..149, EXP 4000, material 31137 x10, cost 5,000,000, success 100%;
+- grade 4: 150..199, EXP 8000, material 31138 x10, cost 8,000,000, success 100%;
+- grade 5: 200..249, EXP 16000, material 31138 x20, cost 10,000,000, success 100%;
+- grade 6: level 250 terminal.
+
+The coded EVOLVE failure branch contains imperfect lock cleanup, but current tracked table makes it unreachable because all nonterminal evolution rates are 100%. It remains a robustness note, not a promoted bug.
+
+### Yohara persistence across evolution
+ABSORB copies both classic attributes and Yohara random applies to the Aura.
+
+Successful EVOLVE replaces the Aura item and only copies sockets + classic attributes. Yohara random applies are not copied.
+
+See `BUG-AURA-004`.
+
+### Aura packet initialization
+Aura SET_ITEM server payloads and the corresponding client temporary `TItemData` are not fully zero-initialized.
+
+See `BUG-AURA-005`.
+
+### Visual / asset chain
+Aura visuals are effect-based, not GR2/MSM-based like many costume/equipment items.
+
+`item_list.txt` rows use:
+`VNUM  AURA  icon  effect.mse`.
+
+Client loader recognizes token type `AURA` and stores the fourth field as the Aura effect resource via `SetAuraEffectID()`.
+
+Character path:
+`PART_AURA`
+-> `CInstanceBase::SetAura(VNUM)`
+-> Aura item data
+-> `AttachEffectByID(..., "Bip01 Spine2", auraEffectID, ...)`.
+
+Each of the four current Aura families has six explicit MSE rows matching grade ranges:
+1–49, 50–99, 100–149, 150–199, 200–249 and 250.
+
+`item_scale.txt` only needs a row for each family's first VNUM (49001 / 49011 / 49021 / 49031). `LoadItemScale` detects COSTUME_AURA and propagates that job/sex scale to six consecutive grade VNUMs.
+
+This is the canonical rule for future Aura item creation: unlike weapon/armor/acce workflows, a new Aura family needs an AURA/MSE effect row per grade plus one scale-base family row; it does not use an MSM/GR2 `value3` visual contract.
+
+## Final verified findings
+`BUG-AURA-001..005`.
+
+## Deferred runtime ownership
+`AURA-T01..AURA-T05`.
+
+No Aura runtime test has been executed.
+
+## Static completion
+Aura System is **STATIC COMPLETE** for the current tracked source/data snapshot.
+
+Covered surfaces:
+- Lua/NPC opener;
+- client packet producer and UI lifecycle;
+- server open/check-in/check-out/accept/cancel contract;
+- ABSORB;
+- GROWTH;
+- EVOLVE;
+- material accounting;
+- item locks;
+- disconnect/warp boundaries;
+- Aura booster/eraser;
+- stat application and Yohara random applies;
+- item creation/default level socket;
+- current Aura proto/refine families;
+- client tooltip state;
+- PART_AURA/MSE/item_list/item_scale visual chain.
+
+Future execution remains deferred to the global runtime phase.
