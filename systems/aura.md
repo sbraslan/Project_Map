@@ -196,7 +196,7 @@ Tracked booster family:
 - 49981: booster index 1 / 86400 s;
 - 49982: index 2 / 259200 s;
 - 49983: index 3 / 432000 s;
-- 49984: index 5 / unlimited flag 1.
+- 49984: booster index 4 / +5% / time 0 / unlimited flag 1.
 
 The timed booster lifecycle is internally coherent:
 - equip / SetEquipped starts the Aura booster expire event;
@@ -336,3 +336,82 @@ Canonical deferred validation:
 No runtime test has been executed.
 
 **Aura System is STATIC COMPLETE.**
+
+
+## Final closure — packet / Yohara / lifecycle — 2026-09-28
+
+### SET_ITEM packet initialization
+Aura check-in and preview construct `TSubPacketGCAuraSetItem` as an uninitialized local object and serialize the full embedded `TItemData`.
+
+Current feature flags extend `TItemData` with seal, ChangeLook, basic-item, element and set metadata. Aura writes only part of that structure before sending it.
+
+The client receive path has the same initialization weakness: its local `TItemData` is not cleared and only the Aura-used subset is copied before storage.
+
+This is canonical `BUG-AURA-004`; deferred validation is `AURA-T04`.
+
+### Yohara data preservation across EVOLVE
+ABSORB copies both classic attributes and Yohara random applies into the Aura.
+
+Successful EVOLVE copies sockets and classic attributes to the newly created grade item, but omits `CopyApplyRandomTo()`. The old Aura is then destroyed.
+
+This is canonical `BUG-AURA-005`; deferred validation is `AURA-T05`.
+
+### Current-data arithmetic closure
+The packed MIPX deployment proto was decoded against the client format/key and checked directly.
+
+Current Aura families:
+- `49001..49006`
+- `49011..49016`
+- `49021..49026`
+- `49031..49036`
+
+Every family uses `RefineSet=409`; grades 1..5 point to the next grade and grade 6 is terminal.
+
+Current `RESOURCE_AURA` rows are exactly `49990..49995` with positive EXP values:
+`1, 10, 50, 100, 250, 500`.
+Therefore the zero/negative-material EXP loop candidate is not reachable from the tracked deployment data.
+
+Current booster rows are:
+- `49981`: booster index 1, +1%, 86400 s;
+- `49982`: booster index 2, +2%, 259200 s;
+- `49983`: booster index 3, +3%, 432000 s;
+- `49984`: booster index 4, +5%, unlimited.
+
+The index is derived from `vnum - 49980`; proto VALUE0 is the percentage, not the index.
+
+All non-terminal Aura EVOLVE table chances are currently 100%, so the failure branch is structurally mapped but is not reachable through current normal deployment data.
+
+### Lifecycle closure
+Normal disconnect calls `AuraRefineWindowClose()` while the descriptor is still bound, which clears:
+- opener pointer;
+- Aura mode/open state;
+- `W_AURA`;
+- checked-in item locks and slot references.
+
+`CanWarp()` and `IsHack()` both include `W_AURA`, closing ordinary player-initiated warp paths while Aura is open.
+
+Direct trusted/server `WarpSet()` calls do not close Aura state. Combined with the already verified post-open authorization bypass, this can preserve a remote Aura transaction across a forced warp; it is treated as an impact extension of `BUG-AURA-001`, not a duplicate bug.
+
+`AuraRefineWindowClose()` returns before cleanup if the descriptor is already null. Normal disconnect ordering does not hit that state, so descriptor-loss cleanup remains robustness-only without a tracked current producer.
+
+Lua `game.open_aura_*_window` wrappers pass `GetCurrentNPCCharacterPtr()` without a null check and `OpenAuraRefineWindow()` dereferences the opener immediately. No tracked current quest invokes this API without NPC context, so this remains a trusted-script precondition rather than a promoted gameplay bug.
+
+### Yohara random-default candidate
+ABSORB preview carries source `alRandomValues`, while committed ABSORB copies Yohara random applies but not the source instance's random-default array.
+
+No current reachable shield/wrist/neck/ear producer carrying meaningful random-default values was established in this pass, so this remains an unpromoted data-dependent candidate.
+
+## Static completion
+
+**Status:** STATIC COMPLETE
+
+Verified findings:
+- `BUG-AURA-001..BUG-AURA-006`
+
+Canonical deferred tests:
+- `AURA-T01..AURA-T06`
+
+Runtime execution:
+- **LOCKED / NOT RUN**
+
+No source repository was modified. Global first future live gate remains `DUNGEON-T10`.
