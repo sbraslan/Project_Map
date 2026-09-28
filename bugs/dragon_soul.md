@@ -245,3 +245,101 @@ For an equipped Dragon Soul, `RemoveFromCharacter()` explicitly enters `Unequip(
 **Reachability note:** which item is first depends on process pointer ordering, so a single attempt is not deterministic. The missing validation and destructive path are static facts.
 
 **Runtime:** Stage B/C isolated modified-client/state test only; never production.
+
+
+## BUG-DS-009 — Relog set cleanup wraps active deck -1 into ordinary wear slots
+
+**Status:** VERIFIED STATIC / NORMAL RELOG PATH / CONDITIONAL ON LATE-WEAR CONTENT
+
+Dragon Soul deck/set affects are persisted by the generic affect layer.
+
+Login order:
+1. `LoadAffect()` restores `AFFECT_DRAGON_SOUL_DECK_0/1` and `NEW_AFFECT_DS_SET`;
+2. `ComputePoints()` runs while `iDragonSoulActiveDeck == -1`;
+3. `DragonSoul_Initialize()` resets DS active sockets;
+4. the persisted deck affect causes `DragonSoul_ActivateDeck(deck)`;
+5. `DragonSoul_ActivateDeck()` first calls `DragonSoul_DeactivateAll()`;
+6. `DragonSoul_DeactivateAll()` calls `DragonSoul_HandleSetBonus()` before assigning active deck `-1` again/removing affects.
+
+At this first cleanup the active deck is still the initialization value `-1`.
+
+`DragonSoul_HandleSetBonus()` converts it to `uint8_t`. In the current build:
+- `WEAR_MAX_NUM = 33`;
+- `DS_SLOT_MAX = 6`;
+- `uint8_t(-1) = 255`;
+- `33 + 255 * 6` wraps to `27`.
+
+Because the persisted `NEW_AFFECT_DS_SET` exists, the function enters subtraction mode and loops wear slots 27..32. Those are ordinary late equipment slots, not Dragon Soul equipment.
+
+For each non-null item, its normal attributes are passed to `GetDSSetValue()`. That helper derives a DS type from the item's VNUM and does not first require `IsDragonSoul()`.
+
+The loop returns at the first null slot, so the exact effect depends on occupancy and attribute/VNUM matches.
+
+**Impact:** a normal relog with a previously active complete DS set can introduce erroneous negative point deltas from ordinary late equipment before the correct deck/set is reactivated. Any non-zero erroneous delta survives the subsequent normal DS reactivation until a later full point recomputation corrects it.
+
+**Runtime:** controlled normal relog/state comparison only; see `DS-T09`.
+
+## BUG-DS-010 — PullOut logs a count-1 extractor after destroying it
+
+**Status:** VERIFIED STATIC
+
+Server:
+`DSManager::PullOut()`.
+
+When an extractor is supplied:
+```
+iBonus = pExtractor->GetValue(...);
+pExtractor->SetCount(pExtractor->GetCount() - 1);
+```
+
+For a normal owned count-1 extractor, `SetCount(0)` removes/destroys the item.
+
+After that consumption, both outcome branches still dereference the old pointer while formatting the item log:
+```
+pExtractor->GetVnum()
+```
+
+Affected branches:
+- successful pull-out;
+- failed pull-out.
+
+The ordinary ITEM_EXTRACT caller reaches this path for `EXTRACT_DRAGON_SOUL` when used on an equipped Dragon Soul.
+
+This is independent of `BUG-DS-002`, which concerns the consumed Dragon Soul source in Dragon Heart extraction.
+
+**Impact:** use-after-free / core-crash candidate on an ordinary Dragon Soul pull-out using a count-1 extractor.
+
+**Runtime:** isolated debug/ASan only; see `DS-T10`. Never reproduce on production.
+
+## BUG-DS-011 — Daily-gift event ID 0 can bypass level and qualification checks
+
+**Status:** VERIFIED STATIC / CONFIGURATION-DEPENDENT
+
+Quest:
+`dragon_soul_daily_gift.quest`.
+
+The chat handler first reads:
+`event_id = game.get_event_flag("ds_dg_id")`.
+
+Level >= 50 and `ds.is_qualified()` are checked only inside:
+```
+if pc.getqf("event_id") != event_id then
+    ...
+end
+```
+
+A character that has never participated normally has quest flag `event_id == 0`.
+
+If an administrator/external event controller activates the time window with `ds_dg_st/ds_dg_et` but leaves `ds_dg_id == 0`, that new character also has `0 == 0`. The entire eligibility block is skipped and execution continues directly to the daily-count gift branch.
+
+The tracked repository contains the compiled daily-gift quest object, while no tracked `dragon_soul_daily_gift_mgr.quest` or other manager was found that enforces a non-zero ID before event activation. An external controller may still do so; therefore reachability is configuration-dependent.
+
+**Impact:** during a misconfigured/default-ID active event, a below-level or unqualified never-participated character can reach the configured once-per-day gift.
+
+**Runtime:** isolated quest/event-flag validation only; see `DS-T11`. Do not alter production event flags for this test.
+
+## Closure
+
+Dragon Soul / Alchemy static mapping is complete with canonical verified findings `BUG-DS-001..BUG-DS-011`.
+
+The malformed grade/step data-boundary observations remain candidates because current tracked data does not establish a malformed producer.
