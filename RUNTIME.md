@@ -702,3 +702,35 @@ Current user rule:
 - write findings only to `Project_Map`;
 - no source, Python, C++, quest, config or game-data changes;
 - no runtime/fault-injection execution until the user explicitly changes phase.
+
+
+## Runtime-readiness consolidation — Costume / Appearance / ChangeLook — 2026-09-28
+**Documentation status:** READY  
+**Execution status:** LOCKED / NOT RUN
+
+Verified coverage:
+- LOOK-T01 -> BUG-LOOK-001
+- LOOK-T02 -> BUG-LOOK-002
+- LOOK-T03 -> BUG-LOOK-003
+- LOOK-T04 -> BUG-LOOK-004
+- LOOK-T05 -> BUG-LOOK-005
+- LOOK-T06 -> BUG-LOOK-006
+- LOOK-T07 -> BUG-LOOK-007
+
+Execution classes:
+- **Ordinary/non-destructive observation:** LOOK-T02 eligibility-only.
+- **Controlled normal-flow/state:** LOOK-T03.
+- **Modified-client isolated:** LOOK-T01, LOOK-T04, LOOK-T05.
+- **Crash/lifetime/sanitizer:** LOOK-T06, LOOK-T07.
+- LOOK-T02 commit/consumption portion is isolated/disposable only.
+
+Deferred, unpromoted:
+- mount ChangeLook expiry helper disconnect;
+- broad `IsExpireTimeItem()` predicate;
+- Aura overlap without separate proven corruption;
+- GuildStorage/Roulette/Switchbot omissions without ChangeLook-specific impact;
+- conditional free-ticket RIGHT/FREE pointer alias.
+
+This is a **post-audit extension**: the original global audit covered 21/21 STATIC COMPLETE subsystems. Costume / Appearance / ChangeLook raises current effective static/readiness coverage to **22/22**.
+
+The global first future live gate remains **DUNGEON-T10**. LOOK tests do not execute before it unless the project phase and order are explicitly changed.
