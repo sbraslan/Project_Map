@@ -51,3 +51,32 @@ the server accepts the non-Aura destination because no COSTUME_AURA check exists
 
 Safety class: **Stage B destructive modified-client / disposable data only**.
 Never use production or valuable items.
+
+
+## AURA-T04 — Aura SET_ITEM packet initialization
+Covers `BUG-AURA-004`.
+
+Future isolated debug test:
+1. instrument or capture one Aura SET_ITEM packet in a controlled debug environment;
+2. compare every serialized `TItemData` field against the source item and explicit zero/default expectations;
+3. repeat several times to detect nondeterministic bytes in seal/transmutation/basic/element/set metadata;
+4. inspect the client-side stored Aura `TItemData` for fields the receive path does not initialize.
+
+Static prediction:
+members not explicitly assigned by the Aura server/client packet paths contain indeterminate data.
+
+Safety class: **Stage C debug / sanitizer / packet-observation only**.
+
+## AURA-T05 — Yohara random apply persistence across successful EVOLVE
+Covers `BUG-AURA-005`.
+
+Future isolated disposable-item test:
+1. prepare an Aura that has a known absorbed Yohara random apply;
+2. record classic attributes and Yohara random-apply array;
+3. perform one successful grade evolution in an isolated test environment;
+4. compare the new Aura's sockets, classic attributes and Yohara random applies.
+
+Static prediction:
+sockets and classic attributes survive, but the Yohara random-apply array is not copied to the new item.
+
+Safety class: **Stage B/C destructive data-integrity / disposable items only**.
