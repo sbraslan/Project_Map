@@ -284,3 +284,15 @@ Closed/unpromoted:
 - cash-out/ranking are separate persistence domains; crash consistency remains future fault-injection territory.
 
 Next canonical subsystem: **World Lottery System**.
+
+
+## Global readiness normalization — 2026-09-28
+The earlier Battle Field sections above preserve historical audit chronology, but the canonical global status is:
+- `BUG-BFIELD-004` — **RETRACTED / RESERVED**; the earlier unresolved-`LoadRanking` conclusion was a false positive after the transitive declaration/include chain was closed.
+- historical `BUG-BFIELD-005` — cross-system duplicate; canonical owner is `BUG-RANK-003`.
+- historical `BUG-BFIELD-007` — cross-system duplicate; canonical owner is `BUG-RANK-007`.
+
+Unique active Battle Field bug IDs are therefore:
+`BUG-BFIELD-001`, `002`, `003`, `006`, `008`, `009`, `010`, `011`.
+
+This normalization overrides the older "Current verified set" lists in this file without deleting their historical text.
