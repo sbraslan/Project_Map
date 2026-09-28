@@ -15,8 +15,8 @@
     "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Consolidate World Boss runtime readiness from bugs/world_boss.md and tests/world_boss.md without executing tests.",
-      "Preserve server, client, session and persistence ownership without inventing duplicate bug IDs.",
+      "Perform final Sung Mahi Tower runtime-readiness consolidation from bugs/sung_mahi_tower.md and tests/sung_mahi_tower.md without executing tests.",
+      "Preserve deferred architectural findings separately from verified BUG-SMT-001..006.",
       "Keep DUNGEON-T10 as the first future live runtime gate.",
       "Preserve all source/game repositories as read-only until the user explicitly changes phase."
     ]
@@ -184,7 +184,8 @@
     "RUNTIME.md::Party Match PMATCH-T01-T05 readiness consolidated; execution locked",
     "RUNTIME.md::Dungeon Core DCORE-T01-T04 readiness consolidated; execution locked",
     "RUNTIME.md::Battle Field readiness consolidated; BFIELD-004 retracted; BFIELD-005/007 normalized to Ranking ownership",
-    "RUNTIME.md::World Lottery WLOT-T01-T15 readiness consolidated; execution locked"
+    "RUNTIME.md::World Lottery WLOT-T01-T15 readiness consolidated; execution locked",
+    "RUNTIME.md::World Boss WB-T01-T16 readiness consolidated; execution locked"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -357,7 +358,7 @@
       "SMT-T05",
       "SMT-T06"
     ],
-    "documentation_cursor": "world_boss",
+    "documentation_cursor": "sung_mahi_tower",
     "completed_readiness_clusters": [
       "dungeon_info",
       "ticket",
@@ -377,7 +378,8 @@
       "party_match",
       "dungeon_core",
       "battle_field",
-      "world_lottery"
+      "world_lottery",
+      "world_boss"
     ],
     "dungeon_info": {
       "status": "DOCUMENTATION READY / NOT RUN",
@@ -1238,6 +1240,111 @@
       "normal_path_candidates": [
         "WLOT-T04",
         "WLOT-T10"
+      ]
+    },
+    "world_boss": {
+      "status": "DOCUMENTATION READY / NOT RUN",
+      "canonical_test_ids": [
+        "WB-T01",
+        "WB-T02",
+        "WB-T03",
+        "WB-T04",
+        "WB-T05",
+        "WB-T06",
+        "WB-T07",
+        "WB-T08",
+        "WB-T09",
+        "WB-T10",
+        "WB-T11",
+        "WB-T12",
+        "WB-T13",
+        "WB-T14",
+        "WB-T15",
+        "WB-T16"
+      ],
+      "verified_bug_tests": {
+        "BUG-WB-001": [
+          "WB-T01"
+        ],
+        "BUG-WB-002": [
+          "WB-T02"
+        ],
+        "BUG-WB-003": [
+          "WB-T03"
+        ],
+        "BUG-WB-004": [
+          "WB-T04"
+        ],
+        "BUG-WB-005": [
+          "WB-T05"
+        ],
+        "BUG-WB-006": [
+          "WB-T06"
+        ],
+        "BUG-WB-007": [
+          "WB-T07"
+        ],
+        "BUG-WB-008": [
+          "WB-T08"
+        ],
+        "BUG-WB-009": [
+          "WB-T09"
+        ],
+        "BUG-WB-010": [
+          "WB-T10"
+        ],
+        "BUG-WB-011": [
+          "WB-T11"
+        ],
+        "BUG-WB-012": [
+          "WB-T12"
+        ],
+        "BUG-WB-013": [
+          "WB-T13"
+        ],
+        "BUG-WB-014": [
+          "WB-T14"
+        ],
+        "BUG-WB-015": [
+          "WB-T15"
+        ],
+        "BUG-WB-016": [
+          "WB-T16"
+        ]
+      },
+      "historical_aliases": {
+        "TEST-WB-MULTICORE-OWNERSHIP": "WB-T14",
+        "TEST-WB-TITLEBAR-PARENT-STATE": "WB-T15",
+        "TEST-WB-REWARD-TIER-PROVENANCE": "WB-T16"
+      },
+      "dependency_notes": {
+        "WB-T08": "Requires controlled nonzero tier because BUG-WB-016 blocks normal tier assignment."
+      },
+      "normal_path_candidates": [
+        "WB-T09",
+        "WB-T13",
+        "WB-T15",
+        "WB-T16"
+      ],
+      "controlled_lifecycle_tests": [
+        "WB-T01",
+        "WB-T02",
+        "WB-T11",
+        "WB-T12",
+        "WB-T14"
+      ],
+      "client_ui_tests": [
+        "WB-T04",
+        "WB-T05",
+        "WB-T06",
+        "WB-T07"
+      ],
+      "ranking_tests": [
+        "WB-T03",
+        "WB-T10"
+      ],
+      "controlled_reward_test": [
+        "WB-T08"
       ]
     }
   }
