@@ -265,6 +265,32 @@ The global first live gate remains **DUNGEON-T10**.
 
 **Next documentation cluster:** Guild Storage runtime readiness.
 
+
+## Runtime-readiness consolidation — Guild Storage — 2026-09-28
+**Documentation status:** READY
+**Execution status:** LOCKED / NOT RUN
+
+Verified mapping:
+- GS-T10 / GS-T11 / GS-T19 -> BUG-GS-003
+- GS-T12 -> BUG-GS-004
+- GS-T15 -> BUG-GS-007
+- GS-T16 -> BUG-GS-008
+- GS-T17 -> BUG-GS-009
+- GS-T18 -> BUG-GS-010
+- GS-T20 -> BUG-GS-011
+
+Candidate-only mapping:
+- GS-T04 / GS-T07 / GS-T08 -> BUG-CANDIDATE-GS-002
+- GS-T13 -> BUG-CANDIDATE-GS-005
+- GS-T14 -> BUG-CANDIDATE-GS-006
+- BUG-CANDIDATE-GS-001 remains an architectural/shared-handler candidate with baseline coverage only.
+
+Legacy candidate GS-003 and GS-004 are superseded by their later verified BUG-GS-003/004 records. Candidate IDs 001/002/005/006 remain candidates and are not promoted by documentation alone.
+
+The global first live gate remains **DUNGEON-T10**.
+
+**Next documentation cluster:** Exchange / Trade runtime readiness.
+
 ## Patch readiness
 First-cluster fix plan is ready at `fixes/dungeon_info.md`.
 
