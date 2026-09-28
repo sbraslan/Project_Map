@@ -79,3 +79,18 @@ Static prediction:
 improve items decrease first; reward-space check then aborts; base materials/currency remain unchanged.
 
 Safety class: **Stage A controlled disposable-item data-integrity test**.
+
+
+## REFCUBE-T06 — Uninitialized Cube recipe controls
+Covers `BUG-REFCUBE-006`.
+
+Future isolated debug validation:
+1. load the current `cube.txt` under a debug/MemorySanitizer build;
+2. inspect representative recipes with no `allow_copy` directive and recipes with no `not_remove` directive;
+3. observe the parsed `CUBE_DATA` values before `RefineCube()`;
+4. compare behavior against an explicitly zero-initialized control build.
+
+Static prediction:
+the omitted scalar fields are read without initialization; current recipes can enter copy/not-remove branches nondeterministically.
+
+Safety class: **Stage C debug / sanitizer only**.
