@@ -315,6 +315,38 @@ The global first live gate remains **DUNGEON-T10**.
 
 **Next documentation cluster:** Shop / Premium Private Shop runtime readiness.
 
+
+## Runtime-readiness consolidation — Shop / Premium Private Shop — 2026-09-28
+**Documentation status:** READY
+**Execution status:** LOCKED / NOT RUN
+
+Canonical deferred IDs are SHP-T01..SHP-T14.
+
+Verified coverage:
+- SHP-T01 -> BUG-SHOP-001
+- SHP-T02 -> BUG-SHOP-002
+- SHP-T03 -> BUG-SHOP-003
+- SHP-T04 -> BUG-SHOP-004
+- SHP-T05 -> BUG-SHOP-005
+- SHP-T06 -> BUG-SHOP-006
+- SHP-T07 -> BUG-SHOP-007
+- SHP-T08 -> BUG-SHOP-008
+- SHP-T09 -> BUG-SHOP-009
+- SHP-T10 -> BUG-SHOP-010
+
+Observation coverage:
+- SHP-T11 -> OBS-SHOP-001
+- SHP-T12 -> OBS-SHOP-002
+- SHP-T13 -> OBS-SHOP-003
+- SHP-T14 -> OBS-SHOP-004
+
+Historical provisional SHOP-T01..T03 are retained but are not canonical continuation IDs. In particular, old stash-cap clipping is observation-only after the later static invariant audit.
+
+Primary normal-path candidates: **SHP-T02** and **SHP-T03**.
+The global first live gate remains **DUNGEON-T10**.
+
+**Next documentation cluster:** Safebox / Mall runtime readiness.
+
 ## Patch readiness
 First-cluster fix plan is ready at `fixes/dungeon_info.md`.
 
