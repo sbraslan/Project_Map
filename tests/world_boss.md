@@ -47,3 +47,35 @@ Do not execute runtime/fault-injection tests unless the user explicitly changes 
 - Invoke `/get_wb_reward` as a normal player.
 - Expected for a working reward system: participation/ranking assigns tier 1-4 and the command grants the tier bundle once.
 - Static prediction from BUG-WB-016: tier remains 0 at every mapped lifecycle point and the reward command returns without items.
+
+
+## Canonical World Boss aliases — 2026-09-28
+
+The three legacy descriptive test headings at the end of this file are retained for history, but future continuation uses these canonical IDs:
+
+### WB-T14 — multicore ownership
+Canonical alias for legacy `TEST-WB-MULTICORE-OWNERSHIP`.
+Covers BUG-WB-014.
+
+### WB-T15 — titlebar parent-state mismatch
+Canonical alias for legacy `TEST-WB-TITLEBAR-PARENT-STATE`.
+Covers BUG-WB-015.
+
+### WB-T16 — reward tier provenance
+Canonical alias for legacy `TEST-WB-REWARD-TIER-PROVENANCE`.
+Covers BUG-WB-016.
+
+## World Boss readiness consolidation — 2026-09-28
+- No World Boss runtime test was executed.
+- WB-T01..WB-T13 -> BUG-WB-001..BUG-WB-013 one-to-one.
+- WB-T14 -> BUG-WB-014.
+- WB-T15 -> BUG-WB-015.
+- WB-T16 -> BUG-WB-016.
+- Legacy TEST-WB-* headings are historical aliases, not separate tests.
+- WB-T08 requires a controlled nonzero tier because BUG-WB-016 prevents normal runtime tier assignment.
+- Primary ordinary/current-flow candidates: WB-T09, WB-T13, WB-T15, WB-T16.
+- Controlled scheduler/multicore/lifecycle: WB-T01, WB-T02, WB-T11, WB-T12, WB-T14.
+- Client parser/UI-isolation: WB-T04, WB-T05, WB-T06, WB-T07.
+- Ranking/drop-shaping: WB-T03, WB-T10.
+- Controlled reward atomicity: WB-T08.
+- Overall first live runtime gate remains DUNGEON-T10.
