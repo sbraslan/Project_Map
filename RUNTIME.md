@@ -429,6 +429,33 @@ The global first live gate remains **DUNGEON-T10**.
 
 **Next documentation cluster:** Party runtime readiness.
 
+
+## Runtime-readiness consolidation — Party — 2026-09-28
+**Documentation status:** READY
+**Execution status:** LOCKED / NOT RUN
+
+A dedicated `tests/party.md` file did not previously exist; the canonical deferred matrix is now PARTY-T01..PARTY-T06.
+
+Verified coverage:
+- PARTY-T01 -> BUG-PARTY-001
+- PARTY-T02 -> BUG-PARTY-002
+- PARTY-T03 -> BUG-PARTY-003
+- PARTY-T04 -> BUG-PARTY-004
+- PARTY-T05 -> BUG-PARTY-005
+- PARTY-T06 -> BUG-PARTY-006
+
+Execution classes:
+- **Normal-path:** PARTY-T01, PARTY-T02, PARTY-T05
+- **Modified-client/state integrity:** PARTY-T03
+- **Malformed-server-packet parser:** PARTY-T04
+- **Trusted/dev quest semantic:** PARTY-T06
+
+Party Match remains a separate subsystem and is not folded into the Party matrix.
+
+The global first live gate remains **DUNGEON-T10**.
+
+**Next documentation cluster:** Party Match runtime readiness.
+
 ## Patch readiness
 First-cluster fix plan is ready at `fixes/dungeon_info.md`.
 
