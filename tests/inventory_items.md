@@ -457,3 +457,23 @@ Runtime server `item_proto` tablosu veya unpacked proto export üzerinde:
 için `size > 1` satırları ara.
 
 Kodun mevcut invariant'ı: `IsEmptySpecialItemGrid(..., bSize > 1) -> false`. Dataset'te böyle item varsa special auto-placement/movement uyumsuzluğu ayrıca sınıflandırılmalı.
+
+
+### Readiness consolidation — 2026-09-28
+- Documentation-only pass completed; no Inventory/Item runtime test executed.
+- ITEM-T02 -> BUG-ITEM-001.
+- ITEM-T01 -> BUG-ITEM-002.
+- ITEM-T03 -> BUG-ITEM-003.
+- ITEM-T06 -> BUG-ITEM-004.
+- ITEM-T09 and ITEM-T10 -> BUG-ITEM-006 from generic storage-window and Additional Equipment angles.
+- ITEM-T11 -> BUG-ITEM-007.
+- ITEM-T12 -> BUG-ITEM-008.
+- ITEM-T05 validates OBS-ITEM-001 only; observation status is unchanged.
+- ITEM-T07 validates OBS-ITEM-002 as regression/behavioral evidence only; observation status is unchanged.
+- ITEM-T04 is a ground-item persistence/lifecycle regression test without a unique verified bug mapping.
+- ITEM-T08 is a Special Inventory type/range regression test.
+- ITEM-T13 is a runtime item_proto dataset audit dependency.
+- There is no canonical BUG-ITEM-005 entry in bugs/inventory_items.md; the numbering gap is preserved and no bug is invented.
+- Legacy Guild Storage and duplicate SWITCHBOT test blocks remain in this file for history, but their readiness ownership belongs to their canonical subsystem clusters.
+- Primary normal-path candidate: ITEM-T01. ITEM-T02 is also reachable through the normal destroy flow but sanitizer/debug evidence is preferred for the use-after-free.
+- Overall first live runtime gate remains DUNGEON-T10.
