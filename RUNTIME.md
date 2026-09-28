@@ -479,6 +479,28 @@ The global first live gate remains **DUNGEON-T10**.
 
 **Next documentation cluster:** Dungeon Core runtime readiness.
 
+
+## Runtime-readiness consolidation — Dungeon Core — 2026-09-28
+**Documentation status:** READY
+**Execution status:** LOCKED / NOT RUN
+
+Verified coverage:
+- DCORE-T01 -> BUG-DUNGEON-001
+- DCORE-T02 -> BUG-DUNGEON-002
+- DCORE-T03 -> BUG-DUNGEON-003
+- DCORE-T04 -> BUG-DUNGEON-004
+
+Execution classes:
+- **Registered Lua / lifecycle:** DCORE-T01
+- **Controlled dungeon-script behavior:** DCORE-T02, DCORE-T04
+- **ASan/debug raw-pointer lifetime:** DCORE-T03
+
+Primary Dungeon Core candidates: **DCORE-T01** and **DCORE-T02**.
+
+Dungeon Core is separate from the already-consolidated Dungeon Info subsystem. The global first live gate remains **DUNGEON-T10**.
+
+**Next documentation cluster:** Battle Field runtime readiness.
+
 ## Patch readiness
 First-cluster fix plan is ready at `fixes/dungeon_info.md`.
 
