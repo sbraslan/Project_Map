@@ -243,6 +243,28 @@ The global first live gate remains **DUNGEON-T10**.
 
 **Next documentation cluster:** Switchbot runtime readiness.
 
+
+## Runtime-readiness consolidation — Switchbot — 2026-09-28
+**Documentation status:** READY
+**Execution status:** LOCKED / NOT RUN
+
+Legacy migration left duplicate `SWITCHBOT-T01..T06` IDs in the test file. They are now explicitly non-canonical.
+
+Canonical deferred IDs:
+- SWB-T01 -> BUG-SWITCHBOT-001
+- SWB-T02 -> BUG-SWITCHBOT-002
+- SWB-T03 -> BUG-SWITCHBOT-003
+- SWB-T04 -> BUG-SWITCHBOT-004
+- SWB-T05 -> BUG-SWITCHBOT-005
+- SWB-T06 -> OBS-SWITCHBOT-001
+- SWB-T07 -> OBS-SWITCHBOT-002
+
+Primary legitimate monitored candidates are SWB-T01 and SWB-T03. Modified-client testing is confined to SWB-T04/SWB-T07; observation status remains unchanged for SWB-T06/SWB-T07.
+
+The global first live gate remains **DUNGEON-T10**.
+
+**Next documentation cluster:** Guild Storage runtime readiness.
+
 ## Patch readiness
 First-cluster fix plan is ready at `fixes/dungeon_info.md`.
 
