@@ -40,3 +40,9 @@ Important global ID rules:
 - Status: STATIC COMPLETE / VERIFIED STATIC for Dragon Soul.
 - `BUG-DS-001..011` -> `dragon_soul.md`.
 - Malformed grade/step boundaries remain unpromoted data-dependent candidates.
+
+
+## Active subsystem ownership — Aura System — 2026-09-28
+- `BUG-AURA-001` -> `aura.md`.
+- Status: STATIC MAPPING IN PROGRESS.
+- First verified finding: post-open Aura transaction distance gate bypass.
