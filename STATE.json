@@ -13,19 +13,22 @@
     "bug_file": "bugs/acce.md",
     "test_file": "tests/acce.md",
     "verified_bug_ids": [
-      "BUG-ACCE-001",
-      "BUG-ACCE-002",
-      "BUG-ACCE-003",
-      "BUG-ACCE-004"
+      "BUG-DS-001",
+      "BUG-DS-002",
+      "BUG-DS-003",
+      "BUG-DS-004",
+      "BUG-DS-005",
+      "BUG-DS-006",
+      "BUG-DS-007"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Continue Acce absorbed-stat math and special apply mapping.",
-      "Close sash socket/attribute persistence and reversal/reset flow.",
-      "Inspect Acce proto/data ranges and client visual dependencies.",
-      "Inspect Acce window/warp/item-mutation lifecycle.",
-      "Inspect combine grade/refine-chain and output-placement edge cases.",
-      "Do not execute ACCE-T01..T04 or any runtime test without an explicit phase change."
+      "Audit DS set bonus reactivation/relog cleanup and whether stale BUG-DS-001 points self-heal.",
+      "Close grade/step material consumption and output failure semantics.",
+      "Audit Dragon Soul qualification/daily quest lifecycle and client/server UI state.",
+      "Audit extraction/refine logging order for additional post-destroy pointer uses.",
+      "Resolve or retain DS-C01 malformed/equipped-step candidates without overpromotion.",
+      "Keep runtime execution locked and source/game repositories immutable."
     ]
   },
   "startup": {
@@ -238,7 +241,12 @@
     "BUG-ACCE-001::final Acce request lacks server open-window/mode gating",
     "BUG-ACCE-002::Acce sash exact type/subtype predicate uses incorrect AND",
     "BUG-ACCE-003::absorb material validates ARMOR_BODY against item type and accepts all armor subtypes",
-    "BUG-ACCE-004::same-cell combine aliases primary/material and reaches destructive/double-remove path"
+    "BUG-ACCE-004::same-cell combine aliases primary/material and reaches destructive/double-remove path",
+    "Project_Game + Project_Binary dragon_soul_table.txt::identical blob 66085b6d957b7b69856a85c36990482f3e04328e",
+    "BUG-DS-004::server ChangeAttr accepts normal/blessed/holly strength materials",
+    "BUG-DS-005::CheckRefineStepTables checks strength node instead of step node",
+    "BUG-DS-006::normal refine opener authorizes ChangeAttr packet mode",
+    "BUG-DS-007::CanWarp/WarpSet preserve DS refine opener while CanHandleItem blocks"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -1818,12 +1826,17 @@
     "verified_bug_ids": [
       "BUG-DS-001",
       "BUG-DS-002",
-      "BUG-DS-003"
+      "BUG-DS-003",
+      "BUG-DS-004",
+      "BUG-DS-005",
+      "BUG-DS-006",
+      "BUG-DS-007"
     ],
     "candidates": [
-      "DoRefineStep first std::set item skips IsEquipped validation.",
-      "GetBasePosition uses row_type > DRAGON_SOUL_GRADE_MAX rather than >=.",
-      "DoChangeAttr indexes needFireCountList by dwDSStep without explicit bounds guard."
+      "DS-C01: DoRefineStep first std::set item skips IsEquipped validation; pointer ordering affects reachability.",
+      "GetBasePosition uses row_type > DRAGON_SOUL_GRADE_MAX rather than >=; malformed grade required.",
+      "DoChangeAttr indexes five-entry needFireCountList by VNUM-derived step without explicit bounds guard; malformed step required.",
+      "ChangeAttrStepTables and ChangeStone* data groups have no mapped consumer in current implementation."
     ],
     "mapped_flows": [
       "ITEM_DS equip/pull-out lifecycle",
@@ -1836,9 +1849,19 @@
     "canonical_tests": [
       "DS-T01",
       "DS-T02",
-      "DS-T03"
+      "DS-T03",
+      "DS-T04",
+      "DS-T05",
+      "DS-T06",
+      "DS-T07"
     ],
-    "runtime_readiness": "NOT YET CONSOLIDATED"
+    "runtime_readiness": "NOT YET CONSOLIDATED",
+    "table_parity": {
+      "status": "CURRENT DEPLOYMENT MATCH",
+      "server_file": "Project_Game/share/locale/europe/dragon_soul_table.txt",
+      "client_file": "Project_Binary/locale/locale/common/dragon_soul_table.txt",
+      "blob_sha": "66085b6d957b7b69856a85c36990482f3e04328e"
+    }
   },
   "acce_sash_mapping": {
     "status": "STATIC MAPPING IN PROGRESS",
