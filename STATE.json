@@ -8,17 +8,17 @@
   "active": {
     "subsystem": "runtime_readiness_consolidation",
     "display_name": "Runtime Readiness Consolidation",
-    "status": "STATIC MAPPING COMPLETE / EXECUTION LOCKED",
+    "status": "STATIC MAPPING COMPLETE / RUNTIME READINESS COMPLETE / EXECUTION LOCKED",
     "system_file": null,
     "bug_file": null,
     "test_file": "RUNTIME.md",
     "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Perform final Sung Mahi Tower runtime-readiness consolidation from bugs/sung_mahi_tower.md and tests/sung_mahi_tower.md without executing tests.",
-      "Preserve deferred architectural findings separately from verified BUG-SMT-001..006.",
-      "Keep DUNGEON-T10 as the first future live runtime gate.",
-      "Preserve all source/game repositories as read-only until the user explicitly changes phase."
+      "Run a documentation-only global readiness integrity audit across INDEX.md, STATE.json, RUNTIME.md and canonical bug/test registries.",
+      "Detect missing subsystem coverage, ID collisions, aliases, retracted-ID leaks and candidate/observation promotion mistakes.",
+      "Normalize one global future execution order with DUNGEON-T10 first.",
+      "Preserve all source/game repositories as read-only and keep runtime execution locked until the user explicitly changes phase."
     ]
   },
   "startup": {
@@ -185,7 +185,8 @@
     "RUNTIME.md::Dungeon Core DCORE-T01-T04 readiness consolidated; execution locked",
     "RUNTIME.md::Battle Field readiness consolidated; BFIELD-004 retracted; BFIELD-005/007 normalized to Ranking ownership",
     "RUNTIME.md::World Lottery WLOT-T01-T15 readiness consolidated; execution locked",
-    "RUNTIME.md::World Boss WB-T01-T16 readiness consolidated; execution locked"
+    "RUNTIME.md::World Boss WB-T01-T16 readiness consolidated; execution locked",
+    "RUNTIME.md::Sung Mahi SMT-T01-T06 readiness consolidated; runtime-readiness documentation milestone complete"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -347,7 +348,7 @@
     ]
   },
   "runtime_readiness": {
-    "status": "DOCUMENTATION READY — EXECUTION LOCKED",
+    "status": "DOCUMENTATION COMPLETE — EXECUTION LOCKED",
     "current_first_live_gate": "DUNGEON-T10",
     "sung_mahi_test_file": "tests/sung_mahi_tower.md",
     "sung_mahi_test_ids": [
@@ -358,7 +359,7 @@
       "SMT-T05",
       "SMT-T06"
     ],
-    "documentation_cursor": "sung_mahi_tower",
+    "documentation_cursor": "global_integrity_audit",
     "completed_readiness_clusters": [
       "dungeon_info",
       "ticket",
@@ -379,7 +380,8 @@
       "dungeon_core",
       "battle_field",
       "world_lottery",
-      "world_boss"
+      "world_boss",
+      "sung_mahi_tower"
     ],
     "dungeon_info": {
       "status": "DOCUMENTATION READY / NOT RUN",
@@ -1346,6 +1348,58 @@
       "controlled_reward_test": [
         "WB-T08"
       ]
-    }
+    },
+    "sung_mahi_tower": {
+      "status": "DOCUMENTATION READY / NOT RUN",
+      "canonical_test_ids": [
+        "SMT-T01",
+        "SMT-T02",
+        "SMT-T03",
+        "SMT-T04",
+        "SMT-T05",
+        "SMT-T06"
+      ],
+      "verified_bug_tests": {
+        "BUG-SMT-001": [
+          "SMT-T01"
+        ],
+        "BUG-SMT-002": [
+          "SMT-T02"
+        ],
+        "BUG-SMT-003": [
+          "SMT-T03"
+        ],
+        "BUG-SMT-004": [
+          "SMT-T04"
+        ],
+        "BUG-SMT-005": [
+          "SMT-T05"
+        ],
+        "BUG-SMT-006": [
+          "SMT-T06"
+        ]
+      },
+      "deferred_unpromoted_findings": [
+        "pc.mailbox_reward nullable mailbox pointer precondition",
+        "smhgate_flower 9100-9107 missing server monster folder without tracked runtime producer",
+        "sung_mahi_ranking player_login versus character-name mailbox recipient semantics",
+        "malformed/out-of-range quest-produced floor/dungeonLevel values",
+        "m_bDungeon_Difficulty versus dungeonLevel synchronization depends on missing quest runtime"
+      ],
+      "normal_path_candidate": "SMT-T01",
+      "isolated_time_or_debug_tests": [
+        "SMT-T02",
+        "SMT-T03",
+        "SMT-T04"
+      ],
+      "deterministic_data_test": [
+        "SMT-T05"
+      ],
+      "deployment_proto_test": [
+        "SMT-T06"
+      ]
+    },
+    "documentation_milestone": "COMPLETE",
+    "global_integrity_audit": "PENDING"
   }
 }
