@@ -18,3 +18,21 @@ Expected static result: `POINT_MOUNT` changes without the corresponding `MountVn
 
 No Horse/Mount runtime test has been executed.
 The global first future live gate remains `DUNGEON-T10`.
+
+
+## HORSE-T02 — zero-level horse progression reachability
+
+**Owner bug:** `BUG-HORSE-002`  
+**Execution state:** NOT RUN / LOCKED
+
+When runtime phase is explicitly opened:
+1. use a clean/test character with horse level 0;
+2. obtain/use the tracked horse exchange flow that grants item 50050;
+3. verify whether any normal player interaction can raise horse level to 1;
+4. attempt the tracked summon/training menus and record their grade/level gates;
+5. verify that no normal-player command or item-use path changes horse level unless an external/untracked dependency is present.
+
+Expected static result: no tracked normal-player progression from horse level 0.
+
+## Cross-system note
+Configured mount-summon Achievement tasks are already covered by `BUG-ACH-006`; no duplicate Horse test ID is created for that defect.
