@@ -131,6 +131,8 @@ Client stores inventory transmutation state in `TItemData.dwTransmutationVnum` a
 - `BUG-LOOK-002` — quest-mount targets 50051..50053 accept arbitrary non-costume right materials; the same faulty predicate exists in client and server.
 - `BUG-LOOK-003` — CanWarp omits W_CHANGELOOK and WarpSet leaves CTransmutation alive across same-character warp.
 - `BUG-LOOK-004` — server accepts sealed/bound right-side ChangeLook material although client UI explicitly rejects it.
+- `BUG-LOOK-005` — server allows LEFT checkout/replacement while RIGHT remains, bypassing final type/subtype/anti-flag compatibility.
+- `BUG-LOOK-006` — real-time expiry can destroy a checked-in item while CTransmutation retains a dangling raw LPITEM.
 
 ## Mapping next
 
@@ -212,3 +214,76 @@ Current live client/server ChangeLook enums agree:
 - mount transmutation = 30,000,000 Yang.
 
 The separate `CL_TRANSMUTATION_PRICE = 15,000,000` common definition appears stale/unused in the mapped transaction and is not a bug by itself.
+
+
+## Hide-costume + ChangeLook closure — 2026-09-28
+
+The hidden costume getters preserve underlying ChangeLook appearance correctly:
+
+- hidden body costume:
+  - `GetPart(PART_MAIN)` resolves the worn body armor;
+  - if that armor has `GetChangeLookVnum()`, the transmuted armor VNUM is returned;
+  - otherwise the armor VNUM is returned.
+- hidden weapon costume:
+  - `GetPart(PART_WEAPON)` similarly resolves the base weapon ChangeLook VNUM first.
+- hair/acce/aura hidden states intentionally return zero for the hidden visual part.
+- toggling hide state calls `UpdatePacket()`, so the dynamic getter is used for the network-visible part.
+
+No verified hide-costume/ChangeLook visual bug was found in the mapped body/weapon path.
+
+## Slot-state invariant audit
+
+Official Python UI prevents removing the left target while the right material remains populated.
+
+Server `CTransmutation::ItemCheckOut()` does not enforce this dependency:
+- LEFT can be removed independently;
+- RIGHT remains stored.
+
+Server LEFT re-check-in validates only `CanAddItem(newLeft)`.
+It does **not** re-run `CheckOtherItem(right)`.
+
+`Accept()` also does not revalidate the final left/right pair.
+
+This makes the material-target relationship mutable after the one-time compatibility check. See `BUG-LOOK-005`.
+
+## Checked-in item lifetime audit
+
+`CTransmutation` stores raw `LPITEM` pointers:
+- LEFT;
+- RIGHT;
+- optional free ticket.
+
+Check-in rejects items that are already locked, but it does not call `Lock(true)`.
+The destructor is empty and item destruction does not notify the transmutation object.
+
+Normal player item movement is blocked by `CanHandleItem()` while ChangeLook is open, but asynchronous item lifetime mechanisms remain active.
+
+A concrete verified path is real-time expiry:
+1. a time-limited eligible weapon/armor/body-costume is checked into ChangeLook;
+2. `real_time_expire_event` reaches its expiry;
+3. `ITEM_MANAGER::RemoveItem()` removes the inventory item;
+4. `DestroyItem()` erases it and `M2_DELETE(item)`;
+5. `CTransmutation::m_Item[]` still contains the old raw pointer.
+
+Subsequent `ItemCheckOut()` or `Accept()` dereferences that stale pointer. See `BUG-LOOK-006`.
+
+## Mount expiry status
+
+Mount ChangeLook expiry remains **deferred / incomplete static intent** rather than promoted:
+- `StartChangeLookExpireEvent()`, `StopChangeLookExpireEvent()`, `IsExpireTimeItem()`, and `GetRealExpireTime()` exist;
+- `OnAfterCreatedItem()` auto-starts this event only for horse-summon VNUMs 50051..50053 when socket2 is already nonzero;
+- `CTransmutation::Accept()` does not initialize socket2 or start this event;
+- costume-mount visual resolution itself works through `GetMountVnum() -> transmutation proto APPLY_MOUNT`.
+
+The missing bridge is suspicious but expected product semantics for time-limited source appearance are not yet proven, so it stays unpromoted.
+
+## Eligibility closure notes
+
+Normal item-mode ChangeLook compatibility is checked by:
+- same type;
+- same subtype;
+- exact same anti flags.
+
+That relationship is sound at initial RIGHT check-in, but `BUG-LOOK-005` lets it be bypassed later by changing LEFT.
+
+The additional equip-time ChangeLook checks do not repair this invariant for arbitrary cross-type values generated through that bypass.
