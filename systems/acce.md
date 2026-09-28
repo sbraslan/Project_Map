@@ -108,6 +108,7 @@ Acce reversal items clear socket 0 and clear attributes on the target sash.
 - `BUG-ACCE-003` — absorption material validation compares item type against `ARMOR_BODY` and therefore accepts every ITEM_ARMOR subtype rather than body armor only.
 - `BUG-ACCE-004` — combine accepts identical primary/material inventory cells; failure can consume the primary sash and success reaches a stale-pointer/double-remove path.
 - `BUG-ACCE-005` — reversal clears absorbed attributes after the only target update packet, leaving stale client attribute/tool-tip state.
+- `BUG-ACCE-006` — absorption does not require an empty target sash; a crafted request can overwrite an existing absorbed item/state and consume the new material.
 
 ## Mapping next
 
@@ -161,3 +162,50 @@ Because `SetSocket(0,0)` sends its full item update **before** attributes are cl
 The server's delayed-save pointer will later serialize the now-cleared normal attributes, so this is not promoted as a DB persistence loss. It is, however, a verified client/server item-state desynchronization. See `BUG-ACCE-005`.
 
 The reversal branch also does not explicitly clear copied element/random/set metadata. Their direct gameplay effect is currently gated or outside the Acce wear-set count mapped here, so this remains an observation rather than a separate promoted bug.
+
+
+## Client visual / asset boundary — 2026-09-28
+
+The equipped sash visual is VNUM-driven, not a per-sash character MSM shape entry.
+
+Static path:
+1. server exposes the equipped Acce VNUM through `PART_ACCE` (or ChangeLook VNUM when present);
+2. client `CInstanceBase::SetAcce(eAcce)` calls `CActorInstance::AttachAcce(eAcce, ..., PART_ACCE)`;
+3. `CItemManager` resolves the VNUM's `CItemData`;
+4. `item_list.txt` rows with four fields provide icon + GR2 model path through `SetDefaultItemData`;
+5. `AttachAcce` uses the item model (sub-model fallback -> model) and attaches it to `Bip01 Spine2`.
+
+Current asset examples are registered in `locale/locale/common/item_list.txt` as `WING` rows, including the 850xx and 860xx Acce ranges, with direct `d:/ymir work/item/wing/...gr2` paths.
+
+This matters for future item creation: a new sash visual needs a valid client item-list/model mapping in addition to a compatible COSTUME_ACCE proto/refine definition. It is not sufficient to add only a generic character MSM ShapeData record.
+
+## Window / warp lifecycle audit
+
+Server-side item mutation through normal handlers is blocked while:
+`m_bAcceCombination || m_bAcceAbsorption`
+because `CHARACTER::CanHandleItem()` returns false.
+
+However:
+- `OpenAcceCombination()` / `OpenAcceAbsorption()` only guard against another Acce mode already being open;
+- the final Acce transaction bypasses `CanHandleItem()`;
+- `CanWarp()` omits `W_ACCE` from its opened-window mask;
+- `CHARACTER::IsHack()` transaction-window masks also omit `W_ACCE`;
+- the only server call site found for `AcceClose()` is the client close request handler.
+
+The normal client mitigates this lifecycle gap by:
+- calling `AcceWindow.Close()` when the character moves more than 500 units from the open position;
+- sending `SendAcceRefineCanCle()` -> server close request.
+
+Because the close is client-driven and no server item pointers are retained by the Acce UI, this is recorded as a lifecycle integration gap rather than a separate verified destructive bug at this checkpoint. It reinforces BUG-ACCE-001: authoritative transaction state is not server-bound.
+
+## Additional absorption invariant
+
+Normal `uiacce.py` only accepts the left absorption target when:
+`GetItemMetinSocket(attachedSlotPos, 0) == 0`.
+
+Server `AcceRefine(..., bAcceWindow == 1, ...)` does not check socket 0 before:
+- replacing socket 0 with the new material VNUM;
+- replacing copied attributes/element/random/set metadata;
+- deleting the new material.
+
+Therefore an occupied/previously absorbed sash can be re-absorbed through a crafted final request. See `BUG-ACCE-006`.
