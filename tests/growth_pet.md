@@ -260,3 +260,33 @@ Static prediction:
 the pet row remains because the game never sends the active `HEADER_GD_PET_ITEM_DESTROY` request.
 
 Safety class: **Stage B disposable item + DB observation**.
+
+
+## GPET-T19 — Transport-box post-removal lifetime
+Covers `BUG-GPET-019`.
+
+Future isolated debug/ASan test:
+1. prepare a disposable valid Growth Pet seal and transport box;
+2. perform normal bagging;
+3. instrument the target seal destruction in `RemoveItem(item2, "PET_BAGGING")`;
+4. observe the following `item2->GetName()` call.
+
+Static prediction:
+the target CItem has already been destroyed when the success message reads its name.
+
+Safety class: **Stage C memory-safety / ASan / disposable items**.
+
+## GPET-T20 — Dead-pet transport-box revive
+Covers `BUG-GPET-020`.
+
+Future isolated validation:
+1. prepare a disposable expired/dead Growth Pet seal and record socket0 plus `pet_max_time`;
+2. use transport box VNUM 55002 on that seal;
+3. confirm the box accepts/stores the pet state;
+4. unbag while the transport box itself is still valid;
+5. compare the new seal socket0 with the original expired value.
+
+Static prediction:
+the new seal receives `now + pet_max_time`, making the formerly dead pet alive at full lifetime without the normal revive mechanic.
+
+Safety class: **Stage B disposable pet / transport-box validation**.
