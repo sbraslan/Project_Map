@@ -125,3 +125,23 @@ Safety class: **Stage B/C cross-window lifetime / sanitizer**.
 Do not run on production.
 
 No test executed.
+
+
+## Runtime-readiness classification — 2026-09-28
+
+**Documentation:** READY  
+**Execution:** LOCKED / NOT RUN
+
+Coverage:
+- LOOK-T01 -> BUG-LOOK-001 — Stage B modified-client/null-deref safety.
+- LOOK-T02 -> BUG-LOOK-002 — Stage A ordinary UI eligibility observation; Stage B disposable commit.
+- LOOK-T03 -> BUG-LOOK-003 — Stage A/B controlled normal-flow warp/state observation.
+- LOOK-T04 -> BUG-LOOK-004 — Stage B modified-client sealed-material validation.
+- LOOK-T05 -> BUG-LOOK-005 — Stage B modified-client state-invariant bypass.
+- LOOK-T06 -> BUG-LOOK-006 — Stage C crash/lifetime/sanitizer.
+- LOOK-T07 -> BUG-LOOK-007 — Stage C cross-window lifetime/sanitizer.
+
+Primary non-destructive future observations are LOOK-T02 eligibility-only and LOOK-T03.
+They do **not** supersede the global first live gate: DUNGEON-T10 remains first.
+
+No test executed.
