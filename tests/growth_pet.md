@@ -244,3 +244,19 @@ Static prediction:
 only the last submitted feed slot is applied/consumed; earlier selected items remain untouched although the feed UI clears the batch.
 
 Safety class: **Stage A normal-client observation**.
+
+
+## GPET-T18 — Growth Pet DB orphan after seal destruction
+Covers `BUG-GPET-018`.
+
+Future isolated Stage B test:
+1. hatch a disposable Growth Pet and record seal item id plus pet id/socket2;
+2. verify the corresponding `pet.id` row exists;
+3. destroy the seal through a normal allowed destruction path;
+4. verify the normal item row is gone;
+5. query the separate pet row by the recorded pet id.
+
+Static prediction:
+the pet row remains because the game never sends the active `HEADER_GD_PET_ITEM_DESTROY` request.
+
+Safety class: **Stage B disposable item + DB observation**.
