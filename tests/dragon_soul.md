@@ -51,16 +51,8 @@ Static prediction:
 
 Safety class: **Stage B controlled instrumentation / memory-registry observation**.
 
-## Candidate DS-C01 — Step refine equipped-first asymmetry
-Not yet tied to a verified bug.
-
-Only in isolated modified-client testing:
-- build a valid-count step-refine grid containing one equipped DS;
-- vary allocation/pointer order;
-- check whether equipped item becomes the first `std::set` element and bypasses the later `IsEquipped()` loop.
-
-Do not run until the static candidate is promoted or explicitly selected.
-
+## Historical candidate DS-C01 — PROMOTED
+The first-item Step-refine equipped-state asymmetry is now canonical `BUG-DS-008 / DS-T08`.
 
 ## DS-T04 — Change Attribute material subtype enforcement
 Covers `BUG-DS-004`.
@@ -114,5 +106,23 @@ Future controlled observation:
 Static prediction: CanWarp/WarpSet preserve the opener pointer.
 
 Safety class: **Stage A/B normal-flow state observation**.
+
+No Dragon Soul test has been executed.
+
+
+## DS-T08 — Step refine equipped-first validation
+Covers `BUG-DS-008`.
+
+Future isolated modified-client/debug test:
+1. prepare a valid Step refine set with one equipped Dragon Soul and the remaining matching materials/items;
+2. place the equipped DS position in the packet grid;
+3. record pointer ordering of the resolved item set;
+4. only evaluate the branch where the equipped DS is `set_items.begin()`;
+5. observe whether Step refine proceeds to consume/unequip that item.
+
+Static prediction: the first pointer-sorted item bypasses `IsEquipped()`; later consumption can remove it.
+
+Safety class: **Stage B/C modified-client + destructive lifetime/state test**.
+Never use production items.
 
 No Dragon Soul test has been executed.
