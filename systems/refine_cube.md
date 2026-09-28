@@ -305,3 +305,97 @@ No Refine/Cube runtime test has been executed.
 5. audit over-9 refine conditional path and current deployment reachability;
 6. close client `uirefine.py` presentation/session lifecycle;
 7. consolidate runtime ownership and decide STATIC COMPLETE.
+
+
+## Closure pass — recipe source, metadata and dormant Over9 — 2026-09-28
+
+### Refine recipe deployment source
+Classic refine recipes are not loaded from a tracked text file by the game process.
+
+DB boot executes a SELECT from `refine_proto` for id, cost, probability and up to five material VNUM/count pairs, then sends `TRefineTable` rows to game.
+
+The DB loader zero-initializes each row and stops material parsing at the first zero VNUM, but it does not enforce semantic domains for probability, cost, material counts or duplicate IDs.
+
+No SQL dump/current `refine_proto` dataset is tracked in the mapped repositories, so current production recipe values cannot be statically audited from GitHub. This is a deployment-data visibility limitation, not a promoted defect without a bad reachable row.
+
+### Current Cube data domain audit
+Tracked `share/locale/europe/cube.txt` contains 3327 complete sections.
+
+Current observed domains:
+- percent: 2..100;
+- gold: 0..500,000,000;
+- gem: 0..25,000;
+- material VNUM/count: all positive in parsed sections;
+- exactly one positive reward entry per parsed section.
+
+No additional bad current Cube value was promoted from those domains.
+
+The independent constructor/default problem remains `BUG-REFCUBE-006`: `allow_copy` is absent from every current section and `not_remove` is absent from 512 sections while the corresponding fields are not initialized by `CUBE_DATA()`.
+
+### MONEY_ONLY / Devil Tower / Serpent authorization
+`REFINE_TYPE_MONEY_ONLY` rechecks authorization at packet execution time.
+
+Serpent:
+- must currently be in a Snake map;
+- must have passed the 24h `snake_lair.refine_time` gate.
+
+Devil Tower:
+- requires positive `deviltower_zone.can_refine`;
+- decrements it only when `DoRefine(..., true)` reports success.
+
+No second `BUG-REFCUBE-008`-style remote authorization issue was promoted for MONEY_ONLY.
+
+### Scroll item-creation failure ordering
+Scroll/material costs are consumed before the result `CreateItem()` call.
+
+If result item creation unexpectedly fails, the source item can survive while consumed materials/scroll are not rolled back. This remains a robustness/fault-injection candidate because no tracked normal-data producer of result-item creation failure was established.
+
+### Over-9 refine
+`COver9RefineManager` is constructed and Lua bindings exist:
+- `item.can_over9refine`;
+- `item.change_to_over9`;
+- `item.over9refine`;
+- `item.get_over9_material_vnum`.
+
+The tracked Project_Game quest source contains no current usage of those bindings, and no tracked startup/config path populating `m_mapItem` through `enableOver9Refine()` was found.
+
+Its transform functions copy only sockets and normal attributes and would lose modern metadata, but without a tracked producer/active quest route this remains dormant and is not promoted.
+
+### Refine client lifecycle
+Normal client cancel/Escape sends `type=255`; server handles that value by `ClearRefineMode()`.
+
+The significant current client presentation defect is instead `BUG-REFCUBE-012`: `RefineDialogNew.Open()` calls the set-value binding with the wrong two-argument signature.
+
+### Transform metadata matrix
+`ITEM_MANAGER::CopyAllAttrTo()` preserves:
+- classic/accessory sockets;
+- element state;
+- normal item attributes;
+- Yohara random apply attributes.
+
+It does not preserve:
+- ChangeLook/transmutation VNUM -> `BUG-REFCUBE-013`;
+- Set Item `set_value` -> `BUG-REFCUBE-014`;
+- Yohara/Serpent random-default values -> `BUG-REFCUBE-015`;
+- Basic starter-item flag -> `BUG-REFCUBE-016`.
+
+Seal date is copied explicitly by the mapped classic refine callers.
+
+Tracked data confirms normal reachability:
+- Set Smith recipes include +7/+8/+9 weapon families;
+- Serpent ranges contain continuous +0..+15 families and generated random defaults affect combat;
+- Basic starter equipment includes refinable body armor while `BLOCK_REFINE_ON_BASIC` is disabled;
+- ChangeLook explicitly accepts ordinary weapons and body armor, and classic refine has no ChangeLook exclusion.
+
+## Current verified findings
+`BUG-REFCUBE-001..016`.
+
+## Closure assessment
+All mapped classic refine, scroll, money-only/Serpent, Cube Renewal, Over9 exposure, client refine UI and persistent transform-metadata boundaries have static ownership.
+
+Remaining non-promoted boundaries are deployment/fault-injection dependent:
+- untracked live DB `refine_proto` semantic values;
+- result `CreateItem()` failure after pre-consumption;
+- dormant Over9 metadata loss without a tracked producer.
+
+No runtime test has been executed.
