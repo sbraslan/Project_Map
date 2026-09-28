@@ -8,7 +8,7 @@
   "active": {
     "subsystem": "acce_sash",
     "display_name": "Acce / Sash",
-    "status": "STATIC MAPPING IN PROGRESS / 6 VERIFIED STATIC BUGS / EXECUTION LOCKED",
+    "status": "STATIC MAPPING IN PROGRESS / 7 VERIFIED STATIC BUGS / EXECUTION LOCKED",
     "system_file": "systems/acce.md",
     "bug_file": "bugs/acce.md",
     "test_file": "tests/acce.md",
@@ -18,15 +18,16 @@
       "BUG-ACCE-003",
       "BUG-ACCE-004",
       "BUG-ACCE-005",
-      "BUG-ACCE-006"
+      "BUG-ACCE-006",
+      "BUG-ACCE-007"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Close Acce combine grade/refine-chain and output-placement edge cases.",
-      "Validate extended element/random/set reversal semantics.",
-      "Close remaining Acce proto/runtime ownership notes.",
-      "Decide STATIC COMPLETE promotion after the final static pass.",
-      "Do not execute ACCE-T01..T06 or any runtime test without an explicit phase change."
+      "Inspect Acce combine grade/refine-chain and output-state preservation edge cases.",
+      "Inspect current sash proto/data/refine chains and client scale/model dependencies.",
+      "Audit Acce server window mutual exclusion against Aura/ChangeLook/other W_* windows.",
+      "Close remaining item-lifetime/persistence/reset edge cases without runtime execution.",
+      "Prepare static closure/readiness only after remaining edge audit."
     ]
   },
   "startup": {
@@ -248,7 +249,10 @@
     "BUG-ACCE-005::reversal UpdatePacket precedes ClearAllAttribute causing stale client attributes",
     "BUG-ACCE-006::absorption accepts occupied sash and overwrites previous absorbed state",
     "Acce visual::item_list WING GR2 -> CItemData -> PART_ACCE -> Bip01 Spine2",
-    "Acce lifecycle::CanWarp and IsHack masks omit W_ACCE; close remains client-driven"
+    "Acce lifecycle::CanWarp and IsHack masks omit W_ACCE; close remains client-driven",
+    "BUG-ACCE-006::server re-absorption overwrites non-empty sash without reversal",
+    "BUG-ACCE-007::warp can preserve Acce open booleans/W_ACCE",
+    "Project_ClientSrc + playersettingmodule.py::SE_ACCE_BACK initial effect path closed as non-bug"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -1873,7 +1877,8 @@
       "BUG-ACCE-003",
       "BUG-ACCE-004",
       "BUG-ACCE-005",
-      "BUG-ACCE-006"
+      "BUG-ACCE-006",
+      "BUG-ACCE-007"
     ],
     "canonical_files": {
       "system": "systems/acce.md",
@@ -1901,15 +1906,20 @@
         "ACCE-T03",
         "ACCE-T04",
         "ACCE-T05",
-        "ACCE-T06"
+        "ACCE-T06",
+        "ACCE-T07"
       ],
       "first_live_gate_unchanged": "DUNGEON-T10"
     },
     "next": [
-      "combine refine-chain edge cases",
-      "extended reset semantics",
-      "proto/runtime ownership closure",
-      "STATIC COMPLETE decision"
+      "combine refine-chain/output-state preservation",
+      "proto/data/client scale-model closure",
+      "cross-window mutual exclusion",
+      "remaining item-lifetime/reset edges"
+    ],
+    "closed_observations": [
+      "EFFECT_ACCE_BACK initial attachment is produced by SE_ACCE_BACK special-effect packet; SetAcce condition alone is not a missing-effect bug.",
+      "Reversal leaves element/random/set metadata but live Acce point application is gated by socket0 and set counting excludes sash slot."
     ]
   }
 }
