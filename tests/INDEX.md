@@ -53,3 +53,9 @@ Dragon Soul is STATIC COMPLETE. `DS-T01..DS-T11` are canonical deferred plans; n
 - `ACCE-T` -> `acce.md`
 
 Acce is STATIC COMPLETE. `ACCE-T01..ACCE-T08` are canonical deferred tests; none has been executed. Global first execution gate remains `DUNGEON-T10`.
+
+
+## Aura System prefix ownership — 2026-09-28
+- `AURA-T` -> `aura.md`.
+
+Aura is mapping-in-progress. `AURA-T01` is deferred and has not been executed. Global first execution gate remains `DUNGEON-T10`.
