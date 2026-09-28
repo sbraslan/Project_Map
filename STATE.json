@@ -8,7 +8,7 @@
   "active": {
     "subsystem": "dragon_soul",
     "display_name": "Dragon Soul / Alchemy",
-    "status": "STATIC MAPPING IN PROGRESS / 7 VERIFIED STATIC BUGS / EXECUTION LOCKED",
+    "status": "STATIC MAPPING IN PROGRESS / 8 VERIFIED STATIC BUGS / EXECUTION LOCKED",
     "system_file": "systems/dragon_soul.md",
     "bug_file": "bugs/dragon_soul.md",
     "test_file": "tests/dragon_soul.md",
@@ -19,16 +19,17 @@
       "BUG-DS-004",
       "BUG-DS-005",
       "BUG-DS-006",
-      "BUG-DS-007"
+      "BUG-DS-007",
+      "BUG-DS-008"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Close Dragon Soul grade/step/strength material-count and stack semantics.",
-      "Inspect deck/set bonus reactivation and relog persistence behavior.",
+      "Inspect Dragon Soul deck/set bonus reactivation and relog persistence behavior.",
       "Audit refine-window overlap and remaining cross-window interactions.",
       "Audit extraction tools and source/extractor aliasing.",
       "Inspect Dragon Soul quest qualification/daily lifecycle.",
-      "Do not execute DS-T01..DS-T07 or any runtime test without an explicit phase change."
+      "Close malformed-data candidates only if tracked/current reachability is established.",
+      "Do not execute DS-T01..DS-T08 or any runtime test without an explicit phase change."
     ]
   },
   "startup": {
@@ -260,7 +261,9 @@
     "Project_ClientSrc/GameLib/ItemManager.cpp::LoadItemScale applies base VNUM scale across grade range",
     "Acce / Sash::STATIC COMPLETE",
     "tests/acce.md::ACCE-T01..ACCE-T08 readiness consolidated; execution locked",
-    "RUNTIME.md::Acce post-audit readiness extension"
+    "RUNTIME.md::Acce post-audit readiness extension",
+    "BUG-DS-008::DoRefineStep skips IsEquipped for std::set begin pointer and can consume an equipped Dragon Soul",
+    "tests/dragon_soul.md::DS-T08 equipped-first step refine deferred"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -1874,10 +1877,10 @@
       "BUG-DS-004",
       "BUG-DS-005",
       "BUG-DS-006",
-      "BUG-DS-007"
+      "BUG-DS-007",
+      "BUG-DS-008"
     ],
     "candidates": [
-      "DS-C01: DoRefineStep first std::set item skips IsEquipped validation; pointer ordering affects reachability.",
       "GetBasePosition uses row_type > DRAGON_SOUL_GRADE_MAX rather than >=; malformed grade required.",
       "DoChangeAttr indexes five-entry needFireCountList by VNUM-derived step without explicit bounds guard; malformed step required.",
       "ChangeAttrStepTables and ChangeStone* data groups have no mapped consumer in current implementation."
@@ -1888,7 +1891,8 @@
       "HEADER_CG_DRAGON_SOUL_REFINE subtype dispatch",
       "grade/step/strength/change-attr refine",
       "Dragon Heart extraction",
-      "ENABLE_DS_REFINE_WINDOW self-opener command"
+      "ENABLE_DS_REFINE_WINDOW self-opener command",
+      "grade/step/strength material-count semantics; step first-pointer equipped validation -> BUG-DS-008"
     ],
     "canonical_tests": [
       "DS-T01",
@@ -1897,7 +1901,8 @@
       "DS-T04",
       "DS-T05",
       "DS-T06",
-      "DS-T07"
+      "DS-T07",
+      "DS-T08"
     ],
     "runtime_readiness": "NOT YET CONSOLIDATED",
     "table_parity": {
