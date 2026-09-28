@@ -6,28 +6,29 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "acce_sash",
-    "display_name": "Acce / Sash",
+    "subsystem": "dragon_soul",
+    "display_name": "Dragon Soul / Alchemy",
     "status": "STATIC MAPPING IN PROGRESS / 7 VERIFIED STATIC BUGS / EXECUTION LOCKED",
-    "system_file": "systems/acce.md",
-    "bug_file": "bugs/acce.md",
-    "test_file": "tests/acce.md",
+    "system_file": "systems/dragon_soul.md",
+    "bug_file": "bugs/dragon_soul.md",
+    "test_file": "tests/dragon_soul.md",
     "verified_bug_ids": [
-      "BUG-ACCE-001",
-      "BUG-ACCE-002",
-      "BUG-ACCE-003",
-      "BUG-ACCE-004",
-      "BUG-ACCE-005",
-      "BUG-ACCE-006",
-      "BUG-ACCE-007"
+      "BUG-DS-001",
+      "BUG-DS-002",
+      "BUG-DS-003",
+      "BUG-DS-004",
+      "BUG-DS-005",
+      "BUG-DS-006",
+      "BUG-DS-007"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Inspect Acce combine grade/refine-chain and output-state preservation edge cases.",
-      "Inspect current sash proto/data/refine chains and client scale/model dependencies.",
-      "Audit Acce server window mutual exclusion against Aura/ChangeLook/other W_* windows.",
-      "Close remaining item-lifetime/persistence/reset edge cases without runtime execution.",
-      "Prepare static closure/readiness only after remaining edge audit."
+      "Close Dragon Soul grade/step/strength material-count and stack semantics.",
+      "Inspect deck/set bonus reactivation and relog persistence behavior.",
+      "Audit refine-window overlap and remaining cross-window interactions.",
+      "Audit extraction tools and source/extractor aliasing.",
+      "Inspect Dragon Soul quest qualification/daily lifecycle.",
+      "Do not execute DS-T01..DS-T07 or any runtime test without an explicit phase change."
     ]
   },
   "startup": {
@@ -252,7 +253,14 @@
     "Acce lifecycle::CanWarp and IsHack masks omit W_ACCE; close remains client-driven",
     "BUG-ACCE-006::server re-absorption overwrites non-empty sash without reversal",
     "BUG-ACCE-007::warp can preserve Acce open booleans/W_ACCE",
-    "Project_ClientSrc + playersettingmodule.py::SE_ACCE_BACK initial effect path closed as non-bug"
+    "Project_ClientSrc + playersettingmodule.py::SE_ACCE_BACK initial effect path closed as non-bug",
+    "BUG-ACCE-007::CanWarp/WarpSet preserve Acce open state and can leave CanHandleItem blocked",
+    "BUG-ACCE-008::reversal leaves copied element/set metadata persisted after socket0 reset",
+    "Project_Binary/locale/locale/common/item_scale.txt::Acce job/sex scale families",
+    "Project_ClientSrc/GameLib/ItemManager.cpp::LoadItemScale applies base VNUM scale across grade range",
+    "Acce / Sash::STATIC COMPLETE",
+    "tests/acce.md::ACCE-T01..ACCE-T08 readiness consolidated; execution locked",
+    "RUNTIME.md::Acce post-audit readiness extension"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -305,7 +313,8 @@
     "world_lottery",
     "world_boss",
     "sung_mahi_tower",
-    "costume_appearance"
+    "costume_appearance",
+    "acce_sash"
   ],
   "ranking_closure": {
     "status": "STATIC COMPLETE",
@@ -462,7 +471,8 @@
       "world_lottery",
       "world_boss",
       "sung_mahi_tower",
-      "costume_appearance"
+      "costume_appearance",
+      "acce_sash"
     ],
     "dungeon_info": {
       "status": "DOCUMENTATION READY / NOT RUN",
@@ -1594,7 +1604,8 @@
       "BFIELD-T": "tests/battle_field.md",
       "WLOT-T": "tests/world_lottery.md",
       "WB-T": "tests/world_boss.md",
-      "SMT-T": "tests/sung_mahi_tower.md"
+      "SMT-T": "tests/sung_mahi_tower.md",
+      "ACCE-T": "tests/acce.md"
     },
     "global_execution_order": {
       "stage_a_normal_current_flow": [
@@ -1706,11 +1717,38 @@
       "execution_priority": "Does not supersede DUNGEON-T10"
     },
     "coverage": {
-      "static_complete_subsystems": 22,
-      "readiness_owned_subsystems": 22,
+      "static_complete_subsystems": 23,
+      "readiness_owned_subsystems": 23,
       "folded_companions": [
         "guild"
       ]
+    },
+    "acce_sash": {
+      "status": "READY / EXECUTION LOCKED / NOT RUN",
+      "system_file": "systems/acce.md",
+      "bug_file": "bugs/acce.md",
+      "test_file": "tests/acce.md",
+      "verified_bug_ids": [
+        "BUG-ACCE-001",
+        "BUG-ACCE-002",
+        "BUG-ACCE-003",
+        "BUG-ACCE-004",
+        "BUG-ACCE-005",
+        "BUG-ACCE-006",
+        "BUG-ACCE-007",
+        "BUG-ACCE-008"
+      ],
+      "canonical_test_ids": [
+        "ACCE-T01",
+        "ACCE-T02",
+        "ACCE-T03",
+        "ACCE-T04",
+        "ACCE-T05",
+        "ACCE-T06",
+        "ACCE-T07",
+        "ACCE-T08"
+      ],
+      "first_live_gate": "DUNGEON-T10"
     }
   },
   "folded_subsystems": {
@@ -1870,7 +1908,7 @@
     }
   },
   "acce_sash_mapping": {
-    "status": "STATIC MAPPING IN PROGRESS",
+    "status": "STATIC COMPLETE",
     "verified_bug_ids": [
       "BUG-ACCE-001",
       "BUG-ACCE-002",
@@ -1878,7 +1916,8 @@
       "BUG-ACCE-004",
       "BUG-ACCE-005",
       "BUG-ACCE-006",
-      "BUG-ACCE-007"
+      "BUG-ACCE-007",
+      "BUG-ACCE-008"
     ],
     "canonical_files": {
       "system": "systems/acce.md",
@@ -1896,10 +1935,13 @@
       "reversal scroll -> SetSocket(0,0) packet -> silent ClearAllAttribute client desync",
       "client visual: PART_ACCE -> CInstanceBase::SetAcce -> CActorInstance::AttachAcce -> item_list GR2 -> Bip01 Spine2",
       "normal client absorb-left requires socket0 == 0; server does not enforce empty target",
-      "CanWarp/IsHack opened-window masks omit W_ACCE; client distance-close sends Acce close"
+      "CanWarp/IsHack opened-window masks omit W_ACCE; client distance-close sends Acce close",
+      "combine refine-chain/output-state preservation closed; no new promoted defect beyond same-slot BUG-ACCE-004",
+      "client scale: item_scale.txt -> CItemManager::LoadItemScale -> per-job/per-sex grade scale",
+      "reversal extended metadata persistence -> BUG-ACCE-008"
     ],
     "runtime_tests": {
-      "status": "DRAFT / NOT RUN / EXECUTION LOCKED",
+      "status": "READY / NOT RUN / EXECUTION LOCKED",
       "canonical_test_ids": [
         "ACCE-T01",
         "ACCE-T02",
@@ -1907,19 +1949,17 @@
         "ACCE-T04",
         "ACCE-T05",
         "ACCE-T06",
-        "ACCE-T07"
+        "ACCE-T07",
+        "ACCE-T08"
       ],
       "first_live_gate_unchanged": "DUNGEON-T10"
     },
-    "next": [
-      "combine refine-chain/output-state preservation",
-      "proto/data/client scale-model closure",
-      "cross-window mutual exclusion",
-      "remaining item-lifetime/reset edges"
-    ],
+    "next": [],
     "closed_observations": [
       "EFFECT_ACCE_BACK initial attachment is produced by SE_ACCE_BACK special-effect packet; SetAcce condition alone is not a missing-effect bug.",
-      "Reversal leaves element/random/set metadata but live Acce point application is gated by socket0 and set counting excludes sash slot."
+      "Cross-window ChangeLook/Acce destructive overlap is canonically owned by BUG-LOOK-007; no duplicate Acce bug ID.",
+      "Aura/Acce opener coexistence is an integration observation without a separately proven Acce corruption path.",
+      "Normal Acce uint8 slot fields cover the 180-cell default inventory and do not truncate supported Acce inputs."
     ]
   }
 }
