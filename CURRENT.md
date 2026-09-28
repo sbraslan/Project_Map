@@ -1,7 +1,6 @@
 # CURRENT — Canonical Active Checkpoint
 
 **Active phase:** Detection / Mapping Only
-**Active state:** Static Mapping Resumed
 **Active subsystem:** Costume / Appearance / ChangeLook
 **Status:** STATIC MAPPING IN PROGRESS
 **Machine state:** `STATE.json`
@@ -14,37 +13,32 @@
 ## Hard rule
 Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-only. Runtime execution remains locked.
 
-## Saved item workflow
-`item ekleyeceğiz` -> use `ITEM_CREATION_AUTOMATION.md`.
-
-## Closed this turn
-- hide-costume + ChangeLook body/weapon visibility path: no bug verified;
-- initial type/subtype/anti-flag compatibility logic mapped;
-- raw checked-in item lifetime mapped through real-time expiry and destruction.
+## This turn
+- renewed W_* registry audited against `CTransmutation::Open()`;
+- ChangeLook omits Acce/Aura/GuildBank/Roulette/Switchbot from its open guard;
+- Acce overlap promoted to `BUG-LOOK-007`;
+- cross-type rendering from `BUG-LOOK-005` statically closed:
+  - PART_MAIN reads arbitrary ChangeLook item VALUE3 as ShapeIndex;
+  - PART_WEAPON receives arbitrary final ChangeLook VNUM without type normalization;
+- item creation automation updated with ChangeLook compatibility constraints.
 
 ## Verified bug set
-- `BUG-LOOK-001` — right-slot-before-left null dereference.
-- `BUG-LOOK-002` — quest mount targets 50051..50053 accept arbitrary non-costume material.
-- `BUG-LOOK-003` — CanWarp omits W_CHANGELOOK.
-- `BUG-LOOK-004` — sealed right material lacks server revalidation.
-- `BUG-LOOK-005` — LEFT can be removed/replaced after RIGHT compatibility check; Accept does not revalidate.
-- `BUG-LOOK-006` — real-time expiry can delete checked-in item while CTransmutation keeps a dangling raw pointer.
+`BUG-LOOK-001..007`.
 
 ## Deferred tests
-LOOK-T01..LOOK-T06. None executed.
+`LOOK-T01..LOOK-T07`. None executed.
 
-## Mount expiry
-Still deferred as incomplete intent:
-- helper/event code exists;
-- Accept does not initialize socket2/start expiry;
-- intended product semantics not yet sufficiently proven for promotion.
+## No new bug
+- hide-costume + ChangeLook remains sound;
+- DB persistence/reversal remains sound;
+- Aura overlap exists but no separate corruption root cause promoted beyond documented cross-window risk;
+- GuildStorage/Roulette/Switchbot omissions need concrete ChangeLook mutation evidence before promotion.
 
 ## Exact next work
-1. audit `CTransmutation::Open` against all renewed open-window states;
-2. close remaining mount expiry intent/call-chain;
-3. inspect invalid cross-type client rendering from BUG-LOOK-005;
-4. map costume item-creation companion dependencies;
-5. consider subsystem closure only after these edges are exhausted.
+1. close mount expiry semantics;
+2. inspect free-ticket pointer lifetime and duplicate-position aliasing;
+3. finish omitted-window concrete-impact audit;
+4. if no further verified edge remains, prepare STATIC COMPLETE + runtime-readiness documentation.
 
 DUNGEON-T10 remains prepared but runtime-locked.
 
