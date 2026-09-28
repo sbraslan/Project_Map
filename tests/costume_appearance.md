@@ -104,3 +104,24 @@ Safety class: **Stage B/C crash / lifetime / sanitizer**.
 Do not run on production.
 
 No test executed.
+
+
+## LOOK-T07 — ChangeLook + Acce shared-item lifetime
+Covers `BUG-LOOK-007`.
+
+Future isolated debug sequence:
+1. open ChangeLook and check in a disposable eligible weapon/body armor;
+2. open Acce absorption without closing ChangeLook;
+3. use the same item as Acce material with a disposable sash;
+4. allow Acce to consume the material;
+5. under ASan/debug only, trigger ChangeLook checkout/accept.
+
+Static prediction:
+- Acce and ChangeLook can coexist;
+- Acce deletes the material;
+- ChangeLook retains the stale raw pointer.
+
+Safety class: **Stage B/C cross-window lifetime / sanitizer**.
+Do not run on production.
+
+No test executed.
