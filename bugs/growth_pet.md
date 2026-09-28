@@ -277,3 +277,38 @@ The structured `m_PetInfo.pet_birthday` used by `GetPetAgeDays()` is initialized
 **Impact:** the intended 30-day final evolution age requirement is effectively bypassed for normally hatched current pets.
 
 **Runtime:** Stage A normal-flow socket/age observation. See `GPET-T11`.
+
+
+## BUG-GPET-012 — Unsummoned pet name-change returns success without changing the name or consuming the scroll
+
+**Status:** VERIFIED STATIC / NORMAL CLIENT REACHABLE
+
+Normal client `PetNameChangeWindow.NameChangeWindowOpen()` accepts an inventory growth-pet seal with a valid pet id; it does not require that pet to be currently summoned.
+
+The client sends:
+- name-change material slot;
+- target pet seal slot;
+- requested name.
+
+Server `CInputMain::GrowthPetNameChangeRequest()` validates both items and the name, then resolves the target pet actor.
+
+If that pet is summoned:
+- `pGrowthPetSystem->ChangeName(__pet_name)` executes;
+- the PET_NAME_CHANGE material is removed;
+- success is sent.
+
+If that pet is **not** summoned, the server instead:
+1. constructs `NAME_CHANGE_USE_SUCCESS`;
+2. sends the success packet and chat message;
+3. immediately `return`s.
+
+That branch never:
+- writes `pet_nick` into the target seal's `TGrowthPetInfo`;
+- saves the target item;
+- consumes the PET_NAME_CHANGE material.
+
+The client treats success as authoritative and closes the dialog.
+
+**Impact:** the normal unsummoned rename flow falsely reports success while performing no rename and charging no material. The user sees a completed operation but the pet name remains unchanged.
+
+**Runtime:** Stage A/B disposable unsummoned-pet rename check; see `GPET-T12`.
