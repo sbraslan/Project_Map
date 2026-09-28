@@ -6,19 +6,19 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "runtime_gate_handoff",
-    "display_name": "DUNGEON-T10 Preflight Handoff",
-    "status": "STATIC MAPPING COMPLETE / RUNTIME READINESS AUDITED / EXECUTION LOCKED",
+    "subsystem": "runtime_gate_ready",
+    "display_name": "DUNGEON-T10 Runtime Gate Ready",
+    "status": "PREFLIGHT COMPLETE / EXECUTION LOCKED",
     "system_file": null,
     "bug_file": null,
-    "test_file": "RUNTIME.md",
+    "test_file": "DUNGEON_T10_HANDOFF.md",
     "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Prepare the documentation-only DUNGEON-T10 runtime gate handoff/checklist without executing the test.",
-      "Use READINESS_AUDIT.md as the canonical global ownership/order reference.",
-      "Keep DUNGEON-T10 as the first future live gate.",
-      "Preserve all source/game repositories as read-only and keep runtime execution locked until the user explicitly changes phase."
+      "Runtime gate DUNGEON-T10 is fully documented and ready, but do not execute it until the user explicitly changes phase.",
+      "When execution is authorized, follow DUNGEON_T10_HANDOFF.md exactly and capture the required evidence before any fix.",
+      "After T10 evidence is recorded, stop before applying FIX-DUNGEON-010 unless source-change authorization is separately explicit.",
+      "Keep all source/game repositories read-only under the current phase."
     ]
   },
   "startup": {
@@ -187,7 +187,8 @@
     "RUNTIME.md::World Lottery WLOT-T01-T15 readiness consolidated; execution locked",
     "RUNTIME.md::World Boss WB-T01-T16 readiness consolidated; execution locked",
     "RUNTIME.md::Sung Mahi SMT-T01-T06 readiness consolidated; runtime-readiness documentation milestone complete",
-    "READINESS_AUDIT.md::global integrity audit complete; 21/21 coverage; DUNGEON namespaces qualified; Guild lifecycle folded coverage"
+    "READINESS_AUDIT.md::global integrity audit complete; 21/21 coverage; DUNGEON namespaces qualified; Guild lifecycle folded coverage",
+    "DUNGEON_T10_HANDOFF.md::first live runtime gate preflight complete; execution locked"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -373,7 +374,7 @@
       "SMT-T05",
       "SMT-T06"
     ],
-    "documentation_cursor": "dungeon_t10_preflight_handoff",
+    "documentation_cursor": "dungeon_t10_gate_ready",
     "completed_readiness_clusters": [
       "dungeon_info",
       "ticket",
@@ -1581,6 +1582,35 @@
       ],
       "stage_b_isolated_controlled": "Use subsystem-local canonical test files and READINESS_AUDIT.md; includes modified-client, parser, admin, dataset, sanitizer and controlled-state tests.",
       "stage_c_persistence_fault": "Use subsystem-local canonical test files and READINESS_AUDIT.md; includes crash-consistency, DB fault, pending-load, restart and durability tests."
+    },
+    "dungeon_t10_handoff": {
+      "status": "READY / EXECUTION LOCKED / NOT RUN",
+      "file": "DUNGEON_T10_HANDOFF.md",
+      "canonical_bug": "DINFO::BUG-DUNGEON-010",
+      "canonical_test": "DUNGEON-T10",
+      "trigger": "Normal login -> minimap Dungeon Info button -> observe opened window",
+      "expected_static_prediction": "Window opens with no dungeon rows although tracked config has 9 entries.",
+      "forbidden_during_gate": [
+        "source edit",
+        "config edit",
+        "DB mutation",
+        "packet injection",
+        "Python console/injection",
+        "GM/admin workaround",
+        "apply FIX-DUNGEON-010 before evidence"
+      ],
+      "result_classes": [
+        "REPRODUCED",
+        "NOT REPRODUCED",
+        "INCONCLUSIVE"
+      ],
+      "stop_after_capture": true,
+      "downstream_order": [
+        "DUNGEON-T09",
+        "DUNGEON-T11",
+        "DUNGEON-T12"
+      ],
+      "downstream_blocked_until_t10_recorded": true
     }
   },
   "folded_subsystems": {
