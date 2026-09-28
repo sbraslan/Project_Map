@@ -209,3 +209,51 @@ Server `AcceRefine(..., bAcceWindow == 1, ...)` does not check socket 0 before:
 - deleting the new material.
 
 Therefore an occupied/previously absorbed sash can be re-absorbed through a crafted final request. See `BUG-ACCE-006`.
+
+
+## Re-absorption policy gap — 2026-09-28
+
+Official client absorption LEFT eligibility requires an empty absorbed-item socket:
+`GetItemMetinSocket(attachedSlotPos, 0) == 0`.
+
+Server `CHARACTER::AcceRefine(..., bAcceWindow == 1)` does not enforce the same invariant.
+
+After type/apply/material checks it directly overwrites:
+`AcceItem->SetSocket(0, AcceMaterial->GetVnum())`
+and copies normal/element/random/set metadata before consuming the new source item.
+
+Therefore a modified client can use an already-absorbed sash as the target and replace its absorption directly, without first using reversal item 39046/90000.
+
+This is a server/client policy mismatch and bypasses the intended reversal step/cost. See `BUG-ACCE-006`.
+
+## Warp / Acce-window lifecycle
+
+Server open state:
+- `OpenAcceCombination()` -> `m_bAcceCombination = true`, `W_ACCE = true`;
+- `OpenAcceAbsorption()` -> `m_bAcceAbsorption = true`, `W_ACCE = true`;
+- `AcceClose()` is the explicit clear path.
+
+`CanHandleItem()` rejects item handling while either Acce boolean is true.
+
+But `CHARACTER::CanWarp()` does not include `W_ACCE` in its open-window mask and `WarpSet()` does not call `AcceClose()`.
+
+Client `uiAcce.AcceWindow.Close()` does send `HEADER_CG_ACCE_CLOSE_REQUEST`, and its distance watcher closes the dialog when the player moves more than 500 units from the opening point. However the client interface does not provide a separate guaranteed Acce close in its generic warp/loading teardown path; `wndAcce.Close()` appears only in the explicit dialog/refine conflict path.
+
+Thus server correctness currently depends on a client CLOSE packet rather than enforcing the warp invariant itself. A warp can preserve Acce open state and leave `CanHandleItem()` blocked after arrival if CLOSE is absent/lost during transition.
+
+See `BUG-ACCE-007`.
+
+## EFFECT_ACCE_BACK closure
+
+Client `SetAcce()` contains:
+`if (m_acceRefineEffect) m_acceRefineEffect = __AttachEffect(EFFECT_ACCE_BACK)`.
+
+Taken alone this looked like a reversed initial-attach condition because the handle initializes to zero.
+
+The full flow closes that concern:
+- server equip path emits `SE_ACCE_BACK` when sash socket1 > 18;
+- the client special-effect path maps it to `EFFECT_ACCE_BACK`;
+- `AttachSpecialEffect(EFFECT_ACCE_BACK)` assigns `m_acceRefineEffect`;
+- the effect itself is registered in `playersettingmodule.py` as `D:/ymir work/pc/common/effect/armor/acc_01.mse`.
+
+Therefore `SetAcce()` is not the only/initial producer of this effect handle. No standalone missing-effect bug is promoted from that condition.
