@@ -15,8 +15,8 @@
     "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Consolidate Exchange / Trade runtime readiness from bugs/exchange.md and tests/exchange.md without executing tests.",
-      "Preserve verified-versus-candidate status exactly; do not promote findings without evidence.",
+      "Consolidate Shop / Premium Private Shop runtime readiness from bugs/shop.md and tests/shop.md without executing tests.",
+      "Preserve historical IDs but use canonical subsystem test IDs when legacy identifiers collide.",
       "Keep DUNGEON-T10 as the first future live runtime gate.",
       "Preserve all source/game repositories as read-only until the user explicitly changes phase."
     ]
@@ -174,7 +174,8 @@
     "RUNTIME.md::Biolog T01-T11 readiness consolidated; execution locked",
     "RUNTIME.md::Inventory Item T01-T13 readiness consolidated; execution locked",
     "RUNTIME.md::Switchbot SWB-T01-T07 canonical readiness consolidated; execution locked",
-    "RUNTIME.md::Guild Storage GS-T01-T20 readiness consolidated; execution locked"
+    "RUNTIME.md::Guild Storage GS-T01-T20 readiness consolidated; execution locked",
+    "RUNTIME.md::Exchange EXC-T01-T10 canonical readiness consolidated; execution locked"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -343,7 +344,7 @@
       "SMT-T05",
       "SMT-T06"
     ],
-    "documentation_cursor": "exchange",
+    "documentation_cursor": "shop",
     "completed_readiness_clusters": [
       "dungeon_info",
       "ticket",
@@ -353,7 +354,8 @@
       "biolog",
       "inventory_items",
       "switchbot",
-      "guild_storage"
+      "guild_storage",
+      "exchange"
     ],
     "dungeon_info": {
       "status": "DOCUMENTATION READY / NOT RUN",
@@ -627,6 +629,59 @@
         "GS-T01",
         "GS-T02",
         "GS-T17"
+      ]
+    },
+    "exchange": {
+      "status": "DOCUMENTATION READY / NOT RUN",
+      "canonical_test_ids": [
+        "EXC-T01",
+        "EXC-T02",
+        "EXC-T03",
+        "EXC-T04",
+        "EXC-T05",
+        "EXC-T06",
+        "EXC-T07",
+        "EXC-T08",
+        "EXC-T09",
+        "EXC-T10"
+      ],
+      "verified_bug_tests": {
+        "BUG-EXCHANGE-001": [
+          "EXC-T01",
+          "EXC-T08"
+        ],
+        "BUG-EXCHANGE-002": [
+          "EXC-T02",
+          "EXC-T08"
+        ],
+        "BUG-EXCHANGE-003": [
+          "EXC-T03",
+          "EXC-T04"
+        ],
+        "BUG-EXCHANGE-004(currency_atomicity)": [
+          "EXC-T06"
+        ],
+        "BUG-EXCHANGE-004(final_distance)": [
+          "EXC-T07"
+        ],
+        "BUG-EXCHANGE-005": [
+          "EXC-T06"
+        ]
+      },
+      "observation_tests": [
+        "EXC-T05",
+        "EXC-T10"
+      ],
+      "regression_tests": [
+        "EXC-T09"
+      ],
+      "id_collisions": {
+        "BUG-EXCHANGE-004": "Two distinct verified findings share this historical ID.",
+        "observations": "Packet initialization and AddGold/Cheque condition labels are historically duplicated/inconsistent."
+      },
+      "normal_path_candidates": [
+        "EXC-T01",
+        "EXC-T02"
       ]
     }
   }
