@@ -192,3 +192,13 @@ Bu nedenle modified client, normal item-move kurallarınca çıkarılması engel
 
 ### Exchange static completion note
 BUG-EXCHANGE-001..005 ve OBS-EXCHANGE-001/002 ile ana statik risk seti çıkarıldı. Bundan sonraki Exchange işi öncelikle EX-T01..EX-T09 runtime doğrulamasıdır.
+
+
+## Registry identifier normalization note — 2026-09-28
+- `BUG-EXCHANGE-001..003` are stable verified identifiers.
+- `BUG-EXCHANGE-004` is currently reused by two distinct verified findings in this historical registry:
+  1. currency overflow/transaction atomicity;
+  2. missing final server-side distance recheck.
+- `BUG-EXCHANGE-005` is the gold-recipient-cap TOCTOU specialization.
+- Observation numbering around packet initialization versus AddGold/Cheque boolean logic is also historically duplicated/inconsistent.
+- Detection-only policy: **do not renumber or rewrite historical bug IDs now**. Runtime documentation must disambiguate by descriptive finding name and canonical `EXC-Txx` test ID.
