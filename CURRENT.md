@@ -10,17 +10,18 @@
 Only `sbraslan/Project_Map` is writable. All source/game repositories remain read-only. Runtime/fault-injection execution does not start unless the user explicitly changes phase.
 
 ## Just closed
-- Guild Storage runtime-readiness documentation is consolidated.
-- Verified coverage is recorded for BUG-GS-003, BUG-GS-004 and BUG-GS-007..011.
-- Legacy candidate GS-003/004 are treated as superseded by their verified records.
-- BUG-CANDIDATE-GS-001/002/005/006 remain candidates; no verified IDs were invented.
-- GS-T01..T06 and GS-T09 remain baseline/regression coverage.
+- Exchange / Trade runtime-readiness is consolidated.
+- New canonical test IDs EXC-T01..EXC-T10 replace ambiguous legacy EX-Txx / EXCHANGE-Txx references for future continuation.
+- BUG-EXCHANGE-001..003 have clear test coverage.
+- Historical BUG-EXCHANGE-004 is reused for two distinct verified findings; the collision is documented without renumbering.
+- Observation numbering around packet-init vs AddGold/Cheque logic is also historically inconsistent and is now referenced descriptively.
+- EXC-T01 and EXC-T02 are the primary normal-path Exchange candidates.
 - DUNGEON-T10 remains the first future live gate.
 - No runtime test was executed and no source/game file was changed.
 
 ## Exact next work
-1. Consolidate Exchange / Trade runtime readiness from `bugs/exchange.md` + `tests/exchange.md`.
-2. Preserve verified-vs-candidate status exactly; do not promote findings without evidence.
+1. Consolidate Shop / Premium Private Shop runtime readiness from `bugs/shop.md` + `tests/shop.md`.
+2. Preserve historical IDs but use canonical subsystem test IDs when legacy identifiers collide.
 3. Preserve DUNGEON-T10 as the first future live runtime gate.
 4. Keep every source/game repository immutable until the phase is explicitly changed.
 
