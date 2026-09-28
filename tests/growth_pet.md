@@ -170,3 +170,47 @@ Static prediction:
 the server sends success but leaves `pet_nick` unchanged and does not consume the name-change item.
 
 Safety class: **Stage A observation / disposable item**.
+
+
+## GPET-T13 — Immortal effect duration
+Covers `BUG-GPET-013`.
+
+Future controlled test:
+1. use a disposable eligible pet with Immortal learned;
+2. record skill level and server-derived current formula values;
+3. put the owner below the trigger HP threshold;
+4. observe a successful proc;
+5. measure the actual `AFFECT_IMPOSSIBLE_ATTACK` lifetime.
+
+Static prediction:
+the affect lasts exactly 123 seconds regardless of configured/scaled skill duration data.
+
+Safety class: **Stage B controlled combat-state test**.
+
+## GPET-T14 — Feather follow-AI suppression
+Covers `BUG-GPET-014`.
+
+Future normal-flow observation:
+1. summon a disposable pet with Light as a Feather learned;
+2. move the owner beyond normal pet follow distance;
+3. compare follow behavior against the same pet without Feather in an active skill slot;
+4. observe whether any Feather effect/cooldown is applied.
+
+Static prediction:
+each actor update returns from the Feather branch before `_UpdateFollowAI()`; the advertised skill effect is absent and pet follow updates stop.
+
+Safety class: **Stage A observation**.
+
+## GPET-T15 — Current-vs-next AUTO proc probability
+Covers `BUG-GPET-015`.
+
+Future controlled/debug validation:
+1. use non-max-level Invincibility and Panacea skills;
+2. record `skill_formula1` and `next_skill_formula1`;
+3. observe/log the probability value selected by the proc branch;
+4. compare with HEAL at the same skill level.
+
+Static prediction:
+Invincibility and Panacea select `next_skill_formula1`, while HEAL uses the current-level value.
+
+Safety class: **Stage A/debug observation**.
