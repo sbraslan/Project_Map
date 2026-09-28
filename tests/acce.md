@@ -67,4 +67,17 @@ Static prediction: socket0 clears immediately, but the old client attribute arra
 Safety: Stage A non-crash UI/state observation.
 
 
-Current ownership: ACCE-T01..T05. No test executed.
+Current ownership: ACCE-T01..T06. No test executed.
+
+
+## ACCE-T06 — Occupied-sash absorption overwrite
+Owner: BUG-ACCE-006.
+
+Future isolated modified-client check with disposable items:
+- prepare a sash with an existing absorbed item in socket0;
+- submit a final absorb request using that occupied sash and a valid disposable weapon/body armor;
+- capture target socket/attribute state and material consumption.
+
+Static prediction: server replaces the previous absorbed source/data and consumes the newly submitted material.
+
+Safety: Stage B destructive item-state test. Do not run on production.
