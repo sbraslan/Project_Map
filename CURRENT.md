@@ -10,18 +10,16 @@
 Only `sbraslan/Project_Map` is writable. All source/game repositories remain read-only. Runtime/fault-injection execution does not start unless the user explicitly changes phase.
 
 ## Just closed
-- Battle Field runtime-readiness is consolidated.
-- Unique active Battle Field bug ownership is now BUG-BFIELD-001/002/003/006/008/009/010/011.
-- BUG-BFIELD-004 is RETRACTED / RESERVED after cross-checking the canonical Ranking LoadRanking correction.
-- Historical BUG-BFIELD-005 and BUG-BFIELD-007 are cross-system duplicates owned canonically by BUG-RANK-003 and BUG-RANK-007.
-- BFIELD-T04/T05/T07 are not active Battle Field validation targets.
-- Primary ordinary-flow candidates are BFIELD-T01/T02/T03/T09/T10/T11.
+- World Lottery runtime-readiness is consolidated.
+- WLOT-T01..T14 cover BUG-WLOT-001..014; WLOT-T15 adds complementary BUG-WLOT-003 login/status-width validation.
+- WLOT-T04 and WLOT-T10 are the primary ordinary/current-flow candidates.
+- Ranking-endpoint tests WLOT-T11/T12 remain dormant; WLOT-T13/T14 remain crash/fault-injection only.
 - DUNGEON-T10 remains the first future live gate.
 - No runtime test was executed and no source/game file was changed.
 
 ## Exact next work
-1. Consolidate World Lottery runtime readiness from `bugs/world_lottery.md` + `tests/world_lottery.md`.
-2. Preserve verified/observation/deferred ownership exactly.
+1. Consolidate World Boss runtime readiness from `bugs/world_boss.md` + `tests/world_boss.md`.
+2. Preserve server/client/session/persistence ownership without inventing duplicate bug IDs.
 3. Preserve DUNGEON-T10 as the first future live runtime gate.
 4. Keep every source/game repository immutable until the phase is explicitly changed.
 
