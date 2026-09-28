@@ -2,7 +2,7 @@
 
 **Active phase:** Detection / Mapping Only
 **Active state:** Acce / Sash Static Mapping
-**Status:** STATIC MAPPING IN PROGRESS / 5 VERIFIED STATIC BUGS / EXECUTION LOCKED
+**Status:** STATIC MAPPING IN PROGRESS / 6 VERIFIED STATIC BUGS / EXECUTION LOCKED
 **Machine state:** `STATE.json`
 **Active subsystem:** Acce / Sash
 **Last completed subsystem:** Costume / Appearance / ChangeLook
@@ -27,6 +27,7 @@ Verified static findings:
 - `BUG-ACCE-003` — absorb material validation accepts every ITEM_ARMOR subtype; `ARMOR_BODY` is incorrectly compared as an item type.
 - `BUG-ACCE-004` — combine allows the same inventory cell as both inputs; failure can consume the primary sash and success reaches a stale-pointer/double-remove path.
 - `BUG-ACCE-005` — reversal clears attributes after the only target update packet, leaving stale absorbed attributes in client item data/tooltips.
+- `BUG-ACCE-006` — absorb accepts an already-occupied sash server-side, overwriting previous absorbed state and consuming the new material.
 
 Key architecture:
 - Acce check-in/check-out is client-local bookkeeping.
@@ -44,15 +45,19 @@ No runtime test has been executed.
 When the user says `item ekleyeceğiz`, use `ITEM_CREATION_AUTOMATION.md`:
 reference VNUM -> compatible template -> unused VNUM/ShapeIndex proposal -> item_proto + companion item/MSM records.
 
+## Newly closed in this pass
+- Client visual boundary is now closed: Acce VNUM -> item_list model -> CItemData -> PART_ACCE -> Bip01 Spine2.
+- Current 850xx/860xx sash assets use direct WING/item_list GR2 mappings.
+- CanWarp/IsHack omit W_ACCE; normal client distance-close mitigates this, so it remains a lifecycle integration note under BUG-ACCE-001 rather than a new destructive bug.
+
 ## Next
 Continue Acce static mapping:
-1. proto/data and client visual dependencies;
-2. open-window/warp/item-mutation lifecycle;
-3. combine grade/refine-chain and output-placement edge cases;
-4. validate extended element/random/set reset semantics;
-5. close remaining Acce edge cases.
+1. close combine grade/refine-chain and output-placement edge cases;
+2. validate extended element/random/set reset semantics;
+3. close remaining Acce proto/runtime ownership notes;
+4. decide STATIC COMPLETE promotion after the final static pass.
 
-Do not execute ACCE-T01..T05.
+Do not execute ACCE-T01..T06.
 The prepared first future runtime gate remains `DUNGEON-T10`.
 
 GitHub state is canonical.
