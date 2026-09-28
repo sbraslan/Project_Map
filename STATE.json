@@ -8,21 +8,22 @@
   "active": {
     "subsystem": "horse_mount",
     "display_name": "Horse / Mount / Riding",
-    "status": "STATIC MAPPING IN PROGRESS / 0 PROMOTED HORSE-MOUNT BUGS / EXECUTION LOCKED",
+    "status": "STATIC MAPPING IN PROGRESS / 1 PROMOTED HORSE-MOUNT BUG / EXECUTION LOCKED",
     "system_file": "systems/horse_mount.md",
     "bug_file": "bugs/horse_mount.md",
     "test_file": "tests/horse_mount.md",
-    "verified_bug_ids": [],
+    "verified_bug_ids": [
+      "BUG-HORSE-001"
+    ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Audit quest horse API authorization/range handling and current quest producers.",
-      "Map mount item/costume -> affect -> MountVnum lifecycle.",
-      "Audit expiry/unequip/death/warp cleanup.",
-      "Close ChangeLook mount socket2 producer and automatic event-start caller graph.",
+      "Verify current deployed time-limited COSTUME_MOUNT data and close the ChangeLook lifetime candidate.",
+      "Locate or exclude non-h_horse active horse-level progression producers.",
+      "Close real-time and timer-based mount expiry paths.",
       "Resolve Achievement SUMMON_MOUNT producer gap.",
       "Close client race/proto/horse-appearance coverage.",
-      "Promote only verified reachable Horse/Mount bugs and tests.",
-      "Do not execute any Horse/Mount runtime test without an explicit phase change."
+      "Promote only verified reachable additional Horse/Mount bugs and tests.",
+      "Do not execute HORSE-T01 or any Horse/Mount runtime test without an explicit phase change."
     ]
   },
   "startup": {
@@ -2315,7 +2316,9 @@
       "bugs": "bugs/horse_mount.md",
       "tests": "tests/horse_mount.md"
     },
-    "verified_bug_ids": [],
+    "verified_bug_ids": [
+      "BUG-HORSE-001"
+    ],
     "mapped_flows": [
       "CHorseRider level/health/stamina/riding state and timer events",
       "CHARACTER horse actor summon/dismiss/death/revive",
@@ -2327,17 +2330,26 @@
       "horse level setter clamp 0..30; raw DB level integrity candidate",
       "stamina consume/regen event ownership and destructor cleanup",
       "active ENABLE_INFINITE_HORSE_HEALTH_STAMINA semantics",
-      "ChangeLook mount automatic event-start asymmetry candidate"
+      "ChangeLook mount automatic event-start asymmetry candidate",
+      "Project_Game quest_list -> eight active h_horse quest sources",
+      "horse_ride.quest -> pc.mount -> AFFECT_MOUNT/POINT_MOUNT state split",
+      "BUG-HORSE-001::POINT_MOUNT changes without MountVnum synchronization",
+      "equipped ride item ModifyPoints -> explicit MountVnum add/remove lifecycle",
+      "death UnEquipSpecialRideUniqueItem includes mount costume",
+      "restricted-map EnterGame -> IS_MOUNTABLE_ZONE -> Unmount"
     ],
     "runtime_tests": {
-      "status": "NOT RUN / EXECUTION LOCKED",
-      "canonical_test_ids": [],
+      "status": "READY / EXECUTION LOCKED / NOT RUN",
+      "canonical_test_ids": [
+        "HORSE-T01"
+      ],
       "first_live_gate_unchanged": "DUNGEON-T10"
     },
     "candidates": [
+      "CTransmutation mount ChangeLook stores donor VNUM and destroys donor without mapped donor lifetime/socket2/event transfer; verify current time-limited COSTUME_MOUNT deployment.",
+      "Active h_horse scripts have horse level/grade gates but no horse.advance/set_level producer; exclude other active quest producers before promotion.",
       "DB-loaded THorseInfo.bLevel is copied without a clamp before c_aHorseStat access; no tracked malformed producer established.",
-      "Login later calls SetHorseLevel(GetHorseLevel()), resetting underlying HP/stamina/drop-time; current infinite-health/stamina build masks a distinct gameplay consequence.",
-      "StartChangeLookExpireEvent supports COSTUME_MOUNT, but automatic start sites found so far only gate on IsHorseSummonItem; socket2 producer/reachability remains open."
+      "Login SetHorseLevel(GetHorseLevel()) resets underlying HP/stamina/drop-time; current infinite-health/stamina build masks a distinct gameplay consequence."
     ]
   }
 }
