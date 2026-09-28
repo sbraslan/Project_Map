@@ -8,27 +8,24 @@
   "active": {
     "subsystem": "acce_sash",
     "display_name": "Acce / Sash",
-    "status": "STATIC MAPPING IN PROGRESS / 4 VERIFIED STATIC BUGS / EXECUTION LOCKED",
+    "status": "STATIC MAPPING IN PROGRESS / 5 VERIFIED STATIC BUGS / EXECUTION LOCKED",
     "system_file": "systems/acce.md",
     "bug_file": "bugs/acce.md",
     "test_file": "tests/acce.md",
     "verified_bug_ids": [
-      "BUG-DS-001",
-      "BUG-DS-002",
-      "BUG-DS-003",
-      "BUG-DS-004",
-      "BUG-DS-005",
-      "BUG-DS-006",
-      "BUG-DS-007"
+      "BUG-ACCE-001",
+      "BUG-ACCE-002",
+      "BUG-ACCE-003",
+      "BUG-ACCE-004",
+      "BUG-ACCE-005"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Audit DS set bonus reactivation/relog cleanup and whether stale BUG-DS-001 points self-heal.",
-      "Close grade/step material consumption and output failure semantics.",
-      "Audit Dragon Soul qualification/daily quest lifecycle and client/server UI state.",
-      "Audit extraction/refine logging order for additional post-destroy pointer uses.",
-      "Resolve or retain DS-C01 malformed/equipped-step candidates without overpromotion.",
-      "Keep runtime execution locked and source/game repositories immutable."
+      "Inspect Acce proto/data ranges and client visual dependencies.",
+      "Inspect Acce window/warp/item-mutation lifecycle.",
+      "Inspect combine grade/refine-chain and output-placement edge cases.",
+      "Validate extended element/random/set reversal semantics.",
+      "Close remaining Acce edge cases without runtime execution."
     ]
   },
   "startup": {
@@ -246,7 +243,8 @@
     "BUG-DS-004::server ChangeAttr accepts normal/blessed/holly strength materials",
     "BUG-DS-005::CheckRefineStepTables checks strength node instead of step node",
     "BUG-DS-006::normal refine opener authorizes ChangeAttr packet mode",
-    "BUG-DS-007::CanWarp/WarpSet preserve DS refine opener while CanHandleItem blocks"
+    "BUG-DS-007::CanWarp/WarpSet preserve DS refine opener while CanHandleItem blocks",
+    "BUG-ACCE-005::reversal UpdatePacket precedes ClearAllAttribute causing stale client attributes"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -1869,7 +1867,8 @@
       "BUG-ACCE-001",
       "BUG-ACCE-002",
       "BUG-ACCE-003",
-      "BUG-ACCE-004"
+      "BUG-ACCE-004",
+      "BUG-ACCE-005"
     ],
     "canonical_files": {
       "system": "systems/acce.md",
@@ -1882,7 +1881,9 @@
       "CInputMain::AcceRefineRequest -> CHARACTER::AcceRefine",
       "combine success/failure item lifecycle",
       "absorb material VNUM -> sash socket0 + attribute copy -> material removal",
-      "COSTUME_ACCE -> WEAR_COSTUME_ACCE -> PART_ACCE visual routing"
+      "COSTUME_ACCE -> WEAR_COSTUME_ACCE -> PART_ACCE visual routing",
+      "socket0/socket1 + attribute SaveSingleItem/DB load persistence closure",
+      "reversal scroll -> SetSocket(0,0) packet -> silent ClearAllAttribute client desync"
     ],
     "runtime_tests": {
       "status": "DRAFT / NOT RUN / EXECUTION LOCKED",
@@ -1890,16 +1891,16 @@
         "ACCE-T01",
         "ACCE-T02",
         "ACCE-T03",
-        "ACCE-T04"
+        "ACCE-T04",
+        "ACCE-T05"
       ],
       "first_live_gate_unchanged": "DUNGEON-T10"
     },
     "next": [
-      "absorbed stat math",
-      "persistence/reset",
       "proto/data/client visuals",
       "window and item-mutation lifecycle",
-      "combine refine-chain edge cases"
+      "combine refine-chain edge cases",
+      "extended reset semantics"
     ]
   }
 }
