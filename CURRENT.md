@@ -2,7 +2,7 @@
 
 **Active phase:** Detection / Mapping Only  
 **Active state:** Aura System Static Mapping  
-**Status:** STATIC MAPPING IN PROGRESS / 1 VERIFIED STATIC BUG / EXECUTION LOCKED  
+**Status:** STATIC MAPPING IN PROGRESS / 3 VERIFIED STATIC BUGS / EXECUTION LOCKED  
 **Machine state:** `STATE.json`  
 **Active subsystem:** Aura System  
 **System:** `systems/aura.md`  
@@ -37,23 +37,24 @@ Current effective readiness coverage is **24/24 STATIC COMPLETE subsystems**, pl
 
 ## Active Aura System state
 
-First verified static bug:
-- `BUG-AURA-001` — Aura's intended opener-distance gate is bypassed after the window opens. `IsAuraRefineWindowCanRefine()` first calls generic `CanHandleItem()`, which rejects the Aura window itself; check-in/check-out/accept then ignore that false result whenever Aura is open and opener is non-null. The intended distance comparison is therefore not enforced for these operations after initial open.
+Verified static bugs:
+- `BUG-AURA-001` — Aura's intended opener-distance gate is bypassed after the window opens. `IsAuraRefineWindowCanRefine()` first calls generic `CanHandleItem()`, which rejects the Aura window itself; check-in/check-out/accept then ignore that false result whenever Aura is open and opener is non-null.
+- `BUG-AURA-002` — EVOLVE validates required material through total `CountSpecifyItem()` quantity but consumes only the checked-in SUB stack, allowing underpayment with split stacks through a crafted client.
+- `BUG-AURA-003` — Aura Eraser never validates COSTUME_AURA and can zero generic socket 2 on an unrelated unequipped item.
 
-Deferred test:
-- `AURA-T01` — open in range, move out of range, verify check-in/check-out and isolated final-accept behavior. Not run.
+Deferred tests:
+- `AURA-T01..AURA-T03`, none executed.
 
 ## Exact next work
-1. map client -> packet -> server Aura open/check-in/check-out/accept contract;
-2. trace ABSORB copy/destruction lifetime and persistence;
-3. trace GROWTH table/material/EXP/socket arithmetic;
-4. trace EVOLVE success/failure lifecycle;
-5. audit booster/eraser absorption-rate arithmetic;
-6. audit warp/disconnect/close locked-item cleanup;
-7. audit opener lifetime and cross-window coexistence;
-8. close Aura visual/proto/client persistence surfaces.
+1. audit booster timer/equip/unequip persistence and absorption-rate application;
+2. close forced-warp/disconnect/destructor locked-item cleanup;
+3. audit opener lifetime and cross-window coexistence;
+4. verify wedding-item absorption policy against tracked data;
+5. map Aura default socket initialization/refine chains;
+6. close Aura visual/proto/client persistence surfaces;
+7. consolidate Aura runtime ownership and decide STATIC COMPLETE.
 
-Do not execute `AURA-T01` or any other runtime test.
+Do not execute `AURA-T01..AURA-T03` or any other runtime test.
 The global future runtime order remains locked with `DUNGEON-T10` first.
 
 GitHub state is canonical.
