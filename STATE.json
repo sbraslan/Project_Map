@@ -15,8 +15,8 @@
     "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Consolidate Guild Storage runtime readiness from bugs/guild_storage.md and tests/guild_storage.md without executing tests.",
-      "Use canonical subsystem test IDs and ignore legacy duplicate IDs from mixed files.",
+      "Consolidate Exchange / Trade runtime readiness from bugs/exchange.md and tests/exchange.md without executing tests.",
+      "Preserve verified-versus-candidate status exactly; do not promote findings without evidence.",
       "Keep DUNGEON-T10 as the first future live runtime gate.",
       "Preserve all source/game repositories as read-only until the user explicitly changes phase."
     ]
@@ -173,7 +173,8 @@
     "RUNTIME.md::Achievement T01-T09 readiness consolidated; execution locked",
     "RUNTIME.md::Biolog T01-T11 readiness consolidated; execution locked",
     "RUNTIME.md::Inventory Item T01-T13 readiness consolidated; execution locked",
-    "RUNTIME.md::Switchbot SWB-T01-T07 canonical readiness consolidated; execution locked"
+    "RUNTIME.md::Switchbot SWB-T01-T07 canonical readiness consolidated; execution locked",
+    "RUNTIME.md::Guild Storage GS-T01-T20 readiness consolidated; execution locked"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -342,7 +343,7 @@
       "SMT-T05",
       "SMT-T06"
     ],
-    "documentation_cursor": "guild_storage",
+    "documentation_cursor": "exchange",
     "completed_readiness_clusters": [
       "dungeon_info",
       "ticket",
@@ -351,7 +352,8 @@
       "achievement",
       "biolog",
       "inventory_items",
-      "switchbot"
+      "switchbot",
+      "guild_storage"
     ],
     "dungeon_info": {
       "status": "DOCUMENTATION READY / NOT RUN",
@@ -562,6 +564,69 @@
       "normal_monitored_candidates": [
         "SWB-T01",
         "SWB-T03"
+      ]
+    },
+    "guild_storage": {
+      "status": "DOCUMENTATION READY / NOT RUN",
+      "verified_bug_tests": {
+        "BUG-GS-003": [
+          "GS-T10",
+          "GS-T11",
+          "GS-T19"
+        ],
+        "BUG-GS-004": [
+          "GS-T12"
+        ],
+        "BUG-GS-007": [
+          "GS-T15"
+        ],
+        "BUG-GS-008": [
+          "GS-T16"
+        ],
+        "BUG-GS-009": [
+          "GS-T17"
+        ],
+        "BUG-GS-010": [
+          "GS-T18"
+        ],
+        "BUG-GS-011": [
+          "GS-T20"
+        ]
+      },
+      "candidate_tests": {
+        "BUG-CANDIDATE-GS-001": [
+          "GS-T01",
+          "GS-T02"
+        ],
+        "BUG-CANDIDATE-GS-002": [
+          "GS-T04",
+          "GS-T07",
+          "GS-T08"
+        ],
+        "BUG-CANDIDATE-GS-005": [
+          "GS-T13"
+        ],
+        "BUG-CANDIDATE-GS-006": [
+          "GS-T14"
+        ]
+      },
+      "superseded_candidate_records": {
+        "BUG-CANDIDATE-GS-003": "BUG-GS-003",
+        "BUG-CANDIDATE-GS-004": "BUG-GS-004"
+      },
+      "regression_baseline": [
+        "GS-T01",
+        "GS-T02",
+        "GS-T03",
+        "GS-T04",
+        "GS-T05",
+        "GS-T06",
+        "GS-T09"
+      ],
+      "normal_path_candidates": [
+        "GS-T01",
+        "GS-T02",
+        "GS-T17"
       ]
     }
   }
