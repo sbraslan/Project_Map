@@ -312,3 +312,86 @@ The client treats success as authoritative and closes the dialog.
 **Impact:** the normal unsummoned rename flow falsely reports success while performing no rename and charging no material. The user sees a completed operation but the pet name remains unchanged.
 
 **Runtime:** Stage A/B disposable unsummoned-pet rename check; see `GPET-T12`.
+
+
+## BUG-GPET-013 — Invincibility pet skill uses a hard-coded 123-second effect duration
+
+**Status:** VERIFIED STATIC / CURRENT SKILL DATA REACHABLE
+
+The tracked client skill table exposes Growth Pet skill 17 as:
+`Immortal / AUTO / Chance of temporary invincibility / cooldown 600`.
+
+The matching server table row is:
+`PET_SKILL_AFFECT_INVINCIBILITY, AUTO, APPLY_NONE, 52, 2.7, 600`.
+
+`GetPetSkillInformation()` derives the skill's scaled formula values and stores them into the active pet state.
+
+But the execution branch in `CGrowthPetSystemActor::Update()` ignores the computed effect-duration/value path:
+```
+ //const long duration = m_dwSkillDuration[slot];
+ const long duration = 123; //review
+```
+
+It then applies:
+`AFFECT_IMPOSSIBLE_ATTACK`
+for exactly 123 seconds.
+
+The explicit `//review` placeholder plus the configured/scaled skill formula path makes this a current implementation defect rather than an intended table-driven value.
+
+**Impact:** a successful Immortal proc grants a fixed 123-second invulnerability-like affect instead of the configured/scaled skill duration.
+
+**Runtime:** Stage B controlled low-HP disposable test; see `GPET-T13`.
+
+## BUG-GPET-014 — Feather skill is shipped but its server execution immediately aborts pet Update and follow AI
+
+**Status:** VERIFIED STATIC / CURRENT SKILL DATA REACHABLE
+
+The tracked client skill table exposes skill 23:
+`Light as a Feather / AUTO / Activates Feather Walk / cooldown 180`.
+
+The matching server skill row and client UI asset `feather.sub` are present.
+
+However the active-skill execution branch is:
+```
+case PET_SKILL_FEATHER:
+{
+    return false;
+    // under construction
+}
+```
+
+This returns from `CGrowthPetSystemActor::Update()` before the normal:
+`_UpdateFollowAI()`
+call at the bottom of the function.
+
+The Growth Pet system event ignores the actor Update return as a stop signal and continues ticking, so the same early return repeats while Feather remains in a skill slot.
+
+**Impact:** Feather provides no advertised skill effect/cooldown handling and can continuously suppress that pet actor's normal follow-AI update.
+
+**Runtime:** Stage A normal-flow follow observation with disposable pet/skill; see `GPET-T14`.
+
+## BUG-GPET-015 — Invincibility and Panacea use the next skill level's proc probability
+
+**Status:** VERIFIED STATIC / NORMAL FLOW
+
+`GetPetSkillInformation()` computes both:
+- `skill_formula1` for the current skill level;
+- `next_skill_formula1` for `skill_level + 1`.
+
+HEAL correctly tests its proc with:
+`m_PetInfo.skill_formula1[slot]`.
+
+By contrast both:
+- `PET_SKILL_AFFECT_INVINCIBILITY`;
+- `PET_SKILL_AFFECT_REMOVAL` (Panacea)
+
+test:
+`m_PetInfo.next_skill_formula1[slot]`.
+
+Therefore these two AUTO skills use the probability intended for the next upgrade level before that level has actually been reached.
+
+The current server table uses base probability values 52 (Invincibility) and 41 (Panacea), so the difference exists throughout non-max skill progression.
+
+**Impact:** proc chance is systematically higher than the current learned skill level is configured to provide.
+
+**Runtime:** Stage A statistical/debug-state validation; see `GPET-T15`.
