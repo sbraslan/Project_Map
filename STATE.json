@@ -8,7 +8,7 @@
   "active": {
     "subsystem": "acce_sash",
     "display_name": "Acce / Sash",
-    "status": "STATIC MAPPING IN PROGRESS / 5 VERIFIED STATIC BUGS / EXECUTION LOCKED",
+    "status": "STATIC MAPPING IN PROGRESS / 6 VERIFIED STATIC BUGS / EXECUTION LOCKED",
     "system_file": "systems/acce.md",
     "bug_file": "bugs/acce.md",
     "test_file": "tests/acce.md",
@@ -17,15 +17,16 @@
       "BUG-ACCE-002",
       "BUG-ACCE-003",
       "BUG-ACCE-004",
-      "BUG-ACCE-005"
+      "BUG-ACCE-005",
+      "BUG-ACCE-006"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Inspect Acce proto/data ranges and client visual dependencies.",
-      "Inspect Acce window/warp/item-mutation lifecycle.",
-      "Inspect combine grade/refine-chain and output-placement edge cases.",
+      "Close Acce combine grade/refine-chain and output-placement edge cases.",
       "Validate extended element/random/set reversal semantics.",
-      "Close remaining Acce edge cases without runtime execution."
+      "Close remaining Acce proto/runtime ownership notes.",
+      "Decide STATIC COMPLETE promotion after the final static pass.",
+      "Do not execute ACCE-T01..T06 or any runtime test without an explicit phase change."
     ]
   },
   "startup": {
@@ -244,7 +245,10 @@
     "BUG-DS-005::CheckRefineStepTables checks strength node instead of step node",
     "BUG-DS-006::normal refine opener authorizes ChangeAttr packet mode",
     "BUG-DS-007::CanWarp/WarpSet preserve DS refine opener while CanHandleItem blocks",
-    "BUG-ACCE-005::reversal UpdatePacket precedes ClearAllAttribute causing stale client attributes"
+    "BUG-ACCE-005::reversal UpdatePacket precedes ClearAllAttribute causing stale client attributes",
+    "BUG-ACCE-006::absorption accepts occupied sash and overwrites previous absorbed state",
+    "Acce visual::item_list WING GR2 -> CItemData -> PART_ACCE -> Bip01 Spine2",
+    "Acce lifecycle::CanWarp and IsHack masks omit W_ACCE; close remains client-driven"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -1868,7 +1872,8 @@
       "BUG-ACCE-002",
       "BUG-ACCE-003",
       "BUG-ACCE-004",
-      "BUG-ACCE-005"
+      "BUG-ACCE-005",
+      "BUG-ACCE-006"
     ],
     "canonical_files": {
       "system": "systems/acce.md",
@@ -1883,7 +1888,10 @@
       "absorb material VNUM -> sash socket0 + attribute copy -> material removal",
       "COSTUME_ACCE -> WEAR_COSTUME_ACCE -> PART_ACCE visual routing",
       "socket0/socket1 + attribute SaveSingleItem/DB load persistence closure",
-      "reversal scroll -> SetSocket(0,0) packet -> silent ClearAllAttribute client desync"
+      "reversal scroll -> SetSocket(0,0) packet -> silent ClearAllAttribute client desync",
+      "client visual: PART_ACCE -> CInstanceBase::SetAcce -> CActorInstance::AttachAcce -> item_list GR2 -> Bip01 Spine2",
+      "normal client absorb-left requires socket0 == 0; server does not enforce empty target",
+      "CanWarp/IsHack opened-window masks omit W_ACCE; client distance-close sends Acce close"
     ],
     "runtime_tests": {
       "status": "DRAFT / NOT RUN / EXECUTION LOCKED",
@@ -1892,15 +1900,16 @@
         "ACCE-T02",
         "ACCE-T03",
         "ACCE-T04",
-        "ACCE-T05"
+        "ACCE-T05",
+        "ACCE-T06"
       ],
       "first_live_gate_unchanged": "DUNGEON-T10"
     },
     "next": [
-      "proto/data/client visuals",
-      "window and item-mutation lifecycle",
       "combine refine-chain edge cases",
-      "extended reset semantics"
+      "extended reset semantics",
+      "proto/runtime ownership closure",
+      "STATIC COMPLETE decision"
     ]
   }
 }
