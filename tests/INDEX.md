@@ -47,3 +47,9 @@ This subsystem was added after the original global readiness audit. Its test own
 - `DS-T` -> `dragon_soul.md`
 
 Dragon Soul is currently mapping-in-progress. `DS-T01..03` are deferred plans; none have been executed.
+
+
+## Acce / Sash prefix ownership — 2026-09-28
+- `ACCE-T` -> `acce.md`
+
+Acce is STATIC COMPLETE. `ACCE-T01..ACCE-T08` are canonical deferred tests; none has been executed. Global first execution gate remains `DUNGEON-T10`.
