@@ -15,8 +15,8 @@
     "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Consolidate Dungeon Core runtime readiness from bugs/dungeon_core.md and tests/dungeon_core.md without executing tests.",
-      "Keep Dungeon Core distinct from the already-consolidated Dungeon Info subsystem.",
+      "Consolidate Battle Field runtime readiness from bugs/battle_field.md and tests/battle_field.md without executing tests.",
+      "Preserve cross-system Party and Ranking ownership; do not duplicate their bug IDs into Battle Field.",
       "Keep DUNGEON-T10 as the first future live runtime gate.",
       "Preserve all source/game repositories as read-only until the user explicitly changes phase."
     ]
@@ -181,7 +181,8 @@
     "RUNTIME.md::Mailbox MAIL-T01-T18 readiness consolidated; execution locked",
     "RUNTIME.md::Ranking RANK-T01-T07 readiness consolidated; BUG-RANK-006 retracted; execution locked",
     "RUNTIME.md::Party PARTY-T01-T06 readiness consolidated; execution locked",
-    "RUNTIME.md::Party Match PMATCH-T01-T05 readiness consolidated; execution locked"
+    "RUNTIME.md::Party Match PMATCH-T01-T05 readiness consolidated; execution locked",
+    "RUNTIME.md::Dungeon Core DCORE-T01-T04 readiness consolidated; execution locked"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -350,7 +351,7 @@
       "SMT-T05",
       "SMT-T06"
     ],
-    "documentation_cursor": "dungeon_core",
+    "documentation_cursor": "battle_field",
     "completed_readiness_clusters": [
       "dungeon_info",
       "ticket",
@@ -367,7 +368,8 @@
       "mailbox",
       "ranking",
       "party",
-      "party_match"
+      "party_match",
+      "dungeon_core"
     ],
     "dungeon_info": {
       "status": "DOCUMENTATION READY / NOT RUN",
@@ -1040,6 +1042,41 @@
       "controlled_multicore_candidate": "PMATCH-T01",
       "isolated_item_lifetime_test": "PMATCH-T02",
       "test_file_created": "tests/party_match.md"
+    },
+    "dungeon_core": {
+      "status": "DOCUMENTATION READY / NOT RUN",
+      "canonical_test_ids": [
+        "DCORE-T01",
+        "DCORE-T02",
+        "DCORE-T03",
+        "DCORE-T04"
+      ],
+      "verified_bug_tests": {
+        "BUG-DUNGEON-001": [
+          "DCORE-T01"
+        ],
+        "BUG-DUNGEON-002": [
+          "DCORE-T02"
+        ],
+        "BUG-DUNGEON-003": [
+          "DCORE-T03"
+        ],
+        "BUG-DUNGEON-004": [
+          "DCORE-T04"
+        ]
+      },
+      "normal_or_legitimate_candidates": [
+        "DCORE-T01",
+        "DCORE-T02"
+      ],
+      "isolated_debug_tests": [
+        "DCORE-T03"
+      ],
+      "controlled_script_tests": [
+        "DCORE-T02",
+        "DCORE-T04"
+      ],
+      "note": "Distinct from Dungeon Info; global first live gate remains DUNGEON-T10."
     }
   }
 }
