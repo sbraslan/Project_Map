@@ -64,3 +64,11 @@ Result: **COMPLETE — PASS WITH NORMALIZATIONS**.
 - Dungeon Info/Core historical bug-ID collision is globally namespace-qualified.
 - Retracted/cross-system IDs and legacy test aliases are normalized.
 - First future live gate remains `DUNGEON-T10`.
+
+
+## First runtime gate handoff — 2026-09-28
+`DUNGEON_T10_HANDOFF.md` is the canonical checklist for the first future live test.
+
+Status: **PREFLIGHT COMPLETE / EXECUTION LOCKED / NOT RUN**.
+
+This does not change the project phase or authorize source/runtime changes.
