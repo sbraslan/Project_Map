@@ -212,3 +212,11 @@ Observations:
 ## Mailbox — canonical first pass (2026-09-26)
 
 Active build: `ENABLE_MAILBOX` ON.
+
+
+## Registry normalization note — 2026-09-28
+- Active-build canonical verified set: BUG-SAFEBOX-003, BUG-SAFEBOX-004, BUG-SAFEBOX-005.
+- Build-dependent dormant verified set: BUG-SAFEBOX-001, BUG-SAFEBOX-002 because ENABLE_SAFEBOX_MONEY is currently OFF.
+- Current observations: OBS-SAFEBOX-002, OBS-SAFEBOX-003, OBS-SAFEBOX-004.
+- Historical OBS-SAFEBOX-001 (unchecked CSafebox::Add grid Put) is subsumed by the later, stronger BUG-SAFEBOX-005 malformed/overlapping persisted-row finding.
+- Detection-only policy: preserve historical text; runtime continuation uses canonical SFB-Txx identifiers and current active/dormant status.
