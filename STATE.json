@@ -15,8 +15,8 @@
     "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Consolidate Ranking runtime readiness from bugs/ranking.md and tests/ranking.md without executing tests.",
-      "Preserve the existing retracted BUG-RANK-006 status.",
+      "Consolidate Party runtime readiness from bugs/party.md and tests/party.md without executing tests.",
+      "Preserve unpromoted and dormant integration gaps without inventing bug IDs.",
       "Keep DUNGEON-T10 as the first future live runtime gate.",
       "Preserve all source/game repositories as read-only until the user explicitly changes phase."
     ]
@@ -178,7 +178,8 @@
     "RUNTIME.md::Exchange EXC-T01-T10 canonical readiness consolidated; execution locked",
     "RUNTIME.md::Shop SHP-T01-T14 canonical readiness consolidated; execution locked",
     "RUNTIME.md::Safebox Mall SFB-T01-T12 canonical readiness consolidated; execution locked",
-    "RUNTIME.md::Mailbox MAIL-T01-T18 readiness consolidated; execution locked"
+    "RUNTIME.md::Mailbox MAIL-T01-T18 readiness consolidated; execution locked",
+    "RUNTIME.md::Ranking RANK-T01-T07 readiness consolidated; BUG-RANK-006 retracted; execution locked"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -347,7 +348,7 @@
       "SMT-T05",
       "SMT-T06"
     ],
-    "documentation_cursor": "ranking",
+    "documentation_cursor": "party",
     "completed_readiness_clusters": [
       "dungeon_info",
       "ticket",
@@ -361,7 +362,8 @@
       "exchange",
       "shop",
       "safebox_mall",
-      "mailbox"
+      "mailbox",
+      "ranking"
     ],
     "dungeon_info": {
       "status": "DOCUMENTATION READY / NOT RUN",
@@ -913,6 +915,47 @@
         "MAIL-T10",
         "MAIL-T12",
         "MAIL-T15"
+      ]
+    },
+    "ranking": {
+      "status": "DOCUMENTATION READY / NOT RUN",
+      "verified_bug_tests": {
+        "BUG-RANK-001": [
+          "RANK-T01"
+        ],
+        "BUG-RANK-002": [
+          "RANK-T02"
+        ],
+        "BUG-RANK-003": [
+          "RANK-T03"
+        ],
+        "BUG-RANK-004": [
+          "RANK-T04"
+        ],
+        "BUG-RANK-005": [
+          "RANK-T07"
+        ],
+        "BUG-RANK-007": [
+          "RANK-T06"
+        ]
+      },
+      "retracted_bug_ids": [
+        "BUG-RANK-006"
+      ],
+      "conditional_tests": {
+        "generic_party_gap": [
+          "RANK-T05"
+        ],
+        "generic_solo_2_7_gap": []
+      },
+      "normal_path_candidates": [
+        "RANK-T01",
+        "RANK-T02",
+        "RANK-T03",
+        "RANK-T04"
+      ],
+      "isolated_parser_test": [
+        "RANK-T07"
       ]
     }
   }
