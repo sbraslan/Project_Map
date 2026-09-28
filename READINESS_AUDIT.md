@@ -179,3 +179,18 @@ A subsequent static-mapping extension added:
 Current effective static-complete/readiness coverage is therefore **22/22**, plus the folded Guild lifecycle companion.
 
 This extension does not change the previously recorded execution order's first gate. **DUNGEON-T10 remains the first future live gate.**
+
+
+## Post-audit extension — Acce / Sash — 2026-09-28
+
+The original audit remains historically scoped to the 21 STATIC COMPLETE rows that existed at audit time.
+
+Subsequent extensions now include:
+- Costume / Appearance / ChangeLook — `BUG-LOOK-001..007`, `LOOK-T01..LOOK-T07`;
+- Acce / Sash — `BUG-ACCE-001..008`, `ACCE-T01..ACCE-T08`.
+
+Current effective static-complete/readiness coverage is therefore **23/23**, plus the folded Guild lifecycle companion.
+
+Acce execution classes are documented in `RUNTIME.md`. No Acce runtime test has been executed.
+
+This extension does not alter the canonical future order's first gate. **DUNGEON-T10 remains the first future live gate.**
