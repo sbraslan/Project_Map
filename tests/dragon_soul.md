@@ -126,3 +126,73 @@ Safety class: **Stage B/C modified-client + destructive lifetime/state test**.
 Never use production items.
 
 No Dragon Soul test has been executed.
+
+
+## DS-T09 — Relog with persisted active DS set
+Covers `BUG-DS-009`.
+
+Future controlled normal-flow test:
+1. use a disposable character with a complete active same-grade DS set and confirmed `NEW_AFFECT_DS_SET`;
+2. populate relevant late wear slots (27..32) with ordinary equipment carrying known attributes;
+3. record expected character points;
+4. logout normally so affects persist;
+5. login normally;
+6. compare immediate post-login points against the mathematically expected ordinary equipment + DS base + DS set result;
+7. trigger/observe a later full point recomputation and compare again.
+
+Static prediction:
+- login cleanup executes while active deck is still -1;
+- uint8 wrap selects wear 27..32;
+- any non-zero erroneous set-value subtraction produces temporary session stat drift until a full recomputation.
+
+Safety class: **Stage A/B controlled normal-flow state observation**.
+No packet crafting is required.
+
+## DS-T10 — Pull-out count-1 extractor lifetime
+Covers `BUG-DS-010`.
+
+Future isolated debug/ASan test:
+1. prepare an equipped disposable Dragon Soul;
+2. prepare exactly one `EXTRACT_DRAGON_SOUL` extractor;
+3. invoke the ordinary extractor-on-DS pull-out path;
+4. cover either success or failure and record extractor destruction at `SetCount(0)`;
+5. observe the later log formatting dereference of `pExtractor->GetVnum()`.
+
+Static prediction: post-destruction extractor dereference in both pull-out outcome branches.
+
+Safety class: **Stage C crash/lifetime/sanitizer**.
+Never run on production.
+
+## DS-T11 — Daily gift event with zero event ID
+Covers `BUG-DS-011`.
+
+Future isolated quest/configuration test:
+1. use a disposable below-level and/or unqualified character that has never joined this event, so quest flag `event_id` is 0;
+2. in an isolated environment, set an active `ds_dg_st/ds_dg_et` time window while leaving `ds_dg_id = 0`;
+3. configure a harmless disposable gift item;
+4. invoke the alchemist daily-gift chat;
+5. record whether the level/qualification messages are skipped and the once-per-day gift path is reached.
+
+Control case:
+- repeat with a non-zero new `ds_dg_id`; eligibility checks should execute.
+
+Safety class: **Stage B isolated quest/event configuration**.
+Do not change production event flags.
+
+## Dragon Soul readiness summary
+
+Canonical ownership:
+- DS-T01 -> BUG-DS-001
+- DS-T02 -> BUG-DS-002
+- DS-T03 -> BUG-DS-003
+- DS-T04 -> BUG-DS-004
+- DS-T05 -> BUG-DS-005
+- DS-T06 -> BUG-DS-006
+- DS-T07 -> BUG-DS-007
+- DS-T08 -> BUG-DS-008
+- DS-T09 -> BUG-DS-009
+- DS-T10 -> BUG-DS-010
+- DS-T11 -> BUG-DS-011
+
+No Dragon Soul test has been executed.
+The global first future live gate remains `DUNGEON-T10`.
