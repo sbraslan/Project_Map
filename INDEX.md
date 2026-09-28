@@ -40,7 +40,8 @@ This is the navigation index. Normal continuation starts at `STATE.json`, then `
 | Dragon Soul / Alchemy | STATIC COMPLETE | `systems/dragon_soul.md` |
 | Aura System | STATIC COMPLETE | `systems/aura.md` |
 | Refine / Cube / Crafting | STATIC COMPLETE | `systems/refine_cube.md` |
-| Growth Pet System | MAPPING IN PROGRESS | `systems/growth_pet.md` |
+| Growth Pet System | STATIC COMPLETE | `systems/growth_pet.md` |
+| Horse / Mount / Riding | MAPPING IN PROGRESS | `systems/horse_mount.md` |
 
 ## Current phase
 - **Detection / mapping only.** Source and game repositories remain read-only.
@@ -141,3 +142,16 @@ Refine / Cube / Crafting is now **STATIC COMPLETE** with verified `BUG-REFCUBE-0
 Current effective static-complete/readiness coverage is **26/26** subsystem rows plus the folded Guild lifecycle companion.
 
 Growth Pet System remains the active mapping cursor. Runtime execution remains locked and `DUNGEON-T10` remains the first future live gate.
+
+
+## Post-audit extension — Growth Pet System — 2026-09-29
+Growth Pet System is now **STATIC COMPLETE** with verified `BUG-GPET-001..020` and canonical deferred tests `GPET-T01..GPET-T20`.
+
+Current effective static-complete/readiness coverage is **27/27** subsystem rows plus the folded Guild lifecycle companion.
+
+The active mapping cursor is now **Horse / Mount / Riding**:
+- `systems/horse_mount.md`;
+- `bugs/horse_mount.md`;
+- `tests/horse_mount.md`.
+
+Runtime execution remains locked and `DUNGEON-T10` remains the first future live gate.
