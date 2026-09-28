@@ -20,3 +20,34 @@ Static prediction:
 Safety class: Stage A observation for check-in/check-out; destructive accept only isolated Stage B.
 
 Global first future live gate remains `DUNGEON-T10`.
+
+
+## AURA-T02 — EVOLVE undersized checked-in material stack
+Covers `BUG-AURA-002`.
+
+Future isolated modified-client test:
+1. prepare an Aura costume at a valid evolution boundary;
+2. prepare the exact required material total split across at least two stacks;
+3. make the Aura SUB stack smaller than the required count while total inventory count still meets the requirement;
+4. submit the check-in/final accept sequence;
+5. record the checked-in stack count, remaining other stacks, Yang change and evolution result.
+
+Static prediction:
+the global `CountSpecifyItem()` gate passes but consumption removes only the undersized checked-in SUB stack.
+
+Safety class: **Stage B modified-client / disposable data**.
+
+## AURA-T03 — Aura Eraser targeting a non-Aura socketed item
+Covers `BUG-AURA-003`.
+
+Future isolated modified-client test:
+1. use a disposable unequipped non-Aura item with a known nonzero socket 2 value;
+2. retain a before-state record of all sockets;
+3. use an Aura Eraser with that item as the crafted destination;
+4. record eraser consumption and target socket state.
+
+Static prediction:
+the server accepts the non-Aura destination because no COSTUME_AURA check exists and executes `SetSocket(2, 0)`.
+
+Safety class: **Stage B destructive modified-client / disposable data only**.
+Never use production or valuable items.
