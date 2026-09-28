@@ -118,3 +118,45 @@ Acce reversal items clear socket 0 and clear attributes on the target sash.
 6. promote additional findings only with static evidence.
 
 No source/game file was modified and no runtime test was executed.
+
+
+## Persistence / stat closure — 2026-09-28
+
+Acce primary persistent state is carried by the normal item record:
+- socket 0 = absorbed source VNUM;
+- socket 1 = absorption percentage / final-grade drain value;
+- normal item attributes = copied absorbed attributes;
+- with enabled extensions, element/random/set fields are also copied by the absorb/combine paths.
+
+Persistence chain is closed:
+1. `CItem::SetSocket()` updates packet state and schedules `Save()`;
+2. `SaveSingleItem()` copies all sockets and normal attributes into `TPlayerItem`;
+3. DB cache writes socket/attribute columns;
+4. item SELECT/load restores them through `CreateItemTableFromRes()`;
+5. game item load restores the item fields.
+
+No Acce-specific socket/normal-attribute persistence defect was verified in this pass.
+
+### Drain math
+`CItem::GetDrainPercentage()` clamps socket 1 to 1..25.
+`DrainedValue(v)` returns `floor(v * drainPct / 100)`.
+
+Creation initializes an Acce item's socket 1 from `APPLY_ACCEDRAIN_RATE`; grade-4 apply value 20 is randomized to 11..19, while final-grade combination can raise socket 1 up to 25.
+
+Equipped Acce stat application is gated by COSTUME_ACCE plus nonzero absorbed socket 0. Body armor gets drained defense and eligible positive proto applies; weapons get drained physical/magic attack and eligible positive proto applies; copied normal/random attributes are also drained before application.
+
+## Reversal / reset audit
+
+Reversal scroll VNUMs 39046 and 90000:
+- require a valid unequipped, unlocked, unsealed COSTUME_ACCE target;
+- execute `SetSocket(0, 0)`;
+- then execute `ClearAllAttribute()`;
+- consume one scroll.
+
+`ClearAllAttribute()` itself neither calls `UpdatePacket()` nor `Save()`.
+
+Because `SetSocket(0,0)` sends its full item update **before** attributes are cleared, the client receives socket0=0 together with the old attribute array. No later target-item update is sent in this reversal branch.
+
+The server's delayed-save pointer will later serialize the now-cleared normal attributes, so this is not promoted as a DB persistence loss. It is, however, a verified client/server item-state desynchronization. See `BUG-ACCE-005`.
+
+The reversal branch also does not explicitly clear copied element/random/set metadata. Their direct gameplay effect is currently gated or outside the Acce wear-set count mapped here, so this remains an observation rather than a separate promoted bug.
