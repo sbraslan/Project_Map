@@ -15,9 +15,9 @@
     "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Consolidate Inventory / Item / Special Inventory runtime readiness from bugs/inventory_items.md and tests/inventory_items.md without executing tests.",
+      "Consolidate Switchbot runtime readiness from bugs/switchbot.md and tests/switchbot.md without executing tests.",
+      "Resolve canonical Switchbot test IDs in the Switchbot subsystem rather than duplicate legacy IDs in tests/inventory_items.md.",
       "Keep DUNGEON-T10 as the first future live runtime gate.",
-      "Keep accumulated normal-path candidates queued behind the Dungeon gate.",
       "Preserve all source/game repositories as read-only until the user explicitly changes phase."
     ]
   },
@@ -171,7 +171,8 @@
     "RUNTIME.md::Hunting T01-T08 readiness consolidated; execution locked",
     "RUNTIME.md::Battle Pass T01-T14 readiness classified; execution locked",
     "RUNTIME.md::Achievement T01-T09 readiness consolidated; execution locked",
-    "RUNTIME.md::Biolog T01-T11 readiness consolidated; execution locked"
+    "RUNTIME.md::Biolog T01-T11 readiness consolidated; execution locked",
+    "RUNTIME.md::Inventory Item T01-T13 readiness consolidated; execution locked"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -340,14 +341,15 @@
       "SMT-T05",
       "SMT-T06"
     ],
-    "documentation_cursor": "inventory_items",
+    "documentation_cursor": "switchbot",
     "completed_readiness_clusters": [
       "dungeon_info",
       "ticket",
       "hunting",
       "battle_pass",
       "achievement",
-      "biolog"
+      "biolog",
+      "inventory_items"
     ],
     "dungeon_info": {
       "status": "DOCUMENTATION READY / NOT RUN",
@@ -473,6 +475,50 @@
         ]
       },
       "normal_path_candidate": "BIO-T01"
+    },
+    "inventory_items": {
+      "status": "DOCUMENTATION READY / NOT RUN",
+      "verified_bug_tests": {
+        "BUG-ITEM-001": [
+          "ITEM-T02"
+        ],
+        "BUG-ITEM-002": [
+          "ITEM-T01"
+        ],
+        "BUG-ITEM-003": [
+          "ITEM-T03"
+        ],
+        "BUG-ITEM-004": [
+          "ITEM-T06"
+        ],
+        "BUG-ITEM-006": [
+          "ITEM-T09",
+          "ITEM-T10"
+        ],
+        "BUG-ITEM-007": [
+          "ITEM-T11"
+        ],
+        "BUG-ITEM-008": [
+          "ITEM-T12"
+        ]
+      },
+      "missing_canonical_bug_id": "BUG-ITEM-005 intentionally absent",
+      "observation_tests": {
+        "OBS-ITEM-001": [
+          "ITEM-T05"
+        ],
+        "OBS-ITEM-002": [
+          "ITEM-T07"
+        ]
+      },
+      "regression_tests": [
+        "ITEM-T04",
+        "ITEM-T08"
+      ],
+      "dataset_audit_dependency": [
+        "ITEM-T13"
+      ],
+      "normal_path_candidate": "ITEM-T01"
     }
   }
 }
