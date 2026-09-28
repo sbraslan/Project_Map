@@ -164,3 +164,18 @@ Resolved by documentation normalization:
 ## Next documentation-only handoff
 
 Prepare the `DUNGEON-T10` runtime gate handoff/checklist without running it. Runtime execution requires an explicit user phase change.
+
+
+## Post-audit extension — Costume / Appearance / ChangeLook — 2026-09-28
+
+The original audit result above remains historically scoped to the 21 STATIC COMPLETE subsystem rows that existed at audit time.
+
+A subsequent static-mapping extension added:
+- `Costume / Appearance / ChangeLook`
+- verified bugs `BUG-LOOK-001..007`
+- canonical tests `LOOK-T01..LOOK-T07`
+- readiness ownership in `RUNTIME.md`
+
+Current effective static-complete/readiness coverage is therefore **22/22**, plus the folded Guild lifecycle companion.
+
+This extension does not change the previously recorded execution order's first gate. **DUNGEON-T10 remains the first future live gate.**
