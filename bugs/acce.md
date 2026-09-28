@@ -132,6 +132,7 @@ Verified static bugs:
 - BUG-ACCE-003
 - BUG-ACCE-004
 - BUG-ACCE-005
+- BUG-ACCE-006
 
 No runtime reproduction has been performed.
 
@@ -172,3 +173,35 @@ The earlier `SetSocket()->Save()` is a delayed save; when flushed it serializes 
 **Impact:** verified client/server item-state and tooltip desynchronization after Acce reversal; displayed bonuses can be stale even though the server has removed them.
 
 **Runtime:** deferred; ordinary UI observation is sufficient if later authorized.
+
+
+---
+
+## BUG-ACCE-006 — Absorption can overwrite an already-occupied sash
+
+**Status:** VERIFIED STATIC
+
+Normal client left-target admission in `uiacce.py` requires:
+```python
+if playerm2g2.GetItemMetinSocket(attachedSlotPos, 0) == 0:
+    possablecheckin = 1
+```
+
+So the intended client workflow rejects a sash that already contains an absorbed source VNUM in socket 0.
+
+Server absorption path validates the target's broad costume/apply identity but never requires:
+`AcceItem->GetSocket(0) == 0`.
+
+It then immediately:
+1. `SetSocket(0, AcceMaterial->GetVnum())`;
+2. overwrites copied normal attributes;
+3. overwrites enabled element/random/set metadata;
+4. `RemoveItem(AcceMaterial, "ABSORBED (REFINE SUCCESS)")`.
+
+Therefore a crafted final absorb request can submit a previously absorbed sash as the target.
+
+**Impact:** the prior absorbed source/state is overwritten without the reversal workflow, while the newly supplied weapon/armor is consumed. This bypasses the normal client invariant that absorption is only performed into an empty sash.
+
+This finding is independent of BUG-ACCE-003: even a normally valid weapon or body-armor material can trigger the overwrite if the target is already occupied.
+
+**Runtime:** deferred; use disposable items only if later authorized.
