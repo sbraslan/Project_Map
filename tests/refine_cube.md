@@ -124,3 +124,19 @@ Static prediction:
 the missing blacksmith is logged but does not abort; the normal refine transaction proceeds if its economic/item checks pass.
 
 Safety class: **Stage B isolated modified-client / disposable refinement**.
+
+
+## REFCUBE-T09 — Soul Awake refine-type routing
+Covers `BUG-REFCUBE-009`.
+
+Future controlled disposable test:
+1. prepare an inactive disposable ITEM_SOUL compatible with the tracked Soul scroll flow;
+2. use VNUM 70603 (Soul Awake parchment) through the normal scroll-on-target UI path;
+3. record the refine-information type shown/sent and the server dispatch after confirmation;
+4. compare with VNUM 70602 (Soul Evolve parchment).
+
+Static prediction:
+- 70602 maps to `REFINE_TYPE_SOUL_EVOLVE` and reaches `DoRefineSoul()`;
+- 70603 leaves the request at generic `REFINE_TYPE_SCROLL` because the second condition repeats the EVOLVE value, so confirmation is routed to `DoRefineWithScroll()` instead of the dedicated Soul Awake path.
+
+Safety class: **Stage A/B controlled disposable Soul-item flow**.
