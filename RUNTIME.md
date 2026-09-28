@@ -563,6 +563,43 @@ The global first live gate remains **DUNGEON-T10**.
 
 **Next documentation cluster:** World Boss runtime readiness.
 
+
+## Runtime-readiness consolidation — World Boss — 2026-09-28
+**Documentation status:** READY
+**Execution status:** LOCKED / NOT RUN
+
+Canonical deferred IDs are WB-T01..WB-T16.
+
+Verified coverage:
+- WB-T01 -> BUG-WB-001
+- WB-T02 -> BUG-WB-002
+- WB-T03 -> BUG-WB-003
+- WB-T04 -> BUG-WB-004
+- WB-T05 -> BUG-WB-005
+- WB-T06 -> BUG-WB-006
+- WB-T07 -> BUG-WB-007
+- WB-T08 -> BUG-WB-008
+- WB-T09 -> BUG-WB-009
+- WB-T10 -> BUG-WB-010
+- WB-T11 -> BUG-WB-011
+- WB-T12 -> BUG-WB-012
+- WB-T13 -> BUG-WB-013
+- WB-T14 -> BUG-WB-014
+- WB-T15 -> BUG-WB-015
+- WB-T16 -> BUG-WB-016
+
+The old TEST-WB-MULTICORE-OWNERSHIP, TEST-WB-TITLEBAR-PARENT-STATE and TEST-WB-REWARD-TIER-PROVENANCE headings remain historical aliases for WB-T14/T15/T16.
+
+Dependency note:
+- WB-T08 is not a clean normal-path test because BUG-WB-016 leaves normal players at tier 0; it needs a controlled nonzero-tier setup.
+
+Primary ordinary/current-flow candidates: **WB-T09, WB-T13, WB-T15, WB-T16**.
+Scheduler/multicore/lifecycle, client-parser and reward-atomicity cases remain controlled/deferred.
+
+The global first live gate remains **DUNGEON-T10**.
+
+**Next documentation cluster:** Sung Mahi Tower runtime-readiness final consolidation.
+
 ## Patch readiness
 First-cluster fix plan is ready at `fixes/dungeon_info.md`.
 
