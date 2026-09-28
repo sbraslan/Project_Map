@@ -15,8 +15,8 @@
     "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Consolidate Party Match runtime readiness from bugs/party_match.md and tests/party_match.md without executing tests.",
-      "Keep Party and Party Match ownership separate.",
+      "Consolidate Dungeon Core runtime readiness from bugs/dungeon_core.md and tests/dungeon_core.md without executing tests.",
+      "Keep Dungeon Core distinct from the already-consolidated Dungeon Info subsystem.",
       "Keep DUNGEON-T10 as the first future live runtime gate.",
       "Preserve all source/game repositories as read-only until the user explicitly changes phase."
     ]
@@ -180,7 +180,8 @@
     "RUNTIME.md::Safebox Mall SFB-T01-T12 canonical readiness consolidated; execution locked",
     "RUNTIME.md::Mailbox MAIL-T01-T18 readiness consolidated; execution locked",
     "RUNTIME.md::Ranking RANK-T01-T07 readiness consolidated; BUG-RANK-006 retracted; execution locked",
-    "RUNTIME.md::Party PARTY-T01-T06 readiness consolidated; execution locked"
+    "RUNTIME.md::Party PARTY-T01-T06 readiness consolidated; execution locked",
+    "RUNTIME.md::Party Match PMATCH-T01-T05 readiness consolidated; execution locked"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -349,7 +350,7 @@
       "SMT-T05",
       "SMT-T06"
     ],
-    "documentation_cursor": "party_match",
+    "documentation_cursor": "dungeon_core",
     "completed_readiness_clusters": [
       "dungeon_info",
       "ticket",
@@ -365,7 +366,8 @@
       "safebox_mall",
       "mailbox",
       "ranking",
-      "party"
+      "party",
+      "party_match"
     ],
     "dungeon_info": {
       "status": "DOCUMENTATION READY / NOT RUN",
@@ -1005,6 +1007,39 @@
         "PARTY-T06"
       ],
       "test_file_created": "tests/party.md"
+    },
+    "party_match": {
+      "status": "DOCUMENTATION READY / NOT RUN",
+      "canonical_test_ids": [
+        "PMATCH-T01",
+        "PMATCH-T02",
+        "PMATCH-T03",
+        "PMATCH-T04",
+        "PMATCH-T05"
+      ],
+      "verified_bug_tests": {
+        "BUG-PMATCH-001": [
+          "PMATCH-T01"
+        ],
+        "BUG-PMATCH-002": [
+          "PMATCH-T02"
+        ],
+        "BUG-PMATCH-003": [
+          "PMATCH-T03"
+        ]
+      },
+      "unpromoted_robustness_tests": {
+        "duplicate_search_hold": [
+          "PMATCH-T04"
+        ],
+        "warpset_failure_ordering": [
+          "PMATCH-T05"
+        ]
+      },
+      "normal_path_candidate": "PMATCH-T03",
+      "controlled_multicore_candidate": "PMATCH-T01",
+      "isolated_item_lifetime_test": "PMATCH-T02",
+      "test_file_created": "tests/party_match.md"
     }
   }
 }
