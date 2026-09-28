@@ -103,3 +103,114 @@ The delayed-save path detects owner==nullptr and sends `HEADER_GD_ITEM_DESTROY` 
 - `GetBasePosition()` row bound uses `>` instead of `>=`; malformed grade state required.
 - Change-attr fire-count table has no explicit `dwDSStep` bounds guard; malformed step state required.
 - `/refine_open` is GM_PLAYER and opens with the character itself as opener. This appears intentional for `ENABLE_DS_REFINE_WINDOW` and is not classified as a bug by itself.
+
+
+## BUG-DS-004 — Server Change Attribute accepts strength-refine materials
+
+**Status:** VERIFIED STATIC
+
+Official client:
+`DragonSoulRefineWindow.__CanRefineChangeAttr()`
+accepts only:
+`ITEM_TYPE_MATERIAL && MATERIAL_DS_CHANGE_ATTR`.
+
+Server:
+`DSManager::DoChangeAttr()`
+classifies material with `IsDragonSoulRefineMaterial()`.
+
+That helper accepts:
+- MATERIAL_DS_REFINE_NORMAL;
+- MATERIAL_DS_REFINE_BLESSED;
+- MATERIAL_DS_REFINE_HOLLY;
+- MATERIAL_DS_CHANGE_ATTR.
+
+No later subtype equality check requires MATERIAL_DS_CHANGE_ATTR.
+
+The server then uses:
+- `pMaterial->GetValue(0)` as fee;
+- `pMaterial->GetCount()` for the hard-coded 1/3/9/27/81 requirement;
+- and consumes that material on success.
+
+**Impact:** modified client can use unintended Dragon Soul strength-refine materials for Myth attribute reroll; exact economic advantage depends on the item_proto VALUE0/count availability of those materials.
+
+**Runtime:** Stage B isolated/modified-client only.
+
+## BUG-DS-005 — RefineStep table validation checks the wrong node
+
+**Status:** VERIFIED STATIC / DORMANT IN CURRENT DATA
+
+`DragonSoulTable::CheckRefineStepTables()` tests:
+`m_pRefineStrengthTableNode == nullptr`
+instead of:
+`m_pRefineStepTableNode == nullptr`.
+
+`GetRefineStepValues()` later directly dereferences:
+`m_pRefineStepTableNode->GetGroupRow(...)`.
+
+Current tracked server/client table contains both RefineStepTables and RefineStrengthTables, so the defect is dormant.
+
+With RefineStepTables missing but RefineStrengthTables present, the initial guard passes and the code can dereference a null step-table pointer during startup validation.
+
+The inverse configuration can also falsely report RefineStepTables missing merely because RefineStrengthTables is missing.
+
+**Impact:** malformed/incomplete Dragon Soul data can turn a clean configuration error into startup null-deref behavior or misleading validation.
+
+**Runtime:** configuration-validation only; do not alter production data.
+
+## BUG-DS-006 — Any open Dragon Soul refine window authorizes Change Attribute packets
+
+**Status:** VERIFIED STATIC
+
+The character stores one authorization pointer:
+`m_pDragonSoulRefineWindowOpener`.
+
+Both normal refine and Change Attribute openers write that same pointer.
+No server-side window mode is retained.
+
+All refine handlers, including `DoChangeAttr()`, authorize only through:
+`DragonSoul_RefineWindow_CanRefine()`
+which returns true whenever the pointer is non-null.
+
+Current build also exposes GM_PLAYER command:
+`/refine_open`
+-> `DragonSoul_RefineWindow_Open(ch)`.
+
+That command:
+- uses the player itself as opener;
+- does not check qualification;
+- opens normal refine mode.
+
+A modified client can then send `DS_SUB_HEADER_DO_CHANGE_ATTR`; the server cannot distinguish it from a request originating from a real Change Attribute window.
+
+**Impact:** server-side mode/qualification boundary for Change Attribute can be bypassed. Item/grade/count checks inside DoChangeAttr still apply.
+
+**Runtime:** Stage B modified-client authorization test only.
+
+## BUG-DS-007 — Dragon Soul refine opener can survive warp and keep item handling locked
+
+**Status:** VERIFIED STATIC
+
+`CanHandleItem()` returns false while:
+`DragonSoul_RefineWindow_GetOpener() != nullptr`.
+
+But:
+- `CanWarp()` does not reject the Dragon Soul refine opener;
+- `WarpSet()` does not close/clear it;
+- the mapped clear path is `DS_SUB_HEADER_CLOSE -> DragonSoul_RefineWindow_Close()`.
+
+Therefore a warp can occur while the server still considers the refine window open.
+
+After arrival, if the client transition discarded the UI without successfully sending CLOSE, the non-null opener continues to make `CanHandleItem()` reject normal inventory/item operations.
+
+With self-opener `/refine_open`, the pointer itself remains valid across the warp, making this a state-lifetime problem rather than a dangling-pointer requirement.
+
+**Impact:** player can arrive after a warp with server-side item handling stuck behind stale Dragon Soul refine state until that state is explicitly cleared.
+
+**Runtime:** controlled normal-flow warp/state observation; no packet crafting required if a normal warp path is available while refine UI is open.
+
+## Candidate / unpromoted refinements
+
+- `DoRefineStep()` skips `IsEquipped()` for the first pointer in its std::set; pointer-order dependence remains unresolved.
+- `GetBasePosition()` accepts grade == DRAGON_SOUL_GRADE_MAX due `>` rather than `>=`; malformed VNUM/proto required.
+- `DoChangeAttr()` indexes a five-element need-count array by VNUM-derived step without explicit bounds validation; malformed VNUM/proto required.
+- ChangeAttrStepTables / ChangeStone* groups are present in data but not consumed by the mapped current server/client implementation; treated as legacy/dead data, not a bug by itself.
