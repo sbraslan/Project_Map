@@ -44,3 +44,27 @@
 - MAIL-T17 block-list policy verification if mailbox blocking is intended.
 
 Statik Mailbox keşfi kapalı; yalnız test sonucu yeni edge çıkarsa tekrar açılmalı.
+
+
+- MAIL-T18 client fixed-string boundary: isolated/debug client only; call mailbox write/confirm bindings with boundary and overlength Python strings and observe client-side packet-buffer behavior under ASan/debug. Validates OBS-MAIL-003 only; server-side BUG-MAIL-011 remains independently covered by MAIL-T14.
+
+## Mailbox readiness consolidation — 2026-09-28
+- No Mailbox runtime test was executed.
+- MAIL-T01/MAIL-T02 -> BUG-MAIL-001.
+- MAIL-T03/MAIL-T04 -> BUG-MAIL-002.
+- MAIL-T10 -> BUG-MAIL-003 and BUG-MAIL-004 across sender-commit / delayed-DB-persistence boundaries.
+- MAIL-T05/MAIL-T06 -> BUG-MAIL-005.
+- MAIL-T07 -> BUG-MAIL-006.
+- MAIL-T08/MAIL-T09 -> BUG-MAIL-007.
+- MAIL-T11 -> BUG-MAIL-008.
+- MAIL-T12 -> BUG-MAIL-009.
+- MAIL-T13 -> BUG-MAIL-010.
+- MAIL-T14 -> BUG-MAIL-011.
+- MAIL-T15 -> BUG-MAIL-012.
+- MAIL-T16 -> OBS-MAIL-001.
+- MAIL-T17 -> OBS-MAIL-002.
+- MAIL-T18 added for OBS-MAIL-003 without promoting the observation.
+- Primary legitimate/ordinary-flow candidates: MAIL-T07 (large legitimate Yang receive arithmetic) and MAIL-T11 (restart reload, disposable environment).
+- Modified-client/adversarial: MAIL-T01..T04, MAIL-T08, MAIL-T09, MAIL-T14.
+- Crash/persistence/fault-injection: MAIL-T10, MAIL-T12, MAIL-T15.
+- Overall first live runtime gate remains DUNGEON-T10.
