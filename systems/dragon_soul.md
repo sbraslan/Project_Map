@@ -1,6 +1,6 @@
 # Dragon Soul / Alchemy — Static Map
 
-**Status:** MAPPING IN PROGRESS  
+**Status:** STATIC COMPLETE  
 **Phase:** Detection / Mapping Only  
 **Execution:** LOCKED / NOT RUN  
 **Opened:** 2026-09-28
@@ -277,3 +277,87 @@ That validation difference is promoted as `BUG-DS-008`.
 No additional normal-data stack/material-count defect was promoted in this pass.
 
 Potential stacked-Dragon-Soul arithmetic in Grade/Step remains non-promoted because current mapping has not established a normal stackable DS producer/invariant violation in tracked data.
+
+
+## Closure pass — relog / extraction / quest lifecycle
+
+### Relog set-state wrap
+Dragon Soul deck/set affects are persisted because the generic affect save filter does not exclude:
+- `AFFECT_DRAGON_SOUL_DECK_0/1`;
+- `NEW_AFFECT_DS_SET`.
+
+On login, `LoadAffect()` restores those affects, runs `ComputePoints()`, then calls `DragonSoul_Initialize()`. The instant active-deck integer is still initialized to `-1`.
+
+`DragonSoul_Initialize()` finds the persisted deck affect and calls `DragonSoul_ActivateDeck()`, whose first action is `DragonSoul_DeactivateAll()`. The set cleanup therefore executes while the active deck is still `-1`.
+
+In the current build:
+- `WEAR_MAX_NUM = 33`;
+- `DS_SLOT_MAX = 6`;
+- `DragonSoul_HandleSetBonus()` stores the deck in `uint8_t`.
+
+Thus `-1 -> 255`, and:
+`33 + 255 * 6` wraps to wear index `27`.
+
+The cleanup loop can consequently inspect ordinary late equipment slots 27..32 instead of Dragon Soul slots and subtract values through `GetDSSetValue()`, which does not require the item itself to be a Dragon Soul.
+
+This is `BUG-DS-009`.
+
+### Pull-out extractor lifetime
+`DSManager::PullOut()` consumes a supplied extractor with `SetCount(count - 1)` before success/failure logging. For a normal count-1 extractor this destroys the item, yet both log branches later read `pExtractor->GetVnum()`.
+
+This is a second ordinary-path use-after-free, distinct from the Dragon Heart source lifetime issue in `BUG-DS-002`.
+
+See `BUG-DS-010`.
+
+Source/extractor self-aliasing was closed separately: the normal ITEM_EXTRACT caller requires the destination to be a Dragon Soul while the extractor itself is ITEM_EXTRACT, so the same object cannot satisfy both roles through the mapped normal caller.
+
+### Refine-window overlap closure
+The Dragon Soul opener is not part of one universal server-side window mutex, so it can coexist at state level with some other custom windows.
+
+However the mapped ChangeLook, Aura and Acce accepted item classes do not provide a second proven Dragon-Soul destructive alias path:
+- ChangeLook accepts weapon/body-costume/mount classes, not ITEM_DS;
+- Aura accepts aura costume / armor / aura-resource classes, not ITEM_DS;
+- Acce server transaction inputs are sash/weapon/armor classes and its UI check-in is client-local.
+
+No additional DS bug ID is promoted from cross-window overlap beyond existing mode authorization `BUG-DS-006` and stale-warp state `BUG-DS-007`.
+
+### Qualification and daily lifecycle
+Qualification itself is persistent:
+- `ds.give_qualification()` adds `AFFECT_DRAGON_SOUL_QUALIFIED`;
+- that affect is not excluded by affect persistence;
+- normal DS quest progression grants qualification at level 30 after the initial gemstone collection.
+
+The normal Cor Draconis daily count is internally coherent:
+- initial qualification gives one reward box and sets `eye_left = 9`;
+- later days reset `eye_left = 10`;
+- therefore the first qualification day still totals ten boxes.
+
+The separate `dragon_soul_daily_gift` event has a configuration-dependent authorization gap:
+- level >= 50 and DS qualification are checked only when the player's stored `event_id` differs from global `ds_dg_id`;
+- a never-participated character normally has quest flag 0;
+- if the event time window is active while global `ds_dg_id` is also 0, the comparison is equal and the eligibility block is skipped;
+- the quest then proceeds directly to the once-per-day gift path.
+
+The tracked repository contains the compiled daily-gift quest object but no `dragon_soul_daily_gift_mgr.quest` or other tracked manager that guarantees a non-zero `ds_dg_id`.
+
+See configuration-dependent `BUG-DS-011`.
+
+### Malformed-data candidates — closure
+The following remain unpromoted:
+- `GetBasePosition()` grade boundary `>` vs `>=`;
+- `DoChangeAttr()` five-entry step-count indexing without an explicit VNUM-derived step bounds check;
+- legacy/dead ChangeStone*/ChangeAttrStep table groups.
+
+Current tracked server/client Dragon Soul table data is aligned and no current malformed producer was established.
+
+## Static closure
+
+**Dragon Soul / Alchemy is STATIC COMPLETE.**
+
+Canonical verified findings:
+`BUG-DS-001..BUG-DS-011`.
+
+Canonical deferred tests:
+`DS-T01..DS-T11`.
+
+No Dragon Soul runtime test has been executed. Runtime remains locked and the global first future live gate remains `DUNGEON-T10`.
