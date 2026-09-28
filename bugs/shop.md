@@ -312,3 +312,11 @@ Bundan sonraki Shop işi öncelikle runtime/ASan/fault-injection test matrisidir
 
 
 ## Safebox / Mall — canonical first pass (2026-09-26)
+
+
+## Registry normalization note — 2026-09-28
+- The early provisional BUG-SHOP-001/002 headings above are historical and are superseded by the section titled **Canonical Shop bug index — 2026-09-26 second pass** plus the later third-pass update.
+- Canonical verified set for runtime-readiness purposes: BUG-SHOP-001 through BUG-SHOP-010.
+- Canonical observations: OBS-SHOP-001 through OBS-SHOP-004.
+- The older stash-cap clipping claim is not a normal-flow verified bug after the second-pass invariant audit; it remains OBS-SHOP-001.
+- Detection-only policy: historical text is preserved; runtime documentation uses the canonical SHP-Txx test IDs rather than rewriting old records.
