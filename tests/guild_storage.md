@@ -457,3 +457,35 @@ Runtime server `item_proto` tablosu veya unpacked proto export üzerinde:
 için `size > 1` satırları ara.
 
 Kodun mevcut invariant'ı: `IsEmptySpecialItemGrid(..., bSize > 1) -> false`. Dataset'te böyle item varsa special auto-placement/movement uyumsuzluğu ayrıca sınıflandırılmalı.
+
+
+## Guild Storage readiness consolidation — 2026-09-28
+**Execution status:** LOCKED / NOT RUN
+
+Verified bug coverage:
+- GS-T10 + GS-T11 + GS-T19 -> BUG-GS-003 (stuck-lock / pending-load cleanup family).
+- GS-T12 -> BUG-GS-004 (cross-core lock synchronization).
+- GS-T15 -> BUG-GS-007.
+- GS-T16 -> BUG-GS-008.
+- GS-T17 -> BUG-GS-009.
+- GS-T18 -> BUG-GS-010.
+- GS-T20 -> BUG-GS-011.
+
+Candidate validation only:
+- GS-T04 / GS-T07 / GS-T08 -> BUG-CANDIDATE-GS-002 authorization/permission boundary.
+- GS-T13 -> BUG-CANDIDATE-GS-005.
+- GS-T14 -> BUG-CANDIDATE-GS-006.
+- BUG-CANDIDATE-GS-001 has no unique failure-specific test; GS-T01/GS-T02 exercise the shared handler only as baseline behavior.
+
+Legacy status normalization:
+- BUG-CANDIDATE-GS-003 was later strengthened by the canonical BUG-GS-003 evidence; treat the verified BUG-GS-003 record as authoritative.
+- BUG-CANDIDATE-GS-004 was later promoted to BUG-GS-004; treat BUG-GS-004 as authoritative.
+- No verified BUG-GS-001, BUG-GS-002, BUG-GS-005 or BUG-GS-006 is invented here.
+
+Regression/lifecycle baseline:
+- GS-T01..GS-T06 are normal checkin/checkout, bounds, permission, logout and reconnect baselines.
+- GS-T09 is a same-storage concurrency regression test.
+- GUILD-T01 belongs to the broader Guild lifecycle companion area, not the Guild Storage verified-bug map.
+
+Primary normal-path Guild Storage candidates: GS-T01/GS-T02 baseline, followed by GS-T17 for live permission-revocation behavior in a controlled guild.
+Overall first live runtime gate remains DUNGEON-T10.
