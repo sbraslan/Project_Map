@@ -188,37 +188,3 @@ Current tracked proto makes this reachable without malformed item data:
 **Impact:** crafted EVOLVE check-in of a legitimate max-level Aura reaches invalid server arithmetic and can produce undefined/nondeterministic preview-byte behavior; depending on floating-point runtime settings this is also a fault candidate.
 
 **Runtime:** Stage B/C modified-client + debug/sanitizer only. See `AURA-T06`.
-
-
-## BUG-AURA-007 — Aura SET_ITEM packets transmit uninitialized TItemData fields
-
-**Status:** VERIFIED STATIC / NORMAL PACKET PATH
-
-Aura check-in/result-preview code declares packet payloads as:
-`TSubPacketGCAuraSetItem sub;`
-and
-`TSubPacketGCAuraSetItem sub2;`
-
-without zero-initialization.
-
-The code then fills only a subset of `TItemData`.
-
-In the current build these optional fields exist because their feature flags are enabled:
-- seal date;
-- ChangeLook/transmutation VNUM;
-- basic-item flag;
-- refine-element grade/attack/type/value fields;
-- set-item value;
-- Yohara fields.
-
-Aura fills VNUM/count/flags/anti-flags/sockets/classic attributes and Yohara arrays. It does **not** initialize several enabled fields such as seal/change-look/basic/element data.
-
-The complete struct is then written to the network buffer and sent to the client.
-
-The ABSORB result-preview path has an additional typo under `ENABLE_SET_ITEM`: it writes `sub.pItem.set_value` instead of `sub2.pItem.set_value`, leaving the result packet's set value uninitialized as well.
-
-Therefore ordinary Aura slot updates can transmit indeterminate stack bytes in the unused TItemData fields.
-
-**Impact:** server-process memory disclosure at packet-field granularity to the connected client, plus nondeterministic Aura metadata. The normal client ignores most of these fields, but a packet-aware client can still observe the raw bytes.
-
-**Runtime:** packet-capture validation only after phase unlock; no destructive action required. See `AURA-T07`.
