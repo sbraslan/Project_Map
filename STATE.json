@@ -8,7 +8,7 @@
   "active": {
     "subsystem": "refine_cube",
     "display_name": "Refine / Cube / Crafting",
-    "status": "STATIC MAPPING IN PROGRESS / 5 VERIFIED STATIC BUGS / EXECUTION LOCKED",
+    "status": "STATIC MAPPING IN PROGRESS / 11 VERIFIED STATIC BUGS / EXECUTION LOCKED",
     "system_file": "systems/refine_cube.md",
     "bug_file": "bugs/refine_cube.md",
     "test_file": "tests/refine_cube.md",
@@ -17,16 +17,24 @@
       "BUG-REFCUBE-002",
       "BUG-REFCUBE-003",
       "BUG-REFCUBE-004",
-      "BUG-REFCUBE-005"
+      "BUG-REFCUBE-005",
+      "BUG-REFCUBE-006",
+      "BUG-REFCUBE-007",
+      "BUG-REFCUBE-008",
+      "BUG-REFCUBE-009",
+      "BUG-REFCUBE-010",
+      "BUG-REFCUBE-011"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Finish Cube special-branch and success/failure atomicity mapping.",
-      "Map classic refine request through server execution.",
-      "Audit refine scroll/blacksmith/guild refine and failure downgrade paths.",
-      "Audit socket/attribute/Yohara/element/set metadata preservation.",
-      "Validate current refine deployment data.",
-      "Do not execute REFCUBE-T01..REFCUBE-T05 or any runtime test without an explicit phase change."
+      "Map DB/refine-table deployment source and validate recipe probability/material bounds.",
+      "Audit random-default / set / transmutation metadata semantics where current refine data makes them reachable.",
+      "Close scroll failure/downgrade consumption and item-creation-failure ordering.",
+      "Audit Devil Tower / money-only / Serpent authorization lifetime.",
+      "Audit over-9 refine path and current deployment reachability.",
+      "Close client uirefine.py session/presentation lifecycle.",
+      "Consolidate Refine/Cube runtime ownership and decide STATIC COMPLETE.",
+      "Do not execute REFCUBE-T01..REFCUBE-T11 or any runtime test without an explicit phase change."
     ]
   },
   "startup": {
@@ -2131,23 +2139,39 @@
       "BUG-REFCUBE-002",
       "BUG-REFCUBE-003",
       "BUG-REFCUBE-004",
-      "BUG-REFCUBE-005"
+      "BUG-REFCUBE-005",
+      "BUG-REFCUBE-006",
+      "BUG-REFCUBE-007",
+      "BUG-REFCUBE-008",
+      "BUG-REFCUBE-009",
+      "BUG-REFCUBE-010",
+      "BUG-REFCUBE-011"
     ],
     "mapped_flows": [
-      "Python Cube Renewal UI -> signed multiplier/client material list -> MAKE packet",
-      "CInputMain::CubeRenewalSend -> CCubeManager::RefineCube",
-      "multiplier availability/currency/material/reward accounting",
-      "Cube open live NPC + cached tempCubeNPC -> close/revocation boundary",
-      "player-level /cube command quest-NPC dereference",
-      "VNUM 79605 chance-improve consumption -> later reward-space validation",
-      "current cube.txt set_value/not_remove deployment reachability"
+      "Python Cube Renewal UI -> signed multiplier/client material VNUM list -> MAKE packet",
+      "CInputMain::CubeRenewalSend -> CCubeManager::RefineCube accounting and cached-NPC authorization",
+      "current cube.txt 3327-section directive reachability and CUBE_DATA scalar initialization",
+      "Cube chance-improve consumption -> reward-space ordering",
+      "HEADER_CG_REFINE -> CInputMain::Refine -> normal/scroll/Soul/money-only dispatch",
+      "DoRefine/DoRefineWithScroll/DoRefineSerpent source replacement lifetime",
+      "ITEM_MANAGER::CopyAllAttrTo metadata preservation matrix",
+      "current item_proto 5587 RefinedVnum edge topology audit",
+      "Soul evolve/awake scroll routing and Soul socket lifecycle",
+      "ENABLE_REFINE_ABILITY_SKILL preview/execution probability direction",
+      "scroll preview probability vs DoRefineWithScroll transaction formula"
     ],
     "canonical_tests": [
       "REFCUBE-T01",
       "REFCUBE-T02",
       "REFCUBE-T03",
       "REFCUBE-T04",
-      "REFCUBE-T05"
+      "REFCUBE-T05",
+      "REFCUBE-T06",
+      "REFCUBE-T07",
+      "REFCUBE-T08",
+      "REFCUBE-T09",
+      "REFCUBE-T10",
+      "REFCUBE-T11"
     ],
     "runtime_tests": {
       "status": "NOT RUN / EXECUTION LOCKED",
@@ -2156,18 +2180,24 @@
         "REFCUBE-T02",
         "REFCUBE-T03",
         "REFCUBE-T04",
-        "REFCUBE-T05"
+        "REFCUBE-T05",
+        "REFCUBE-T06",
+        "REFCUBE-T07",
+        "REFCUBE-T08",
+        "REFCUBE-T09",
+        "REFCUBE-T10",
+        "REFCUBE-T11"
       ],
       "first_live_gate_unchanged": "DUNGEON-T10"
     },
     "next": [
-      "Cube authorization/distance/window state",
-      "improve item accounting",
-      "allow_copy/set_value/not_remove",
-      "success/failure atomicity",
-      "classic refine execution",
-      "metadata preservation",
-      "deployment cube/refine data"
+      "DB/refine-table deployment source and recipe bounds",
+      "reachable metadata semantics",
+      "scroll failure/downgrade and creation-failure ordering",
+      "money-only/Devil Tower/Serpent authorization lifetime",
+      "over-9 refine deployment reachability",
+      "client uirefine lifecycle",
+      "STATIC COMPLETE decision"
     ]
   }
 }
