@@ -124,3 +124,58 @@ Bug göstergesi: önce taşınmış item yeni owner'da kalır; failed remainder 
 Ayrı ayrı participant disconnect, participant death ve standard CanWarp kullanan portal/channel change test et.
 
 Beklenti: disconnect/death exchange'i cancel eder; active W_EXCHANGE nedeniyle standard CanWarp reddedilir.
+
+
+## Canonical Exchange runtime matrix — 2026-09-28
+
+The migrated file above contains overlapping legacy `EX-Txx` and `EXCHANGE-Txx` identifiers. They are retained as historical notes. From this point forward, **EXC-Txx** identifiers are canonical.
+
+### EXC-T01 — Special Inventory preflight/commit divergence
+Controlled normal trade with enough regular inventory space but no compatible special-inventory capacity.
+Covers BUG-EXCHANGE-001.
+
+### EXC-T02 — Extended page-4 reservation mismatch
+Controlled recipient inventory where only page 4 provides the final slot capacity.
+Covers BUG-EXCHANGE-002.
+
+### EXC-T03 — Switchbot source-window validation
+Isolated modified-client validation that an unexpected SWITCHBOT source cannot enter an Exchange offer.
+Covers BUG-EXCHANGE-003.
+
+### EXC-T04 — Additional Equipment source-window validation
+Isolated modified-client validation that ADDITIONAL_EQUIPMENT_1 cannot bypass normal unequip/trade semantics.
+Covers BUG-EXCHANGE-003.
+
+### EXC-T05 — Exchange packet initialization observation
+Official/debug client packet capture for deterministic initialization of non-used packet fields.
+Validates the packet-initialization observation only.
+
+### EXC-T06 — Currency atomicity / late-cap validation
+Controlled disposable-character test for offer-time versus commit-time currency-cap changes and rollback behavior.
+Covers the verified currency-atomicity finding currently recorded under BUG-EXCHANGE-004 and the related BUG-EXCHANGE-005 gold-cap specialization.
+
+### EXC-T07 — Final distance revalidation
+Controlled dev client: start in range, move out of range without client auto-cancel, then attempt final acceptance.
+Covers the separate verified final-distance finding that is also currently labeled BUG-EXCHANGE-004 in the registry.
+
+### EXC-T08 — Partial-transfer persistence
+After an EXC-T01 or EXC-T02 failure, relog/reload disposable characters and verify whether already-moved items remain committed.
+Severity validation for BUG-EXCHANGE-001/002.
+
+### EXC-T09 — lifecycle cancellation regression
+Disconnect, death and standard CanWarp paths during an active Exchange.
+Regression/sanity coverage; no unique verified bug mapping.
+
+### EXC-T10 — AddGold/Cheque offer-stage boolean observation
+Controlled cheque-enabled build: verify single-currency insufficiency/overwrite behavior at offer stage while confirming final Check still blocks invalid completed transfer.
+Validates the AddGold boolean-condition observation only; no verified bug promotion.
+
+### Readiness consolidation — 2026-09-28
+- No Exchange runtime test was executed.
+- EXC-T01..T10 are the canonical deferred Exchange tests.
+- BUG-EXCHANGE-001..003 have unambiguous canonical coverage.
+- The registry currently uses BUG-EXCHANGE-004 for two distinct verified findings: currency atomicity and missing final-distance recheck. This identifier collision is preserved and explicitly documented; no renumbering is performed during detection-only phase.
+- BUG-EXCHANGE-005 remains the gold-cap TOCTOU specialization and is covered together with EXC-T06.
+- Observation numbering is also historically inconsistent around the cheque AddGold condition; EXC-T05 and EXC-T10 use descriptive semantics rather than relying on the duplicated legacy observation label.
+- Primary legitimate normal-path candidates: EXC-T01 and EXC-T02. EXC-T07 requires suppressing client auto-cancel and is isolated.
+- Overall first live runtime gate remains DUNGEON-T10.
