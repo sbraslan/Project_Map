@@ -36,6 +36,7 @@ This is the navigation index. Normal continuation starts at `STATE.json`, then `
 | World Boss System | STATIC COMPLETE | `systems/world_boss.md` |
 | Sung Mahi Tower | STATIC COMPLETE | `systems/sung_mahi_tower.md` |
 | Costume / Appearance / ChangeLook | STATIC COMPLETE | `systems/costume_appearance.md` |
+| Acce / Sash | STATIC MAPPING IN PROGRESS | `systems/acce.md` |
 | Dragon Soul / Alchemy | MAPPING IN PROGRESS | `systems/dragon_soul.md` |
 
 ## Current phase
@@ -82,3 +83,7 @@ Costume / Appearance / ChangeLook was mapped after the original 21/21 readiness 
 Current effective coverage is **22/22 STATIC COMPLETE subsystem rows** plus the folded Guild lifecycle companion.
 
 The historical `READINESS_AUDIT.md` 21/21 result remains valid for its original scope; a post-audit extension records this additional subsystem. The first future live gate remains `DUNGEON-T10`.
+
+
+## Active static extension — Acce / Sash — 2026-09-28
+Acce / Sash is currently the deliberately opened next subsystem and is **STATIC MAPPING IN PROGRESS**. The existing 22 STATIC COMPLETE subsystem rows remain readiness-covered; Acce is not yet included in that completed count. Runtime execution remains locked and `DUNGEON-T10` remains the first future live gate.
