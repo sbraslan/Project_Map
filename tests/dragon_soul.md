@@ -51,7 +51,7 @@ Static prediction:
 
 Safety class: **Stage B controlled instrumentation / memory-registry observation**.
 
-## Candidate DS-T04 — Step refine equipped-first asymmetry
+## Candidate DS-C01 — Step refine equipped-first asymmetry
 Not yet tied to a verified bug.
 
 Only in isolated modified-client testing:
@@ -60,3 +60,59 @@ Only in isolated modified-client testing:
 - check whether equipped item becomes the first `std::set` element and bypasses the later `IsEquipped()` loop.
 
 Do not run until the static candidate is promoted or explicitly selected.
+
+
+## DS-T04 — Change Attribute material subtype enforcement
+Covers `BUG-DS-004`.
+
+Future isolated modified-client test:
+1. open/authorize a Dragon Soul refine session;
+2. use a disposable Myth DS eligible for attribute change;
+3. submit MATERIAL_DS_REFINE_NORMAL/BLESSED/HOLLY as the material instead of MATERIAL_DS_CHANGE_ATTR;
+4. verify server acceptance/consumption and resulting attribute reroll.
+
+Static prediction: server accepts because all four material subtypes pass IsDragonSoulRefineMaterial.
+
+Safety class: **Stage B modified-client / disposable data**.
+
+## DS-T05 — Missing RefineStepTables validation
+Covers `BUG-DS-005`.
+
+Future isolated configuration test only:
+1. copy the Dragon Soul table into a disposable test environment;
+2. remove RefineStepTables while keeping RefineStrengthTables;
+3. start under debugger/ASan;
+4. observe CheckRefineStepTables reaching GetRefineStepValues with a null m_pRefineStepTableNode.
+
+Static prediction: wrong guard does not reject the missing step node.
+
+Safety class: **Stage C startup/configuration isolation**.
+Never modify production table data for this test.
+
+## DS-T06 — Normal-refine opener used for Change Attribute
+Covers `BUG-DS-006`.
+
+Future isolated modified-client test:
+1. invoke the normal GM_PLAYER `/refine_open` path;
+2. do not open the dedicated Change Attribute window;
+3. send a valid `DS_SUB_HEADER_DO_CHANGE_ATTR` grid for disposable eligible data;
+4. verify that the server processes it because opener != nullptr.
+
+Also record qualification state to confirm the normal command does not add a separate qualification gate.
+
+Safety class: **Stage B authorization / modified client**.
+
+## DS-T07 — Warp while Dragon Soul refine opener is active
+Covers `BUG-DS-007`.
+
+Future controlled observation:
+1. open the normal Dragon Soul refine window;
+2. invoke an ordinary server-authorized warp without manually closing the window;
+3. after arrival, attempt a normal inventory operation;
+4. record whether CanHandleItem remains blocked until a refine CLOSE/reconnect clears the opener.
+
+Static prediction: CanWarp/WarpSet preserve the opener pointer.
+
+Safety class: **Stage A/B normal-flow state observation**.
+
+No Dragon Soul test has been executed.
