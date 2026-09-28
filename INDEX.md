@@ -53,3 +53,14 @@ Full pre-migration maps/checkpoints are in `archive/`. They are fallback evidenc
 
 ## Runtime-readiness milestone — 2026-09-28
 All STATIC COMPLETE subsystem rows currently represented by the canonical mapping have deferred runtime-readiness coverage or an explicitly folded ownership path. Runtime execution remains locked. The active documentation cursor is now the global readiness integrity audit; first future live gate remains DUNGEON-T10.
+
+
+## Global readiness integrity audit — 2026-09-28
+Canonical audit: `READINESS_AUDIT.md`.
+
+Result: **COMPLETE — PASS WITH NORMALIZATIONS**.
+- 21/21 STATIC COMPLETE subsystem rows have runtime-readiness ownership.
+- Guild lifecycle is folded with Guild Storage but `BUG-GUILD-001` has explicit `GUILD-T01` companion coverage.
+- Dungeon Info/Core historical bug-ID collision is globally namespace-qualified.
+- Retracted/cross-system IDs and legacy test aliases are normalized.
+- First future live gate remains `DUNGEON-T10`.
