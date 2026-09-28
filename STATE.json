@@ -1,41 +1,30 @@
 {
   "schema_version": 2,
-  "updated_at": "2026-09-28",
+  "updated_at": "2026-09-29",
   "project": "Metin2 Project",
   "mapping_repo": "sbraslan/Project_Map",
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "growth_pet",
-    "display_name": "Growth Pet System",
-    "status": "STATIC MAPPING IN PROGRESS / 11 VERIFIED STATIC BUGS / EXECUTION LOCKED",
-    "system_file": "systems/growth_pet.md",
-    "bug_file": "bugs/growth_pet.md",
-    "test_file": "tests/growth_pet.md",
-    "verified_bug_ids": [
-      "BUG-GPET-001",
-      "BUG-GPET-002",
-      "BUG-GPET-003",
-      "BUG-GPET-004",
-      "BUG-GPET-005",
-      "BUG-GPET-006",
-      "BUG-GPET-007",
-      "BUG-GPET-008",
-      "BUG-GPET-009",
-      "BUG-GPET-010",
-      "BUG-GPET-011"
-    ],
+    "subsystem": "horse_mount",
+    "display_name": "Horse / Mount / Riding",
+    "status": "STATIC MAPPING IN PROGRESS / 0 PROMOTED HORSE-MOUNT BUGS / EXECUTION LOCKED",
+    "system_file": "systems/horse_mount.md",
+    "bug_file": "bugs/horse_mount.md",
+    "test_file": "tests/horse_mount.md",
+    "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Finish summon/dismiss/death/real-time expiry/rewarp lifetime.",
-      "Audit EXP table and item/mob EXP arithmetic through level 105.",
-      "Audit active/passive skill execution beyond HEAL.",
-      "Audit name-change normal unsummoned branch.",
-      "Audit attribute determine/change state and material consumption beyond the 55713 OOB.",
-      "Close DB pet-table save/load/delete ownership and orphan lifecycle.",
-      "Close current 55701..55713 proto/race/client asset coverage.",
-      "Consolidate Growth Pet runtime ownership and decide STATIC COMPLETE.",
-      "Do not execute GPET-T01..GPET-T11 or any runtime test without an explicit phase change."
+      "Close horse persistence/login/logout and horse-level bounds.",
+      "Audit stamina/health events and repeated ride-state transitions.",
+      "Audit quest horse API authorization and range handling.",
+      "Map mount item/costume -> affect -> MountVnum lifecycle.",
+      "Audit expiry/unequip/death/warp cleanup.",
+      "Close ChangeLook mount expiry caller graph.",
+      "Resolve Achievement SUMMON_MOUNT producer gap.",
+      "Close client race/proto/horse-appearance coverage.",
+      "Promote only verified reachable Horse/Mount bugs and tests.",
+      "Do not execute any Horse/Mount runtime test without an explicit phase change."
     ]
   },
   "startup": {
@@ -284,7 +273,14 @@
     "BUG-REFCUBE-014::set_value lost on refine transform",
     "BUG-REFCUBE-015::Serpent random-default values lost on refine",
     "BUG-REFCUBE-016::Basic starter flag stripped by refine",
-    "Refine / Cube / Crafting::STATIC COMPLETE"
+    "Refine / Cube / Crafting::STATIC COMPLETE",
+    "Growth Pet System::STATIC COMPLETE",
+    "BUG-GPET-001..020::Growth Pet canonical verified findings",
+    "tests/growth_pet.md::GPET-T01..GPET-T20 deferred validation; execution locked",
+    "Horse / Mount / Riding::MAPPING IN PROGRESS",
+    "game/src/horse_rider.cpp/.h::horse health stamina riding state",
+    "game/src/char_horse.cpp::horse summon dismiss ride death revive",
+    "game/src/item.cpp + char_item.cpp::mount ride-item and affect integration"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -2164,7 +2160,12 @@
     }
   },
   "growth_pet_mapping": {
-    "status": "STATIC MAPPING IN PROGRESS",
+    "status": "STATIC COMPLETE",
+    "canonical_files": {
+      "system": "systems/growth_pet.md",
+      "bugs": "bugs/growth_pet.md",
+      "tests": "tests/growth_pet.md"
+    },
     "verified_bug_ids": [
       "BUG-GPET-001",
       "BUG-GPET-002",
@@ -2176,41 +2177,50 @@
       "BUG-GPET-008",
       "BUG-GPET-009",
       "BUG-GPET-010",
-      "BUG-GPET-011"
+      "BUG-GPET-011",
+      "BUG-GPET-012",
+      "BUG-GPET-013",
+      "BUG-GPET-014",
+      "BUG-GPET-015",
+      "BUG-GPET-016",
+      "BUG-GPET-017",
+      "BUG-GPET-018",
+      "BUG-GPET-019",
+      "BUG-GPET-020"
     ],
-    "canonical_files": {
-      "system": "systems/growth_pet.md",
-      "bugs": "bugs/growth_pet.md",
-      "tests": "tests/growth_pet.md"
-    },
-    "mapped_flows": [
-      "PET_EGG Value0 -> PET_UPBRINGING hatch target and hatch-info table",
-      "feed request fixed-slot packet boundary",
-      "three-slot persistent pet skill state and learn/upgrade/delete packet trust",
-      "premium revive material/count and structured-state lifecycle",
-      "evolution requirement/material validation",
-      "specialist skill-table lookup shape",
-      "HEAL auto-skill delta semantics",
-      "pet-name fixed packet strings",
-      "hatch birthday/duration/socket final-evolution age semantics"
+    "canonical_tests": [
+      "GPET-T01",
+      "GPET-T02",
+      "GPET-T03",
+      "GPET-T04",
+      "GPET-T05",
+      "GPET-T06",
+      "GPET-T07",
+      "GPET-T08",
+      "GPET-T09",
+      "GPET-T10",
+      "GPET-T11",
+      "GPET-T12",
+      "GPET-T13",
+      "GPET-T14",
+      "GPET-T15",
+      "GPET-T16",
+      "GPET-T17",
+      "GPET-T18",
+      "GPET-T19",
+      "GPET-T20"
     ],
     "runtime_tests": {
-      "status": "NOT RUN / EXECUTION LOCKED",
-      "canonical_test_ids": [
-        "GPET-T01",
-        "GPET-T02",
-        "GPET-T03",
-        "GPET-T04",
-        "GPET-T05",
-        "GPET-T06",
-        "GPET-T07",
-        "GPET-T08",
-        "GPET-T09",
-        "GPET-T10",
-        "GPET-T11"
-      ],
+      "status": "READY / EXECUTION LOCKED / NOT RUN",
       "first_live_gate_unchanged": "DUNGEON-T10"
-    }
+    },
+    "closure_notes": [
+      "Summon/dismiss/death/real-time expiry and rewarp lifetime closed.",
+      "EXP arithmetic through level 105 closed without a new table-bound defect.",
+      "Current 55701..55713 family/data coverage audited.",
+      "PET_BAG transport path produced GPET-019 and GPET-020.",
+      "No Growth Pet runtime test has been executed."
+    ]
   },
   "refine_cube_mapping": {
     "status": "STATIC COMPLETE",
@@ -2299,5 +2309,26 @@
       "CopyAllAttrTo omits ChangeLook, set_value, random-default values and Basic flag; verified reachable defects are REFCUBE-013..016.",
       "No Refine/Cube runtime test has been executed."
     ]
+  },
+  "horse_mount_mapping": {
+    "status": "STATIC MAPPING IN PROGRESS",
+    "canonical_files": {
+      "system": "systems/horse_mount.md",
+      "bugs": "bugs/horse_mount.md",
+      "tests": "tests/horse_mount.md"
+    },
+    "verified_bug_ids": [],
+    "mapped_flows": [
+      "CHorseRider level/health/stamina/riding state and timer events",
+      "CHARACTER horse actor summon/dismiss/death/revive",
+      "character StartRiding/StopRiding -> MountVnum lifecycle",
+      "UNIQUE/COSTUME ride-item classification and mount proto affects",
+      "mount ChangeLook expiry helper surface"
+    ],
+    "runtime_tests": {
+      "status": "NOT RUN / EXECUTION LOCKED",
+      "canonical_test_ids": [],
+      "first_live_gate_unchanged": "DUNGEON-T10"
+    }
   }
 }
