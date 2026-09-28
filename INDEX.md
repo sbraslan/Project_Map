@@ -36,6 +36,7 @@ This is the navigation index. Normal continuation starts at `STATE.json`, then `
 | World Boss System | STATIC COMPLETE | `systems/world_boss.md` |
 | Sung Mahi Tower | STATIC COMPLETE | `systems/sung_mahi_tower.md` |
 | Costume / Appearance / ChangeLook | STATIC COMPLETE | `systems/costume_appearance.md` |
+| Dragon Soul / Alchemy | MAPPING IN PROGRESS | `systems/dragon_soul.md` |
 
 ## Current phase
 - **Detection / mapping only.** Source and game repositories remain read-only.
