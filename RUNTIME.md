@@ -403,6 +403,32 @@ The global first live gate remains **DUNGEON-T10**.
 
 **Next documentation cluster:** Ranking runtime readiness.
 
+
+## Runtime-readiness consolidation — Ranking — 2026-09-28
+**Documentation status:** READY
+**Execution status:** LOCKED / NOT RUN
+
+Verified coverage:
+- RANK-T01 -> BUG-RANK-001
+- RANK-T02 -> BUG-RANK-002
+- RANK-T03 -> BUG-RANK-003
+- RANK-T04 -> BUG-RANK-004
+- RANK-T07 -> BUG-RANK-005
+- RANK-T06 -> BUG-RANK-007
+
+**BUG-RANK-006 remains RETRACTED / RESERVED** and is intentionally excluded from the runtime bug-validation matrix.
+
+Conditional/unpromoted:
+- RANK-T05 -> dormant generic PARTY ranking integration gap if an active caller appears later.
+- Generic SOLO category 2..7 dictionary gap remains documentation-only without an active opener.
+
+Primary normal-path candidates: **RANK-T01, RANK-T02, RANK-T03, RANK-T04**.
+RANK-T07 is isolated malformed-server-packet parser validation.
+
+The global first live gate remains **DUNGEON-T10**.
+
+**Next documentation cluster:** Party runtime readiness.
+
 ## Patch readiness
 First-cluster fix plan is ready at `fixes/dungeon_info.md`.
 
