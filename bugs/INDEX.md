@@ -27,3 +27,9 @@ Important global ID rules:
 ## Dragon Soul ownership — 2026-09-28
 - `BUG-DS-001..003` -> `dragon_soul.md`
 - Step-refine equipped-first, malformed grade bound and change-attr step bound remain candidate/unpromoted.
+
+
+## Active subsystem ownership — Acce / Sash — 2026-09-28
+- `BUG-ACCE-001..004` -> `acce.md`
+- Status: VERIFIED STATIC / subsystem mapping still in progress.
+- Runtime ownership draft: `../tests/acce.md` (`ACCE-T01..T04`), execution locked.
