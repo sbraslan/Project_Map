@@ -454,3 +454,43 @@ The EVOLVE branch is structurally different and re-iterates the submitted slot a
 **Impact:** a normal multi-item feed action applies only one selected item, so displayed/selected feed batches do not match server-side effect and consumption.
 
 **Runtime:** Stage A normal-client multi-slot feed observation with disposable items; see `GPET-T17`.
+
+
+## BUG-GPET-018 — Destroying a Growth Pet seal leaves an orphan row in the separate pet table
+
+**Status:** VERIFIED STATIC / NORMAL ITEM LIFECYCLE
+
+Growth Pet persistence uses two linked records:
+
+1. the normal `item` row for the seal;
+2. a separate `pet` row keyed by a generated pet id stored in seal socket 2.
+
+Hatching inserts the pet row first:
+`INSERT INTO pet (...) VALUES(NULL, ...)`,
+then stores the returned auto-increment id into:
+- `petInfo.pet_id`;
+- seal `socket2`.
+
+Load later resolves the structured pet state with:
+`SELECT ... FROM pet WHERE id = item.alSockets[2]`.
+
+DB-side deletion support exists:
+`HEADER_GD_PET_ITEM_DESTROY -> QUERY_PET_ITEM_DESTROY() -> DELETE FROM pet WHERE id=...`.
+
+However the only game-side send found in the tracked source is inside `ITEM_MANAGER::DestroyItem()`, and that entire Growth Pet block is commented out:
+```
+/*
+if (item is PET_UPBRINGING) {
+    dwSocketID = item->GetSocket(2);
+    send HEADER_GD_PET_ITEM_DESTROY(dwSocketID);
+}
+*/
+```
+
+The active destruction path sends only `HEADER_GD_ITEM_DESTROY`, which removes the normal item row.
+
+Consequently deleting/destroying a Growth Pet seal removes its item record but does not remove the associated structured row from `pet`.
+
+**Impact:** permanent orphan Growth Pet rows accumulate in the database. The tracked code does not establish normal pet-id reuse, so stale-row adoption is not claimed here; the confirmed defect is orphan persistence/storage leakage.
+
+**Runtime:** Stage B disposable-pet + DB verification only after runtime phase unlock; see `GPET-T18`.
