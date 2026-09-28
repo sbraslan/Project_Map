@@ -1,8 +1,8 @@
 # Refine / Cube / Crafting — Verified Bugs
 
-## BUG-REFCUBE-001 — Cube Renewal accepts negative multiplier and can credit Yang/Gem
+## BUG-REFCUBE-001 — Cube Renewal accepts non-positive/out-of-domain multiplier
 
-**Status:** VERIFIED STATIC / MODIFIED-CLIENT ECONOMY BUG
+**Status:** VERIFIED STATIC / MODIFIED-CLIENT ECONOMY/CRAFTING BUG
 
 `TSubPacketCGCubeRenwalMake.multiplier` is a signed `int` controlled by the client.
 
@@ -10,22 +10,24 @@ Normal UI constrains its own value, but `CInputMain::CubeRenewalSend()` forwards
 
 The server has no `multiplier >= 1` or maximum-domain check.
 
+For **multiplier = 0**, all multiplied material/Yang/Gem requirements become zero. The availability gates therefore pass even with no required resources. Actual material removal later uses the unmultiplied base count and its result is not checked; reward creation can still continue. Currency cost is also zero.
+
+For **negative multiplier**, the multiplied requirements become negative and ordinary non-negative balances satisfy the checks.
+
 Preconditions use:
 - `CountSpecifyItem(...) < material.count * multiplier`;
 - `GetGold() < gold * multiplier`;
 - `GetGemPoint() < gem_point * multiplier`.
 
-For a negative multiplier these required values are negative, so ordinary non-negative player balances satisfy the checks.
-
 Currency mutation later uses:
 - `PointChange(POINT_GOLD, -(gold * multiplier), false)`;
 - `PointChange(POINT_GEM, -(gem_point * multiplier), false)`.
 
-Therefore a negative multiplier reverses the sign and credits recipe currency costs.
+Therefore a negative multiplier reverses the sign and credits recipe currency costs. A zero multiplier can bypass multiplied availability/currency requirements entirely while still reaching the single-reward path.
 
-The code still removes base recipe materials and uses the normal single reward path, but that does not neutralize the currency-credit defect.
+Extremely large signed values are likewise outside any server-enforced domain and can enter signed multiplication overflow territory; the canonical defect is the missing authoritative multiplier range validation.
 
-**Impact:** crafted Cube Renewal request can turn positive recipe Yang/Gem costs into player currency gains.
+**Impact:** crafted Cube Renewal requests can bypass recipe resource/currency requirements with zero multiplier or turn positive Yang/Gem costs into credits with a negative multiplier.
 
 **Runtime:** Stage B isolated modified-client/economy test only; do not execute in production. See `REFCUBE-T01`.
 
