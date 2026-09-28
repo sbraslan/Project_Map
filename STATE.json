@@ -6,9 +6,9 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "costume_appearance",
-    "display_name": "Costume / Appearance / ChangeLook",
-    "status": "STATIC MAPPING IN PROGRESS",
+    "subsystem": "runtime_readiness_extension",
+    "display_name": "Post-Audit Readiness Extension",
+    "status": "STATIC MAPPING COMPLETE / 22-OF-22 READINESS COVERED / EXECUTION LOCKED",
     "system_file": "systems/costume_appearance.md",
     "bug_file": "bugs/costume_appearance.md",
     "test_file": "tests/costume_appearance.md",
@@ -23,11 +23,11 @@
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Close remaining mount ChangeLook expiry helper semantics as deferred-or-promoted.",
-      "Audit guild-storage/roulette/switchbot omissions only for concrete ChangeLook state mutation paths.",
-      "Review free-ticket lifetime and duplicate-position aliasing in CTransmutation.",
-      "Prepare subsystem static-closure/readiness if no additional verified edge remains.",
-      "Keep source/game repositories read-only and runtime execution locked."
+      "Treat Costume / Appearance / ChangeLook as STATIC COMPLETE.",
+      "Preserve DUNGEON-T10 as the first future live runtime gate.",
+      "Use ITEM_CREATION_AUTOMATION.md when the user says item ekleyeceğiz.",
+      "Do not execute runtime tests or modify source/game repositories without an explicit phase change.",
+      "Continue documentation-only mapping only if another unmapped subsystem is deliberately opened."
     ]
   },
   "startup": {
@@ -219,7 +219,11 @@
     "common/length.h::renewed window registry audited against CTransmutation::Open",
     "BUG-LOOK-007::Acce overlap can delete ChangeLook-retained raw item",
     "Project_ClientSrc/InstanceBase.cpp::__ArmorVnumToShape blindly interprets cross-type VALUE3",
-    "ITEM_CREATION_AUTOMATION.md::ChangeLook compatibility constraints synchronized"
+    "ITEM_CREATION_AUTOMATION.md::ChangeLook compatibility constraints synchronized",
+    "Costume / Appearance / ChangeLook::STATIC COMPLETE",
+    "tests/costume_appearance.md::LOOK-T01..LOOK-T07 readiness consolidated; execution locked",
+    "RUNTIME.md::Costume Appearance post-audit readiness extension",
+    "READINESS_AUDIT.md::post-audit extension current effective coverage 22/22"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -271,7 +275,8 @@
     "battle_field",
     "world_lottery",
     "world_boss",
-    "sung_mahi_tower"
+    "sung_mahi_tower",
+    "costume_appearance"
   ],
   "ranking_closure": {
     "status": "STATIC COMPLETE",
@@ -394,7 +399,7 @@
     ]
   },
   "runtime_readiness": {
-    "status": "DOCUMENTATION AUDITED — EXECUTION LOCKED",
+    "status": "DOCUMENTATION AUDITED + POST-AUDIT EXTENSION — EXECUTION LOCKED",
     "current_first_live_gate": "DUNGEON-T10",
     "sung_mahi_test_file": "tests/sung_mahi_tower.md",
     "sung_mahi_test_ids": [
@@ -405,7 +410,7 @@
       "SMT-T05",
       "SMT-T06"
     ],
-    "documentation_cursor": "dungeon_t10_gate_ready",
+    "documentation_cursor": "post_audit_22_of_22_complete",
     "completed_readiness_clusters": [
       "dungeon_info",
       "ticket",
@@ -427,7 +432,8 @@
       "battle_field",
       "world_lottery",
       "world_boss",
-      "sung_mahi_tower"
+      "sung_mahi_tower",
+      "costume_appearance"
     ],
     "dungeon_info": {
       "status": "DOCUMENTATION READY / NOT RUN",
@@ -1642,6 +1648,40 @@
         "DUNGEON-T12"
       ],
       "downstream_blocked_until_t10_recorded": true
+    },
+    "costume_appearance": {
+      "status": "READY / NOT RUN",
+      "test_file": "tests/costume_appearance.md",
+      "verified_bug_ids": [
+        "BUG-LOOK-001",
+        "BUG-LOOK-002",
+        "BUG-LOOK-003",
+        "BUG-LOOK-004",
+        "BUG-LOOK-005",
+        "BUG-LOOK-006",
+        "BUG-LOOK-007"
+      ],
+      "tests": [
+        "LOOK-T01",
+        "LOOK-T02",
+        "LOOK-T03",
+        "LOOK-T04",
+        "LOOK-T05",
+        "LOOK-T06",
+        "LOOK-T07"
+      ],
+      "first_safe_observations": [
+        "LOOK-T02 eligibility-only",
+        "LOOK-T03 controlled warp/state"
+      ],
+      "execution_priority": "Does not supersede DUNGEON-T10"
+    },
+    "coverage": {
+      "static_complete_subsystems": 22,
+      "readiness_owned_subsystems": 22,
+      "folded_companions": [
+        "guild"
+      ]
     }
   },
   "folded_subsystems": {
@@ -1677,7 +1717,7 @@
     }
   },
   "costume_appearance_closure": {
-    "status": "STATIC MAPPING IN PROGRESS",
+    "status": "STATIC COMPLETE",
     "verified_bug_ids": [
       "BUG-LOOK-001",
       "BUG-LOOK-002",
@@ -1700,9 +1740,11 @@
       "clear_scroll": "SetChangeLookVnum(0) -> Save -> UpdatePacket"
     },
     "deferred_findings": [
-      "Mount ChangeLook expiry helpers remain partially disconnected from CTransmutation::Accept; intended expiry semantics not yet proven.",
-      "CItem::IsExpireTimeItem uses an overly broad && type/subtype guard; no proven live caller/impact yet.",
-      "CTransmutation::Open manual window exclusions may be incomplete versus renewed opened-window registry; audit next."
+      "Mount ChangeLook expiry helper disconnect; intended live semantics not proven.",
+      "CItem::IsExpireTimeItem broad predicate without proven live caller impact.",
+      "Aura + ChangeLook overlap without distinct proven destructive path.",
+      "GuildStorage/Roulette/Switchbot omitted from CTransmutation::Open without extra proven ChangeLook corruption.",
+      "Conditional RIGHT/FREE same-pointer ticket alias; ticket proto eligibility precondition not statically closed."
     ],
     "hide_costume": {
       "status": "STATIC CLOSED / NO BUG VERIFIED",
@@ -1744,6 +1786,16 @@
       "file": "ITEM_CREATION_AUTOMATION.md",
       "changelook_key": "TYPE + SUBTYPE + exact ANTI_FLAG compatibility",
       "body_visual": "VALUE3 -> ShapeIndex -> allowed race/sex MSM"
-    }
+    },
+    "canonical_tests": [
+      "LOOK-T01",
+      "LOOK-T02",
+      "LOOK-T03",
+      "LOOK-T04",
+      "LOOK-T05",
+      "LOOK-T06",
+      "LOOK-T07"
+    ],
+    "runtime_readiness": "READY / NOT RUN"
   }
 }
