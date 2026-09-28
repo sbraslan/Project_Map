@@ -6,30 +6,26 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "dragon_soul",
-    "display_name": "Dragon Soul / Alchemy",
-    "status": "STATIC MAPPING IN PROGRESS / 8 VERIFIED STATIC BUGS / EXECUTION LOCKED",
-    "system_file": "systems/dragon_soul.md",
-    "bug_file": "bugs/dragon_soul.md",
-    "test_file": "tests/dragon_soul.md",
+    "subsystem": "aura",
+    "display_name": "Aura System",
+    "status": "STATIC MAPPING IN PROGRESS / 1 VERIFIED STATIC BUG / EXECUTION LOCKED",
+    "system_file": "systems/aura.md",
+    "bug_file": "bugs/aura.md",
+    "test_file": "tests/aura.md",
     "verified_bug_ids": [
-      "BUG-DS-001",
-      "BUG-DS-002",
-      "BUG-DS-003",
-      "BUG-DS-004",
-      "BUG-DS-005",
-      "BUG-DS-006",
-      "BUG-DS-007",
-      "BUG-DS-008"
+      "BUG-AURA-001"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Inspect Dragon Soul deck/set bonus reactivation and relog persistence behavior.",
-      "Audit refine-window overlap and remaining cross-window interactions.",
-      "Audit extraction tools and source/extractor aliasing.",
-      "Inspect Dragon Soul quest qualification/daily lifecycle.",
-      "Close malformed-data candidates only if tracked/current reachability is established.",
-      "Do not execute DS-T01..DS-T08 or any runtime test without an explicit phase change."
+      "Map client -> packet -> server Aura open/check-in/check-out/accept contract.",
+      "Trace Aura ABSORB copy/destruction lifetime and persistence.",
+      "Trace Aura GROWTH table/material/EXP/socket arithmetic.",
+      "Trace Aura EVOLVE success/failure lifecycle.",
+      "Audit booster/eraser absorption-rate arithmetic.",
+      "Audit warp/disconnect/close locked-item cleanup.",
+      "Audit opener lifetime and cross-window coexistence.",
+      "Map Aura visual/proto/client persistence surfaces.",
+      "Do not execute AURA-T01 or any runtime test without an explicit phase change."
     ]
   },
   "startup": {
@@ -49,7 +45,7 @@
       "legacy monolithic root maps",
       "bulk reads of systems/, bugs/, tests/"
     ],
-    "source_read_strategy": "Static subsystem mapping is complete. For runtime-readiness documentation, start from bugs/INDEX.md and open only the specific bug/system evidence needed."
+    "source_read_strategy": "Continue only the active subsystem from STATE.json/CURRENT.md; source/game repos are read-only and Project_Map is the only writable repository."
   },
   "repositories": {
     "writable": [
@@ -317,7 +313,8 @@
     "world_boss",
     "sung_mahi_tower",
     "costume_appearance",
-    "acce_sash"
+    "acce_sash",
+    "dragon_soul"
   ],
   "ranking_closure": {
     "status": "STATIC COMPLETE",
@@ -1608,7 +1605,8 @@
       "WLOT-T": "tests/world_lottery.md",
       "WB-T": "tests/world_boss.md",
       "SMT-T": "tests/sung_mahi_tower.md",
-      "ACCE-T": "tests/acce.md"
+      "ACCE-T": "tests/acce.md",
+      "DS-T": "tests/dragon_soul.md"
     },
     "global_execution_order": {
       "stage_a_normal_current_flow": [
@@ -1720,8 +1718,8 @@
       "execution_priority": "Does not supersede DUNGEON-T10"
     },
     "coverage": {
-      "static_complete_subsystems": 23,
-      "readiness_owned_subsystems": 23,
+      "static_complete_subsystems": 24,
+      "readiness_owned_subsystems": 24,
       "folded_companions": [
         "guild"
       ]
@@ -1750,6 +1748,39 @@
         "ACCE-T06",
         "ACCE-T07",
         "ACCE-T08"
+      ],
+      "first_live_gate": "DUNGEON-T10"
+    },
+    "dragon_soul": {
+      "status": "READY / EXECUTION LOCKED / NOT RUN",
+      "system_file": "systems/dragon_soul.md",
+      "bug_file": "bugs/dragon_soul.md",
+      "test_file": "tests/dragon_soul.md",
+      "verified_bug_ids": [
+        "BUG-DS-001",
+        "BUG-DS-002",
+        "BUG-DS-003",
+        "BUG-DS-004",
+        "BUG-DS-005",
+        "BUG-DS-006",
+        "BUG-DS-007",
+        "BUG-DS-008",
+        "BUG-DS-009",
+        "BUG-DS-010",
+        "BUG-DS-011"
+      ],
+      "canonical_test_ids": [
+        "DS-T01",
+        "DS-T02",
+        "DS-T03",
+        "DS-T04",
+        "DS-T05",
+        "DS-T06",
+        "DS-T07",
+        "DS-T08",
+        "DS-T09",
+        "DS-T10",
+        "DS-T11"
       ],
       "first_live_gate": "DUNGEON-T10"
     }
@@ -1869,7 +1900,7 @@
     "runtime_readiness": "READY / NOT RUN"
   },
   "dragon_soul_closure": {
-    "status": "STATIC MAPPING IN PROGRESS",
+    "status": "STATIC COMPLETE",
     "verified_bug_ids": [
       "BUG-DS-001",
       "BUG-DS-002",
@@ -1878,11 +1909,14 @@
       "BUG-DS-005",
       "BUG-DS-006",
       "BUG-DS-007",
-      "BUG-DS-008"
+      "BUG-DS-008",
+      "BUG-DS-009",
+      "BUG-DS-010",
+      "BUG-DS-011"
     ],
     "candidates": [
-      "GetBasePosition uses row_type > DRAGON_SOUL_GRADE_MAX rather than >=; malformed grade required.",
-      "DoChangeAttr indexes five-entry needFireCountList by VNUM-derived step without explicit bounds guard; malformed step required.",
+      "GetBasePosition uses row_type > DRAGON_SOUL_GRADE_MAX rather than >=; malformed grade required and no tracked malformed producer was established.",
+      "DoChangeAttr indexes five-entry needFireCountList by VNUM-derived step without explicit bounds guard; malformed step required and no tracked malformed producer was established.",
       "ChangeAttrStepTables and ChangeStone* data groups have no mapped consumer in current implementation."
     ],
     "mapped_flows": [
@@ -1892,7 +1926,12 @@
       "grade/step/strength/change-attr refine",
       "Dragon Heart extraction",
       "ENABLE_DS_REFINE_WINDOW self-opener command",
-      "grade/step/strength material-count semantics; step first-pointer equipped validation -> BUG-DS-008"
+      "grade/step/strength material-count semantics; step first-pointer equipped validation -> BUG-DS-008",
+      "affect persistence -> relog DragonSoul_Initialize -> deck/set cleanup wrap -> BUG-DS-009",
+      "pull-out extractor consumption/log lifetime -> BUG-DS-010",
+      "source/extractor aliasing closed by normal caller item-type constraints",
+      "refine-window overlap checked against ChangeLook/Aura/Acce; no additional DS-specific destructive alias promoted",
+      "qualification, Cor Draconis daily lifecycle, and daily-gift event authorization -> BUG-DS-011"
     ],
     "canonical_tests": [
       "DS-T01",
@@ -1902,15 +1941,25 @@
       "DS-T05",
       "DS-T06",
       "DS-T07",
-      "DS-T08"
+      "DS-T08",
+      "DS-T09",
+      "DS-T10",
+      "DS-T11"
     ],
-    "runtime_readiness": "NOT YET CONSOLIDATED",
+    "runtime_readiness": "READY / EXECUTION LOCKED / NOT RUN",
     "table_parity": {
       "status": "CURRENT DEPLOYMENT MATCH",
       "server_file": "Project_Game/share/locale/europe/dragon_soul_table.txt",
       "client_file": "Project_Binary/locale/locale/common/dragon_soul_table.txt",
       "blob_sha": "66085b6d957b7b69856a85c36990482f3e04328e"
-    }
+    },
+    "closure_notes": [
+      "NEW_AFFECT_DS_SET and deck affects persist across normal logout/login.",
+      "Current build WEAR_MAX_NUM=33 and DS_SLOT_MAX=6 make active-deck -1 wrap the set-cleanup start to wear 27.",
+      "Tracked daily-gift quest is compiled, but no tracked manager quest guarantees ds_dg_id is non-zero before event activation.",
+      "No Dragon Soul runtime test has been executed.",
+      "Global first future live gate remains DUNGEON-T10."
+    ]
   },
   "acce_sash_mapping": {
     "status": "STATIC COMPLETE",
@@ -1965,6 +2014,37 @@
       "Cross-window ChangeLook/Acce destructive overlap is canonically owned by BUG-LOOK-007; no duplicate Acce bug ID.",
       "Aura/Acce opener coexistence is an integration observation without a separately proven Acce corruption path.",
       "Normal Acce uint8 slot fields cover the 180-cell default inventory and do not truncate supported Acce inputs."
+    ]
+  },
+  "aura_mapping": {
+    "status": "STATIC MAPPING IN PROGRESS",
+    "verified_bug_ids": [
+      "BUG-AURA-001"
+    ],
+    "canonical_files": {
+      "system": "systems/aura.md",
+      "bugs": "bugs/aura.md",
+      "tests": "tests/aura.md"
+    },
+    "mapped_flows": [
+      "OpenAuraRefineWindow initial opener-distance check",
+      "AuraRefineWindowCheckIn/CheckOut/Accept gate structure",
+      "Aura slot TItemPos storage + inventory item locking",
+      "IsAuraRefineWindowCanRefine self-conflict with CanHandleItem -> BUG-AURA-001"
+    ],
+    "canonical_tests": [
+      "AURA-T01"
+    ],
+    "runtime_readiness": "NOT YET CONSOLIDATED",
+    "next": [
+      "client packet contract",
+      "ABSORB lifecycle",
+      "GROWTH arithmetic/material lifecycle",
+      "EVOLVE lifecycle",
+      "booster/eraser",
+      "warp/disconnect/lock recovery",
+      "cross-window/opening lifetime",
+      "visual/proto persistence"
     ]
   }
 }
