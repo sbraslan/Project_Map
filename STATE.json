@@ -16,14 +16,16 @@
       "BUG-LOOK-001",
       "BUG-LOOK-002",
       "BUG-LOOK-003",
-      "BUG-LOOK-004"
+      "BUG-LOOK-004",
+      "BUG-LOOK-005",
+      "BUG-LOOK-006"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Close mount ChangeLook use/expiry intent and call-chain without promoting dead helpers prematurely.",
-      "Map hide-costume plus ChangeLook interaction.",
-      "Audit weapon/body/job/gender ChangeLook eligibility edge cases.",
-      "Audit alternate item mutation paths against CTransmutation raw pointers.",
+      "Audit CTransmutation::Open against all renewed opened-window states (Aura, Guild Storage, Switchbot, Roulette and companions).",
+      "Close mount ChangeLook expiry intent without assuming unused helpers are live requirements.",
+      "Map item-creation companion dependencies for costume ChangeLook/hide behavior.",
+      "Review client behavior for invalid cross-type transmutation VNUMs from BUG-LOOK-005.",
       "Keep source/game repositories read-only and runtime execution locked."
     ]
   },
@@ -207,7 +209,12 @@
     "game/src/char_item.cpp::TRANSMUTATION_REVERSAL clear-scroll persistent reset",
     "BUG-LOOK-003::CanWarp omits W_CHANGELOOK while WarpSet preserves transmutation",
     "BUG-LOOK-004::sealed right ChangeLook material lacks server validation",
-    "game/src/item.cpp::mount ChangeLook expiry helpers deferred pending live call-chain"
+    "game/src/item.cpp::mount ChangeLook expiry helpers deferred pending live call-chain",
+    "game/src/char.cpp::hide-costume getters preserve underlying armor/weapon ChangeLook VNUM",
+    "BUG-LOOK-005::LEFT checkout/replacement bypasses RIGHT compatibility",
+    "BUG-LOOK-006::real-time expiry deletes checked-in item while raw CTransmutation pointer survives",
+    "game/src/item_manager.cpp::RemoveItem -> DestroyItem -> M2_DELETE lifetime proof",
+    "game/src/questlua_game.cpp::game.open_transmutation entry point identified"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -1670,7 +1677,9 @@
       "BUG-LOOK-001",
       "BUG-LOOK-002",
       "BUG-LOOK-003",
-      "BUG-LOOK-004"
+      "BUG-LOOK-004",
+      "BUG-LOOK-005",
+      "BUG-LOOK-006"
     ],
     "mapped_flows": [
       "COSTUME_BODY item VNUM -> client VALUE3 -> MSM ShapeIndex -> GR2/DDS",
@@ -1685,9 +1694,24 @@
       "clear_scroll": "SetChangeLookVnum(0) -> Save -> UpdatePacket"
     },
     "deferred_findings": [
-      "Mount ChangeLook expiry helpers appear partially disconnected from CTransmutation::Accept.",
-      "CItem::IsExpireTimeItem uses an overly broad && type/subtype guard; live impact not yet closed.",
-      "Alternate item-mutation paths while CTransmutation stores raw LPITEM references remain under audit."
-    ]
+      "Mount ChangeLook expiry helpers remain partially disconnected from CTransmutation::Accept; intended expiry semantics not yet proven.",
+      "CItem::IsExpireTimeItem uses an overly broad && type/subtype guard; no proven live caller/impact yet.",
+      "CTransmutation::Open manual window exclusions may be incomplete versus renewed opened-window registry; audit next."
+    ],
+    "hide_costume": {
+      "status": "STATIC CLOSED / NO BUG VERIFIED",
+      "body": "hidden getter prefers underlying armor ChangeLook VNUM",
+      "weapon": "hidden getter prefers underlying weapon ChangeLook VNUM"
+    },
+    "slot_state": {
+      "status": "BUG VERIFIED",
+      "bug": "BUG-LOOK-005",
+      "invariant": "RIGHT compatibility is not revalidated after LEFT checkout/replacement"
+    },
+    "item_lifetime": {
+      "status": "BUG VERIFIED",
+      "bug": "BUG-LOOK-006",
+      "path": "real-time expiry -> RemoveItem -> DestroyItem/M2_DELETE while CTransmutation retains raw LPITEM"
+    }
   }
 }
