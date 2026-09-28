@@ -2,7 +2,7 @@
 
 **Active phase:** Detection / Mapping Only
 **Active state:** Acce / Sash Static Mapping
-**Status:** STATIC MAPPING IN PROGRESS / 4 VERIFIED STATIC BUGS / EXECUTION LOCKED
+**Status:** STATIC MAPPING IN PROGRESS / 5 VERIFIED STATIC BUGS / EXECUTION LOCKED
 **Machine state:** `STATE.json`
 **Active subsystem:** Acce / Sash
 **Last completed subsystem:** Costume / Appearance / ChangeLook
@@ -26,6 +26,7 @@ Verified static findings:
 - `BUG-ACCE-002` — wrong ITEM_COSTUME subtypes can pass the server sash type/subtype predicate because it uses `&&`.
 - `BUG-ACCE-003` — absorb material validation accepts every ITEM_ARMOR subtype; `ARMOR_BODY` is incorrectly compared as an item type.
 - `BUG-ACCE-004` — combine allows the same inventory cell as both inputs; failure can consume the primary sash and success reaches a stale-pointer/double-remove path.
+- `BUG-ACCE-005` — reversal clears attributes after the only target update packet, leaving stale absorbed attributes in client item data/tooltips.
 
 Key architecture:
 - Acce check-in/check-out is client-local bookkeeping.
@@ -45,13 +46,13 @@ reference VNUM -> compatible template -> unused VNUM/ShapeIndex proposal -> item
 
 ## Next
 Continue Acce static mapping:
-1. absorbed-stat math and special apply behavior;
-2. socket/attribute persistence and reversal/reset;
-3. proto/data and client visual dependencies;
-4. open-window/warp/item-mutation lifecycle;
-5. combine grade/refine-chain and output-placement edge cases.
+1. proto/data and client visual dependencies;
+2. open-window/warp/item-mutation lifecycle;
+3. combine grade/refine-chain and output-placement edge cases;
+4. validate extended element/random/set reset semantics;
+5. close remaining Acce edge cases.
 
-Do not execute ACCE-T01..T04.
+Do not execute ACCE-T01..T05.
 The prepared first future runtime gate remains `DUNGEON-T10`.
 
 GitHub state is canonical.
