@@ -25,12 +25,18 @@ Important global ID rules:
 
 
 ## Dragon Soul ownership — 2026-09-28
-- `BUG-DS-001..008` -> `dragon_soul.md`
+- `BUG-DS-001..011` -> `dragon_soul.md`
 - Malformed grade bound and change-attr step bound remain candidate/unpromoted.
-- Step-refine equipped-first validation is now promoted as `BUG-DS-008`.
+- Step-refine equipped-first validation is `BUG-DS-008`; relog set wrap, pull-out extractor lifetime, and zero-ID daily-gift authorization are `BUG-DS-009..011`.
 
 
 ## Active subsystem ownership — Acce / Sash — 2026-09-28
 - `BUG-ACCE-001..008` -> `acce.md`
 - Status: STATIC COMPLETE / VERIFIED STATIC.
 - Runtime ownership draft: `../tests/acce.md` (`ACCE-T01..T08`), execution locked.
+
+
+## Dragon Soul closure — 2026-09-28
+- Status: STATIC COMPLETE / VERIFIED STATIC for Dragon Soul.
+- `BUG-DS-001..011` -> `dragon_soul.md`.
+- Malformed grade/step boundaries remain unpromoted data-dependent candidates.
