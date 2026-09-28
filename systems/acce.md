@@ -1,6 +1,6 @@
 # Acce / Sash — Static Map
 
-**Status:** STATIC MAPPING IN PROGRESS  
+**Status:** STATIC COMPLETE  
 **Phase:** Detection / Mapping Only  
 **Source/Game repos:** read-only  
 **Opened:** 2026-09-28  
@@ -109,15 +109,18 @@ Acce reversal items clear socket 0 and clear attributes on the target sash.
 - `BUG-ACCE-004` — combine accepts identical primary/material inventory cells; failure can consume the primary sash and success reaches a stale-pointer/double-remove path.
 - `BUG-ACCE-005` — reversal clears absorbed attributes after the only target update packet, leaving stale client attribute/tool-tip state.
 - `BUG-ACCE-006` — absorption does not require an empty target sash; a crafted request can overwrite an existing absorbed item/state and consume the new material.
+- `BUG-ACCE-007` — Acce open state can survive warp and keep item handling blocked.
+- `BUG-ACCE-008` — reversal never clears copied element/set metadata, so stale extended state is persisted and can remain visible after refresh/relog.
 
-## Mapping next
+## Historical mapping checklist — CLOSED
 
-1. close absorbed-stat math and special apply behavior;
-2. close save/load persistence of sash sockets/attributes and reset flow;
-3. inspect Acce-specific proto/data ranges and client visual definitions;
-4. inspect open-window / warp / item-mutation lifecycle beyond the already-mapped ChangeLook overlap;
-5. inspect combine grade/refine-chain edge cases and output placement;
-6. promote additional findings only with static evidence.
+The originally listed remaining passes are now closed:
+- absorbed-stat math and persistence;
+- client model/scale dependencies;
+- window/warp/item-mutation lifecycle;
+- combine/refine-chain and output placement;
+- extended reversal metadata;
+- deferred runtime ownership.
 
 No source/game file was modified and no runtime test was executed.
 
@@ -257,3 +260,75 @@ The full flow closes that concern:
 - the effect itself is registered in `playersettingmodule.py` as `D:/ymir work/pc/common/effect/armor/acc_01.mse`.
 
 Therefore `SetAcce()` is not the only/initial producer of this effect handle. No standalone missing-effect bug is promoted from that condition.
+
+
+## Final static closure — 2026-09-28
+
+### Combine / refine-chain
+Final combine audit found no additional promoted defect beyond `BUG-ACCE-004`.
+
+For legitimate distinct inputs:
+- same drain-grade inputs are required;
+- price is derived from the primary/left sash;
+- success follows the primary sash's `GetRefinedVnum()` chain;
+- terminal-grade output can raise socket1 up to 25;
+- primary absorbed state/attributes/extended metadata are preserved into the result;
+- primary and material are removed and output returns to the primary cell;
+- failure consumes only material.
+
+Different sash families therefore intentionally follow the left/primary refine chain. No separate cross-family output bug was verified.
+
+The final request uses uint8 inventory cells, but the normal default inventory is 4 pages x 45 = 180 cells, so no normal Acce slot truncation boundary exists above 255 for the supported costume/weapon/body-armor inputs.
+
+### Client model and scale dependency
+Acce visual data is not driven by a generic character MSM ShapeData entry.
+
+Canonical current path:
+`PART_ACCE`
+-> `CInstanceBase::SetAcce()`
+-> `CActorInstance::AttachAcce()`
+-> VNUM `CItemData`
+-> `item_list.txt` WING model
+-> attach to `Bip01 Spine2`.
+
+`locale/locale/common/item_list.txt` contains direct WING/GR2 mappings for current 850xx/860xx sash families.
+
+`locale/locale/common/item_scale.txt` provides per-job/per-sex scale rows for those families. `CItemManager::LoadItemScale()` loads these rows and applies each base row across the configured grade range through `SetItemTableScaleData()`.
+
+For future sash creation, the visual dependency is therefore:
+1. compatible COSTUME_ACCE item/refine proto;
+2. `item_list.txt` WING -> GR2 mapping;
+3. `item_scale.txt` job/sex scale data where required;
+4. valid GR2 asset.
+
+A character MSM shape entry alone is not the current sash integration path.
+
+### Cross-window ownership
+`OpenAcceCombination()` and `OpenAcceAbsorption()` only prevent a second Acce mode; they do not enforce a global opened-window mutex.
+
+This architecture already has one concrete cross-system destructive finding owned by:
+`BUG-LOOK-007` — Acce overlap with ChangeLook can invalidate a ChangeLook-retained raw item pointer.
+
+Aura can likewise coexist at the open-state level because neither opener globally excludes the other, but no new Acce-specific corruption/lifetime consequence was proven in this pass. It remains an integration observation, not a duplicate bug ID.
+
+### Reversal extended metadata
+The earlier observation that reversal leaves element/random/set metadata is promoted to `BUG-ACCE-008` after closing the persistence and client-consumer chain.
+
+Socket0 correctly gates the live absorbed gameplay bonuses, but:
+- copied element/set metadata is never cleared;
+- it is included in normal item persistence;
+- generic tooltip/title code can consume it independently of socket0.
+
+Thus the stale state can survive a full item refresh and relog.
+
+## Closure result
+
+**Acce / Sash is STATIC COMPLETE.**
+
+Canonical verified findings:
+`BUG-ACCE-001..008`.
+
+Canonical deferred tests:
+`ACCE-T01..ACCE-T08`.
+
+No runtime test has been executed. Runtime order remains locked with `DUNGEON-T10` first.
