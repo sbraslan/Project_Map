@@ -18,30 +18,33 @@ Only `sbraslan/Project_Map` is writable. All source/game repositories remain rea
 When the user says `item ekleyeceğiz`, use `ITEM_CREATION_AUTOMATION.md` as the canonical generation workflow.
 
 ## Mapping progress
-Costume / Appearance / ChangeLook is now open.
+Closed this turn:
+- `dwTransmutationVnum` DB persistence is complete end-to-end; no persistence bug verified.
+- ChangeLook reversal/clear scroll persistently resets the appearance; no clear-scroll bug verified.
+- Character destruction closes `CTransmutation`.
+- Client and server live ChangeLook prices both use 50M item / 30M mount.
 
-Mapped:
-- body costume: item VNUM -> item_proto VALUE3 -> MSM ShapeIndex -> GR2/DDS;
-- hair costume VALUE3 visual path;
-- server ChangeLook packet/transaction flow;
-- client/server ChangeLook eligibility logic;
-- transmutation VNUM item-state propagation boundary.
+Verified bug set:
+- `BUG-LOOK-001` — right-slot-before-left server null dereference.
+- `BUG-LOOK-002` — quest mount targets 50051..50053 accept arbitrary non-costume material.
+- `BUG-LOOK-003` — `CanWarp()` omits `W_CHANGELOOK`; same-character warp can retain active transmutation state/raw item references.
+- `BUG-LOOK-004` — sealed right material is blocked by official client but not revalidated server-side.
 
-Verified:
-- `BUG-LOOK-001` — right-slot check-in before left target can null-deref server `CheckOtherItem`.
-- `BUG-LOOK-002` — mount targets 50051..50053 accept arbitrary non-costume right materials; same faulty predicate exists client and server.
+Deferred:
+- mount ChangeLook expiry helper/call-chain inconsistencies;
+- broad `IsExpireTimeItem()` predicate;
+- alternate item-mutation paths while raw `LPITEM` references are retained.
 
 Deferred tests:
-- `LOOK-T01` isolated modified-client server-safety validation;
-- `LOOK-T02` UI eligibility + isolated disposable commit validation.
+- LOOK-T01..LOOK-T04; none executed.
 
 ## Exact next work
-1. close DB persistence for transmutation VNUM;
-2. map ChangeLook clear-scroll/reset;
-3. map mount appearance use/expiry;
-4. inspect close/disconnect/raw-item lifetime boundaries;
-5. promote findings only with static evidence.
+1. close mount ChangeLook use/expiry call-chain;
+2. map hide-costume + ChangeLook interaction;
+3. audit weapon/body/job/gender eligibility edge cases;
+4. audit alternate mutation paths against raw transmutation pointers;
+5. preserve source/game immutability.
 
-DUNGEON-T10 remains prepared but runtime-locked; it is not being executed during renewed static mapping.
+DUNGEON-T10 remains prepared but runtime-locked.
 
 GitHub state is canonical.
