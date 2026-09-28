@@ -37,3 +37,17 @@ Future validation for BUG-DUNGEON-004:
 - separately exercise `d.set_unique("same", secondVID)` after the key already points to another mob.
 
 Do not execute during the current detection/mapping phase.
+
+
+## Dungeon Core readiness consolidation — 2026-09-28
+- No Dungeon Core runtime test was executed.
+- DCORE-T01 -> BUG-DUNGEON-001.
+- DCORE-T02 -> BUG-DUNGEON-002.
+- DCORE-T03 -> BUG-DUNGEON-003.
+- DCORE-T04 -> BUG-DUNGEON-004.
+- DCORE-T01 is a registered-Lua failure-path lifecycle test.
+- DCORE-T02/DCORE-T04 are controlled dungeon-script semantic/regression tests.
+- DCORE-T03 is isolated ASan/debug raw-pointer lifetime validation.
+- Primary legitimate/current-code candidates: DCORE-T01 and DCORE-T02.
+- Dungeon Core remains distinct from Dungeon Info; the global first live gate is still Dungeon Info DUNGEON-T10.
+- Unnumbered defensive candidates from the static audit remain unpromoted and receive no invented runtime bug mapping.
