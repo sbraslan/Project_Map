@@ -194,3 +194,16 @@ Current effective static-complete/readiness coverage is therefore **23/23**, plu
 Acce execution classes are documented in `RUNTIME.md`. No Acce runtime test has been executed.
 
 This extension does not alter the canonical future order's first gate. **DUNGEON-T10 remains the first future live gate.**
+
+
+## Post-audit extension — Dragon Soul / Alchemy — 2026-09-28
+The original audit remains historically scoped to the initial 21 STATIC COMPLETE rows.
+
+Subsequent extensions now include:
+- Costume / Appearance / ChangeLook;
+- Acce / Sash;
+- Dragon Soul / Alchemy — `BUG-DS-001..011`, `DS-T01..DS-T11`.
+
+Current effective static-complete/readiness coverage is therefore **24/24**, plus the folded Guild lifecycle companion.
+
+Dragon Soul execution classes are documented in `RUNTIME.md`. No Dragon Soul runtime test has been executed. **DUNGEON-T10 remains the first future live gate.**
