@@ -65,3 +65,6 @@ Future ordinary-UI observation with a disposable absorbed sash:
 Static prediction: socket0 clears immediately, but the old client attribute array remains until another full target item update.
 
 Safety: Stage A non-crash UI/state observation.
+
+
+Current ownership: ACCE-T01..T05. No test executed.
