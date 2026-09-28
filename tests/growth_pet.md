@@ -214,3 +214,33 @@ Static prediction:
 Invincibility and Panacea select `next_skill_formula1`, while HEAL uses the current-level value.
 
 Safety class: **Stage A/debug observation**.
+
+
+## GPET-T16 — Active-seal attribute-change rollback
+Covers `BUG-GPET-016`.
+
+Future isolated modified-client test:
+1. summon a disposable pet and record the actor/seal Growth Pet state;
+2. submit an attribute-change request targeting that active seal;
+3. record the changed seal/cache values after the server response;
+4. dismiss the pet normally;
+5. inspect the persisted seal again.
+
+Static prediction:
+the changed state is overwritten by the actor's stale pre-change `m_PetInfo` during `Dismiss()`.
+
+Safety class: **Stage B modified-client / disposable pet**.
+
+## GPET-T17 — Multi-slot Life/EXP feed
+Covers `BUG-GPET-017`.
+
+Future Stage A normal-client test:
+1. place at least two disposable valid feed items in the Life or EXP feed window;
+2. record both inventory items and pet lifetime/EXP;
+3. submit one feed action;
+4. record which items were consumed and the resulting pet state.
+
+Static prediction:
+only the last submitted feed slot is applied/consumed; earlier selected items remain untouched although the feed UI clears the batch.
+
+Safety class: **Stage A normal-client observation**.
