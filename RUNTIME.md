@@ -529,6 +529,40 @@ The global first live gate remains **DUNGEON-T10**.
 
 **Next documentation cluster:** World Lottery runtime readiness.
 
+
+## Runtime-readiness consolidation — World Lottery — 2026-09-28
+**Documentation status:** READY
+**Execution status:** LOCKED / NOT RUN
+
+Verified coverage:
+- WLOT-T01 -> BUG-WLOT-001
+- WLOT-T02 -> BUG-WLOT-002
+- WLOT-T03 / WLOT-T15 -> BUG-WLOT-003
+- WLOT-T04 -> BUG-WLOT-004
+- WLOT-T05 -> BUG-WLOT-005
+- WLOT-T06 -> BUG-WLOT-006
+- WLOT-T07 -> BUG-WLOT-007
+- WLOT-T08 -> BUG-WLOT-008
+- WLOT-T09 -> BUG-WLOT-009
+- WLOT-T10 -> BUG-WLOT-010
+- WLOT-T11 -> BUG-WLOT-011
+- WLOT-T12 -> BUG-WLOT-012
+- WLOT-T13 -> BUG-WLOT-013
+- WLOT-T14 -> BUG-WLOT-014
+
+Execution classes:
+- **Modified-client/adversarial:** WLOT-T01, T02, T05, T06
+- **Numeric/high-value boundary:** WLOT-T03, T04, T15
+- **DB/state-shaping:** WLOT-T07, T08, T09, T10
+- **Dormant ranking endpoint:** WLOT-T11, T12
+- **Crash/fault-injection:** WLOT-T13, T14
+
+Primary ordinary/current-flow candidates: **WLOT-T04** and **WLOT-T10**.
+
+The global first live gate remains **DUNGEON-T10**.
+
+**Next documentation cluster:** World Boss runtime readiness.
+
 ## Patch readiness
 First-cluster fix plan is ready at `fixes/dungeon_info.md`.
 
