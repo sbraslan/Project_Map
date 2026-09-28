@@ -15,8 +15,8 @@
     "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Consolidate Party runtime readiness from bugs/party.md and tests/party.md without executing tests.",
-      "Preserve unpromoted and dormant integration gaps without inventing bug IDs.",
+      "Consolidate Party Match runtime readiness from bugs/party_match.md and tests/party_match.md without executing tests.",
+      "Keep Party and Party Match ownership separate.",
       "Keep DUNGEON-T10 as the first future live runtime gate.",
       "Preserve all source/game repositories as read-only until the user explicitly changes phase."
     ]
@@ -179,7 +179,8 @@
     "RUNTIME.md::Shop SHP-T01-T14 canonical readiness consolidated; execution locked",
     "RUNTIME.md::Safebox Mall SFB-T01-T12 canonical readiness consolidated; execution locked",
     "RUNTIME.md::Mailbox MAIL-T01-T18 readiness consolidated; execution locked",
-    "RUNTIME.md::Ranking RANK-T01-T07 readiness consolidated; BUG-RANK-006 retracted; execution locked"
+    "RUNTIME.md::Ranking RANK-T01-T07 readiness consolidated; BUG-RANK-006 retracted; execution locked",
+    "RUNTIME.md::Party PARTY-T01-T06 readiness consolidated; execution locked"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -348,7 +349,7 @@
       "SMT-T05",
       "SMT-T06"
     ],
-    "documentation_cursor": "party",
+    "documentation_cursor": "party_match",
     "completed_readiness_clusters": [
       "dungeon_info",
       "ticket",
@@ -363,7 +364,8 @@
       "shop",
       "safebox_mall",
       "mailbox",
-      "ranking"
+      "ranking",
+      "party"
     ],
     "dungeon_info": {
       "status": "DOCUMENTATION READY / NOT RUN",
@@ -957,6 +959,52 @@
       "isolated_parser_test": [
         "RANK-T07"
       ]
+    },
+    "party": {
+      "status": "DOCUMENTATION READY / NOT RUN",
+      "canonical_test_ids": [
+        "PARTY-T01",
+        "PARTY-T02",
+        "PARTY-T03",
+        "PARTY-T04",
+        "PARTY-T05",
+        "PARTY-T06"
+      ],
+      "verified_bug_tests": {
+        "BUG-PARTY-001": [
+          "PARTY-T01"
+        ],
+        "BUG-PARTY-002": [
+          "PARTY-T02"
+        ],
+        "BUG-PARTY-003": [
+          "PARTY-T03"
+        ],
+        "BUG-PARTY-004": [
+          "PARTY-T04"
+        ],
+        "BUG-PARTY-005": [
+          "PARTY-T05"
+        ],
+        "BUG-PARTY-006": [
+          "PARTY-T06"
+        ]
+      },
+      "normal_path_candidates": [
+        "PARTY-T01",
+        "PARTY-T02",
+        "PARTY-T05"
+      ],
+      "modified_client_tests": [
+        "PARTY-T03"
+      ],
+      "parser_tests": [
+        "PARTY-T04"
+      ],
+      "trusted_dev_tests": [
+        "PARTY-T06"
+      ],
+      "test_file_created": "tests/party.md"
     }
   }
 }
