@@ -80,3 +80,20 @@ Static prediction:
 sockets and classic attributes survive, but the Yohara random-apply array is not copied to the new item.
 
 Safety class: **Stage B/C destructive data-integrity / disposable items only**.
+
+
+## AURA-T06 — Terminal Radiant EVOLVE check-in arithmetic
+Covers `BUG-AURA-006`.
+
+Future isolated modified-client/debug test:
+1. prepare a legitimate grade-6 Radiant Aura at level 250 / exp 0;
+2. open the EVOLVE Aura window normally;
+3. bypass the client-side `curLevel >= AURA_MAX_LEVEL` rejection and submit the Radiant Aura to MAIN;
+4. instrument `__GetAuraRefineInfo()` and the outgoing current-info preview byte;
+5. stop before any destructive follow-up.
+
+Static prediction:
+the server accepts MAIN check-in, resolves the terminal table row with `NEED_EXP=0`, and evaluates the current EXP percentage with a zero denominator before the later Accept-time Radiant rejection.
+
+Safety class: **Stage B/C modified-client + arithmetic instrumentation**.
+No production execution.
