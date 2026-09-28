@@ -374,6 +374,35 @@ The global first live gate remains **DUNGEON-T10**.
 
 **Next documentation cluster:** Mailbox runtime readiness.
 
+
+## Runtime-readiness consolidation — Mailbox — 2026-09-28
+**Documentation status:** READY
+**Execution status:** LOCKED / NOT RUN
+
+Verified bug coverage:
+- MAIL-T01 / MAIL-T02 -> BUG-MAIL-001
+- MAIL-T03 / MAIL-T04 -> BUG-MAIL-002
+- MAIL-T10 -> BUG-MAIL-003 + BUG-MAIL-004 persistence boundaries
+- MAIL-T05 / MAIL-T06 -> BUG-MAIL-005
+- MAIL-T07 -> BUG-MAIL-006
+- MAIL-T08 / MAIL-T09 -> BUG-MAIL-007
+- MAIL-T11 -> BUG-MAIL-008
+- MAIL-T12 -> BUG-MAIL-009
+- MAIL-T13 -> BUG-MAIL-010
+- MAIL-T14 -> BUG-MAIL-011
+- MAIL-T15 -> BUG-MAIL-012
+
+Observation coverage:
+- MAIL-T16 -> OBS-MAIL-001
+- MAIL-T17 -> OBS-MAIL-002
+- MAIL-T18 -> OBS-MAIL-003
+
+Primary ordinary-flow candidates: **MAIL-T07** and **MAIL-T11**. Adversarial, crash-consistency and fault-injection cases remain isolated/deferred.
+
+The global first live gate remains **DUNGEON-T10**.
+
+**Next documentation cluster:** Ranking runtime readiness.
+
 ## Patch readiness
 First-cluster fix plan is ready at `fixes/dungeon_info.md`.
 
