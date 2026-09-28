@@ -31,6 +31,13 @@ Canonical test prefixes:
 - `WLOT-T` -> `world_lottery.md`
 - `WB-T` -> `world_boss.md`
 - `SMT-T` -> `sung_mahi_tower.md`
+- `LOOK-T` -> `costume_appearance.md`
 
 Migrated files contain copied foreign blocks. A test ID outside its canonical owner file is historical only unless `STATE.json` explicitly says otherwise.
 Legacy `SWITCHBOT-Txx`, `EX-Txx`, `EXCHANGE-Txx`, `SHOP-Txx`, and `TEST-WB-*` forms are non-canonical aliases/history.
+
+
+## Post-audit prefix extension — 2026-09-28
+- `LOOK-T` -> `costume_appearance.md`
+
+This subsystem was added after the original global readiness audit. Its test ownership is canonical here; global first execution gate remains `DUNGEON-T10`.
