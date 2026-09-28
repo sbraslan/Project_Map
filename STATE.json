@@ -15,8 +15,8 @@
     "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Consolidate Battle Field runtime readiness from bugs/battle_field.md and tests/battle_field.md without executing tests.",
-      "Preserve cross-system Party and Ranking ownership; do not duplicate their bug IDs into Battle Field.",
+      "Consolidate World Lottery runtime readiness from bugs/world_lottery.md and tests/world_lottery.md without executing tests.",
+      "Preserve verified, observation and deferred ownership exactly.",
       "Keep DUNGEON-T10 as the first future live runtime gate.",
       "Preserve all source/game repositories as read-only until the user explicitly changes phase."
     ]
@@ -182,7 +182,8 @@
     "RUNTIME.md::Ranking RANK-T01-T07 readiness consolidated; BUG-RANK-006 retracted; execution locked",
     "RUNTIME.md::Party PARTY-T01-T06 readiness consolidated; execution locked",
     "RUNTIME.md::Party Match PMATCH-T01-T05 readiness consolidated; execution locked",
-    "RUNTIME.md::Dungeon Core DCORE-T01-T04 readiness consolidated; execution locked"
+    "RUNTIME.md::Dungeon Core DCORE-T01-T04 readiness consolidated; execution locked",
+    "RUNTIME.md::Battle Field readiness consolidated; BFIELD-004 retracted; BFIELD-005/007 normalized to Ranking ownership"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -271,15 +272,19 @@
       "BUG-BFIELD-001",
       "BUG-BFIELD-002",
       "BUG-BFIELD-003",
-      "BUG-BFIELD-004",
-      "BUG-BFIELD-005",
       "BUG-BFIELD-006",
-      "BUG-BFIELD-007",
       "BUG-BFIELD-008",
       "BUG-BFIELD-009",
       "BUG-BFIELD-010",
       "BUG-BFIELD-011"
-    ]
+    ],
+    "retracted_bug_ids": [
+      "BUG-BFIELD-004"
+    ],
+    "cross_system_aliases": {
+      "BUG-BFIELD-005": "BUG-RANK-003",
+      "BUG-BFIELD-007": "BUG-RANK-007"
+    }
   },
   "world_lottery_closure": {
     "status": "STATIC COMPLETE",
@@ -351,7 +356,7 @@
       "SMT-T05",
       "SMT-T06"
     ],
-    "documentation_cursor": "battle_field",
+    "documentation_cursor": "world_lottery",
     "completed_readiness_clusters": [
       "dungeon_info",
       "ticket",
@@ -369,7 +374,8 @@
       "ranking",
       "party",
       "party_match",
-      "dungeon_core"
+      "dungeon_core",
+      "battle_field"
     ],
     "dungeon_info": {
       "status": "DOCUMENTATION READY / NOT RUN",
@@ -1077,6 +1083,66 @@
         "DCORE-T04"
       ],
       "note": "Distinct from Dungeon Info; global first live gate remains DUNGEON-T10."
+    },
+    "battle_field": {
+      "status": "DOCUMENTATION READY / NOT RUN",
+      "active_verified_bug_tests": {
+        "BUG-BFIELD-001": [
+          "BFIELD-T01"
+        ],
+        "BUG-BFIELD-002": [
+          "BFIELD-T02"
+        ],
+        "BUG-BFIELD-003": [
+          "BFIELD-T03"
+        ],
+        "BUG-BFIELD-006": [
+          "BFIELD-T06"
+        ],
+        "BUG-BFIELD-008": [
+          "BFIELD-T08"
+        ],
+        "BUG-BFIELD-009": [
+          "BFIELD-T09"
+        ],
+        "BUG-BFIELD-010": [
+          "BFIELD-T10"
+        ],
+        "BUG-BFIELD-011": [
+          "BFIELD-T11"
+        ]
+      },
+      "retracted_bug_tests": {
+        "BUG-BFIELD-004": [
+          "BFIELD-T04"
+        ]
+      },
+      "cross_system_aliases": {
+        "BUG-BFIELD-005": {
+          "canonical_bug": "BUG-RANK-003",
+          "canonical_test": "RANK-T03",
+          "legacy_test": "BFIELD-T05"
+        },
+        "BUG-BFIELD-007": {
+          "canonical_bug": "BUG-RANK-007",
+          "canonical_test": "RANK-T06",
+          "legacy_test": "BFIELD-T07"
+        }
+      },
+      "normal_path_candidates": [
+        "BFIELD-T01",
+        "BFIELD-T02",
+        "BFIELD-T03",
+        "BFIELD-T09",
+        "BFIELD-T10",
+        "BFIELD-T11"
+      ],
+      "privileged_tests": [
+        "BFIELD-T06"
+      ],
+      "deterministic_arithmetic_tests": [
+        "BFIELD-T08"
+      ]
     }
   }
 }
