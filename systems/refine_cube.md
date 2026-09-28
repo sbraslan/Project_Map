@@ -135,3 +135,173 @@ Set-value recipes are real/current, e.g. NPC 20475 recipes preserve the source i
 
 ## Next
 Continue into classic refine execution, scroll/failure paths and metadata preservation while finishing Cube special-branch atomicity.
+
+
+## Classic refine / recipe-control pass — 2026-09-28
+
+### Cube recipe object initialization
+`CUBE_DATA` defines a user constructor that initializes only:
+- `set_value = 0`;
+- `gem_point = 0`.
+
+At section start the parser also explicitly assigns `gold = 0`.
+
+Other scalar control members are written only when their directive appears.
+
+Current tracked `cube.txt` has **3327 complete sections**:
+- `percent`: 3327 / 3327;
+- `allow_copy`: 0 / 3327;
+- `not_remove`: 2815 / 3327;
+- `set_value`: 2790 / 3327.
+
+Therefore:
+- `allow_copy` is uninitialized for every current recipe;
+- `not_remove` is uninitialized for 512 current recipes.
+
+Both are read by `RefineCube()` to decide material removal / source preservation / attribute-copy behavior.
+
+See `BUG-REFCUBE-006`.
+
+### Current set-value recipe contract
+All 2790 current `set_value` sections use:
+- first material VNUM == reward VNUM;
+- `not_remove` == that reward/source VNUM.
+
+The stock Cube UI sends recipe/reward VNUM plus material **VNUMs**, not a chosen physical item cell. Therefore duplicate same-VNUM instance selection is not represented in the protocol; no separate “wrong selected instance” bug was promoted from this pass.
+
+### Classic refine packet entry
+Primary route:
+`HEADER_CG_REFINE`
+-> `CInputMain::Refine()`
+-> one of:
+- `DoRefine()`;
+- `DoRefineWithScroll()`;
+- `DoRefineSoul()`;
+- `DoRefineSerpent()` through money-only SnakeLair branch.
+
+`RefineInformation()` is the normal UI/info producer, but `CInputMain::Refine()` does not require a matching active refine session before honoring `REFINE_TYPE_NORMAL`.
+
+`DoRefine()` calls `CanHandleItem(true)`, which intentionally bypasses the under-refine guard.
+
+Its nearby-blacksmith scan logs `REFINE_FAR_BLACKSMITH` when none is present but deliberately continues.
+
+See `BUG-REFCUBE-008`.
+
+### Refine source lifetime
+`ITEM_MANAGER::RemoveItem()` ends in `M2_DELETE(item)`.
+
+Normal/scroll/Serpent refine replacement paths retain and use the old raw item pointer after that destruction.
+
+Current enabled features make the normal-success path directly reachable:
+- refine-success announcement;
+- Yohara;
+- Battle Pass.
+
+The Battle Pass update alone calls `item->GetVnum()` after ordinary source destruction.
+
+See `BUG-REFCUBE-007`.
+
+### Metadata copy matrix
+`ITEM_MANAGER::CopyAllAttrTo(old,new)` preserves:
+- accessory sockets as-is;
+- normal metin/socket state through its reconstruction rules;
+- Yohara glove extra socket range;
+- element grade/attacks/type/values;
+- classic attributes;
+- Yohara random apply attributes.
+
+Refine callers additionally copy seal date.
+
+It does **not** generically copy:
+- item set value;
+- Yohara random-default values;
+- transmutation;
+- basic-item marker.
+
+Current set-value recipes provide explicit re-application routes for set-equipped VNUMs; no semantic bug is promoted yet from set-value reset alone.
+
+Random-default preservation remains a data/semantics candidate pending current producer/consumer closure.
+
+### Refine output proto topology
+Current tracked item proto contains **5587** valid `RefinedVnum != 0` edges and no missing target VNUMs.
+
+Across all edges:
+- one size-changing edge exists;
+- three subtype-changing edges exist;
+- no type-changing edge exists.
+
+All size/subtype anomalies have `RefineSet = 0`, so normal classic refine cannot obtain a recipe for them.
+
+No currently executable refine edge was found that grows item size while the result is placed back into the old inventory cell.
+
+### Soul refine path
+Current build enables `ENABLE_SOUL_SYSTEM`.
+
+Tracked Soul data includes:
+- ITEM_SOUL families 70500..70509;
+- evolve scroll 70602, Value0=8;
+- awake scroll 70603, Value0=9.
+
+`RefineItem()` correctly enters the shared Soul-scroll case, but its second condition repeats `SOUL_EVOLVE_SCROLL` rather than checking `SOUL_AWAKE_SCROLL`.
+
+Thus Awake leaves `refType` at generic SCROLL and is later dispatched to `DoRefineWithScroll()`, not `DoRefineSoul()`.
+
+See `BUG-REFCUBE-009`.
+
+Soul socket lifecycle itself is currently coherent with replacement semantics:
+- socket0 = real-time expiry;
+- socket1 = activated marker (active Soul cannot be refined);
+- socket2 is initialized from the new grade's Value2 and updated by Soul time-use logic;
+- socket3 tracks Soul play time.
+
+No additional Soul metadata-loss bug was promoted from this pass.
+
+### Refine ability skill inversion
+Current build enables `ENABLE_REFINE_ABILITY_SKILL`.
+
+Positive tables:
+- normal refine skill: 0..6;
+- guild refine skill: 0..3.
+
+`RefineInformation()` reports these as additions to the success percentage.
+
+`DoRefine()` instead adds them to the random roll and compares that larger roll against the unchanged recipe threshold.
+
+Therefore the skill reduces real success while UI reports an increase. Guild/money-only additionally adds 10 to the roll.
+
+See `BUG-REFCUBE-010`.
+
+### Scroll probability preview vs transaction
+`RefineInformation()` builds non-guild scroll preview as:
+`base recipe prob + refine skill + scroll_buff`.
+
+`DoRefineWithScroll()` does not use refine skill and several scroll values are absolute probability tables rather than additive bonuses.
+
+Affected examples include:
+- Magic Stone;
+- Dragon Scroll;
+- Smith Handbook;
+- BDragon;
+- Ritual Stone;
+- Seal of God.
+
+The preview can therefore materially overstate the actual server transaction probability, including displaying 100% for attempts that execute below 100%.
+
+See `BUG-REFCUBE-011`.
+
+## Current verified findings
+`BUG-REFCUBE-001..011`.
+
+## Deferred runtime ownership
+`REFCUBE-T01..REFCUBE-T11`.
+
+No Refine/Cube runtime test has been executed.
+
+## Remaining static work
+1. map the DB/refine-table deployment source and validate recipe probability/material bounds;
+2. audit current refine edges for random-default / set / transmutation semantics where those fields are actually produced;
+3. close scroll failure/downgrade consumption and item-creation-failure ordering;
+4. audit money-only / Devil Tower / Serpent authorization lifetime;
+5. audit over-9 refine conditional path and current deployment reachability;
+6. close client `uirefine.py` presentation/session lifecycle;
+7. consolidate runtime ownership and decide STATIC COMPLETE.
