@@ -196,3 +196,35 @@ Stackable Metin handling can avoid immediate object destruction when only count 
 **Impact:** use-after-free during normal successful classic refinement, with crash/corruption/stale-data potential; additional UAF exists on relevant scroll downgrade/Serpent paths.
 
 **Runtime:** Stage C debug/ASan only. See `REFCUBE-T07`.
+
+
+## BUG-REFCUBE-008 — Classic REFINE_TYPE_NORMAL is not bound to an opened refine session or blacksmith
+
+**Status:** VERIFIED STATIC / MODIFIED-CLIENT REACHABLE
+
+`CInputMain::Refine()` accepts `TPacketCGRefine.type` directly.
+
+For `REFINE_TYPE_NORMAL` it resolves the inventory item and immediately calls:
+`ch->DoRefine(item)`.
+
+There is no authoritative check that:
+- `RefineInformation()` was previously called;
+- `m_bUnderRefine` / a refine session is active;
+- the packet type matches the refine type that the server offered;
+- a stored refine NPC is still valid / in range.
+
+`DoRefine()` reinforces the gap by calling:
+`CanHandleItem(true)`,
+where `true` explicitly skips the under-refine check.
+
+It does scan nearby entities through `FindBlacksmith`, but when no valid blacksmith is found the code only emits:
+`HackLog("REFINE_FAR_BLACKSMITH", ...)`
+and then deliberately continues execution.
+
+Therefore a crafted `HEADER_CG_REFINE` packet with `REFINE_TYPE_NORMAL` can invoke ordinary refinement from arbitrary location without first opening a blacksmith refine dialog, as long as the item/refine recipe/material/currency checks themselves pass.
+
+The same trust boundary also means a client can choose NORMAL independently of the type originally displayed by a refine-information flow.
+
+**Impact:** remote / sessionless classic refinement; blacksmith proximity is logged rather than enforced.
+
+**Runtime:** Stage B isolated modified-client authorization test only. See `REFCUBE-T08`.
