@@ -501,6 +501,34 @@ Dungeon Core is separate from the already-consolidated Dungeon Info subsystem. T
 
 **Next documentation cluster:** Battle Field runtime readiness.
 
+
+## Runtime-readiness consolidation — Battle Field — 2026-09-28
+**Documentation status:** READY
+**Execution status:** LOCKED / NOT RUN
+
+Unique verified Battle Field coverage:
+- BFIELD-T01 -> BUG-BFIELD-001
+- BFIELD-T02 -> BUG-BFIELD-002
+- BFIELD-T03 -> BUG-BFIELD-003
+- BFIELD-T06 -> BUG-BFIELD-006
+- BFIELD-T08 -> BUG-BFIELD-008
+- BFIELD-T09 -> BUG-BFIELD-009
+- BFIELD-T10 -> BUG-BFIELD-010
+- BFIELD-T11 -> BUG-BFIELD-011
+
+Registry corrections:
+- **BUG-BFIELD-004 is RETRACTED / RESERVED**; the LoadRanking symbol is resolvable through the already-verified declaration/include chain.
+- BUG-BFIELD-005 is a historical cross-system duplicate of canonical BUG-RANK-003; use RANK-T03.
+- BUG-BFIELD-007 is a historical cross-system duplicate of canonical BUG-RANK-007; use RANK-T06.
+- BFIELD-T04/T05/T07 are therefore not active Battle Field validation targets.
+
+Primary ordinary-flow candidates: **BFIELD-T01, T02, T03, T09, T10, T11**.
+BFIELD-T06 is privileged/admin routing; BFIELD-T08 is deterministic schedule arithmetic.
+
+The global first live gate remains **DUNGEON-T10**.
+
+**Next documentation cluster:** World Lottery runtime readiness.
+
 ## Patch readiness
 First-cluster fix plan is ready at `fixes/dungeon_info.md`.
 
