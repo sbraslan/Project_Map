@@ -10,17 +10,18 @@
 Only `sbraslan/Project_Map` is writable. All source/game repositories remain read-only. Runtime/fault-injection execution does not start unless the user explicitly changes phase.
 
 ## Just closed
-- Dungeon Core runtime-readiness is consolidated.
-- DCORE-T01..T04 cover BUG-DUNGEON-001..004 one-to-one.
-- DCORE-T01/DCORE-T02 are the primary legitimate Dungeon Core candidates.
-- DCORE-T03 is ASan/debug lifetime validation; DCORE-T04 is controlled script/regression coverage.
-- Dungeon Core remains separate from Dungeon Info.
+- Battle Field runtime-readiness is consolidated.
+- Unique active Battle Field bug ownership is now BUG-BFIELD-001/002/003/006/008/009/010/011.
+- BUG-BFIELD-004 is RETRACTED / RESERVED after cross-checking the canonical Ranking LoadRanking correction.
+- Historical BUG-BFIELD-005 and BUG-BFIELD-007 are cross-system duplicates owned canonically by BUG-RANK-003 and BUG-RANK-007.
+- BFIELD-T04/T05/T07 are not active Battle Field validation targets.
+- Primary ordinary-flow candidates are BFIELD-T01/T02/T03/T09/T10/T11.
 - DUNGEON-T10 remains the first future live gate.
 - No runtime test was executed and no source/game file was changed.
 
 ## Exact next work
-1. Consolidate Battle Field runtime readiness from `bugs/battle_field.md` + `tests/battle_field.md`.
-2. Preserve cross-system Party/Ranking ownership; do not duplicate their bug IDs into Battle Field.
+1. Consolidate World Lottery runtime readiness from `bugs/world_lottery.md` + `tests/world_lottery.md`.
+2. Preserve verified/observation/deferred ownership exactly.
 3. Preserve DUNGEON-T10 as the first future live runtime gate.
 4. Keep every source/game repository immutable until the phase is explicitly changed.
 
