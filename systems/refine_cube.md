@@ -86,3 +86,52 @@ See `BUG-REFCUBE-002`.
 8. validate current `cube.txt` and refine-table deployment data.
 
 No runtime test is authorized. Global first future live gate remains `DUNGEON-T10`.
+
+
+## Cube authorization / improve-item pass — 2026-09-28
+
+### Cached NPC authorization
+Renewal `/cube` open stores both:
+- a live NPC pointer through `SetCubeNpc(GetQuestNPC())`;
+- the NPC race through `SetTempCubeNPC(GetQuestNPC()->GetRaceNum())`.
+
+Close clears the live pointer / `W_CUBE` but leaves `tempCubeNPC` unchanged.
+
+MAKE does not require open state, live NPC, `W_CUBE`, or NPC distance. Recipe selection is driven by the cached temporary NPC VNUM.
+
+This is `BUG-REFCUBE-003`.
+
+### Player command null boundary
+The command table exposes `cube` at `GM_PLAYER`.
+
+A character initializes `m_dwQuestNPCVID=0`; `GetQuestNPC()` resolves that VID and can return null.
+
+Renewal `do_cube()` has no null check before `GetQuestNPC()->GetRaceNum()`.
+
+This is `BUG-REFCUBE-004`.
+
+### Improve item ordering
+VNUM 79605 is consumed immediately after its count is converted into added success chance.
+
+Reward inventory-space validation happens afterward using a temporary reward item.
+
+Therefore a no-space abort can occur after the chance item has already been consumed.
+
+This is `BUG-REFCUBE-005`.
+
+### Current cube.txt reachability
+Current deployment file has about 3.3k parsed sections and actively uses:
+- `not_remove` extensively;
+- `set_value` extensively;
+- percentage values from 2..100;
+- Yang and, for set recipes, Gem costs.
+
+No current `allow_copy=1` section was found, so that branch is mapped but presently deployment-dormant.
+
+Set-value recipes are real/current, e.g. NPC 20475 recipes preserve the source item with `not_remove`, charge 100,000,000 Yang + 500 Gem, and set set-value 1 on success.
+
+## Current verified findings
+`BUG-REFCUBE-001..BUG-REFCUBE-005`.
+
+## Next
+Continue into classic refine execution, scroll/failure paths and metadata preservation while finishing Cube special-branch atomicity.
