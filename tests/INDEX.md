@@ -46,7 +46,7 @@ This subsystem was added after the original global readiness audit. Its test own
 ## Dragon Soul prefix ownership — 2026-09-28
 - `DS-T` -> `dragon_soul.md`
 
-Dragon Soul is currently mapping-in-progress. `DS-T01..03` are deferred plans; none have been executed.
+Dragon Soul is currently mapping-in-progress. `DS-T01..DS-T08` are deferred plans; none have been executed.
 
 
 ## Acce / Sash prefix ownership — 2026-09-28
