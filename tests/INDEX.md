@@ -41,3 +41,9 @@ Legacy `SWITCHBOT-Txx`, `EX-Txx`, `EXCHANGE-Txx`, `SHOP-Txx`, and `TEST-WB-*` fo
 - `LOOK-T` -> `costume_appearance.md`
 
 This subsystem was added after the original global readiness audit. Its test ownership is canonical here; global first execution gate remains `DUNGEON-T10`.
+
+
+## Dragon Soul prefix ownership — 2026-09-28
+- `DS-T` -> `dragon_soul.md`
+
+Dragon Soul is currently mapping-in-progress. `DS-T01..03` are deferred plans; none have been executed.
