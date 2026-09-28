@@ -796,3 +796,33 @@ Closure notes:
 Dragon Soul is a **post-audit extension**. Current effective static-complete/readiness coverage is **24/24**, plus the folded Guild lifecycle companion.
 
 The global first future live gate remains **DUNGEON-T10**. No Dragon Soul test has been executed.
+
+
+## Runtime-readiness consolidation — Aura System — 2026-09-28
+**Documentation status:** READY  
+**Execution status:** LOCKED / NOT RUN
+
+Verified coverage:
+- AURA-T01 -> BUG-AURA-001
+- AURA-T02 -> BUG-AURA-002
+- AURA-T03 -> BUG-AURA-003
+- AURA-T04 -> BUG-AURA-004
+- AURA-T05 -> BUG-AURA-005
+- AURA-T06 -> BUG-AURA-006
+
+Execution classes:
+- **Controlled normal/state observation:** AURA-T01.
+- **Modified-client / disposable-data:** AURA-T02, AURA-T03.
+- **Debug / packet-initialization / sanitizer:** AURA-T04.
+- **Destructive data-integrity / disposable:** AURA-T05.
+- **Modified-client arithmetic instrumentation:** AURA-T06.
+
+Unpromoted closure boundaries:
+- direct forced `WarpSet()` can preserve Aura state, but no tracked normal producer combining it with an open Aura transaction was established;
+- Lua Aura open functions lack a null opener guard, but no tracked current null-opener producer was established;
+- current eligible Aura/ABSORB/GROWTH data does not establish timer-driven checked-in slot replacement;
+- cross-window state coexistence did not produce an additional distinct same-item alias under current eligibility.
+
+Aura is a **post-audit extension**. Current effective static-complete/readiness coverage is **25/25**, plus the folded Guild lifecycle companion.
+
+The global first future live gate remains **DUNGEON-T10**. No Aura test has been executed.
