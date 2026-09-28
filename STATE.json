@@ -15,12 +15,10 @@
     "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Close horse persistence/login/logout and horse-level bounds.",
-      "Audit stamina/health events and repeated ride-state transitions.",
-      "Audit quest horse API authorization and range handling.",
+      "Audit quest horse API authorization/range handling and current quest producers.",
       "Map mount item/costume -> affect -> MountVnum lifecycle.",
       "Audit expiry/unequip/death/warp cleanup.",
-      "Close ChangeLook mount expiry caller graph.",
+      "Close ChangeLook mount socket2 producer and automatic event-start caller graph.",
       "Resolve Achievement SUMMON_MOUNT producer gap.",
       "Close client race/proto/horse-appearance coverage.",
       "Promote only verified reachable Horse/Mount bugs and tests.",
@@ -2323,12 +2321,23 @@
       "CHARACTER horse actor summon/dismiss/death/revive",
       "character StartRiding/StopRiding -> MountVnum lifecycle",
       "UNIQUE/COSTUME ride-item classification and mount proto affects",
-      "mount ChangeLook expiry helper surface"
+      "mount ChangeLook expiry helper surface",
+      "TPlayerTable/DB horse level-riding-health-stamina-drop-time persistence",
+      "SetPlayerProto -> UpdateHorseDataByLogoff -> EnterHorse login reconstruction",
+      "horse level setter clamp 0..30; raw DB level integrity candidate",
+      "stamina consume/regen event ownership and destructor cleanup",
+      "active ENABLE_INFINITE_HORSE_HEALTH_STAMINA semantics",
+      "ChangeLook mount automatic event-start asymmetry candidate"
     ],
     "runtime_tests": {
       "status": "NOT RUN / EXECUTION LOCKED",
       "canonical_test_ids": [],
       "first_live_gate_unchanged": "DUNGEON-T10"
-    }
+    },
+    "candidates": [
+      "DB-loaded THorseInfo.bLevel is copied without a clamp before c_aHorseStat access; no tracked malformed producer established.",
+      "Login later calls SetHorseLevel(GetHorseLevel()), resetting underlying HP/stamina/drop-time; current infinite-health/stamina build masks a distinct gameplay consequence.",
+      "StartChangeLookExpireEvent supports COSTUME_MOUNT, but automatic start sites found so far only gate on IsHorseSummonItem; socket2 producer/reachability remains open."
+    ]
   }
 }
