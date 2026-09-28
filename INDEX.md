@@ -35,7 +35,7 @@ This is the navigation index. Normal continuation starts at `STATE.json`, then `
 | World Lottery System | STATIC COMPLETE | `systems/world_lottery.md` |
 | World Boss System | STATIC COMPLETE | `systems/world_boss.md` |
 | Sung Mahi Tower | STATIC COMPLETE | `systems/sung_mahi_tower.md` |
-| Costume / Appearance / ChangeLook | MAPPING IN PROGRESS | `systems/costume_appearance.md` |
+| Costume / Appearance / ChangeLook | STATIC COMPLETE | `systems/costume_appearance.md` |
 
 ## Current phase
 - **Detection / mapping only.** Source and game repositories remain read-only.
@@ -73,3 +73,11 @@ Result: **COMPLETE — PASS WITH NORMALIZATIONS**.
 Status: **PREFLIGHT COMPLETE / EXECUTION LOCKED / NOT RUN**.
 
 This does not change the project phase or authorize source/runtime changes.
+
+
+## Post-audit extension — Costume / Appearance — 2026-09-28
+Costume / Appearance / ChangeLook was mapped after the original 21/21 readiness audit and is now **STATIC COMPLETE** with explicit runtime-readiness ownership.
+
+Current effective coverage is **22/22 STATIC COMPLETE subsystem rows** plus the folded Guild lifecycle companion.
+
+The historical `READINESS_AUDIT.md` 21/21 result remains valid for its original scope; a post-audit extension records this additional subsystem. The first future live gate remains `DUNGEON-T10`.
