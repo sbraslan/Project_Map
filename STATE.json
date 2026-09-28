@@ -6,27 +6,27 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "growth_pet",
-    "display_name": "Growth Pet System",
-    "status": "STATIC MAPPING IN PROGRESS / 1 VERIFIED STATIC BUG / EXECUTION LOCKED",
-    "system_file": "systems/growth_pet.md",
-    "bug_file": "bugs/growth_pet.md",
-    "test_file": "tests/growth_pet.md",
+    "subsystem": "refine_cube",
+    "display_name": "Refine / Cube / Crafting",
+    "status": "STATIC MAPPING IN PROGRESS / 2 VERIFIED STATIC BUGS / EXECUTION LOCKED",
+    "system_file": "systems/refine_cube.md",
+    "bug_file": "bugs/refine_cube.md",
+    "test_file": "tests/refine_cube.md",
     "verified_bug_ids": [
-      "BUG-GPET-001"
+      "BUG-REFCUBE-001",
+      "BUG-REFCUBE-002"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Map hatch packet/UI -> server -> DB -> seal creation atomically.",
-      "Map summon/dismiss/death/revive and lifetime persistence.",
-      "Map mob/item EXP arithmetic and pet_exp_table boundaries.",
-      "Map evolution materials/count/consumption.",
-      "Map feed windows and item-slot trust boundaries.",
-      "Map skill learn/upgrade/delete/passive/auto-skill execution.",
-      "Audit PET_ATTR_DETERMINE and name-change inputs.",
-      "Close disconnect/warp/owner destruction and DB lifetime.",
-      "Map current 55701..55713 proto/race/client visual coverage.",
-      "Do not execute GPET-T01 or any runtime test without an explicit phase change."
+      "Map Cube open/NPC/distance/window authorization.",
+      "Audit Cube improve-item chance accounting and lifetime.",
+      "Audit allow_copy/set_value/not_remove item semantics.",
+      "Close Cube success/failure/inventory-space atomicity.",
+      "Map classic refine request through server execution.",
+      "Audit refine scroll/blacksmith/guild refine and failure downgrade paths.",
+      "Audit socket/attribute/Yohara/element/set metadata preservation.",
+      "Validate current cube.txt and refine deployment data.",
+      "Do not execute REFCUBE-T01..REFCUBE-T02 or any runtime test without an explicit phase change."
     ]
   },
   "startup": {
@@ -1608,7 +1608,8 @@
       "WB-T": "tests/world_boss.md",
       "SMT-T": "tests/sung_mahi_tower.md",
       "ACCE-T": "tests/acce.md",
-      "DS-T": "tests/dragon_soul.md"
+      "DS-T": "tests/dragon_soul.md",
+      "AURA-T": "tests/aura.md"
     },
     "global_execution_order": {
       "stage_a_normal_current_flow": [
@@ -1720,8 +1721,8 @@
       "execution_priority": "Does not supersede DUNGEON-T10"
     },
     "coverage": {
-      "static_complete_subsystems": 24,
-      "readiness_owned_subsystems": 24,
+      "static_complete_subsystems": 25,
+      "readiness_owned_subsystems": 25,
       "folded_companions": [
         "guild"
       ]
@@ -1783,6 +1784,27 @@
         "DS-T09",
         "DS-T10",
         "DS-T11"
+      ],
+      "first_live_gate": "DUNGEON-T10"
+    },
+    "aura": {
+      "status": "READY / EXECUTION LOCKED / NOT RUN",
+      "test_file": "tests/aura.md",
+      "verified_bug_ids": [
+        "BUG-AURA-001",
+        "BUG-AURA-002",
+        "BUG-AURA-003",
+        "BUG-AURA-004",
+        "BUG-AURA-005",
+        "BUG-AURA-006"
+      ],
+      "canonical_test_ids": [
+        "AURA-T01",
+        "AURA-T02",
+        "AURA-T03",
+        "AURA-T04",
+        "AURA-T05",
+        "AURA-T06"
       ],
       "first_live_gate": "DUNGEON-T10"
     }
@@ -2034,29 +2056,34 @@
       "tests": "tests/aura.md"
     },
     "mapped_flows": [
-      "client Aura check-in/check-out/accept/cancel -> server Aura state",
-      "server checked-in TItemPos locking and mode binding",
-      "ABSORB source/material copy and material removal",
-      "GROWTH refinement bands and EXP/material consumption",
-      "EVOLVE inventory-count validation vs checked-in-stack consumption",
-      "Aura Eraser generic socket2 mutation boundary"
+      "client Aura check-in/check-out/accept/cancel -> authoritative server slot state",
+      "ABSORB source/material copy and destruction lifecycle",
+      "GROWTH refine bands/resource EXP accounting",
+      "EVOLVE material/currency/item replacement lifecycle",
+      "Aura booster/eraser socket and timer lifecycle",
+      "Aura item creation/default level socket and current RefineSet=409 grade families",
+      "PART_AURA -> item_list AURA/MSE -> Spine2 client visual chain",
+      "disconnect/W_AURA normal cleanup and forced-WarpSet boundary",
+      "Aura SET_ITEM packet metadata initialization boundary",
+      "Yohara classic/random-apply preservation boundary",
+      "terminal Radiant EVOLVE preview arithmetic"
     ],
     "canonical_tests": [
-      "AURA-T01"
+      "AURA-T01",
+      "AURA-T02",
+      "AURA-T03",
+      "AURA-T04",
+      "AURA-T05",
+      "AURA-T06"
     ],
-    "runtime_readiness": "NOT YET CONSOLIDATED",
-    "next": [
-      "client packet contract",
-      "ABSORB lifecycle",
-      "GROWTH arithmetic/material lifecycle",
-      "EVOLVE lifecycle",
-      "booster/eraser",
-      "warp/disconnect/lock recovery",
-      "cross-window/opening lifetime",
-      "visual/proto persistence"
+    "runtime_readiness": "READY / EXECUTION LOCKED / NOT RUN",
+    "candidates": [
+      "Lua game.open_aura_* has no null opener guard, but no tracked current null-NPC producer is established.",
+      "AuraRefineWindowClose returns before cleanup if descriptor is already null; normal disconnect ordering does not hit it.",
+      "ABSORB random-default preview/commit parity remains data-dependent without a tracked eligible producer."
     ],
     "runtime_tests": {
-      "status": "NOT RUN / EXECUTION LOCKED",
+      "status": "READY / NOT RUN / EXECUTION LOCKED",
       "canonical_test_ids": [
         "AURA-T01",
         "AURA-T02",
@@ -2091,5 +2118,43 @@
       ],
       "first_live_gate_unchanged": "DUNGEON-T10"
     }
+  },
+  "refine_cube_mapping": {
+    "status": "STATIC MAPPING IN PROGRESS",
+    "canonical_files": {
+      "system": "systems/refine_cube.md",
+      "bugs": "bugs/refine_cube.md",
+      "tests": "tests/refine_cube.md"
+    },
+    "verified_bug_ids": [
+      "BUG-REFCUBE-001",
+      "BUG-REFCUBE-002"
+    ],
+    "mapped_flows": [
+      "Python Cube Renewal UI multiplier -> cuberenewal.SendRefine",
+      "TSubPacketCGCubeRenwalMake -> CInputMain::CubeRenewalSend",
+      "CCubeManager::RefineCube multiplier material/currency/reward accounting"
+    ],
+    "canonical_tests": [
+      "REFCUBE-T01",
+      "REFCUBE-T02"
+    ],
+    "runtime_tests": {
+      "status": "NOT RUN / EXECUTION LOCKED",
+      "canonical_test_ids": [
+        "REFCUBE-T01",
+        "REFCUBE-T02"
+      ],
+      "first_live_gate_unchanged": "DUNGEON-T10"
+    },
+    "next": [
+      "Cube authorization/distance/window state",
+      "improve item accounting",
+      "allow_copy/set_value/not_remove",
+      "success/failure atomicity",
+      "classic refine execution",
+      "metadata preservation",
+      "deployment cube/refine data"
+    ]
   }
 }
