@@ -55,3 +55,72 @@ Therefore a legitimate multi-craft request does not execute the quantity contrac
 **Impact:** for multiplier >1, material consumption, currency cost and produced quantity diverge. Removable items are under-consumed relative to the requested batch, while the output is also under-produced and the full multiplied Yang/Gem cost is still charged.
 
 **Runtime:** Stage A/B controlled disposable recipe test. See `REFCUBE-T02`.
+
+
+## BUG-REFCUBE-003 — Cube Renewal MAKE remains authorized after window close / at arbitrary distance
+
+**Status:** VERIFIED STATIC / MODIFIED-CLIENT REACHABLE
+
+The Renewal open command caches the current quest NPC race in:
+`SetTempCubeNPC(ch->GetQuestNPC()->GetRaceNum())`
+and stores the live NPC pointer through `SetCubeNpc()`.
+
+`Cube_close()` clears the live Cube NPC pointer and `W_CUBE`, but it does **not** clear `tempCubeNPC`.
+
+The MAKE packet path does not require:
+- `IsCubeOpen()`;
+- `GetOpenedWindow(W_CUBE)`;
+- a live Cube NPC pointer;
+- a current distance check to that NPC.
+
+`RefineCube()` instead selects recipes only from the stale cached `GetTempCubeNPC()`.
+
+Therefore, once a player has legitimately opened a Cube Renewal NPC at least once, closing the window or moving away does not revoke the server-side recipe identity. A crafted MAKE packet can still submit recipes belonging to that cached NPC, subject only to the normal recipe/material/currency checks.
+
+**Impact:** Cube crafting authorization survives window close and NPC range; crafting can be performed remotely using the last cached Cube NPC identity.
+
+**Runtime:** Stage B isolated modified-client authorization test only. See `REFCUBE-T03`.
+
+## BUG-REFCUBE-004 — Player-accessible /cube command dereferences a null quest NPC
+
+**Status:** VERIFIED STATIC / CRASH CANDIDATE
+
+The command table registers:
+`"cube" -> do_cube`
+at `GM_PLAYER` and `POS_DEAD`, so ordinary players can invoke the command.
+
+Under `ENABLE_CUBE_RENEWAL`, `do_cube()` immediately executes:
+`ch->SetTempCubeNPC(ch->GetQuestNPC()->GetRaceNum());`
+and then again uses `ch->GetQuestNPC()`.
+
+There is no null check.
+
+A character initializes `m_dwQuestNPCVID = 0`, and `GetQuestNPC()` resolves it through `CHARACTER_MANAGER::Find(m_dwQuestNPCVID)`. Without a valid current quest NPC this can return null.
+
+Thus a direct player `/cube` command outside an NPC quest context can dereference a null pointer.
+
+**Impact:** player-reachable game-process crash candidate from an ordinary command path.
+
+**Runtime:** Stage C crash/sanitizer test only; do not execute in production. See `REFCUBE-T04`.
+
+## BUG-REFCUBE-005 — Cube improve items are consumed before reward-space validation
+
+**Status:** VERIFIED STATIC / NORMAL-CLIENT REACHABLE DATA LOSS
+
+Cube Renewal supports the chance-improvement item VNUM `79605`.
+
+When `indexImprove != -1`, the server:
+1. resolves the inventory item;
+2. verifies VNUM 79605 and count <= 40;
+3. computes the added success chance;
+4. immediately consumes the applicable improve-item count with `SetCount(... - substract)`.
+
+Only **after that consumption** does the code create a temporary reward item and call `GetEmptyInventory()` / `GetEmptyDragonSoulInventory()` to verify reward space.
+
+If no destination slot is available, the temporary reward is destroyed and the craft returns without consuming normal recipe materials or currency — but the already-consumed improve items are not restored.
+
+The normal UI sends the improve-item slot directly and has no equivalent free-inventory guard before `SendRefine()`.
+
+**Impact:** a normal player can lose Cube chance-improvement items when attempting a craft with insufficient reward inventory space.
+
+**Runtime:** Stage A controlled disposable-item test. See `REFCUBE-T05`.
