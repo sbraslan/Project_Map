@@ -171,3 +171,86 @@ These require malformed/inconsistent DS proto/VNUM state and are not yet promote
 6. inspect Dragon Soul quest qualification/daily lifecycle.
 
 No runtime test has been executed.
+
+
+## Server/client table parity — second pass
+
+Tracked deployment tables are identical:
+- server runtime data: `Project_Game/share/locale/europe/dragon_soul_table.txt`;
+- client locale data: `Project_Binary/locale/locale/common/dragon_soul_table.txt`;
+- both currently have blob SHA `66085b6d957b7b69856a85c36990482f3e04328e`.
+
+Current dimensions align with the enabled Myth build:
+- grade indices 0..5, `DRAGON_SOUL_GRADE_MAX = 6`;
+- step indices 0..4, `DRAGON_SOUL_STEP_MAX = 5`;
+- strength columns 0..6, `DRAGON_SOUL_STRENGTH_MAX = 7`;
+- client hard-coded grade/step need-counts and fees match the server table;
+- client strength fees match the server Default strength table.
+
+No current server/client recipe drift was found.
+
+### Refine-step table loader defect
+`DragonSoulTable::CheckRefineStepTables()` checks:
+`m_pRefineStrengthTableNode == nullptr`
+while its error text and subsequent work concern RefineStepTables.
+
+`GetRefineStepValues()` then dereferences `m_pRefineStepTableNode` directly.
+
+Current deployment contains both groups, so startup is unaffected today.
+If RefineStepTables were missing while RefineStrengthTables remained present, the intended validation would not catch the missing step node before dereference.
+
+See dormant `BUG-DS-005`.
+
+## Change Attribute authorization audit
+
+Official client `__CanRefineChangeAttr()` requires the material to be:
+`ITEM_TYPE_MATERIAL / MATERIAL_DS_CHANGE_ATTR`.
+
+Server `DoChangeAttr()` instead accepts any item passing `IsDragonSoulRefineMaterial()`, which includes:
+- MATERIAL_DS_REFINE_NORMAL;
+- MATERIAL_DS_REFINE_BLESSED;
+- MATERIAL_DS_REFINE_HOLLY;
+- MATERIAL_DS_CHANGE_ATTR.
+
+Thus a modified client can substitute ordinary strength-refine materials for the dedicated Change Attribute material, subject only to count/gold checks. See `BUG-DS-004`.
+
+### Refine mode is not server-bound
+Both:
+- `DragonSoul_RefineWindow_Open()`;
+- `DragonSoul_ChangeAttrWindow_Open()`
+
+store only one pointer:
+`m_pDragonSoulRefineWindowOpener`.
+
+No mode/type field is retained.
+
+All refine operations use the same authorization:
+`DragonSoul_RefineWindow_CanRefine() == opener != nullptr`.
+
+Therefore a normal refine window opened by the GM_PLAYER command `/refine_open` can authorize a crafted `DS_SUB_HEADER_DO_CHANGE_ATTR` request even though the server never opened the Change Attribute mode. The self-opener command itself also does not check Dragon Soul qualification.
+
+See `BUG-DS-006`.
+
+## Refine-window warp lifecycle
+
+`CHARACTER::CanHandleItem()` blocks normal item handling while:
+`DragonSoul_RefineWindow_GetOpener() != nullptr`.
+
+However `CHARACTER::CanWarp()` does not test the Dragon Soul refine opener and `WarpSet()` does not call `DragonSoul_RefineWindow_Close()`.
+
+The only mapped normal clear path is the client `DS_SUB_HEADER_CLOSE` packet.
+
+Thus a server-authorized warp can preserve the opener token across the warp. If the client-side refine UI disappears during phase/map transition without the CLOSE packet reaching the server, normal item handling remains blocked after arrival until an explicit close/reopen/reconnect path clears the pointer.
+
+See `BUG-DS-007`.
+
+## Dead/unconsumed table groups
+The tracked `dragon_soul_table.txt` also contains:
+- VnumToChangeStoneTypeNameMapper;
+- ChangeStoneTypeTables;
+- ChangeDSTypeTables;
+- ChangeAttrStepTables.
+
+The mapped current server/client DragonSoulTable loaders do not expose corresponding consumers for these groups, and `DoChangeAttr()` uses hard-coded step counts plus the material proto VALUE0 fee instead.
+
+These groups are recorded as legacy/dead data in the current mapped implementation, not promoted as a bug without a required runtime consumer.
