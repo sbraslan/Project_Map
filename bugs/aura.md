@@ -147,3 +147,44 @@ The old Aura is then removed, so any absorbed Yohara random applies stored on it
 **Impact:** a successfully evolved Aura can silently lose absorbed Yohara random bonus data while its classic absorbed attributes survive.
 
 **Runtime:** Stage B/C disposable-item data-integrity test only. See `AURA-T05`.
+
+
+## BUG-AURA-006 — Radiant level-250 Aura can enter EVOLVE check-in and hit zero-denominator refine-info arithmetic
+
+**Status:** VERIFIED STATIC / MODIFIED-CLIENT REACHABLE
+
+Current Aura table terminal row:
+- step: `AURA_GRADE_RADIANT`;
+- level min/max: `250 / 250`;
+- `NEED_EXP = 0`;
+- evolution material/count/cost/chance = 0.
+
+The official client rejects EVOLVE MAIN attachment when:
+`curLevel >= AURA_MAX_LEVEL`.
+
+The server does not enforce the same terminal-grade rule during EVOLVE check-in.
+
+In `AuraRefineWindowCheckIn(AURA_WINDOW_TYPE_EVOLVE)`, the MAIN slot only requires:
+`currentLevel == LEVEL_MAX && currentExp == NEED_EXP`.
+
+A normal current Radiant Aura at level 250 / exp 0 satisfies that condition, so a modified client can check it into EVOLVE.
+
+After locking/storing the item, the server prepares current/evolved preview data and calls:
+`__GetAuraRefineInfo(ItemCell)`.
+
+That helper computes:
+`(socketExp * 1.0f / aiAuraRefineTable[AURA_REFINE_INFO_NEED_EXP]) * 100`
+and converts the result to `uint8_t`.
+
+For the terminal row the denominator is zero. The resulting non-finite floating value is then converted to an integer byte, which is outside the intended arithmetic domain and is not a valid deterministic percentage calculation.
+
+The final Accept path later rejects `AURA_GRADE_RADIANT`, but that guard is too late: the invalid preview calculation already occurred during check-in.
+
+Current tracked proto makes this reachable without malformed item data:
+- grade-6 Aura VNUMs `49006/49016/49026/49036` exist;
+- grade 6 initializes at level 250;
+- all are terminal `RefineSet=409` Aura items.
+
+**Impact:** crafted EVOLVE check-in of a legitimate max-level Aura reaches invalid server arithmetic and can produce undefined/nondeterministic preview-byte behavior; depending on floating-point runtime settings this is also a fault candidate.
+
+**Runtime:** Stage B/C modified-client + debug/sanitizer only. See `AURA-T06`.
