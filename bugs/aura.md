@@ -93,3 +93,57 @@ The separate booster-attachment path is stricter because `IsAuraBoosterForSocket
 **Impact:** an Aura-specific consumable can destructively mutate unrelated item socket state.
 
 **Runtime:** Stage B modified-client / disposable-item test only. Never test on valuable or production items. See `AURA-T03`.
+
+
+## BUG-AURA-004 — Aura SET_ITEM packets expose uninitialized TItemData fields
+
+**Status:** VERIFIED STATIC / PASSIVE INFORMATION DISCLOSURE
+
+Aura check-in/result preview packets are built with:
+`TSubPacketGCAuraSetItem sub;`
+or
+`TSubPacketGCAuraSetItem sub2;`
+
+These objects are not value-initialized or cleared before transmission.
+
+The Aura sender fills only a subset of `TItemData`: VNUM/count/flags/anti-flags, sockets, normal attributes, Yohara random arrays and, in some branches, set value.
+
+In the current build, `TItemData` also contains enabled fields for:
+- seal date;
+- transmutation VNUM;
+- basic-item state;
+- element grade/attack/type/value data;
+- set value.
+
+The corresponding feature macros are enabled in `CommonDefines.h`.
+
+Because the packet object is sent in full, any member not explicitly assigned by the Aura branch contains indeterminate stack bytes and crosses the server -> client trust boundary.
+
+The client receive path compounds the problem by declaring `TItemData kItemData;` without clearing it and copying only VNUM/count/sockets/attributes/Yohara arrays before storing the Aura slot. In particular, normal Aura tooltip code can request set-value data from this stored object even though the receive path does not initialize/copy it.
+
+**Impact:** Aura window traffic can disclose stale stack bytes in unused metadata fields and can create nondeterministic client-side Aura preview metadata. This is primarily an information-initialization defect; no production exploitation is required to establish it statically.
+
+**Runtime:** Stage C debug packet-capture / sanitizer ownership only. See `AURA-T04`.
+
+## BUG-AURA-005 — Successful Aura evolution drops absorbed Yohara random applies
+
+**Status:** VERIFIED STATIC / DESTRUCTIVE DATA LOSS
+
+With `ENABLE_YOHARA_SYSTEM`, ABSORB success explicitly transfers the source material's Yohara random applies into the Aura:
+`mtrlItem->CopyApplyRandomTo(auraItem)`.
+
+On successful EVOLVE the server creates the next Aura item and transfers:
+- all sockets through `CopySocketTo()`;
+- classic item attributes through `CopyAttributeTo()`.
+
+It does **not** call `CopyApplyRandomTo()` for the new Aura.
+
+The implementations are independent:
+- `CopyAttributeTo()` only calls `SetAttributes(m_aAttr)`;
+- `CopyApplyRandomTo()` separately calls `SetRandomAttrs(m_aApplyRandom)`.
+
+The old Aura is then removed, so any absorbed Yohara random applies stored on it are lost permanently on a successful grade evolution.
+
+**Impact:** a successfully evolved Aura can silently lose absorbed Yohara random bonus data while its classic absorbed attributes survive.
+
+**Runtime:** Stage B/C disposable-item data-integrity test only. See `AURA-T05`.
