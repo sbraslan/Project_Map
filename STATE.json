@@ -6,27 +6,27 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "aura",
-    "display_name": "Aura System",
-    "status": "STATIC MAPPING IN PROGRESS / 3 VERIFIED STATIC BUGS / EXECUTION LOCKED",
-    "system_file": "systems/aura.md",
-    "bug_file": "bugs/aura.md",
-    "test_file": "tests/aura.md",
+    "subsystem": "growth_pet",
+    "display_name": "Growth Pet System",
+    "status": "STATIC MAPPING IN PROGRESS / 1 VERIFIED STATIC BUG / EXECUTION LOCKED",
+    "system_file": "systems/growth_pet.md",
+    "bug_file": "bugs/growth_pet.md",
+    "test_file": "tests/growth_pet.md",
     "verified_bug_ids": [
-      "BUG-AURA-001",
-      "BUG-AURA-002",
-      "BUG-AURA-003"
+      "BUG-GPET-001"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Audit Aura booster timer/equip/unequip persistence and absorption-rate application.",
-      "Close forced-warp/disconnect/destructor locked-item cleanup.",
-      "Audit opener lifetime and cross-window coexistence.",
-      "Verify wedding-item absorption policy against tracked proto/data.",
-      "Map Aura costume default socket initialization and refine chains.",
-      "Close Aura visual/proto/client persistence surfaces.",
-      "Consolidate Aura runtime ownership and decide STATIC COMPLETE.",
-      "Do not execute AURA-T01..AURA-T03 or any runtime test without an explicit phase change."
+      "Map hatch packet/UI -> server -> DB -> seal creation atomically.",
+      "Map summon/dismiss/death/revive and lifetime persistence.",
+      "Map mob/item EXP arithmetic and pet_exp_table boundaries.",
+      "Map evolution materials/count/consumption.",
+      "Map feed windows and item-slot trust boundaries.",
+      "Map skill learn/upgrade/delete/passive/auto-skill execution.",
+      "Audit PET_ATTR_DETERMINE and name-change inputs.",
+      "Close disconnect/warp/owner destruction and DB lifetime.",
+      "Map current 55701..55713 proto/race/client visual coverage.",
+      "Do not execute GPET-T01 or any runtime test without an explicit phase change."
     ]
   },
   "startup": {
@@ -315,7 +315,8 @@
     "sung_mahi_tower",
     "costume_appearance",
     "acce_sash",
-    "dragon_soul"
+    "dragon_soul",
+    "aura"
   ],
   "ranking_closure": {
     "status": "STATIC COMPLETE",
@@ -2018,11 +2019,14 @@
     ]
   },
   "aura_mapping": {
-    "status": "STATIC MAPPING IN PROGRESS",
+    "status": "STATIC COMPLETE",
     "verified_bug_ids": [
       "BUG-AURA-001",
       "BUG-AURA-002",
-      "BUG-AURA-003"
+      "BUG-AURA-003",
+      "BUG-AURA-004",
+      "BUG-AURA-005",
+      "BUG-AURA-006"
     ],
     "canonical_files": {
       "system": "systems/aura.md",
@@ -2056,7 +2060,34 @@
       "canonical_test_ids": [
         "AURA-T01",
         "AURA-T02",
-        "AURA-T03"
+        "AURA-T03",
+        "AURA-T04",
+        "AURA-T05",
+        "AURA-T06"
+      ],
+      "first_live_gate_unchanged": "DUNGEON-T10"
+    }
+  },
+  "growth_pet_mapping": {
+    "status": "STATIC MAPPING IN PROGRESS",
+    "verified_bug_ids": [
+      "BUG-GPET-001"
+    ],
+    "canonical_files": {
+      "system": "systems/growth_pet.md",
+      "bugs": "bugs/growth_pet.md",
+      "tests": "tests/growth_pet.md"
+    },
+    "mapped_flows": [
+      "initial GrowthPetSystem architecture",
+      "PET_EGG Value0 -> PET_UPBRINGING hatch target",
+      "PET_HATCH_INFO_RANGE current-data boundary",
+      "PET_ATTR_DETERMINE shared hatch-info indexing"
+    ],
+    "runtime_tests": {
+      "status": "NOT RUN / EXECUTION LOCKED",
+      "canonical_test_ids": [
+        "GPET-T01"
       ],
       "first_live_gate_unchanged": "DUNGEON-T10"
     }
