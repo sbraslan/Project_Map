@@ -228,3 +228,35 @@ The same trust boundary also means a client can choose NORMAL independently of t
 **Impact:** remote / sessionless classic refinement; blacksmith proximity is logged rather than enforced.
 
 **Runtime:** Stage B isolated modified-client authorization test only. See `REFCUBE-T08`.
+
+
+## BUG-REFCUBE-009 — Soul Awake scroll is assigned the wrong refine request type
+
+**Status:** VERIFIED STATIC / CURRENT FEATURE-DATA REACHABLE
+
+`RefineItem()` handles both Soul scroll values in one branch.
+
+The intended mapping is:
+- `SOUL_EVOLVE_SCROLL` -> `REFINE_TYPE_SOUL_EVOLVE`;
+- `SOUL_AWAKE_SCROLL` -> `REFINE_TYPE_SOUL_AWAKE`.
+
+But the code is:
+`if (pkItem->GetValue(0) == SOUL_EVOLVE_SCROLL) ...`
+`else if (pkItem->GetValue(0) == SOUL_EVOLVE_SCROLL) ...`
+
+The second comparison repeats EVOLVE instead of testing `SOUL_AWAKE_SCROLL`.
+
+Thus when the actual Awake scroll is used, `refType` remains its initial `REFINE_TYPE_SCROLL`.
+
+`RefineInformation()` special-cases ITEM_SOUL only for `REFINE_TYPE_SOUL_EVOLVE` / `REFINE_TYPE_SOUL_AWAKE`; with generic SCROLL it sends the wrong refine type.
+
+On confirmation, `CInputMain::Refine()` dispatches only the two Soul refine types to `DoRefineSoul()`; generic SCROLL goes to `DoRefineWithScroll()` instead.
+
+Current build enables `ENABLE_SOUL_SYSTEM`, and tracked item data contains:
+- 70602 — Soul parchment / evolve;
+- 70603 — Soul parchment / awake;
+- 70500..70509 Soul item family names.
+
+**Impact:** the normal Soul Awake scroll flow is routed through the generic scroll refine path instead of the dedicated Soul-awakening transaction/probability path.
+
+**Runtime:** Stage A controlled disposable Soul-item test after global phase unlock. See `REFCUBE-T09`.
