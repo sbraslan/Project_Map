@@ -657,6 +657,29 @@ The first future live gate remains **DUNGEON-T10**.
 
 **Next documentation-only target:** prepare the DUNGEON-T10 preflight/handoff checklist. Do not run it until the user explicitly changes phase.
 
+
+## DUNGEON-T10 runtime gate handoff — READY — 2026-09-28
+**Execution:** LOCKED / NOT RUN  
+**Canonical checklist:** `DUNGEON_T10_HANDOFF.md`
+
+The first future live gate is now fully prepared.
+
+Gate contract:
+- normal player login only;
+- click the Dungeon Info button next to the minimap;
+- no packet crafting, Python injection, GM command, DB/config mutation, sanitizer or source edit;
+- capture window state and relevant client/server errors;
+- classify only as `REPRODUCED`, `NOT REPRODUCED`, or `INCONCLUSIVE`;
+- stop immediately after evidence capture.
+
+Static prediction remains:
+- tracked config has 9 dungeon entries;
+- client count is nonzero before UI initialization;
+- list creation is located in the zero-count branch;
+- expected reproduction is an opened Dungeon Info window with no visible dungeon rows.
+
+T09/T11/T12 remain blocked behind a recorded T10 outcome. Applying `FIX-DUNGEON-010` is a separate future phase action and is not authorized by this handoff.
+
 ## Patch readiness
 First-cluster fix plan is ready at `fixes/dungeon_info.md`.
 
