@@ -94,3 +94,18 @@ Static prediction:
 the omitted scalar fields are read without initialization; current recipes can enter copy/not-remove branches nondeterministically.
 
 Safety class: **Stage C debug / sanitizer only**.
+
+
+## REFCUBE-T07 — Classic refine source lifetime after successful replacement
+Covers `BUG-REFCUBE-007`.
+
+Future isolated ASan/debug test:
+1. use a disposable ordinary non-Metin refinable item;
+2. execute one successful normal refine with Battle Pass code active;
+3. separately cover scroll success and, where reachable, scroll grade-down / Serpent paths;
+4. instrument `ITEM_MANAGER::RemoveItem()` and all subsequent old-source accesses.
+
+Static prediction:
+`RemoveItem()` destroys the source CItem before later announcement/Yohara/Battle-Pass code dereferences the stale pointer.
+
+Safety class: **Stage C crash/lifetime/sanitizer only**.
