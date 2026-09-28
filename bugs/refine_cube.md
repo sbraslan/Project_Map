@@ -162,3 +162,37 @@ Because reading an uninitialized scalar is undefined/indeterminate behavior, obs
 **Impact:** current Cube recipes can nondeterministically enter copy/not-remove semantics, causing incorrect material consumption and/or metadata copying even though the deployment never enables `allow_copy`.
 
 **Runtime:** Stage C debug/MemorySanitizer or deterministic initialization-comparison test only. See `REFCUBE-T06`.
+
+
+## BUG-REFCUBE-007 — Classic refine dereferences the source item after RemoveItem destroys it
+
+**Status:** VERIFIED STATIC / NORMAL REFINE SUCCESS REACHABLE
+
+`ITEM_MANAGER::RemoveItem(item)` removes the item from its owner and ends with:
+`M2_DESTROY_ITEM(item)` -> `ITEM_MANAGER::DestroyItem()` -> `M2_DELETE(item)`.
+
+Classic refine paths keep using the raw `item` pointer after that destruction.
+
+### Normal blacksmith / guild / money-only refine
+On successful non-Metin refine, `DoRefine()`:
+1. creates the refined item;
+2. copies metadata;
+3. calls `RemoveItem(item, "REMOVE (REFINE SUCCESS)")`;
+4. then can call:
+   - announcement predicates using `item->CheckItemUseLevel()`, `item->GetType()`, `item->GetSubType()`;
+   - `IsConquerorItem(item)` and `CRandomHelper::RefineRandomAttr(item, ...)`;
+   - Battle Pass progress with `item->GetVnum()`.
+
+This build enables `ENABLE_ANNOUNCEMENT_REFINE_SUCCES`, `ENABLE_YOHARA_SYSTEM` and `ENABLE_BATTLE_PASS_SYSTEM`. The Battle Pass call alone makes a post-destruction dereference part of ordinary successful non-Metin refinement.
+
+### Scroll refine
+`DoRefineWithScroll()` has the same ordering on success, and the grade-down failure branch also removes the old item before Yohara `IsConquerorItem(item)` / random-refine handling.
+
+### Serpent refine
+`DoRefineSerpent()` likewise removes the source before the Yohara random-refine call.
+
+Stackable Metin handling can avoid immediate object destruction when only count is decremented, but the ordinary weapon/armor/accessory paths call `RemoveItem()` and destroy the object.
+
+**Impact:** use-after-free during normal successful classic refinement, with crash/corruption/stale-data potential; additional UAF exists on relevant scroll downgrade/Serpent paths.
+
+**Runtime:** Stage C debug/ASan only. See `REFCUBE-T07`.
