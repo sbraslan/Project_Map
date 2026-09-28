@@ -15,8 +15,8 @@
     "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Consolidate Switchbot runtime readiness from bugs/switchbot.md and tests/switchbot.md without executing tests.",
-      "Resolve canonical Switchbot test IDs in the Switchbot subsystem rather than duplicate legacy IDs in tests/inventory_items.md.",
+      "Consolidate Guild Storage runtime readiness from bugs/guild_storage.md and tests/guild_storage.md without executing tests.",
+      "Use canonical subsystem test IDs and ignore legacy duplicate IDs from mixed files.",
       "Keep DUNGEON-T10 as the first future live runtime gate.",
       "Preserve all source/game repositories as read-only until the user explicitly changes phase."
     ]
@@ -172,7 +172,8 @@
     "RUNTIME.md::Battle Pass T01-T14 readiness classified; execution locked",
     "RUNTIME.md::Achievement T01-T09 readiness consolidated; execution locked",
     "RUNTIME.md::Biolog T01-T11 readiness consolidated; execution locked",
-    "RUNTIME.md::Inventory Item T01-T13 readiness consolidated; execution locked"
+    "RUNTIME.md::Inventory Item T01-T13 readiness consolidated; execution locked",
+    "RUNTIME.md::Switchbot SWB-T01-T07 canonical readiness consolidated; execution locked"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -341,7 +342,7 @@
       "SMT-T05",
       "SMT-T06"
     ],
-    "documentation_cursor": "switchbot",
+    "documentation_cursor": "guild_storage",
     "completed_readiness_clusters": [
       "dungeon_info",
       "ticket",
@@ -349,7 +350,8 @@
       "battle_pass",
       "achievement",
       "biolog",
-      "inventory_items"
+      "inventory_items",
+      "switchbot"
     ],
     "dungeon_info": {
       "status": "DOCUMENTATION READY / NOT RUN",
@@ -519,6 +521,48 @@
         "ITEM-T13"
       ],
       "normal_path_candidate": "ITEM-T01"
+    },
+    "switchbot": {
+      "status": "DOCUMENTATION READY / NOT RUN",
+      "canonical_test_ids": [
+        "SWB-T01",
+        "SWB-T02",
+        "SWB-T03",
+        "SWB-T04",
+        "SWB-T05",
+        "SWB-T06",
+        "SWB-T07"
+      ],
+      "verified_bug_tests": {
+        "BUG-SWITCHBOT-001": [
+          "SWB-T01"
+        ],
+        "BUG-SWITCHBOT-002": [
+          "SWB-T02"
+        ],
+        "BUG-SWITCHBOT-003": [
+          "SWB-T03"
+        ],
+        "BUG-SWITCHBOT-004": [
+          "SWB-T04"
+        ],
+        "BUG-SWITCHBOT-005": [
+          "SWB-T05"
+        ]
+      },
+      "observation_tests": {
+        "OBS-SWITCHBOT-001": [
+          "SWB-T06"
+        ],
+        "OBS-SWITCHBOT-002": [
+          "SWB-T07"
+        ]
+      },
+      "legacy_duplicate_ids": "SWITCHBOT-T01..T06 retained as non-canonical historical notes",
+      "normal_monitored_candidates": [
+        "SWB-T01",
+        "SWB-T03"
+      ]
     }
   }
 }
