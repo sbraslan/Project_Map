@@ -494,3 +494,56 @@ Consequently deleting/destroying a Growth Pet seal removes its item record but d
 **Impact:** permanent orphan Growth Pet rows accumulate in the database. The tracked code does not establish normal pet-id reuse, so stale-row adoption is not claimed here; the confirmed defect is orphan persistence/storage leakage.
 
 **Runtime:** Stage B disposable-pet + DB verification only after runtime phase unlock; see `GPET-T18`.
+
+
+## BUG-GPET-019 — PET_BAG bagging dereferences the removed pet seal
+
+**Status:** VERIFIED STATIC / NORMAL ITEM-USE PATH
+
+In `CHARACTER::UseItemEx()` for `ITEM_PET / PET_BAG`, the bagging branch copies the target pet's state into the transport box and then executes:
+
+`ITEM_MANAGER::Instance().RemoveItem(item2, "PET_BAGGING");`
+
+The normal item manager removal path destroys the CItem object.
+
+Immediately afterward the same raw pointer is used:
+
+`ChatPacket(CHAT_TYPE_INFO, "[LS;1154;%s]", item2->GetName());`
+
+This is a post-destruction dereference in the Growth Pet transport-box path.
+
+It is a distinct call site from the generic inventory destroy UAF already owned by `BUG-ITEM-001`: here the trigger is ordinary PET_BAG item-to-item use and the freed pointer is the transported Growth Pet seal.
+
+**Impact:** ordinary successful transport-box bagging can reach use-after-free with crash/stale-data/corruption potential.
+
+**Runtime:** Stage C debug/ASan with a disposable pet and transport box only after phase unlock. See `GPET-T19`.
+
+## BUG-GPET-020 — PET_BAG can revive a dead Growth Pet at full lifetime
+
+**Status:** VERIFIED STATIC / SERVER-VALIDATION GAP
+
+The PET_BAG bagging branch validates the target only as:
+- item exists;
+- not exchanging;
+- `GetType() == ITEM_PET`;
+- not locked.
+
+It never checks that the target PET_UPBRINGING seal is still alive.
+
+When bagging, the transport box receives the pet's structured `TGrowthPetInfo` but its own socket0 is replaced with the transport-box expiry:
+`time(0) + bag limit`.
+
+When unbagging, the code validates the **bag's** remaining lifetime, creates a new pet seal, then assigns:
+`newPet.socket0 = time(0) + petInfo.pet_max_time`.
+
+The original pet seal's expired socket0 is not preserved or revalidated.
+
+Therefore a dead Growth Pet seal can be placed into a transport box and later extracted as a newly alive seal with the full configured `pet_max_time`.
+
+This bypasses the dedicated revive/feed mechanics and their material/cost/state rules.
+
+Current tracked data contains the transport box item `55002` and the Growth Pet seal family `55701..55713`.
+
+**Impact:** dead Growth Pets can be revived by transport-box round trip rather than the intended revive path, resetting lifetime to the pet's full maximum.
+
+**Runtime:** Stage B disposable dead-pet/transport-box validation only after phase unlock. See `GPET-T20`.
