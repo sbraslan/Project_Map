@@ -260,3 +260,63 @@ Current build enables `ENABLE_SOUL_SYSTEM`, and tracked item data contains:
 **Impact:** the normal Soul Awake scroll flow is routed through the generic scroll refine path instead of the dedicated Soul-awakening transaction/probability path.
 
 **Runtime:** Stage A controlled disposable Soul-item test after global phase unlock. See `REFCUBE-T09`.
+
+
+## BUG-REFCUBE-010 — Refine skill bonus is applied to the random roll, reducing real success while the UI reports an increase
+
+**Status:** VERIFIED STATIC / NORMAL REFINE REACHABLE
+
+Current build enables `ENABLE_REFINE_ABILITY_SKILL`.
+
+The configured bonus tables are positive:
+- normal blacksmith: `aiRefinePowerByLevel` = 0..6;
+- guild blacksmith: `aiGuildRefinePowerByLevel` = 0..3.
+
+`RefineInformation()` presents these values as success bonuses:
+- normal: `prt->prob + refine_skill`;
+- guild: `prt->prob + 10 + guild_refine_skill`.
+
+But `DoRefine()` does not increase the success threshold. Instead it increases the random roll:
+`int prob = number(1, 100);`
+then
+- normal: `prob += refine_skill`;
+- guild / money-only: `prob += 10 + guild_refine_skill`;
+and success remains:
+`if (prob <= prt->prob)`.
+
+For positive bonus `k`, the real success probability becomes approximately `max(prt->prob - k, 0)%`, while the UI advertises `min(prt->prob + k, 100)%`.
+
+Example:
+base 50%, normal refine skill +6:
+- UI: 56%;
+- execution: `roll + 6 <= 50` -> 44%.
+
+Guild/money-only additionally subtracts roughly 10..13 percentage points from the base while the UI reports that same amount as an increase.
+
+**Impact:** leveling the refine ability skill makes actual normal refinement worse, opposite to the displayed probability; guild/money-only probability is likewise inverted.
+
+**Runtime:** Stage A statistical/debug RNG-seed validation only after phase unlock. See `REFCUBE-T10`.
+
+## BUG-REFCUBE-011 — Scroll refine preview probability does not match the execution formula
+
+**Status:** VERIFIED STATIC / NORMAL UI FLOW REACHABLE
+
+For non-guild `RefineInformation()`, the displayed probability is always built as:
+`prt->prob + refine_skill + scroll_buff`.
+
+However `DoRefineWithScroll()` does not use the refine skill bonus at all and several scroll values are **absolute success probabilities**, not additive buffs.
+
+Examples:
+- Magic Stone: execution = `prt->prob + 10`; preview = `prt->prob + refine_skill + 10`.
+- Dragon Scroll: execution = table `{100,75,65,55,45,40,35,25,20}`; preview adds that absolute table value to `prt->prob + refine_skill`, often clamping to 100.
+- War/Musin Scroll: execution = 100%; preview adds 100 to base and clamps to 100.
+- Smith Handbook: execution = absolute table `{100,100,90,80,70,60,50,30,20}`; preview adds it to base + skill.
+- Memo: execution = 100%; preview also clamps 100, coincidentally matching.
+- BDragon: execution = 80%; preview = base + skill + 80, generally clamped/higher.
+- Ritual / Seal of God: execution = base + 15 / +20; preview additionally includes refine skill, which execution ignores.
+
+Thus the probability sent in `TPacketGCRefineInformation` is not an authoritative representation of the probability later used by the server transaction.
+
+**Impact:** the refine dialog can materially overstate scroll success chance, including showing 100% for attempts that execute below 100%.
+
+**Runtime:** Stage A deterministic formula comparison with disposable items only. See `REFCUBE-T11`.
