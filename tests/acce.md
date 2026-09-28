@@ -50,3 +50,18 @@ Static prediction:
 Safety: Stage C crash/lifetime/sanitizer. Do not run on production.
 
 No test executed.
+
+
+## ACCE-T05 — Reversal client/server attribute refresh
+Owner: BUG-ACCE-005.
+
+Future ordinary-UI observation with a disposable absorbed sash:
+- record target attributes before reversal;
+- use reversal scroll;
+- inspect the same inventory slot without moving/relogging;
+- compare tooltip/client item data with server-side effective stats;
+- then force an item refresh and compare again.
+
+Static prediction: socket0 clears immediately, but the old client attribute array remains until another full target item update.
+
+Safety: Stage A non-crash UI/state observation.
