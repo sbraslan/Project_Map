@@ -1,6 +1,6 @@
 # Acce / Sash — Deferred Runtime Tests
 
-**Status:** DOCUMENTATION DRAFT / NOT RUN  
+**Status:** READY / NOT RUN  
 **Execution:** LOCKED  
 **Global first future live gate:** DUNGEON-T10 remains unchanged.
 
@@ -67,7 +67,7 @@ Static prediction: socket0 clears immediately, but the old client attribute arra
 Safety: Stage A non-crash UI/state observation.
 
 
-Current ownership: ACCE-T01..T06. No test executed.
+Current ownership: ACCE-T01..ACCE-T08. No test executed.
 
 
 ## ACCE-T06 — Occupied-sash absorption overwrite
@@ -81,3 +81,32 @@ Future isolated modified-client check with disposable items:
 Static prediction: server replaces the previous absorbed source/data and consumes the newly submitted material.
 
 Safety: Stage B destructive item-state test. Do not run on production.
+
+
+## ACCE-T07 — Warp with Acce state still open
+Owner: BUG-ACCE-007.
+
+Future controlled observation:
+1. open an Acce combine/absorb window normally;
+2. trigger an ordinary server-authorized warp without manually closing it;
+3. after arrival, attempt a normal inventory/item operation;
+4. record whether the server continues to reject item handling until Acce CLOSE/reconnect clears the flags.
+
+Static prediction: `CanWarp()/WarpSet()` preserve Acce state because `W_ACCE` is omitted and no server-side `AcceClose()` is forced.
+
+Safety: Stage A/B ordinary-flow state observation.
+
+
+## ACCE-T08 — Reversal extended-metadata persistence
+Owner: BUG-ACCE-008.
+
+Future disposable-data observation:
+1. prepare an absorbed sash whose source carries nonzero element and/or set metadata;
+2. record socket0, normal attributes, element metadata and set label;
+3. use the reversal item;
+4. inspect immediately, after a full item refresh, and after relog;
+5. confirm gameplay absorbed stats stop while extended metadata/title/element display remains.
+
+Static prediction: socket0 and normal attributes reset, but copied element/set metadata remains persisted.
+
+Safety: Stage A if suitable test data already exists; otherwise Stage B controlled data setup.
