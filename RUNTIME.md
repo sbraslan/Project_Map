@@ -456,6 +456,29 @@ The global first live gate remains **DUNGEON-T10**.
 
 **Next documentation cluster:** Party Match runtime readiness.
 
+
+## Runtime-readiness consolidation — Party Match — 2026-09-28
+**Documentation status:** READY
+**Execution status:** LOCKED / NOT RUN
+
+A dedicated `tests/party_match.md` file did not previously exist; canonical deferred IDs are now PMATCH-T01..PMATCH-T05.
+
+Verified coverage:
+- PMATCH-T01 -> BUG-PMATCH-001
+- PMATCH-T02 -> BUG-PMATCH-002
+- PMATCH-T03 -> BUG-PMATCH-003
+
+Unpromoted robustness:
+- PMATCH-T04 -> duplicate SEARCH / HOLD client-state desync
+- PMATCH-T05 -> ignored WarpSet failure / non-atomic completion ordering
+
+Primary normal-path candidate: **PMATCH-T03**.
+PMATCH-T01 is a controlled multi-core normal-flow architecture test; PMATCH-T02 is isolated exchange/item-lifetime testing.
+
+The global first live gate remains **DUNGEON-T10**.
+
+**Next documentation cluster:** Dungeon Core runtime readiness.
+
 ## Patch readiness
 First-cluster fix plan is ready at `fixes/dungeon_info.md`.
 
