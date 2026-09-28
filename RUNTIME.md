@@ -826,3 +826,40 @@ Unpromoted closure boundaries:
 Aura is a **post-audit extension**. Current effective static-complete/readiness coverage is **25/25**, plus the folded Guild lifecycle companion.
 
 The global first future live gate remains **DUNGEON-T10**. No Aura test has been executed.
+
+
+## Runtime-readiness consolidation — Refine / Cube / Crafting — 2026-09-28
+**Documentation status:** READY  
+**Execution status:** LOCKED / NOT RUN
+
+Canonical verified coverage:
+- REFCUBE-T01 -> BUG-REFCUBE-001
+- REFCUBE-T02 -> BUG-REFCUBE-002
+- REFCUBE-T03 -> BUG-REFCUBE-003
+- REFCUBE-T04 -> BUG-REFCUBE-004
+- REFCUBE-T05 -> BUG-REFCUBE-005
+- REFCUBE-T06 -> BUG-REFCUBE-006
+- REFCUBE-T07 -> BUG-REFCUBE-007
+- REFCUBE-T08 -> BUG-REFCUBE-008
+- REFCUBE-T09 -> BUG-REFCUBE-009
+- REFCUBE-T10 -> BUG-REFCUBE-010
+- REFCUBE-T11 -> BUG-REFCUBE-011
+- REFCUBE-T12 -> BUG-REFCUBE-012
+- REFCUBE-T13 -> BUG-REFCUBE-013
+- REFCUBE-T14 -> BUG-REFCUBE-014
+- REFCUBE-T15 -> BUG-REFCUBE-015
+- REFCUBE-T16 -> BUG-REFCUBE-016
+
+Execution classes:
+- **Stage A / normal observation:** T10, T11, T12 where no destructive commit is required.
+- **Stage B / disposable state or modified client:** T01, T02, T03, T05, T06, T08, T09, T13, T14, T15, T16.
+- **Stage C / crash, lifetime, sanitizer or fault-injection:** T04, T07 and any explicit CreateItem-failure experiment.
+
+Closure candidates left unpromoted:
+- live DB `refine_proto` semantic bounds are not versioned in tracked repositories;
+- scroll/result CreateItem failure after pre-consumption has no tracked normal-data producer;
+- Over9 transform metadata loss is dormant because no tracked current quest/config populates/enables its mapping.
+
+Refine / Cube / Crafting is a **post-audit extension**. Current effective static-complete/readiness coverage is **26/26**, plus the folded Guild lifecycle companion.
+
+The global first future live gate remains **DUNGEON-T10**. No REFCUBE test has been executed.
