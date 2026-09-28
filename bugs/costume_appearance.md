@@ -124,3 +124,72 @@ A modified client can therefore check in a sealed right material. `Accept()` the
 - Mount expiry helpers appear partially disconnected from the mapped Transmutation Accept path.
 - `IsExpireTimeItem()` has an overly broad boolean predicate, but no live caller/impact has yet been closed.
 - Normal item movement/drop paths are blocked by `CanHandleItem()` while ChangeLook is active; alternate mutation paths still require audit.
+
+
+## BUG-LOOK-005 — LEFT replacement bypasses final ChangeLook compatibility
+
+**Status:** VERIFIED STATIC
+
+Normal intended order:
+1. LEFT target is checked in;
+2. RIGHT material is checked against LEFT by `CheckOtherItem()`;
+3. client UI prevents removing LEFT while RIGHT is present;
+4. Accept applies RIGHT VNUM to LEFT.
+
+Server does not preserve this state invariant.
+
+`CTransmutation::ItemCheckOut(LEFT)`:
+- does not check whether RIGHT is populated;
+- simply sets LEFT to nullptr.
+
+A modified client can therefore:
+1. check in target A as LEFT;
+2. check in compatible material B as RIGHT;
+3. check out LEFT only;
+4. check in a different target C as LEFT.
+
+The new LEFT path calls only `CanAddItem(C)`.
+It does not call `CheckOtherItem(B)`.
+
+`Accept()` checks only that LEFT and RIGHT are non-null and does not revalidate their relationship before:
+`left->SetChangeLookVnum(right->GetVnum())`.
+
+Because item-mode `CanAddItem()` independently accepts weapons, body armor and body costumes, this can produce a final pair that would have failed the original same-type/same-subtype/anti-flag checks.
+
+**Impact:** incompatible appearance VNUMs can be attached to otherwise valid target items; resulting client/server visual behavior is data-dependent and can cross normal weapon/armor/costume compatibility boundaries.
+
+**Runtime:** deferred modified-client/isolation test.
+
+## BUG-LOOK-006 — Time expiry can leave dangling ChangeLook item pointers
+
+**Status:** VERIFIED STATIC
+
+`CTransmutation` stores checked-in items as raw `LPITEM` pointers.
+
+Check-in:
+- rejects an item if `isLocked()`;
+- does not lock the accepted item;
+- registers no destruction callback.
+
+Normal manual movement is constrained by `CanHandleItem()`, but item expiry events remain independent.
+
+Concrete path:
+1. check in an eligible item that has an active real-time expiry event;
+2. keep the ChangeLook window open until expiry;
+3. `real_time_expire_event` calls `ITEM_MANAGER::RemoveItem(item, "REAL_TIME_EXPIRE")`;
+4. `RemoveItem()` removes it from the character;
+5. `DestroyItem()` erases item maps and performs `M2_DELETE(item)`;
+6. `CTransmutation::m_Item[]` is not cleared.
+
+Later server operations dereference the stale pointer:
+- `ItemCheckOut()` uses `item->GetCell()`;
+- `Accept()` uses `left->SetChangeLookVnum(...)` and/or `right->GetVnum()`.
+
+**Impact:** use-after-free / game-core crash candidate reachable through a checked-in time-limited ChangeLook item expiring while the window remains active.
+
+**Runtime:** crash-class test; isolated sanitizer/debug environment only.
+
+## Additional closed observations
+
+- Hide-costume body/weapon getters correctly prefer the underlying armor/weapon ChangeLook VNUM while the costume visual is hidden.
+- Initial same-type/subtype/anti-flag compatibility is internally consistent; the vulnerability is the later state transition in BUG-LOOK-005.
