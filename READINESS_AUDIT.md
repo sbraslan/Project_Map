@@ -207,3 +207,20 @@ Subsequent extensions now include:
 Current effective static-complete/readiness coverage is therefore **24/24**, plus the folded Guild lifecycle companion.
 
 Dragon Soul execution classes are documented in `RUNTIME.md`. No Dragon Soul runtime test has been executed. **DUNGEON-T10 remains the first future live gate.**
+
+
+## Post-audit extension — Aura System — 2026-09-28
+
+The original audit remains historically scoped to the initial 21 STATIC COMPLETE rows.
+
+Subsequent extensions now include:
+- Costume / Appearance / ChangeLook;
+- Acce / Sash;
+- Dragon Soul / Alchemy;
+- Aura System — `BUG-AURA-001..006`, `AURA-T01..AURA-T06`.
+
+Current effective static-complete/readiness coverage is therefore **25/25**, plus the folded Guild lifecycle companion.
+
+Aura execution classes and deferred validation ownership are documented in `RUNTIME.md`. No Aura runtime test has been executed.
+
+This extension does not alter the canonical first future live gate: **DUNGEON-T10**.
