@@ -15,8 +15,8 @@
     "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Consolidate Mailbox runtime readiness from bugs/mailbox.md and tests/mailbox.md without executing tests.",
-      "Preserve active, dormant and observation status exactly.",
+      "Consolidate Ranking runtime readiness from bugs/ranking.md and tests/ranking.md without executing tests.",
+      "Preserve the existing retracted BUG-RANK-006 status.",
       "Keep DUNGEON-T10 as the first future live runtime gate.",
       "Preserve all source/game repositories as read-only until the user explicitly changes phase."
     ]
@@ -177,7 +177,8 @@
     "RUNTIME.md::Guild Storage GS-T01-T20 readiness consolidated; execution locked",
     "RUNTIME.md::Exchange EXC-T01-T10 canonical readiness consolidated; execution locked",
     "RUNTIME.md::Shop SHP-T01-T14 canonical readiness consolidated; execution locked",
-    "RUNTIME.md::Safebox Mall SFB-T01-T12 canonical readiness consolidated; execution locked"
+    "RUNTIME.md::Safebox Mall SFB-T01-T12 canonical readiness consolidated; execution locked",
+    "RUNTIME.md::Mailbox MAIL-T01-T18 readiness consolidated; execution locked"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -346,7 +347,7 @@
       "SMT-T05",
       "SMT-T06"
     ],
-    "documentation_cursor": "mailbox",
+    "documentation_cursor": "ranking",
     "completed_readiness_clusters": [
       "dungeon_info",
       "ticket",
@@ -359,7 +360,8 @@
       "guild_storage",
       "exchange",
       "shop",
-      "safebox_mall"
+      "safebox_mall",
+      "mailbox"
     ],
     "dungeon_info": {
       "status": "DOCUMENTATION READY / NOT RUN",
@@ -818,6 +820,100 @@
       "active_build_note": "ENABLE_SAFEBOX_MONEY is OFF",
       "normal_path_verified_candidate": null,
       "ordinary_flow_observation_candidate": "SFB-T09"
+    },
+    "mailbox": {
+      "status": "DOCUMENTATION READY / NOT RUN",
+      "canonical_test_ids": [
+        "MAIL-T01",
+        "MAIL-T02",
+        "MAIL-T03",
+        "MAIL-T04",
+        "MAIL-T05",
+        "MAIL-T06",
+        "MAIL-T07",
+        "MAIL-T08",
+        "MAIL-T09",
+        "MAIL-T10",
+        "MAIL-T11",
+        "MAIL-T12",
+        "MAIL-T13",
+        "MAIL-T14",
+        "MAIL-T15",
+        "MAIL-T16",
+        "MAIL-T17",
+        "MAIL-T18"
+      ],
+      "verified_bug_tests": {
+        "BUG-MAIL-001": [
+          "MAIL-T01",
+          "MAIL-T02"
+        ],
+        "BUG-MAIL-002": [
+          "MAIL-T03",
+          "MAIL-T04"
+        ],
+        "BUG-MAIL-003": [
+          "MAIL-T10"
+        ],
+        "BUG-MAIL-004": [
+          "MAIL-T10"
+        ],
+        "BUG-MAIL-005": [
+          "MAIL-T05",
+          "MAIL-T06"
+        ],
+        "BUG-MAIL-006": [
+          "MAIL-T07"
+        ],
+        "BUG-MAIL-007": [
+          "MAIL-T08",
+          "MAIL-T09"
+        ],
+        "BUG-MAIL-008": [
+          "MAIL-T11"
+        ],
+        "BUG-MAIL-009": [
+          "MAIL-T12"
+        ],
+        "BUG-MAIL-010": [
+          "MAIL-T13"
+        ],
+        "BUG-MAIL-011": [
+          "MAIL-T14"
+        ],
+        "BUG-MAIL-012": [
+          "MAIL-T15"
+        ]
+      },
+      "observation_tests": {
+        "OBS-MAIL-001": [
+          "MAIL-T16"
+        ],
+        "OBS-MAIL-002": [
+          "MAIL-T17"
+        ],
+        "OBS-MAIL-003": [
+          "MAIL-T18"
+        ]
+      },
+      "ordinary_flow_candidates": [
+        "MAIL-T07",
+        "MAIL-T11"
+      ],
+      "adversarial_tests": [
+        "MAIL-T01",
+        "MAIL-T02",
+        "MAIL-T03",
+        "MAIL-T04",
+        "MAIL-T08",
+        "MAIL-T09",
+        "MAIL-T14"
+      ],
+      "persistence_fault_tests": [
+        "MAIL-T10",
+        "MAIL-T12",
+        "MAIL-T15"
+      ]
     }
   }
 }
