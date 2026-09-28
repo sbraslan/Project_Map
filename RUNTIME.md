@@ -636,6 +636,27 @@ The next allowed documentation-only step is a **global readiness integrity audit
 3. produce one canonical global execution order while preserving DUNGEON-T10 as the first live gate;
 4. do not execute anything until the user explicitly changes phase.
 
+
+## Global runtime-readiness integrity audit — 2026-09-28
+**Status:** COMPLETE — PASS WITH NORMALIZATIONS
+**Execution:** LOCKED / NOT RUN
+**Canonical detail:** `READINESS_AUDIT.md`
+
+Audit result:
+- all **21/21 STATIC COMPLETE** subsystem rows in `INDEX.md` have runtime-readiness ownership;
+- Guild lifecycle is folded with Guild Storage but its independent `BUG-GUILD-001` now has explicit `GUILD-T01` runtime ownership;
+- historical Dungeon Info/Core reuse of `BUG-DUNGEON-001..004` is globally qualified as `DINFO::...` versus `DCORE::...` without renumbering local history;
+- `BUG-RANK-006` and `BUG-BFIELD-004` remain retracted/reserved;
+- historical `BUG-BFIELD-005/007` remain owned by `BUG-RANK-003/007`;
+- candidate/observation/dormant statuses remain non-promoted;
+- migrated foreign test blocks are non-canonical outside the prefix owner declared in `tests/INDEX.md`;
+- `STATE.json completed_subsystems` is normalized to the 21 STATIC COMPLETE rows.
+
+Canonical future order is recorded in `READINESS_AUDIT.md` and `STATE.json`.
+The first future live gate remains **DUNGEON-T10**.
+
+**Next documentation-only target:** prepare the DUNGEON-T10 preflight/handoff checklist. Do not run it until the user explicitly changes phase.
+
 ## Patch readiness
 First-cluster fix plan is ready at `fixes/dungeon_info.md`.
 
