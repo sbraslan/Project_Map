@@ -1,6 +1,6 @@
 # Acce / Sash — Bug Registry
 
-**Status:** STATIC MAPPING IN PROGRESS  
+**Status:** STATIC COMPLETE  
 **Execution:** LOCKED / NOT RUN
 
 ## BUG-ACCE-001 — Final refine packet is not gated by active server Acce window/mode
@@ -133,6 +133,8 @@ Verified static bugs:
 - BUG-ACCE-004
 - BUG-ACCE-005
 - BUG-ACCE-006
+- BUG-ACCE-007
+- BUG-ACCE-008
 
 No runtime reproduction has been performed.
 
@@ -205,3 +207,69 @@ Therefore a crafted final absorb request can submit a previously absorbed sash a
 This finding is independent of BUG-ACCE-003: even a normally valid weapon or body-armor material can trigger the overwrite if the target is already occupied.
 
 **Runtime:** deferred; use disposable items only if later authorized.
+
+
+---
+
+## BUG-ACCE-007 — Acce open state can survive warp and keep item handling blocked
+
+**Status:** VERIFIED STATIC
+
+Server Acce open state is represented by:
+- `m_bAcceCombination`;
+- `m_bAcceAbsorption`;
+- and, with renewed window tracking, `W_ACCE`.
+
+`CHARACTER::CanHandleItem()` rejects normal item operations while either Acce boolean is true.
+
+However:
+- `CHARACTER::CanWarp()` does not include `W_ACCE` in its opened-window mask;
+- the mapped `IsHack()` transaction-window masks also omit `W_ACCE`;
+- `WarpSet()` does not call `AcceClose()`;
+- the mapped server close path is the client Acce CLOSE request.
+
+The normal client mitigates this by distance-closing the Acce UI and sending CLOSE, but server correctness still depends on that client packet arriving before/during transition.
+
+**Impact:** after a server-authorized warp, stale Acce flags can survive and continue making `CanHandleItem()` reject normal inventory/item operations until Acce state is explicitly cleared or the session resets.
+
+**Runtime:** deferred ordinary/controlled warp-state observation.
+
+
+---
+
+## BUG-ACCE-008 — Reversal leaves copied element/set metadata persistently attached to the sash
+
+**Status:** VERIFIED STATIC
+
+Absorption copies extended source metadata when the corresponding features are enabled, including:
+- element grade/type/value data;
+- Yohara/random item apply data;
+- `set_value`.
+
+The reversal item path clears only:
+1. absorbed source socket 0;
+2. normal item attributes.
+
+It does **not** clear the copied element/random/set fields.
+
+Gameplay application of the absorbed Acce bonuses is largely protected by socket0:
+- Acce absorbed weapon/armor point application requires a nonzero absorbed source;
+- copied Yohara/random Acce application is also socket0-gated;
+- the sash slot is not part of the character's normal equipment set-count slots.
+
+But the client has persistent UI consumers that are not socket0-gated:
+- `AddItemData(..., set_value)` passes `set_value` into the item-title path, where `SetItemString(set_value)` can prepend a set label;
+- the generic element tooltip path can render a positive stored element grade before the Acce-specific socket0-gated branch.
+
+Persistence is explicit:
+- `SaveSingleItem()` copies `set_value`, element fields and enabled random fields into `TPlayerItem`;
+- DB cache/player load persists and restores them;
+- reversal's `SetSocket(0,0)` schedules save while those extended fields are unchanged.
+
+**Impact:** after reversal, absorbed gameplay stats stop because socket0 is zero, but copied extended metadata can remain durably attached to the sash and remain visible in tooltip/title even after full refresh or relog. This is a persistent inconsistent item state.
+
+This is distinct from `BUG-ACCE-005`:
+- 005 is transient stale **normal attributes** caused by packet ordering; delayed save eventually stores them cleared;
+- 008 is **extended metadata never cleared at all**, so DB persistence preserves it.
+
+**Runtime:** deferred UI/persistence observation using disposable metadata-bearing items.
