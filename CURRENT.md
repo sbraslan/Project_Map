@@ -10,19 +10,16 @@
 Only `sbraslan/Project_Map` is writable. All source/game repositories remain read-only. Runtime/fault-injection execution does not start unless the user explicitly changes phase.
 
 ## Just closed
-- Inventory / Item / Special Inventory runtime-readiness documentation is consolidated.
-- Verified bug coverage is recorded for BUG-ITEM-001..004 and BUG-ITEM-006..008.
-- No canonical BUG-ITEM-005 exists; the numbering gap is preserved.
-- ITEM-T05/T07 remain observation/regression validation for OBS-ITEM-001/002.
-- ITEM-T04/T08 are regression checks; ITEM-T13 is a dataset-audit dependency.
-- Mixed legacy SWITCHBOT tests were not folded into Inventory ownership because Switchbot has its own canonical subsystem.
-- ITEM-T01 is the primary Inventory normal-path candidate.
+- Switchbot runtime-readiness is consolidated.
+- Duplicate legacy SWITCHBOT-T01..T06 identifiers were preserved but marked non-canonical.
+- New unique canonical IDs SWB-T01..SWB-T07 now map BUG-SWITCHBOT-001..005 and OBS-SWITCHBOT-001/002.
+- SWB-T01 and SWB-T03 are the primary legitimate monitored candidates.
 - DUNGEON-T10 remains the first future live gate.
 - No runtime test was executed and no source/game file was changed.
 
 ## Exact next work
-1. Consolidate Switchbot runtime readiness from `bugs/switchbot.md` + `tests/switchbot.md`.
-2. Resolve canonical Switchbot test IDs there rather than relying on duplicate legacy IDs in `tests/inventory_items.md`.
+1. Consolidate Guild Storage runtime readiness from `bugs/guild_storage.md` + `tests/guild_storage.md`.
+2. Use only canonical subsystem test IDs; do not reuse legacy mixed-file duplicates.
 3. Preserve DUNGEON-T10 as the first future live runtime gate.
 4. Keep every source/game repository immutable until the phase is explicitly changed.
 
