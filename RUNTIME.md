@@ -347,6 +347,33 @@ The global first live gate remains **DUNGEON-T10**.
 
 **Next documentation cluster:** Safebox / Mall runtime readiness.
 
+
+## Runtime-readiness consolidation — Safebox / Mall — 2026-09-28
+**Documentation status:** READY
+**Execution status:** LOCKED / NOT RUN
+
+Canonical deferred IDs are SFB-T01..SFB-T12.
+
+Active-build verified coverage:
+- SFB-T01 / SFB-T02 -> BUG-SAFEBOX-003
+- SFB-T03 / SFB-T04 / SFB-T05 -> BUG-SAFEBOX-004
+- SFB-T06 / SFB-T07 -> BUG-SAFEBOX-005
+
+Observation coverage:
+- SFB-T08 -> OBS-SAFEBOX-002
+- SFB-T09 -> OBS-SAFEBOX-003
+- SFB-T10 -> OBS-SAFEBOX-004
+
+Dormant ENABLE_SAFEBOX_MONEY coverage:
+- SFB-T11 -> BUG-SAFEBOX-001
+- SFB-T12 -> BUG-SAFEBOX-002
+
+Historical OBS-SAFEBOX-001 is superseded by BUG-SAFEBOX-005. The active build has no clean normal-player verified-bug test; SFB-T09 is an ordinary-flow access-policy observation, not a verified bug.
+
+The global first live gate remains **DUNGEON-T10**.
+
+**Next documentation cluster:** Mailbox runtime readiness.
+
 ## Patch readiness
 First-cluster fix plan is ready at `fixes/dungeon_info.md`.
 
