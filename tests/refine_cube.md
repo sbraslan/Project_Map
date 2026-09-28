@@ -169,3 +169,60 @@ Static prediction:
 the preview adds refine skill and treats several absolute scroll probability tables as additive buffs, while execution uses different formulas.
 
 Safety class: **Stage A debug/formula validation**.
+
+
+## REFCUBE-T12 — Refine preview set identity
+Covers `BUG-REFCUBE-012`.
+
+Future Stage A UI test:
+1. prepare a disposable item with a known nonzero `set_value`;
+2. place it in several inventory cells, including cell 0 and a normal nonzero cell;
+3. open the standard refine dialog;
+4. compare the normal inventory tooltip Set Item identity with the refine-result preview;
+5. repeat after moving the same item to another cell.
+
+Static prediction:
+the refine preview reads `GetItemSetValue(targetItemPos, stale_i)` instead of the target item and therefore reports zero/wrong set identity.
+
+No item destruction is required.
+
+## REFCUBE-T13 — ChangeLook persistence across successful refine
+Covers `BUG-REFCUBE-013`.
+
+Future isolated Stage B test:
+1. use a disposable refinable weapon/body item;
+2. apply a known ChangeLook;
+3. record source VNUM and `dwTransmutationVnum`;
+4. force/obtain a successful normal refinement in an isolated test setup;
+5. inspect the created next-grade item.
+
+Static prediction:
+normal attributes/sockets are transferred but `dwTransmutationVnum` becomes zero because `CopyAllAttrTo()` does not copy it.
+
+Do not use valuable appearance material.
+
+## REFCUBE-T14 — Set Item identity across successful refine
+Covers `BUG-REFCUBE-014`.
+
+Future isolated Stage B test:
+1. create a disposable set-marked refinable item through a tracked Set Smith recipe;
+2. record its nonzero `set_value`;
+3. refine it successfully to its next VNUM;
+4. inspect the new item's `set_value` and equipped set-bonus count.
+
+Static prediction:
+the new item has `set_value == 0` and no longer participates in the previous set.
+
+## REFCUBE-T15 — Serpent random-default persistence
+Covers `BUG-REFCUBE-015`.
+
+Future isolated Stage B test:
+1. use a disposable Serpent weapon/armor with nonzero generated `alRandomValues[]`;
+2. record the full random-default array and, for armor, effective base defense contribution;
+3. perform a successful Serpent refinement;
+4. inspect the newly created item before any unrelated regeneration path can alter it.
+
+Static prediction:
+`aApplyRandom[]` is refined/rebuilt as designed but `alRandomValues[]` is zero because neither `CopyAllAttrTo()` nor `RefineRandomAttr()` transfers it.
+
+Never test on production/high-value Serpent gear.
