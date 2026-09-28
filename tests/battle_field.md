@@ -87,3 +87,23 @@ Future validation for BUG-BFIELD-011:
 - separately accumulate several deaths, reconnect, die once more and compare restart wait against pre-reconnect accumulated penalty.
 
 Do not execute during the current detection/mapping phase.
+
+
+## Battle Field readiness consolidation — 2026-09-28
+- No Battle Field runtime test was executed.
+- Canonical unique Battle Field coverage:
+  - BFIELD-T01 -> BUG-BFIELD-001
+  - BFIELD-T02 -> BUG-BFIELD-002
+  - BFIELD-T03 -> BUG-BFIELD-003
+  - BFIELD-T06 -> BUG-BFIELD-006
+  - BFIELD-T08 -> BUG-BFIELD-008
+  - BFIELD-T09 -> BUG-BFIELD-009
+  - BFIELD-T10 -> BUG-BFIELD-010
+  - BFIELD-T11 -> BUG-BFIELD-011
+- BFIELD-T04 is retired from active validation because BUG-BFIELD-004 is retracted/reserved.
+- BFIELD-T05 is a legacy duplicate of canonical Ranking coverage RANK-T03 -> BUG-RANK-003.
+- BFIELD-T07 is a legacy duplicate of canonical Ranking coverage RANK-T06 -> BUG-RANK-007.
+- Primary ordinary/normal-flow Battle Field candidates: BFIELD-T01, BFIELD-T02, BFIELD-T03, BFIELD-T09, BFIELD-T10, BFIELD-T11.
+- BFIELD-T06 is privileged/admin routing validation.
+- BFIELD-T08 is deterministic schedule arithmetic validation.
+- Overall first live runtime gate remains DUNGEON-T10.
