@@ -133,3 +133,41 @@ Verified static bugs:
 - BUG-ACCE-004
 
 No runtime reproduction has been performed.
+
+
+---
+
+## BUG-ACCE-005 — Reversal sends the target update before clearing absorbed attributes
+
+**Status:** VERIFIED STATIC
+
+Reversal path:
+`char_item.cpp`
+1. `item2->SetSocket(0, 0)`;
+2. `item2->ClearAllAttribute()`;
+3. consume reversal scroll.
+
+`SetSocket()` immediately calls:
+- `UpdatePacket()`;
+- `Save()`.
+
+The item update packet contains the full socket and attribute arrays. At that moment the old absorbed attributes are still present.
+
+`ClearAllAttribute()` then zeroes the server-side attribute array but performs neither:
+- `UpdatePacket()`;
+- nor its own `Save()`.
+
+There is no later target-sash `UpdatePacket()` in the reversal branch.
+
+Client Acce tooltip `__AppendAttributeInformationAcce()` reads the client-side attribute slots and does not require absorbed socket0 to be nonzero before rendering them. It derives drain percentage from socket1.
+
+Therefore immediately after reversal:
+- server target sash has socket0=0 and cleared normal attributes;
+- client target sash has socket0=0 but retains the old attribute array from the earlier packet;
+- tooltip can continue displaying the removed absorbed bonuses until another full item refresh occurs.
+
+The earlier `SetSocket()->Save()` is a delayed save; when flushed it serializes the current item object, including the cleared attributes. Thus no separate DB-persistence defect is established here.
+
+**Impact:** verified client/server item-state and tooltip desynchronization after Acce reversal; displayed bonuses can be stale even though the server has removed them.
+
+**Runtime:** deferred; ordinary UI observation is sufficient if later authorized.
