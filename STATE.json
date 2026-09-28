@@ -12,13 +12,17 @@
     "system_file": "systems/costume_appearance.md",
     "bug_file": "bugs/costume_appearance.md",
     "test_file": "tests/costume_appearance.md",
-    "verified_bug_ids": [],
+    "verified_bug_ids": [
+      "BUG-LOOK-001",
+      "BUG-LOOK-002"
+    ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Map server costume equip/change-look visual state flow.",
-      "Map client PART_MAIN/SetArmor/VALUE3/MSM shape resolution.",
-      "Map item_proto and locale/item_list dependencies for costume creation.",
-      "Record findings only; do not execute runtime tests or modify source/game repositories."
+      "Close transmutation VNUM persistence through DB load/save.",
+      "Map ChangeLook clear-scroll/reset behavior.",
+      "Map mount ChangeLook use/expiry lifecycle.",
+      "Inspect window close/disconnect cleanup and alternate item-mutation paths.",
+      "Keep source/game repositories read-only and runtime execution locked."
     ]
   },
   "startup": {
@@ -189,7 +193,14 @@
     "RUNTIME.md::Sung Mahi SMT-T01-T06 readiness consolidated; runtime-readiness documentation milestone complete",
     "READINESS_AUDIT.md::global integrity audit complete; 21/21 coverage; DUNGEON namespaces qualified; Guild lifecycle folded coverage",
     "DUNGEON_T10_HANDOFF.md::first live runtime gate preflight complete; execution locked",
-    "ITEM_CREATION_AUTOMATION.md::conversation trigger item ekleyeceğiz canonicalized"
+    "ITEM_CREATION_AUTOMATION.md::conversation trigger item ekleyeceğiz canonicalized",
+    "game/src/Transmutation.cpp/.h::ChangeLook transaction and eligibility",
+    "game/src/input_main.cpp::HEADER_CG_CHANGE_LOOK -> Transmutation",
+    "game/src/item.cpp::costume/change-look visual part routing",
+    "Project_ClientSrc/UserInterface/PythonItem.cpp::ChangeLook eligibility mirror",
+    "Project_Binary/root/uichangelook.py::ChangeLook UI lifecycle",
+    "BUG-LOOK-001::right-slot-before-left null dereference",
+    "BUG-LOOK-002::quest mount accepts arbitrary non-costume material"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -1645,5 +1656,19 @@
         "ANTI_FLAG/WEAR_FLAG/LIMIT/APPLY/VALUE/MASK validation"
       ]
     }
+  },
+  "costume_appearance_closure": {
+    "status": "STATIC MAPPING IN PROGRESS",
+    "verified_bug_ids": [
+      "BUG-LOOK-001",
+      "BUG-LOOK-002"
+    ],
+    "mapped_flows": [
+      "COSTUME_BODY item VNUM -> client VALUE3 -> MSM ShapeIndex -> GR2/DDS",
+      "COSTUME_HAIR server VALUE3 visual routing",
+      "ChangeLook HEADER_CG_CHANGE_LOOK -> CInputMain::Transmutation -> CTransmutation",
+      "Accept -> SetChangeLookVnum(material VNUM) -> material consumption",
+      "client/server eligibility predicate comparison"
+    ]
   }
 }
