@@ -12,38 +12,39 @@
 **Last updated:** 2026-09-28
 
 ## Hard rule
-Only `sbraslan/Project_Map` is writable. All source/game repositories remain read-only. Runtime execution remains locked.
+Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-only. Runtime execution remains locked.
 
-## Saved side workflow
-When the user says `item ekleyeceğiz`, use `ITEM_CREATION_AUTOMATION.md` as the canonical generation workflow.
+## Saved item workflow
+`item ekleyeceğiz` -> use `ITEM_CREATION_AUTOMATION.md`.
 
-## Mapping progress
-Closed this turn:
-- `dwTransmutationVnum` DB persistence is complete end-to-end; no persistence bug verified.
-- ChangeLook reversal/clear scroll persistently resets the appearance; no clear-scroll bug verified.
-- Character destruction closes `CTransmutation`.
-- Client and server live ChangeLook prices both use 50M item / 30M mount.
+## Closed this turn
+- hide-costume + ChangeLook body/weapon visibility path: no bug verified;
+- initial type/subtype/anti-flag compatibility logic mapped;
+- raw checked-in item lifetime mapped through real-time expiry and destruction.
 
-Verified bug set:
-- `BUG-LOOK-001` — right-slot-before-left server null dereference.
+## Verified bug set
+- `BUG-LOOK-001` — right-slot-before-left null dereference.
 - `BUG-LOOK-002` — quest mount targets 50051..50053 accept arbitrary non-costume material.
-- `BUG-LOOK-003` — `CanWarp()` omits `W_CHANGELOOK`; same-character warp can retain active transmutation state/raw item references.
-- `BUG-LOOK-004` — sealed right material is blocked by official client but not revalidated server-side.
+- `BUG-LOOK-003` — CanWarp omits W_CHANGELOOK.
+- `BUG-LOOK-004` — sealed right material lacks server revalidation.
+- `BUG-LOOK-005` — LEFT can be removed/replaced after RIGHT compatibility check; Accept does not revalidate.
+- `BUG-LOOK-006` — real-time expiry can delete checked-in item while CTransmutation keeps a dangling raw pointer.
 
-Deferred:
-- mount ChangeLook expiry helper/call-chain inconsistencies;
-- broad `IsExpireTimeItem()` predicate;
-- alternate item-mutation paths while raw `LPITEM` references are retained.
+## Deferred tests
+LOOK-T01..LOOK-T06. None executed.
 
-Deferred tests:
-- LOOK-T01..LOOK-T04; none executed.
+## Mount expiry
+Still deferred as incomplete intent:
+- helper/event code exists;
+- Accept does not initialize socket2/start expiry;
+- intended product semantics not yet sufficiently proven for promotion.
 
 ## Exact next work
-1. close mount ChangeLook use/expiry call-chain;
-2. map hide-costume + ChangeLook interaction;
-3. audit weapon/body/job/gender eligibility edge cases;
-4. audit alternate mutation paths against raw transmutation pointers;
-5. preserve source/game immutability.
+1. audit `CTransmutation::Open` against all renewed open-window states;
+2. close remaining mount expiry intent/call-chain;
+3. inspect invalid cross-type client rendering from BUG-LOOK-005;
+4. map costume item-creation companion dependencies;
+5. consider subsystem closure only after these edges are exhausted.
 
 DUNGEON-T10 remains prepared but runtime-locked.
 
