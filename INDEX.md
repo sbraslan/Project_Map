@@ -35,6 +35,7 @@ This is the navigation index. Normal continuation starts at `STATE.json`, then `
 | World Lottery System | STATIC COMPLETE | `systems/world_lottery.md` |
 | World Boss System | STATIC COMPLETE | `systems/world_boss.md` |
 | Sung Mahi Tower | STATIC COMPLETE | `systems/sung_mahi_tower.md` |
+| Costume / Appearance / ChangeLook | MAPPING IN PROGRESS | `systems/costume_appearance.md` |
 
 ## Current phase
 - **Detection / mapping only.** Source and game repositories remain read-only.
