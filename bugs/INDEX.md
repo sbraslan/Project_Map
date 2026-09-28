@@ -30,6 +30,6 @@ Important global ID rules:
 
 
 ## Active subsystem ownership — Acce / Sash — 2026-09-28
-- `BUG-ACCE-001..006` -> `acce.md`
-- Status: VERIFIED STATIC / subsystem mapping still in progress.
-- Runtime ownership draft: `../tests/acce.md` (`ACCE-T01..T06`), execution locked.
+- `BUG-ACCE-001..008` -> `acce.md`
+- Status: STATIC COMPLETE / VERIFIED STATIC.
+- Runtime ownership draft: `../tests/acce.md` (`ACCE-T01..T08`), execution locked.
