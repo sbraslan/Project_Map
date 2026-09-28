@@ -2,7 +2,7 @@
 
 **Active phase:** Detection / Mapping Only
 **Active state:** Dragon Soul / Alchemy Static Mapping
-**Status:** STATIC MAPPING IN PROGRESS / 7 VERIFIED STATIC BUGS / EXECUTION LOCKED
+**Status:** STATIC MAPPING IN PROGRESS / 8 VERIFIED STATIC BUGS / EXECUTION LOCKED
 **Machine state:** `STATE.json`
 **Active subsystem:** Dragon Soul / Alchemy
 **System:** `systems/dragon_soul.md`
@@ -49,18 +49,19 @@ Verified static bugs:
 - `BUG-DS-005` — RefineStep table validation checks the wrong table node; dormant with current tracked data.
 - `BUG-DS-006` — any open DS refine opener token authorizes Change Attribute packets; mode is not server-bound.
 - `BUG-DS-007` — DS refine opener can survive warp and keep item handling locked.
+- `BUG-DS-008` — Step refine skips equipped-state validation for the first pointer-sorted item; an equipped Dragon Soul can reach destructive refinement when ordered first.
 
 Current server/client Dragon Soul table files are mapped as matching for the tracked deployment. Candidate malformed-data boundaries remain unpromoted.
 
 ## Exact next work
-1. close grade/step/strength material-count and stack semantics;
-2. inspect DS deck/set reactivation and relog persistence;
-3. close refine-window overlap and cross-window interactions;
-4. inspect extraction tool/source aliasing;
-5. inspect qualification/daily quest lifecycle;
+1. inspect DS deck/set reactivation and relog persistence;
+2. close refine-window overlap and cross-window interactions;
+3. inspect extraction tool/source aliasing;
+4. inspect qualification/daily quest lifecycle;
+5. close malformed-data candidates only if current/tracked reachability is established;
 6. only then decide Dragon Soul STATIC COMPLETE/readiness promotion.
 
-Do not execute `DS-T01..DS-T07`.
+Do not execute `DS-T01..DS-T08`.
 The global future runtime order remains locked with `DUNGEON-T10` first.
 
 GitHub state is canonical.
