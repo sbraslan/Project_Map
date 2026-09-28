@@ -320,3 +320,106 @@ Thus the probability sent in `TPacketGCRefineInformation` is not an authoritativ
 **Impact:** the refine dialog can materially overstate scroll success chance, including showing 100% for attempts that execute below 100%.
 
 **Runtime:** Stage A deterministic formula comparison with disposable items only. See `REFCUBE-T11`.
+
+
+## BUG-REFCUBE-012 — Refine preview reads set_value with the wrong Python API signature
+
+**Status:** VERIFIED STATIC / NORMAL CLIENT
+
+Current build enables both `ENABLE_YOHARA_SYSTEM` and `ENABLE_SET_ITEM`.
+
+In `root/uirefine.py::RefineDialogNew.Open()`, after the Yohara loops, the set id is read as:
+`playerm2g2.GetItemSetValue(targetItemPos, i)`.
+
+But the C++ Python binding defines:
+- one argument: inventory slot index;
+- two arguments: `(window_type, cell)`.
+
+Therefore the normal refine UI interprets the target inventory cell as a **window type**, while stale loop variable `i` becomes the item cell.
+
+For most target inventory positions this creates an invalid `TItemPos` and `CPythonPlayer::GetItemSetValue()` returns 0. If the target happens to be in a numeric cell equal to a valid window enum (notably slot 0 -> INVENTORY), the code instead reads a different cell selected by the stale loop index.
+
+The resulting wrong `set_value` is passed into `toolTip.AddRefineItemData(...)`.
+
+**Impact:** refine preview can hide or display the wrong Set Item identity/effect for a set-marked target. This is presentation-only; server refinement remains authoritative.
+
+**Runtime:** Stage A normal-client preview validation; see `REFCUBE-T12`.
+
+## BUG-REFCUBE-013 — Successful classic refine drops persistent ChangeLook / transmutation metadata
+
+**Status:** VERIFIED STATIC / NORMAL FLOW REACHABLE
+
+`CTransmutation::CanAddItem()` explicitly allows ordinary:
+- weapons except arrows;
+- body armor.
+
+On successful transmutation, the target item receives:
+`left->SetChangeLookVnum(right->GetVnum())`,
+and this field is persistent item-instance metadata.
+
+Classic refine success paths create a new result item and call:
+`ITEM_MANAGER::CopyAllAttrTo(old, new)`.
+
+`CopyAllAttrTo()` transfers sockets, element state, normal attributes and Yohara random applies, but it does **not** transfer `dwTransmutationVnum / GetChangeLookVnum()`.
+
+Neither `RefineInformation()` nor the mapped `DoRefine()/DoRefineWithScroll()/DoRefineSerpent()` entry validation rejects a target merely because it carries ChangeLook metadata.
+
+Thus a normal refinable weapon/body item can first receive a ChangeLook and then, on a successful refine that creates the next VNUM, lose that appearance metadata with the destroyed source item.
+
+**Impact:** paid/persistent appearance state can be silently lost on successful refinement.
+
+**Ownership note:** the producer belongs to Costume/Appearance, but the destructive metadata-loss boundary is the classic refine transform and is owned here.
+
+**Runtime:** Stage B disposable transformed-item test only; see `REFCUBE-T13`.
+
+## BUG-REFCUBE-014 — Successful classic refine drops persistent Set Item identity
+
+**Status:** VERIFIED STATIC / CURRENT DATA REACHABLE
+
+`set_value` is persistent item-instance metadata:
+- stored on `CItem`;
+- serialized to DB/player item data;
+- used by equipped set-bonus counting;
+- exposed to client item packets.
+
+Cube Renewal Set Smith recipes actively assign set ids 1..5 through NPCs 20475..20479.
+
+The tracked `cube.txt` contains **2790 set_value recipes** and includes normal refine families such as:
+- Poison Sword 187/188/189 = +7/+8/+9;
+- Zodiac Dagger 1187/1188/1189 = +7/+8/+9;
+- Zodiac Bow 2207/2208/2209 = +7/+8/+9.
+
+Classic refine creates the next item and calls `ITEM_MANAGER::CopyAllAttrTo()`, but that function never copies `GetItemSetValue()` / `set_value`.
+
+No mapped classic refine gate rejects a set-marked item.
+
+Therefore a set-marked refinable item that succeeds into the next VNUM loses its Set Item identity on the new item.
+
+**Impact:** set membership and consequently equipped set-bonus eligibility can disappear after an otherwise successful refine.
+
+**Runtime:** Stage B disposable set-item refinement; see `REFCUBE-T14`.
+
+## BUG-REFCUBE-015 — Serpent refinement drops random-default base values
+
+**Status:** VERIFIED STATIC / NORMAL SERPENT FLOW
+
+`CRandomHelper::GenerateRandomAttr()` recognizes the current Serpent families, including:
+- weapons 360..375, 380..395, 1210..1225, 2230..2245, 3250..3265, 5200..5215, 6150..6165, 7330..7345;
+- gloves 23050..23089;
+- armor 21310..21406.
+
+For Serpent items it creates persistent `alRandomValues[]` entries from proto socket min/max ranges using `SetRandomDefaultAttr()`.
+
+Those values are not cosmetic. For armor, combat calculation checks `ItemHasRandomDefaultAttr()` and uses `GetRandomDefaultAttr(0)` as the armor value.
+
+`DoRefineSerpent()` creates the next item, calls `ITEM_MANAGER::CopyAllAttrTo()`, then calls `CRandomHelper::RefineRandomAttr()`.
+
+However:
+- `CopyAllAttrTo()` does not copy `alRandomValues[]`;
+- `RefineRandomAttr()` recalculates only `aApplyRandom[]` and never restores/copies random-default values.
+
+The tracked names show continuous current Serpent refine families such as Snake Sword 360..375 (+0..+15) and Snake Coat 21310..21325 (+0..+15).
+
+**Impact:** a successful Serpent refinement can replace an item carrying generated random-default base values with a new item whose random-default array is zero, changing base combat/stat behavior and permanently losing the rolled values.
+
+**Runtime:** Stage B disposable Serpent item test with before/after random-default capture; see `REFCUBE-T15`.
