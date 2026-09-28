@@ -600,6 +600,42 @@ The global first live gate remains **DUNGEON-T10**.
 
 **Next documentation cluster:** Sung Mahi Tower runtime-readiness final consolidation.
 
+
+## Runtime-readiness consolidation — Sung Mahi Tower — 2026-09-28
+**Documentation status:** READY
+**Execution status:** LOCKED / NOT RUN
+
+Verified coverage:
+- SMT-T01 -> BUG-SMT-001
+- SMT-T02 -> BUG-SMT-002
+- SMT-T03 -> BUG-SMT-003
+- SMT-T04 -> BUG-SMT-004
+- SMT-T05 -> BUG-SMT-005
+- SMT-T06 -> BUG-SMT-006
+
+Deferred architectural/data questions remain separate and unpromoted:
+- nullable pc.mailbox_reward mailbox pointer precondition;
+- smhgate_flower 9100–9107 missing server monster folder without tracked producer;
+- ranking player_login versus character-name mailbox recipient semantics;
+- malformed/out-of-range quest-produced dungeonLevel;
+- m_bDungeon_Difficulty versus dungeonLevel synchronization dependency.
+
+Primary current-repository candidate: **SMT-T01**.
+SMT-T02/T03/T04 require isolated time/state or ASan/debug execution; SMT-T05 is deterministic data validation; SMT-T06 is deployment/proto drift validation.
+
+The global first live gate remains **DUNGEON-T10**.
+
+## Runtime-readiness documentation milestone — COMPLETE — 2026-09-28
+All currently indexed static-complete subsystem clusters now have deferred runtime-readiness coverage or an explicitly documented folded ownership path.
+
+Execution remains locked. No runtime, crafted-packet, sanitizer, crash-consistency, or fault-injection test has been run.
+
+The next allowed documentation-only step is a **global readiness integrity audit**:
+1. cross-check every STATIC COMPLETE subsystem in INDEX.md against STATE.json runtime_readiness;
+2. cross-check verified/retracted/candidate/observation ownership for numbering gaps and aliases;
+3. produce one canonical global execution order while preserving DUNGEON-T10 as the first live gate;
+4. do not execute anything until the user explicitly changes phase.
+
 ## Patch readiness
 First-cluster fix plan is ready at `fixes/dungeon_info.md`.
 
