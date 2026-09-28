@@ -226,3 +226,19 @@ Static prediction:
 `aApplyRandom[]` is refined/rebuilt as designed but `alRandomValues[]` is zero because neither `CopyAllAttrTo()` nor `RefineRandomAttr()` transfers it.
 
 Never test on production/high-value Serpent gear.
+
+
+## REFCUBE-T16 — Basic starter-item restriction after refine
+Covers `BUG-REFCUBE-016`.
+
+Future isolated Stage B test:
+1. create a fresh test character and identify a disposable refinable starter equipment item with `is_basic=true`;
+2. verify a representative Basic restriction before refinement (for example drop/shop rejection);
+3. successfully refine the item to its next grade;
+4. inspect the new item's `is_basic` field;
+5. repeat the same restricted operation.
+
+Static prediction:
+the result item has `is_basic=false` because `CopyAllAttrTo()` does not transfer the flag, so restrictions tied to Basic status disappear.
+
+Use a disposable test character/item only.
