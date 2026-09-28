@@ -154,3 +154,19 @@ Future normal disposable-pet observation:
 Static prediction: socket1 contains duration seconds and the helper interprets it as a timestamp, producing an age far above 30 days and satisfying the final evolution age gate.
 
 Safety class: **Stage A state observation**.
+
+
+## GPET-T12 — Unsummoned pet name-change
+Covers `BUG-GPET-012`.
+
+Future controlled test:
+1. keep a disposable growth-pet seal unsummoned in inventory;
+2. record its current `pet_nick` and PET_NAME_CHANGE scroll count;
+3. use the normal client name-change UI with a valid different name;
+4. observe the success response/dialog close;
+5. re-read the seal's stored pet name and material count, including after relog.
+
+Static prediction:
+the server sends success but leaves `pet_nick` unchanged and does not consume the name-change item.
+
+Safety class: **Stage A observation / disposable item**.
