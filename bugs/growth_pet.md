@@ -395,3 +395,62 @@ The current server table uses base probability values 52 (Invincibility) and 41 
 **Impact:** proc chance is systematically higher than the current learned skill level is configured to provide.
 
 **Runtime:** Stage A statistical/debug-state validation; see `GPET-T15`.
+
+
+## BUG-GPET-016 — Crafted attribute-change on the summoned seal is later overwritten by stale actor state
+
+**Status:** VERIFIED STATIC / MODIFIED-CLIENT REACHABLE
+
+The normal client refuses to place the currently active pet seal into the attribute-change target slot:
+`metinSlot[2] == GetActivePetItemId() -> return false`.
+
+The server does not repeat that invariant.
+
+`GrowthPetAttrChangeRequest()` directly calls:
+`CHARACTER::PetAttrChange(petSlot, materialSlot)`.
+
+`PetAttrChange()` validates item type/subtype and lifetime, but does not reject:
+- the currently summoned pet;
+- a locked pet seal;
+- a pet whose id is owned by the active Growth Pet actor.
+
+It then writes newly rolled type/lifetime/HP/DEF/SP state into the seal with:
+`itemPet->SetGrowthPetItemInfo(info)`
+and updates the CHARACTER-side pet-info cache.
+
+The active `CGrowthPetSystemActor`, however, still owns its older private `m_PetInfo` copy.
+
+Later normal actor dismissal executes:
+`m_pkPetSeal->SetGrowthPetItemInfo(m_PetInfo)`
+and saves it, overwriting the attribute-changed seal with the stale pre-change actor state.
+
+**Impact:** a crafted request against the active pet can consume the attribute-change material, temporarily report the new state, and then lose/revert that state when the pet is dismissed.
+
+**Runtime:** Stage B modified-client / disposable pet only; see `GPET-T16`.
+
+## BUG-GPET-017 — Multi-item Life/EXP feed processes only the final selected slot
+
+**Status:** VERIFIED STATIC / NORMAL CLIENT REACHABLE
+
+The normal Pet Feed UI supports up to `PET_FEED_SLOT_MAX` entries, builds:
+`resultFeedItems = [all populated feed slots]`,
+and sends the whole list with `SendPetFeedPacket()`.
+
+Server `CGrowthPetSystemActor::ItemCubeFeed()` first loops across `wFeedItemsCount`, but only assigns each resolved item into one local variable:
+`pFeedItem`.
+
+After the loop, `pFeedItem` therefore refers only to the **last** submitted slot.
+
+For:
+- `PET_FEED_WINDOW` (life feeding);
+- `PET_EXP_ITEM_WINDOW` (EXP feeding),
+
+all type checks, EXP/lifetime calculation and item consumption operate only on that final `pFeedItem`.
+
+The earlier selected slots are neither consumed nor applied. The client nevertheless receives a successful feed result and clears its feed-window selection.
+
+The EVOLVE branch is structurally different and re-iterates the submitted slot array; this finding is limited to Life/EXP feed modes.
+
+**Impact:** a normal multi-item feed action applies only one selected item, so displayed/selected feed batches do not match server-side effect and consumption.
+
+**Runtime:** Stage A normal-client multi-slot feed observation with disposable items; see `GPET-T17`.
