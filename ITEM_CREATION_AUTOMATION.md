@@ -315,3 +315,32 @@ When the user says **"item ekleyeceğiz"** or clearly asks to add/create a new M
 7. do not write source/game repositories unless the user explicitly changes the source-write phase.
 
 This trigger is intentionally independent from chat history.
+
+
+## ChangeLook compatibility constraints
+
+When generating a new item that should participate in ChangeLook/transmutation:
+
+- normal compatibility is exact `TYPE + SUBTYPE + ANTI_FLAG` equality;
+- weapon appearance pairs must use the same weapon subtype;
+- body armor appearance pairs must be `ITEM_ARMOR / ARMOR_BODY`;
+- body costume appearance pairs must be `ITEM_COSTUME / COSTUME_BODY`;
+- do not rely on BUG-LOOK-005 to create unsupported cross-type appearances;
+- generated variants intended to transmute between each other should deliberately share the same ANTI_FLAG pattern.
+
+For body costumes:
+- `VALUE3` must reference a ShapeIndex;
+- every job/sex allowed by ANTI_FLAG must have a corresponding ShapeIndex entry in its MSM;
+- if a race/sex model is not supplied, restrict that race/sex instead of emitting a broken visual mapping.
+
+For weapon costumes:
+- preserve `VALUE3` weapon-subtype semantics;
+- never replace it with body-costume ShapeIndex semantics.
+
+Companion generation should include, when applicable:
+- item_proto;
+- item_names;
+- item_list/icon;
+- all required race/sex MSM ShapeData blocks;
+- GR2/DDS path validation;
+- ChangeLook compatibility validation against intended reference items.
