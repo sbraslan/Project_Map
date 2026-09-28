@@ -39,6 +39,7 @@ This is the navigation index. Normal continuation starts at `STATE.json`, then `
 | Acce / Sash | STATIC COMPLETE | `systems/acce.md` |
 | Dragon Soul / Alchemy | STATIC COMPLETE | `systems/dragon_soul.md` |
 | Aura System | STATIC COMPLETE | `systems/aura.md` |
+| Growth Pet System | MAPPING IN PROGRESS | `systems/growth_pet.md` |
 
 ## Current phase
 - **Detection / mapping only.** Source and game repositories remain read-only.
@@ -109,3 +110,15 @@ Aura System is now **STATIC COMPLETE** with verified `BUG-AURA-001..006` and can
 Current effective coverage is **25/25 STATIC COMPLETE subsystem rows** plus the folded Guild lifecycle companion.
 
 Runtime execution remains locked and `DUNGEON-T10` remains the first future live gate.
+
+
+## Active continuation — Growth Pet System — 2026-09-28
+Aura closure raises effective static-complete/readiness coverage to **25/25** plus folded Guild lifecycle.
+
+Growth Pet System is the next active mapping cursor:
+- system: `systems/growth_pet.md`;
+- bugs: `bugs/growth_pet.md`;
+- tests: `tests/growth_pet.md`;
+- first verified finding: `BUG-GPET-001`.
+
+Growth Pet is not yet counted as STATIC COMPLETE. Runtime remains locked.
