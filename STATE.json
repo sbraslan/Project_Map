@@ -6,18 +6,18 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "runtime_readiness_consolidation",
-    "display_name": "Runtime Readiness Consolidation",
-    "status": "STATIC MAPPING COMPLETE / RUNTIME READINESS COMPLETE / EXECUTION LOCKED",
+    "subsystem": "runtime_gate_handoff",
+    "display_name": "DUNGEON-T10 Preflight Handoff",
+    "status": "STATIC MAPPING COMPLETE / RUNTIME READINESS AUDITED / EXECUTION LOCKED",
     "system_file": null,
     "bug_file": null,
     "test_file": "RUNTIME.md",
     "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Run a documentation-only global readiness integrity audit across INDEX.md, STATE.json, RUNTIME.md and canonical bug/test registries.",
-      "Detect missing subsystem coverage, ID collisions, aliases, retracted-ID leaks and candidate/observation promotion mistakes.",
-      "Normalize one global future execution order with DUNGEON-T10 first.",
+      "Prepare the documentation-only DUNGEON-T10 runtime gate handoff/checklist without executing the test.",
+      "Use READINESS_AUDIT.md as the canonical global ownership/order reference.",
+      "Keep DUNGEON-T10 as the first future live gate.",
       "Preserve all source/game repositories as read-only and keep runtime execution locked until the user explicitly changes phase."
     ]
   },
@@ -186,7 +186,8 @@
     "RUNTIME.md::Battle Field readiness consolidated; BFIELD-004 retracted; BFIELD-005/007 normalized to Ranking ownership",
     "RUNTIME.md::World Lottery WLOT-T01-T15 readiness consolidated; execution locked",
     "RUNTIME.md::World Boss WB-T01-T16 readiness consolidated; execution locked",
-    "RUNTIME.md::Sung Mahi SMT-T01-T06 readiness consolidated; runtime-readiness documentation milestone complete"
+    "RUNTIME.md::Sung Mahi SMT-T01-T06 readiness consolidated; runtime-readiness documentation milestone complete",
+    "READINESS_AUDIT.md::global integrity audit complete; 21/21 coverage; DUNGEON namespaces qualified; Guild lifecycle folded coverage"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -218,6 +219,19 @@
     ]
   },
   "completed_subsystems": [
+    "guild_storage",
+    "inventory_items",
+    "switchbot",
+    "exchange",
+    "shop",
+    "safebox_mall",
+    "mailbox",
+    "ticket",
+    "dungeon_info",
+    "battle_pass",
+    "achievement",
+    "biolog",
+    "hunting",
     "ranking",
     "party",
     "party_match",
@@ -348,7 +362,7 @@
     ]
   },
   "runtime_readiness": {
-    "status": "DOCUMENTATION COMPLETE — EXECUTION LOCKED",
+    "status": "DOCUMENTATION AUDITED — EXECUTION LOCKED",
     "current_first_live_gate": "DUNGEON-T10",
     "sung_mahi_test_file": "tests/sung_mahi_tower.md",
     "sung_mahi_test_ids": [
@@ -359,7 +373,7 @@
       "SMT-T05",
       "SMT-T06"
     ],
-    "documentation_cursor": "global_integrity_audit",
+    "documentation_cursor": "dungeon_t10_preflight_handoff",
     "completed_readiness_clusters": [
       "dungeon_info",
       "ticket",
@@ -392,7 +406,45 @@
         "DUNGEON-T12"
       ],
       "isolated_debug_range": "DUNGEON-T01..DUNGEON-T08",
-      "first_live_gate": "DUNGEON-T10"
+      "first_live_gate": "DUNGEON-T10",
+      "global_qualified_bug_tests": {
+        "DINFO::BUG-DUNGEON-001": [
+          "DUNGEON-T01"
+        ],
+        "DINFO::BUG-DUNGEON-002": [
+          "DUNGEON-T02"
+        ],
+        "DINFO::BUG-DUNGEON-003": [
+          "DUNGEON-T03"
+        ],
+        "DINFO::BUG-DUNGEON-004": [
+          "DUNGEON-T04"
+        ],
+        "DINFO::BUG-DUNGEON-005": [
+          "DUNGEON-T05"
+        ],
+        "DINFO::BUG-DUNGEON-006": [
+          "DUNGEON-T06"
+        ],
+        "DINFO::BUG-DUNGEON-007": [
+          "DUNGEON-T07"
+        ],
+        "DINFO::BUG-DUNGEON-008": [
+          "DUNGEON-T08"
+        ],
+        "DINFO::BUG-DUNGEON-009": [
+          "DUNGEON-T09"
+        ],
+        "DINFO::BUG-DUNGEON-010": [
+          "DUNGEON-T10"
+        ],
+        "DINFO::BUG-DUNGEON-011": [
+          "DUNGEON-T11"
+        ],
+        "DINFO::BUG-DUNGEON-012": [
+          "DUNGEON-T12"
+        ]
+      }
     },
     "ticket": {
       "status": "DOCUMENTATION READY / NOT RUN",
@@ -1088,7 +1140,21 @@
         "DCORE-T02",
         "DCORE-T04"
       ],
-      "note": "Distinct from Dungeon Info; global first live gate remains DUNGEON-T10."
+      "note": "Distinct from Dungeon Info; global first live gate remains DUNGEON-T10.",
+      "global_qualified_bug_tests": {
+        "DCORE::BUG-DUNGEON-001": [
+          "DCORE-T01"
+        ],
+        "DCORE::BUG-DUNGEON-002": [
+          "DCORE-T02"
+        ],
+        "DCORE::BUG-DUNGEON-003": [
+          "DCORE-T03"
+        ],
+        "DCORE::BUG-DUNGEON-004": [
+          "DCORE-T04"
+        ]
+      }
     },
     "battle_field": {
       "status": "DOCUMENTATION READY / NOT RUN",
@@ -1400,6 +1466,133 @@
       ]
     },
     "documentation_milestone": "COMPLETE",
-    "global_integrity_audit": "PENDING"
+    "global_integrity_audit": {
+      "status": "COMPLETE — PASS WITH NORMALIZATIONS",
+      "file": "READINESS_AUDIT.md",
+      "static_complete_coverage": "21/21",
+      "folded_companion_coverage": {
+        "guild_lifecycle": "GUILD-T01 -> BUG-GUILD-001"
+      },
+      "first_live_gate": "DUNGEON-T10"
+    },
+    "guild_lifecycle": {
+      "status": "FOLDED COMPANION READY / NOT RUN",
+      "canonical_owner": "tests/guild.md",
+      "verified_bug_tests": {
+        "BUG-GUILD-001": [
+          "GUILD-T01"
+        ]
+      },
+      "folded_with": "guild_storage"
+    },
+    "global_bug_id_rules": {
+      "dungeon_namespace_collision": {
+        "historical_range": "BUG-DUNGEON-001..004",
+        "dungeon_info_global_prefix": "DINFO::",
+        "dungeon_core_global_prefix": "DCORE::",
+        "policy": "Do not renumber historical local IDs; qualify global references."
+      },
+      "exchange_004": "Use BUG-EXCHANGE-004(currency_atomicity) or BUG-EXCHANGE-004(final_distance).",
+      "retracted": [
+        "BUG-RANK-006",
+        "BUG-BFIELD-004"
+      ],
+      "cross_system_aliases": {
+        "BUG-BFIELD-005": "BUG-RANK-003",
+        "BUG-BFIELD-007": "BUG-RANK-007"
+      },
+      "intentional_absence": [
+        "BUG-ITEM-005"
+      ]
+    },
+    "global_test_owners": {
+      "DUNGEON-T": "tests/dungeon_info.md",
+      "DCORE-T": "tests/dungeon_core.md",
+      "TICKET-T": "tests/ticket.md",
+      "HUNT-T": "tests/hunting.md",
+      "BP-T": "tests/battle_pass.md",
+      "ACH-T": "tests/achievement.md",
+      "BIO-T": "tests/biolog.md",
+      "ITEM-T": "tests/inventory_items.md",
+      "SWB-T": "tests/switchbot.md",
+      "GS-T": "tests/guild_storage.md",
+      "GUILD-T": "tests/guild.md",
+      "EXC-T": "tests/exchange.md",
+      "SHP-T": "tests/shop.md",
+      "SFB-T": "tests/safebox_mall.md",
+      "MAIL-T": "tests/mailbox.md",
+      "RANK-T": "tests/ranking.md",
+      "PARTY-T": "tests/party.md",
+      "PMATCH-T": "tests/party_match.md",
+      "BFIELD-T": "tests/battle_field.md",
+      "WLOT-T": "tests/world_lottery.md",
+      "WB-T": "tests/world_boss.md",
+      "SMT-T": "tests/sung_mahi_tower.md"
+    },
+    "global_execution_order": {
+      "stage_a_normal_current_flow": [
+        "DUNGEON-T10",
+        "DUNGEON-T09",
+        "DUNGEON-T11",
+        "DUNGEON-T12",
+        "TICKET-T07",
+        "HUNT-T04",
+        "BP-T02",
+        "ACH-T03",
+        "ACH-T04",
+        "BIO-T01",
+        "ITEM-T01",
+        "SWB-T01",
+        "SWB-T03",
+        "GS-T01",
+        "GS-T02",
+        "GS-T17",
+        "GUILD-T01",
+        "EXC-T01",
+        "EXC-T02",
+        "SHP-T02",
+        "SHP-T03",
+        "SFB-T09(observation-only)",
+        "MAIL-T07",
+        "MAIL-T11",
+        "RANK-T01",
+        "RANK-T02",
+        "RANK-T03",
+        "RANK-T04",
+        "PARTY-T01",
+        "PARTY-T02",
+        "PARTY-T05",
+        "PMATCH-T03",
+        "DCORE-T01",
+        "DCORE-T02",
+        "BFIELD-T01",
+        "BFIELD-T02",
+        "BFIELD-T03",
+        "BFIELD-T09",
+        "BFIELD-T10",
+        "BFIELD-T11",
+        "WLOT-T04",
+        "WLOT-T10",
+        "WB-T09",
+        "WB-T13",
+        "WB-T15",
+        "WB-T16",
+        "SMT-T01"
+      ],
+      "stage_b_isolated_controlled": "Use subsystem-local canonical test files and READINESS_AUDIT.md; includes modified-client, parser, admin, dataset, sanitizer and controlled-state tests.",
+      "stage_c_persistence_fault": "Use subsystem-local canonical test files and READINESS_AUDIT.md; includes crash-consistency, DB fault, pending-load, restart and durability tests."
+    }
+  },
+  "folded_subsystems": {
+    "guild": "guild_storage"
+  },
+  "guild_lifecycle_closure": {
+    "status": "MAPPED WITH GUILD STORAGE",
+    "verified_bug_ids": [
+      "BUG-GUILD-001"
+    ],
+    "runtime_test_ids": [
+      "GUILD-T01"
+    ]
   }
 }
