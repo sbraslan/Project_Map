@@ -1,6 +1,6 @@
 # Aura System — Static Map
 
-**Status:** STATIC MAPPING IN PROGRESS  
+**Status:** STATIC COMPLETE  
 **Phase:** Detection / Mapping Only  
 **Source policy:** read-only source repos; only Project_Map may be edited.
 
@@ -274,3 +274,65 @@ Remaining closure focus:
 - opener-null Lua boundary;
 - final persistence/check-in lifetime pass;
 - readiness consolidation.
+
+
+## Final lifecycle / persistence closure — 2026-09-28
+
+### Normal close / disconnect
+Aura check-in stores inventory positions rather than long-lived item pointers and locks the real checked-in items.
+
+`AuraRefineWindowClose()`:
+- clears opener/type/open state and `W_AURA`;
+- resolves each stored `TItemPos`;
+- unlocks any still-existing item;
+- clears every stored Aura slot.
+
+The normal character disconnect sequence calls `AuraRefineWindowClose()` while the descriptor is still bound, before character destruction. Therefore ordinary logout/disconnect does not leave Aura item locks behind.
+
+### Warp boundary
+`CanWarp()` and the generic anti-transaction gate both include `W_AURA`, so normal player-controlled warp flows are blocked while Aura is open.
+
+`WarpSet()` itself does not close Aura and can be called directly by trusted server/quest code. A forced direct warp can therefore preserve Aura state. With the currently verified `BUG-AURA-001`, post-open Aura operations do not dereference the opener for distance validation and can continue while the opener pointer merely remains non-null.
+
+No tracked current Aura quest producer or other concrete normal gameplay path was established that combines an open Aura transaction with such a forced warp, so this remains a robustness/integration boundary rather than a separate promoted bug.
+
+### Opener lifetime / null boundary
+The Lua bindings pass `GetCurrentNPCCharacterPtr()` directly to `OpenAuraRefineWindow()`; that function immediately reads opener coordinates without a null guard.
+
+No tracked `Project_Game` source call to `game.open_aura_absorb_window`, `game.open_aura_growth_window`, or `game.open_aura_evolve_window` was found in the current snapshot. The tracked object scripts inspected for the conventional blacksmith NPC likewise do not expose Aura entry.
+
+Because a concrete current producer for a null opener was not established, the null-opener dereference remains an integration/content-authoring candidate only.
+
+### Checked-in item lifetime
+Current tracked eligible inputs do not expose a normal timer-driven slot replacement path:
+- the four Aura costume families have no real-time limit in tracked proto;
+- current `RESOURCE_AURA` items have no real-time limit;
+- no tracked shield/wrist/neck/ear ABSORB material carries a `LIMIT_REAL_TIME*` limit.
+
+The server also blocks ordinary move/use/drop/destroy/equip flows while Aura is open, and each checked-in item is locked.
+
+No current reachable same-slot replacement/lifetime corruption was promoted.
+
+### Readiness conclusion
+All mapped Aura transaction surfaces now have canonical ownership:
+- packet/state authorization;
+- ABSORB;
+- GROWTH;
+- EVOLVE;
+- booster/eraser;
+- Yohara persistence;
+- terminal-grade arithmetic;
+- packet initialization;
+- disconnect/warp state;
+- proto/refine chain;
+- client visual/effect chain.
+
+Canonical verified findings:
+`BUG-AURA-001..BUG-AURA-006`.
+
+Canonical deferred validation:
+`AURA-T01..AURA-T06`.
+
+No runtime test has been executed.
+
+**Aura System is STATIC COMPLETE.**
