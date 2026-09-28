@@ -18,14 +18,15 @@
       "BUG-LOOK-003",
       "BUG-LOOK-004",
       "BUG-LOOK-005",
-      "BUG-LOOK-006"
+      "BUG-LOOK-006",
+      "BUG-LOOK-007"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Audit CTransmutation::Open against all renewed opened-window states (Aura, Guild Storage, Switchbot, Roulette and companions).",
-      "Close mount ChangeLook expiry intent without assuming unused helpers are live requirements.",
-      "Map item-creation companion dependencies for costume ChangeLook/hide behavior.",
-      "Review client behavior for invalid cross-type transmutation VNUMs from BUG-LOOK-005.",
+      "Close remaining mount ChangeLook expiry helper semantics as deferred-or-promoted.",
+      "Audit guild-storage/roulette/switchbot omissions only for concrete ChangeLook state mutation paths.",
+      "Review free-ticket lifetime and duplicate-position aliasing in CTransmutation.",
+      "Prepare subsystem static-closure/readiness if no additional verified edge remains.",
       "Keep source/game repositories read-only and runtime execution locked."
     ]
   },
@@ -214,7 +215,11 @@
     "BUG-LOOK-005::LEFT checkout/replacement bypasses RIGHT compatibility",
     "BUG-LOOK-006::real-time expiry deletes checked-in item while raw CTransmutation pointer survives",
     "game/src/item_manager.cpp::RemoveItem -> DestroyItem -> M2_DELETE lifetime proof",
-    "game/src/questlua_game.cpp::game.open_transmutation entry point identified"
+    "game/src/questlua_game.cpp::game.open_transmutation entry point identified",
+    "common/length.h::renewed window registry audited against CTransmutation::Open",
+    "BUG-LOOK-007::Acce overlap can delete ChangeLook-retained raw item",
+    "Project_ClientSrc/InstanceBase.cpp::__ArmorVnumToShape blindly interprets cross-type VALUE3",
+    "ITEM_CREATION_AUTOMATION.md::ChangeLook compatibility constraints synchronized"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -1679,7 +1684,8 @@
       "BUG-LOOK-003",
       "BUG-LOOK-004",
       "BUG-LOOK-005",
-      "BUG-LOOK-006"
+      "BUG-LOOK-006",
+      "BUG-LOOK-007"
     ],
     "mapped_flows": [
       "COSTUME_BODY item VNUM -> client VALUE3 -> MSM ShapeIndex -> GR2/DDS",
@@ -1712,6 +1718,32 @@
       "status": "BUG VERIFIED",
       "bug": "BUG-LOOK-006",
       "path": "real-time expiry -> RemoveItem -> DestroyItem/M2_DELETE while CTransmutation retains raw LPITEM"
+    },
+    "open_window_audit": {
+      "status": "PARTIAL CLOSED",
+      "omitted_by_transmutation_open": [
+        "W_ACCE",
+        "W_AURA",
+        "W_GUILDBANK",
+        "W_ROULETTE",
+        "W_SWITCHBOT"
+      ],
+      "verified_cross_window_bug": "BUG-LOOK-007",
+      "aura": "overlap confirmed; separate corruption not promoted",
+      "guildstorage_roulette_switchbot": "no ChangeLook-specific corruption promoted yet"
+    },
+    "cross_type_rendering": {
+      "status": "STATIC CLOSED",
+      "bug": "BUG-LOOK-005",
+      "body": "client interprets arbitrary item VALUE3 as ShapeIndex",
+      "weapon": "AttachWeapon receives final ChangeLook VNUM without type normalization",
+      "crash": "not proven"
+    },
+    "item_creation_companion": {
+      "status": "RULES SYNCED",
+      "file": "ITEM_CREATION_AUTOMATION.md",
+      "changelook_key": "TYPE + SUBTYPE + exact ANTI_FLAG compatibility",
+      "body_visual": "VALUE3 -> ShapeIndex -> allowed race/sex MSM"
     }
   }
 }
