@@ -6,28 +6,25 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "runtime_readiness_extension",
-    "display_name": "Post-Audit Readiness Extension",
-    "status": "STATIC MAPPING COMPLETE / 22-OF-22 READINESS COVERED / EXECUTION LOCKED",
-    "system_file": "systems/costume_appearance.md",
-    "bug_file": "bugs/costume_appearance.md",
-    "test_file": "tests/costume_appearance.md",
+    "subsystem": "dragon_soul",
+    "display_name": "Dragon Soul / Alchemy",
+    "status": "STATIC MAPPING IN PROGRESS",
+    "system_file": "systems/dragon_soul.md",
+    "bug_file": "bugs/dragon_soul.md",
+    "test_file": "tests/dragon_soul.md",
     "verified_bug_ids": [
-      "BUG-LOOK-001",
-      "BUG-LOOK-002",
-      "BUG-LOOK-003",
-      "BUG-LOOK-004",
-      "BUG-LOOK-005",
-      "BUG-LOOK-006",
-      "BUG-LOOK-007"
+      "BUG-DS-001",
+      "BUG-DS-002",
+      "BUG-DS-003"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Treat Costume / Appearance / ChangeLook as STATIC COMPLETE.",
-      "Preserve DUNGEON-T10 as the first future live runtime gate.",
-      "Use ITEM_CREATION_AUTOMATION.md when the user says item ekleyeceğiz.",
-      "Do not execute runtime tests or modify source/game repositories without an explicit phase change.",
-      "Continue documentation-only mapping only if another unmapped subsystem is deliberately opened."
+      "Audit grade/step/strength material-count and stack semantics.",
+      "Cross-check server/client dragon_soul_table dimensions and myth-grade boundaries.",
+      "Audit DS set-bonus reactivation/relog cleanup and persistence.",
+      "Audit extraction source/extractor aliasing and refine-window overlap/warp state.",
+      "Audit Dragon Soul quest qualification and daily lifecycle.",
+      "Do not execute runtime tests or modify source/game repositories."
     ]
   },
   "startup": {
@@ -223,7 +220,14 @@
     "Costume / Appearance / ChangeLook::STATIC COMPLETE",
     "tests/costume_appearance.md::LOOK-T01..LOOK-T07 readiness consolidated; execution locked",
     "RUNTIME.md::Costume Appearance post-audit readiness extension",
-    "READINESS_AUDIT.md::post-audit extension current effective coverage 22/22"
+    "READINESS_AUDIT.md::post-audit extension current effective coverage 22/22",
+    "Dragon Soul / Alchemy::MAPPING IN PROGRESS",
+    "game/src/DragonSoul.cpp::grade-step-strength-extract-pullout mapped",
+    "game/src/char_dragonsoul.cpp::deck and set bonus lifecycle mapped",
+    "BUG-DS-001::set bonus stale after active set pull-out",
+    "BUG-DS-002::Dragon Heart extraction ItemLog after SetCount destruction",
+    "BUG-DS-003::strength success ownerless zero-count CItem leak",
+    "tests/dragon_soul.md::DS-T01..DS-T03 deferred validation"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -1797,5 +1801,32 @@
       "LOOK-T07"
     ],
     "runtime_readiness": "READY / NOT RUN"
+  },
+  "dragon_soul_closure": {
+    "status": "STATIC MAPPING IN PROGRESS",
+    "verified_bug_ids": [
+      "BUG-DS-001",
+      "BUG-DS-002",
+      "BUG-DS-003"
+    ],
+    "candidates": [
+      "DoRefineStep first std::set item skips IsEquipped validation.",
+      "GetBasePosition uses row_type > DRAGON_SOUL_GRADE_MAX rather than >=.",
+      "DoChangeAttr indexes needFireCountList by dwDSStep without explicit bounds guard."
+    ],
+    "mapped_flows": [
+      "ITEM_DS equip/pull-out lifecycle",
+      "deck activate/deactivate and DS set bonus",
+      "HEADER_CG_DRAGON_SOUL_REFINE subtype dispatch",
+      "grade/step/strength/change-attr refine",
+      "Dragon Heart extraction",
+      "ENABLE_DS_REFINE_WINDOW self-opener command"
+    ],
+    "canonical_tests": [
+      "DS-T01",
+      "DS-T02",
+      "DS-T03"
+    ],
+    "runtime_readiness": "NOT YET CONSOLIDATED"
   }
 }
