@@ -1,6 +1,6 @@
 # Refine / Cube / Crafting — Static Map
 
-**Status:** STATIC MAPPING IN PROGRESS  
+**Status:** STATIC COMPLETE  
 **Phase:** Detection / Mapping Only  
 **Source policy:** source/game repositories read-only; only Project_Map may be edited.
 
