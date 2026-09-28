@@ -6,25 +6,26 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "dragon_soul",
-    "display_name": "Dragon Soul / Alchemy",
-    "status": "STATIC MAPPING IN PROGRESS",
-    "system_file": "systems/dragon_soul.md",
-    "bug_file": "bugs/dragon_soul.md",
-    "test_file": "tests/dragon_soul.md",
+    "subsystem": "acce_sash",
+    "display_name": "Acce / Sash",
+    "status": "STATIC MAPPING IN PROGRESS / 4 VERIFIED STATIC BUGS / EXECUTION LOCKED",
+    "system_file": "systems/acce.md",
+    "bug_file": "bugs/acce.md",
+    "test_file": "tests/acce.md",
     "verified_bug_ids": [
-      "BUG-DS-001",
-      "BUG-DS-002",
-      "BUG-DS-003"
+      "BUG-ACCE-001",
+      "BUG-ACCE-002",
+      "BUG-ACCE-003",
+      "BUG-ACCE-004"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Audit grade/step/strength material-count and stack semantics.",
-      "Cross-check server/client dragon_soul_table dimensions and myth-grade boundaries.",
-      "Audit DS set-bonus reactivation/relog cleanup and persistence.",
-      "Audit extraction source/extractor aliasing and refine-window overlap/warp state.",
-      "Audit Dragon Soul quest qualification and daily lifecycle.",
-      "Do not execute runtime tests or modify source/game repositories."
+      "Continue Acce absorbed-stat math and special apply mapping.",
+      "Close sash socket/attribute persistence and reversal/reset flow.",
+      "Inspect Acce proto/data ranges and client visual dependencies.",
+      "Inspect Acce window/warp/item-mutation lifecycle.",
+      "Inspect combine grade/refine-chain and output-placement edge cases.",
+      "Do not execute ACCE-T01..T04 or any runtime test without an explicit phase change."
     ]
   },
   "startup": {
@@ -227,7 +228,17 @@
     "BUG-DS-001::set bonus stale after active set pull-out",
     "BUG-DS-002::Dragon Heart extraction ItemLog after SetCount destruction",
     "BUG-DS-003::strength success ownerless zero-count CItem leak",
-    "tests/dragon_soul.md::DS-T01..DS-T03 deferred validation"
+    "tests/dragon_soul.md::DS-T01..DS-T03 deferred validation",
+    "game/src/char_acce.cpp::Acce open/close/combine/absorb transaction",
+    "game/src/input_main.cpp::HEADER_CG_ACCE_REFINE_REQUEST -> CHARACTER::AcceRefine",
+    "game/src/questlua_pc.cpp::pc.open_acce_absorption/open_acce_combination",
+    "Project_ClientSrc/UserInterface/PythonNetworkStreamModule.cpp::Acce check-in/check-out are client-local; accept sends final slots",
+    "Project_ClientSrc/UserInterface/PythonNetworkStreamPhaseGame.cpp::SendAcceRefinePacket/RecvAcceRefinePacket",
+    "Project_Binary/root/uiacce.py::Acce client eligibility and local slot lifecycle",
+    "BUG-ACCE-001::final Acce request lacks server open-window/mode gating",
+    "BUG-ACCE-002::Acce sash exact type/subtype predicate uses incorrect AND",
+    "BUG-ACCE-003::absorb material validates ARMOR_BODY against item type and accepts all armor subtypes",
+    "BUG-ACCE-004::same-cell combine aliases primary/material and reaches destructive/double-remove path"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -1828,5 +1839,44 @@
       "DS-T03"
     ],
     "runtime_readiness": "NOT YET CONSOLIDATED"
+  },
+  "acce_sash_mapping": {
+    "status": "STATIC MAPPING IN PROGRESS",
+    "verified_bug_ids": [
+      "BUG-ACCE-001",
+      "BUG-ACCE-002",
+      "BUG-ACCE-003",
+      "BUG-ACCE-004"
+    ],
+    "canonical_files": {
+      "system": "systems/acce.md",
+      "bugs": "bugs/acce.md",
+      "tests": "tests/acce.md"
+    },
+    "mapped_flows": [
+      "quest pc.open_acce_* -> CHARACTER::OpenAcce* -> client dialog",
+      "client-local Acce check-in/check-out -> final HEADER_CG_ACCE_REFINE_REQUEST",
+      "CInputMain::AcceRefineRequest -> CHARACTER::AcceRefine",
+      "combine success/failure item lifecycle",
+      "absorb material VNUM -> sash socket0 + attribute copy -> material removal",
+      "COSTUME_ACCE -> WEAR_COSTUME_ACCE -> PART_ACCE visual routing"
+    ],
+    "runtime_tests": {
+      "status": "DRAFT / NOT RUN / EXECUTION LOCKED",
+      "canonical_test_ids": [
+        "ACCE-T01",
+        "ACCE-T02",
+        "ACCE-T03",
+        "ACCE-T04"
+      ],
+      "first_live_gate_unchanged": "DUNGEON-T10"
+    },
+    "next": [
+      "absorbed stat math",
+      "persistence/reset",
+      "proto/data/client visuals",
+      "window and item-mutation lifecycle",
+      "combine refine-chain edge cases"
+    ]
   }
 }
