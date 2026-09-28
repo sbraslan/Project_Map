@@ -8,25 +8,25 @@
   "active": {
     "subsystem": "refine_cube",
     "display_name": "Refine / Cube / Crafting",
-    "status": "STATIC MAPPING IN PROGRESS / 2 VERIFIED STATIC BUGS / EXECUTION LOCKED",
+    "status": "STATIC MAPPING IN PROGRESS / 5 VERIFIED STATIC BUGS / EXECUTION LOCKED",
     "system_file": "systems/refine_cube.md",
     "bug_file": "bugs/refine_cube.md",
     "test_file": "tests/refine_cube.md",
     "verified_bug_ids": [
       "BUG-REFCUBE-001",
-      "BUG-REFCUBE-002"
+      "BUG-REFCUBE-002",
+      "BUG-REFCUBE-003",
+      "BUG-REFCUBE-004",
+      "BUG-REFCUBE-005"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Map Cube open/NPC/distance/window authorization.",
-      "Audit Cube improve-item chance accounting and lifetime.",
-      "Audit allow_copy/set_value/not_remove item semantics.",
-      "Close Cube success/failure/inventory-space atomicity.",
+      "Finish Cube special-branch and success/failure atomicity mapping.",
       "Map classic refine request through server execution.",
       "Audit refine scroll/blacksmith/guild refine and failure downgrade paths.",
       "Audit socket/attribute/Yohara/element/set metadata preservation.",
-      "Validate current cube.txt and refine deployment data.",
-      "Do not execute REFCUBE-T01..REFCUBE-T02 or any runtime test without an explicit phase change."
+      "Validate current refine deployment data.",
+      "Do not execute REFCUBE-T01..REFCUBE-T05 or any runtime test without an explicit phase change."
     ]
   },
   "startup": {
@@ -2128,22 +2128,35 @@
     },
     "verified_bug_ids": [
       "BUG-REFCUBE-001",
-      "BUG-REFCUBE-002"
+      "BUG-REFCUBE-002",
+      "BUG-REFCUBE-003",
+      "BUG-REFCUBE-004",
+      "BUG-REFCUBE-005"
     ],
     "mapped_flows": [
-      "Python Cube Renewal UI multiplier -> cuberenewal.SendRefine",
-      "TSubPacketCGCubeRenwalMake -> CInputMain::CubeRenewalSend",
-      "CCubeManager::RefineCube multiplier material/currency/reward accounting"
+      "Python Cube Renewal UI -> signed multiplier/client material list -> MAKE packet",
+      "CInputMain::CubeRenewalSend -> CCubeManager::RefineCube",
+      "multiplier availability/currency/material/reward accounting",
+      "Cube open live NPC + cached tempCubeNPC -> close/revocation boundary",
+      "player-level /cube command quest-NPC dereference",
+      "VNUM 79605 chance-improve consumption -> later reward-space validation",
+      "current cube.txt set_value/not_remove deployment reachability"
     ],
     "canonical_tests": [
       "REFCUBE-T01",
-      "REFCUBE-T02"
+      "REFCUBE-T02",
+      "REFCUBE-T03",
+      "REFCUBE-T04",
+      "REFCUBE-T05"
     ],
     "runtime_tests": {
       "status": "NOT RUN / EXECUTION LOCKED",
       "canonical_test_ids": [
         "REFCUBE-T01",
-        "REFCUBE-T02"
+        "REFCUBE-T02",
+        "REFCUBE-T03",
+        "REFCUBE-T04",
+        "REFCUBE-T05"
       ],
       "first_live_gate_unchanged": "DUNGEON-T10"
     },
