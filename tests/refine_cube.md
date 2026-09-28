@@ -140,3 +140,32 @@ Static prediction:
 - 70603 leaves the request at generic `REFINE_TYPE_SCROLL` because the second condition repeats the EVOLVE value, so confirmation is routed to `DoRefineWithScroll()` instead of the dedicated Soul Awake path.
 
 Safety class: **Stage A/B controlled disposable Soul-item flow**.
+
+
+## REFCUBE-T10 — Refine ability skill probability direction
+Covers `BUG-REFCUBE-010`.
+
+Future deterministic debug/statistical validation:
+1. choose a disposable recipe with a known base probability;
+2. compare normal refine at skill 0 and a positive refine-skill level;
+3. separately compare guild/money-only if available;
+4. instrument the random roll and displayed probability.
+
+Static prediction:
+the positive skill value is added to the random roll rather than the threshold, lowering the real success rate while the refine-information packet reports an increase.
+
+Safety class: **Stage A controlled probability/debug validation**.
+
+## REFCUBE-T11 — Scroll preview vs execution probability
+Covers `BUG-REFCUBE-011`.
+
+Future deterministic validation:
+1. use disposable targets at known refine levels;
+2. capture displayed `TPacketGCRefineInformation.prob` for Magic Stone, Dragon Scroll, Smith Handbook and BDragon;
+3. instrument the `DoRefineWithScroll()` `success_prob` selected for the same attempts;
+4. compare formula/result without relying on random outcomes.
+
+Static prediction:
+the preview adds refine skill and treats several absolute scroll probability tables as additive buffs, while execution uses different formulas.
+
+Safety class: **Stage A debug/formula validation**.
