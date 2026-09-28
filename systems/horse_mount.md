@@ -123,3 +123,95 @@ No Horse/Mount runtime test is authorized. Global first future live gate remains
 7. create bugs/tests only for verified reachable paths.
 
 No Horse/Mount runtime test is authorized. Global first future live gate remains `DUNGEON-T10`.
+
+
+## Checkpoint — active quest API + mount state synchronization
+
+### Active horse quest deployment
+The current `quest_list` loads these eight Horse/Mount scripts:
+- `horse_exchange_ticket.quest`
+- `horse_guard.quest`
+- `horse_menu.quest`
+- `horse_revive.quest`
+- `horse_ride.quest`
+- `horse_summon.quest`
+- `ride_ticket_change.quest`
+- `training_mount.quest`
+
+Verified current producers:
+- `horse_menu` -> `horse.ride/unride/summon/unsummon/revive/feed/set_name`;
+- `horse_summon` -> `horse.summon()` with no custom VNUM argument;
+- `horse_ride` -> `pc.mount(20030, 600)` and item 71241 -> `pc.mount(20030, 10)`;
+- `training_mount` consumes horse-level gates but does not change horse level.
+
+No active h_horse producer was found for:
+- `horse.set_level`;
+- `horse.advance`;
+- `horse.set_appearance`;
+- `horse.set_stat0`.
+
+The current package therefore depends on an already-existing horse level for grade-gated flows. This is kept as a deployment/progression candidate until all non-h_horse active quest producers are excluded.
+
+### BUG-HORSE-001 — pc.mount affect does not synchronize MountVnum
+Current build enables `ENABLE_MOUNT_COSTUME_SYSTEM` and therefore `ENABLE_MOUNT_PROTO_AFFECT_SYSTEM`.
+
+Live path:
+`horse_ride.quest`
+-> `pc.mount(20030, duration)`
+-> `questlua_pc.cpp::pc_mount`
+-> `AddAffect(AFFECT_MOUNT, POINT_MOUNT, 20030, ...)`
+-> `ComputeAffect`
+-> `PointChange(POINT_MOUNT, 20030)`.
+
+But `CHARACTER::PointChange(POINT_MOUNT)` only updates the point value; its `MountVnum(val)` call is commented out.
+
+No later call in `pc_mount` synchronizes `m_dwMountVnum`.
+
+Consequences in the reachable active quest path:
+- `GetPoint(POINT_MOUNT)` becomes non-zero;
+- `GetMountVnum()` remains unchanged;
+- `pc.is_mount()` reads `GetMountVnum()`, so it does not reflect the new affect-backed mount;
+- character packet/render riding state also continues to use `GetMountVnum()`;
+- the active rental horse path therefore has split authoritative state.
+
+Promoted as `BUG-HORSE-001`.
+
+### Item/costume mount lifecycle closure
+Normal equipped ride-item flow is separate from `pc.mount` and does explicitly synchronize:
+- `CItem::ModifyPoints(true)` applies `APPLY_MOUNT -> POINT_MOUNT`;
+- `CHARACTER::EquipItem()` then calls `MountVnum(GetPoint(POINT_MOUNT))`;
+- unequip removes the apply and then calls `MountVnum(GetPoint(POINT_MOUNT))` again.
+
+Death cleanup:
+- `Dead()` clears riding state;
+- `UnEquipSpecialRideUniqueItem()` covers special-ride UNIQUE items and `WEAR_COSTUME_MOUNT`.
+
+Restricted-map cleanup:
+- `WarpSet()` itself does not unmount;
+- post-warp EnterGame checks `IS_MOUNTABLE_ZONE()` and calls `Unmount()` when required.
+
+No separate death/warp stale-mount bug was verified in these paths.
+
+### ChangeLook mount candidate strengthened
+`CTransmutation::Accept()` writes only:
+`left->SetChangeLookVnum(right->GetVnum())`
+and then destroys the right material.
+
+It does not:
+- call `right->IsExpireTimeItem()`;
+- copy `right->GetRealExpireTime()` into the target's socket2;
+- call `StartChangeLookExpireEvent()`.
+
+Additionally, automatic ChangeLook expire-event start sites currently found in `ITEM_MANAGER::CreateItem()` and `CItem::OnAfterCreatedItem()` gate on `IsHorseSummonItem()`, not `COSTUME_MOUNT`.
+
+This is a strong lifetime-laundering candidate, but promotion is deferred until a current deployed time-limited `COSTUME_MOUNT` proto is verified.
+
+## Exact next work
+1. verify current time-limited COSTUME_MOUNT proto/data reachability and close the ChangeLook lifetime candidate;
+2. exclude/locate non-h_horse active producers for horse level progression;
+3. close timer-based/real-time mount item expiry paths;
+4. resolve Achievement SUMMON_MOUNT producer gap;
+5. close client race/proto/horse-appearance asset coverage;
+6. promote only verified reachable additional Horse/Mount bugs/tests.
+
+No runtime execution is authorized. Global first future live gate remains `DUNGEON-T10`.
