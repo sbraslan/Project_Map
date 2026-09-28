@@ -22,3 +22,8 @@ Important global ID rules:
 ## Post-audit subsystem ownership — 2026-09-28
 - `BUG-LOOK-001..007` -> `costume_appearance.md`
 - Mount-expiry helper gaps, Aura overlap, omitted GuildStorage/Roulette/Switchbot guards and the conditional free-ticket alias remain unpromoted observations/candidates.
+
+
+## Dragon Soul ownership — 2026-09-28
+- `BUG-DS-001..003` -> `dragon_soul.md`
+- Step-refine equipped-first, malformed grade bound and change-attr step bound remain candidate/unpromoted.
