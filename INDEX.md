@@ -38,7 +38,7 @@ This is the navigation index. Normal continuation starts at `STATE.json`, then `
 | Costume / Appearance / ChangeLook | STATIC COMPLETE | `systems/costume_appearance.md` |
 | Acce / Sash | STATIC COMPLETE | `systems/acce.md` |
 | Dragon Soul / Alchemy | STATIC COMPLETE | `systems/dragon_soul.md` |
-| Aura System | MAPPING IN PROGRESS | `systems/aura.md` |
+| Aura System | STATIC COMPLETE | `systems/aura.md` |
 
 ## Current phase
 - **Detection / mapping only.** Source and game repositories remain read-only.
@@ -99,5 +99,13 @@ Runtime execution remains locked and `DUNGEON-T10` remains the first future live
 Dragon Soul / Alchemy is now **STATIC COMPLETE** with verified `BUG-DS-001..011` and canonical deferred tests `DS-T01..DS-T11`.
 
 Current effective coverage is **24/24 STATIC COMPLETE subsystem rows** plus the folded Guild lifecycle companion. Aura System is the next active mapping cursor.
+
+Runtime execution remains locked and `DUNGEON-T10` remains the first future live gate.
+
+
+## Post-audit extension — Aura System — 2026-09-28
+Aura System is now **STATIC COMPLETE** with verified `BUG-AURA-001..006` and canonical deferred tests `AURA-T01..AURA-T06`.
+
+Current effective coverage is **25/25 STATIC COMPLETE subsystem rows** plus the folded Guild lifecycle companion.
 
 Runtime execution remains locked and `DUNGEON-T10` remains the first future live gate.
