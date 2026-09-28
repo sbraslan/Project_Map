@@ -133,6 +133,7 @@ Client stores inventory transmutation state in `TItemData.dwTransmutationVnum` a
 - `BUG-LOOK-004` — server accepts sealed/bound right-side ChangeLook material although client UI explicitly rejects it.
 - `BUG-LOOK-005` — server allows LEFT checkout/replacement while RIGHT remains, bypassing final type/subtype/anti-flag compatibility.
 - `BUG-LOOK-006` — real-time expiry can destroy a checked-in item while CTransmutation retains a dangling raw LPITEM.
+- `BUG-LOOK-007` — ChangeLook and Acce windows are not mutually exclusive; Acce can delete an item still retained by ChangeLook.
 
 ## Mapping next
 
@@ -287,3 +288,93 @@ Normal item-mode ChangeLook compatibility is checked by:
 That relationship is sound at initial RIGHT check-in, but `BUG-LOOK-005` lets it be bypassed later by changing LEFT.
 
 The additional equip-time ChangeLook checks do not repair this invariant for arbitrary cross-type values generated through that bypass.
+
+
+## Open-window registry audit — 2026-09-28
+
+The renewed window registry defines:
+- W_SAFEBOX
+- W_CUBE
+- W_EXCHANGE
+- W_MYSHOP
+- W_SHOP_OWNER
+- W_SKILLBOOK_COMB
+- W_ATTR_6TH_7TH
+- W_ACCE
+- W_CHANGELOOK
+- W_AURA
+- W_SWITCHBOT
+- W_GUILDBANK
+- W_ROULETTE
+- W_MAILBOX
+
+`CTransmutation::Open()` still uses a manual legacy-style list instead of the renewed bitmask and omits at least:
+- W_ACCE;
+- W_AURA;
+- W_GUILDBANK;
+- W_ROULETTE;
+- W_SWITCHBOT.
+
+Not every omission is independently exploitable, but Acce/Aura are proven interactive overlaps.
+
+### Acce overlap
+`OpenAcceCombination()` / `OpenAcceAbsorption()` only guard their own Acce state and can open while ChangeLook is active.
+Conversely, `CTransmutation::Open()` does not check Acce state.
+
+ChangeLook check-in does not lock items.
+Acce refine/absorption also does not call `CanHandleItem()` before operating on supplied inventory cells.
+
+In absorption mode, a weapon/body-armor item can be used as Acce material and removed by:
+`ITEM_MANAGER::RemoveItem(AcceMaterial, "ABSORBED (REFINE SUCCESS)")`.
+
+If that same item is already stored as a ChangeLook LEFT/RIGHT raw pointer, Acce can delete it underneath CTransmutation.
+This provides a second concrete trigger for the dangling-pointer condition beyond real-time expiry.
+
+See `BUG-LOOK-007`.
+
+### Aura overlap
+`OpenAuraRefineWindow()` does not reject active ChangeLook.
+`IsAuraRefineWindowCanRefine()` correctly returns false when ChangeLook is active because `CanHandleItem()` rejects it, but several Aura check-in paths explicitly continue when the Aura window/opener still exist instead of returning.
+
+Aura item slots use `Lock(true)`, so the overlap semantics differ from Acce. It is recorded as a cross-window consistency risk but not promoted separately during this pass.
+
+### Other omitted windows
+Guild Storage, Roulette and Switchbot are omitted from `CTransmutation::Open()`.
+No additional ChangeLook-specific corruption path was promoted for them in this pass; existing subsystem-specific controls remain authoritative.
+
+## Cross-type client rendering closure
+
+`BUG-LOOK-005` can produce an invalid stored ChangeLook VNUM across allowed ChangeLook classes.
+
+Client body path:
+`SetArmor(changeLookVnum)`
+-> `__ArmorVnumToShape(vnum)`
+-> blindly read item `VALUE3`
+-> `SetShape(VALUE3)`.
+
+There is no armor/body type guard inside `__ArmorVnumToShape()`.
+
+Therefore if a weapon VNUM is attached to a body target through BUG-LOOK-005, the weapon's VALUE3 semantics are interpreted as a character ShapeIndex.
+
+Client weapon path:
+`SetWeapon(changeLookVnum)`
+-> `AttachWeapon(vnum)`
+with no item-type compatibility guard before attachment.
+
+Thus BUG-LOOK-005 has a confirmed direct rendering impact: incompatible VNUM semantics reach PART_MAIN/PART_WEAPON interpretation rather than being normalized away client-side.
+
+No independent client crash is proven statically; malformed/missing/wrong visuals remain the expected result class.
+
+## Item-creation companion closure
+
+For future `item ekleyeceğiz` automation, ChangeLook compatibility must be treated as a generation constraint:
+- intended transmutation pairs require same TYPE;
+- weapon pairs require same weapon SUBTYPE;
+- body armor pairs require ARMOR_BODY;
+- body costume pairs require COSTUME_BODY;
+- normal ChangeLook requires exact ANTI_FLAG equality;
+- COSTUME_BODY VALUE3 is ShapeIndex;
+- COSTUME_WEAPON VALUE3 remains weapon-subtype semantics;
+- body ShapeIndex must exist in every race/sex MSM that is allowed by the generated ANTI_FLAG set;
+- if a GR2/MSM mapping is intentionally absent for a race/sex, generated restrictions must prevent that race/sex from equipping the item;
+- item_list/icon and item_names records remain companion outputs.
