@@ -39,7 +39,7 @@ This is the navigation index. Normal continuation starts at `STATE.json`, then `
 | Acce / Sash | STATIC COMPLETE | `systems/acce.md` |
 | Dragon Soul / Alchemy | STATIC COMPLETE | `systems/dragon_soul.md` |
 | Aura System | STATIC COMPLETE | `systems/aura.md` |
-| Refine / Cube / Crafting | MAPPING IN PROGRESS | `systems/refine_cube.md` |
+| Refine / Cube / Crafting | STATIC COMPLETE | `systems/refine_cube.md` |
 | Growth Pet System | MAPPING IN PROGRESS | `systems/growth_pet.md` |
 
 ## Current phase
@@ -133,3 +133,11 @@ Current effective completed/readiness coverage is **25/25 STATIC COMPLETE subsys
 The active mapping cursor is now **Refine / Cube / Crafting**. Initial Cube Renewal mapping has already verified `BUG-REFCUBE-001..002`.
 
 Runtime execution remains locked and `DUNGEON-T10` remains the first future live gate.
+
+
+## Post-audit extension — Refine / Cube / Crafting — 2026-09-28
+Refine / Cube / Crafting is now **STATIC COMPLETE** with verified `BUG-REFCUBE-001..016` and canonical deferred tests `REFCUBE-T01..REFCUBE-T16`.
+
+Current effective static-complete/readiness coverage is **26/26** subsystem rows plus the folded Guild lifecycle companion.
+
+Growth Pet System remains the active mapping cursor. Runtime execution remains locked and `DUNGEON-T10` remains the first future live gate.
