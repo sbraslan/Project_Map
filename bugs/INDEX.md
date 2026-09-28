@@ -17,3 +17,8 @@ Important global ID rules:
 - historical `BUG-BFIELD-005` and `BUG-BFIELD-007` are owned canonically by `BUG-RANK-003` and `BUG-RANK-007`.
 - `BUG-ITEM-005` is intentionally absent.
 - Candidate, observation and dormant labels must never be promoted by documentation alone.
+
+
+## Post-audit subsystem ownership — 2026-09-28
+- `BUG-LOOK-001..007` -> `costume_appearance.md`
+- Mount-expiry helper gaps, Aura overlap, omitted GuildStorage/Roulette/Switchbot guards and the conditional free-ticket alias remain unpromoted observations/candidates.
