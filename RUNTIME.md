@@ -763,3 +763,36 @@ Cross-system note:
 Acce is a **post-audit extension**. Current effective static-complete/readiness coverage is **23/23**, plus the folded Guild lifecycle companion.
 
 The global first future live gate remains **DUNGEON-T10**. No Acce test has been executed.
+
+
+## Runtime-readiness consolidation — Dragon Soul / Alchemy — 2026-09-28
+**Documentation status:** READY  
+**Execution status:** LOCKED / NOT RUN
+
+Verified coverage:
+- DS-T01 -> BUG-DS-001
+- DS-T02 -> BUG-DS-002
+- DS-T03 -> BUG-DS-003
+- DS-T04 -> BUG-DS-004
+- DS-T05 -> BUG-DS-005
+- DS-T06 -> BUG-DS-006
+- DS-T07 -> BUG-DS-007
+- DS-T08 -> BUG-DS-008
+- DS-T09 -> BUG-DS-009
+- DS-T10 -> BUG-DS-010
+- DS-T11 -> BUG-DS-011
+
+Execution classes:
+- **Normal/controlled state:** DS-T01, DS-T07, DS-T09.
+- **Isolated/modified-client/configuration:** DS-T04, DS-T05, DS-T06, DS-T08, DS-T11.
+- **Crash/lifetime/sanitizer:** DS-T02, DS-T03, DS-T10.
+
+Closure notes:
+- source/extractor self-aliasing is rejected by the mapped normal ITEM_EXTRACT caller type constraints;
+- ChangeLook/Aura/Acce overlap did not produce a separate proven DS destructive alias path;
+- malformed grade/step boundaries remain unpromoted because tracked deployment data does not establish malformed reachability;
+- the daily-gift zero-ID issue is verified code behavior but configuration-dependent.
+
+Dragon Soul is a **post-audit extension**. Current effective static-complete/readiness coverage is **24/24**, plus the folded Guild lifecycle companion.
+
+The global first future live gate remains **DUNGEON-T10**. No Dragon Soul test has been executed.
