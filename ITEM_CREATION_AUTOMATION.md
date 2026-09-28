@@ -301,3 +301,17 @@ Before emitting a proto row:
 ## Current state
 
 This is a design rule set only. No item_proto, MSM, source, locale or game file has been modified.
+
+
+## Conversation trigger
+
+When the user says **"item ekleyeceğiz"** or clearly asks to add/create a new Metin2 item:
+1. treat this file as the canonical item-generation rule set;
+2. ask for no information that is already provided in the current turn;
+3. use the supplied reference VNUM as the primary exemplar when one is given;
+4. find the nearest compatible unused VNUM/ShapeIndex when the user delegates numbering;
+5. generate the complete proposed item_proto row plus any required item_names/item_list/MSM blocks;
+6. for COSTUME_BODY, preserve `VALUE3 -> ShapeIndex -> MSM -> GR2/DDS`;
+7. do not write source/game repositories unless the user explicitly changes the source-write phase.
+
+This trigger is intentionally independent from chat history.
