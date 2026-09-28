@@ -1,67 +1,59 @@
 # CURRENT — Canonical Active Checkpoint
 
-**Active phase:** Detection / Mapping Only
-**Active state:** Dragon Soul / Alchemy Static Mapping
-**Status:** STATIC MAPPING IN PROGRESS / 8 VERIFIED STATIC BUGS / EXECUTION LOCKED
-**Machine state:** `STATE.json`
-**Active subsystem:** Dragon Soul / Alchemy
-**System:** `systems/dragon_soul.md`
-**Bugs:** `bugs/dragon_soul.md`
-**Tests:** `tests/dragon_soul.md`
-**Last completed subsystem:** Acce / Sash
-**Effective completed/readiness-covered subsystems:** 23
-**First future live gate:** `DUNGEON-T10`
+**Active phase:** Detection / Mapping Only  
+**Active state:** Aura System Static Mapping  
+**Status:** STATIC MAPPING IN PROGRESS / 1 VERIFIED STATIC BUG / EXECUTION LOCKED  
+**Machine state:** `STATE.json`  
+**Active subsystem:** Aura System  
+**System:** `systems/aura.md`  
+**Bugs:** `bugs/aura.md`  
+**Tests:** `tests/aura.md`  
+**Last completed subsystem:** Dragon Soul / Alchemy  
+**Effective completed/readiness-covered subsystems:** 24  
+**First future live gate:** `DUNGEON-T10`  
 **Last updated:** 2026-09-28
 
 ## Hard rule
 Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-only. Runtime, crafted-packet, crash, sanitizer and fault-injection execution remains locked until an explicit phase change.
 
-## Acce / Sash closure
+## Dragon Soul / Alchemy closure
 
-Acce is now **STATIC COMPLETE**.
+Dragon Soul is now **STATIC COMPLETE**.
 
 Canonical verified findings:
-`BUG-ACCE-001..008`.
+`BUG-DS-001..BUG-DS-011`.
 
-Newest closure findings:
-- `BUG-ACCE-007` — Acce open state can survive warp because `CanWarp()` omits `W_ACCE` and `WarpSet()` does not force `AcceClose()`; stale flags can keep `CanHandleItem()` blocked after arrival.
-- `BUG-ACCE-008` — reversal clears socket0 and normal attributes but never clears copied element/set metadata; those fields are persisted and can remain visible after full refresh/relog.
+Closure added:
+- `BUG-DS-009` — relog with persisted DS set can execute set cleanup while active deck is still -1; uint8 arithmetic wraps the current build's start index to wear 27 and can subtract DS-set values from ordinary late equipment.
+- `BUG-DS-010` — `DSManager::PullOut()` can destroy a count-1 extractor and later dereference it in success/failure log formatting.
+- `BUG-DS-011` — active daily-gift event with `ds_dg_id=0` can skip level/qualification checks for a never-participated character whose quest event_id is also 0.
 
-Visual/data dependency is closed:
-- sash VNUM -> `item_list.txt` WING -> GR2;
-- `item_scale.txt` -> per-job/per-sex scale through `CItemManager::LoadItemScale()`;
-- equipped visual -> `PART_ACCE` -> `Bip01 Spine2`.
-
-Combine/refine-chain and normal uint8 inventory-cell boundaries were closed without another promoted bug.
+Cross-window aliasing produced no additional DS-specific promoted defect. Malformed grade/step boundaries remain unpromoted because current tracked data does not establish malformed reachability.
 
 Deferred ownership:
-`ACCE-T01..ACCE-T08`, none executed.
+`DS-T01..DS-T11`, none executed.
 
-Current effective readiness coverage is **23/23 STATIC COMPLETE subsystems**, plus folded Guild lifecycle.
+Current effective readiness coverage is **24/24 STATIC COMPLETE subsystems**, plus folded Guild lifecycle.
 
-## Active Dragon Soul / Alchemy state
+## Active Aura System state
 
-Verified static bugs:
-- `BUG-DS-001` — stale DS set contribution after breaking an active complete set.
-- `BUG-DS-002` — Dragon Heart extraction logs a source pointer after count-1 destruction.
-- `BUG-DS-003` — successful strength refine can leave an ownerless zero-count CItem registered in memory.
-- `BUG-DS-004` — Change Attribute server path accepts ordinary strength-refine materials.
-- `BUG-DS-005` — RefineStep table validation checks the wrong table node; dormant with current tracked data.
-- `BUG-DS-006` — any open DS refine opener token authorizes Change Attribute packets; mode is not server-bound.
-- `BUG-DS-007` — DS refine opener can survive warp and keep item handling locked.
-- `BUG-DS-008` — Step refine skips equipped-state validation for the first pointer-sorted item; an equipped Dragon Soul can reach destructive refinement when ordered first.
+First verified static bug:
+- `BUG-AURA-001` — Aura's intended opener-distance gate is bypassed after the window opens. `IsAuraRefineWindowCanRefine()` first calls generic `CanHandleItem()`, which rejects the Aura window itself; check-in/check-out/accept then ignore that false result whenever Aura is open and opener is non-null. The intended distance comparison is therefore not enforced for these operations after initial open.
 
-Current server/client Dragon Soul table files are mapped as matching for the tracked deployment. Candidate malformed-data boundaries remain unpromoted.
+Deferred test:
+- `AURA-T01` — open in range, move out of range, verify check-in/check-out and isolated final-accept behavior. Not run.
 
 ## Exact next work
-1. inspect DS deck/set reactivation and relog persistence;
-2. close refine-window overlap and cross-window interactions;
-3. inspect extraction tool/source aliasing;
-4. inspect qualification/daily quest lifecycle;
-5. close malformed-data candidates only if current/tracked reachability is established;
-6. only then decide Dragon Soul STATIC COMPLETE/readiness promotion.
+1. map client -> packet -> server Aura open/check-in/check-out/accept contract;
+2. trace ABSORB copy/destruction lifetime and persistence;
+3. trace GROWTH table/material/EXP/socket arithmetic;
+4. trace EVOLVE success/failure lifecycle;
+5. audit booster/eraser absorption-rate arithmetic;
+6. audit warp/disconnect/close locked-item cleanup;
+7. audit opener lifetime and cross-window coexistence;
+8. close Aura visual/proto/client persistence surfaces.
 
-Do not execute `DS-T01..DS-T08`.
+Do not execute `AURA-T01` or any other runtime test.
 The global future runtime order remains locked with `DUNGEON-T10` first.
 
 GitHub state is canonical.
