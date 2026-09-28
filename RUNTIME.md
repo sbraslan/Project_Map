@@ -734,3 +734,32 @@ Deferred, unpromoted:
 This is a **post-audit extension**: the original global audit covered 21/21 STATIC COMPLETE subsystems. Costume / Appearance / ChangeLook raises current effective static/readiness coverage to **22/22**.
 
 The global first future live gate remains **DUNGEON-T10**. LOOK tests do not execute before it unless the project phase and order are explicitly changed.
+
+
+## Runtime-readiness consolidation — Acce / Sash — 2026-09-28
+**Documentation status:** READY  
+**Execution status:** LOCKED / NOT RUN
+
+Verified coverage:
+- ACCE-T01 -> BUG-ACCE-001
+- ACCE-T02 -> BUG-ACCE-002
+- ACCE-T03 -> BUG-ACCE-003
+- ACCE-T04 -> BUG-ACCE-004
+- ACCE-T05 -> BUG-ACCE-005
+- ACCE-T06 -> BUG-ACCE-006
+- ACCE-T07 -> BUG-ACCE-007
+- ACCE-T08 -> BUG-ACCE-008
+
+Execution classes:
+- **Ordinary/non-crash state observation:** ACCE-T05.
+- **Ordinary/controlled warp state:** ACCE-T07.
+- **UI/persistence observation:** ACCE-T08 when suitable metadata-bearing disposable data already exists; otherwise controlled Stage B setup.
+- **Modified-client / controlled item-state:** ACCE-T01, T02, T03, T06.
+- **Crash/lifetime/sanitizer:** ACCE-T04.
+
+Cross-system note:
+- ChangeLook/Acce raw-pointer overlap remains canonically owned by `BUG-LOOK-007 / LOOK-T07`; it is not duplicated under the Acce namespace.
+
+Acce is a **post-audit extension**. Current effective static-complete/readiness coverage is **23/23**, plus the folded Guild lifecycle companion.
+
+The global first future live gate remains **DUNGEON-T10**. No Acce test has been executed.
