@@ -8,24 +8,25 @@
   "active": {
     "subsystem": "aura",
     "display_name": "Aura System",
-    "status": "STATIC MAPPING IN PROGRESS / 1 VERIFIED STATIC BUG / EXECUTION LOCKED",
+    "status": "STATIC MAPPING IN PROGRESS / 3 VERIFIED STATIC BUGS / EXECUTION LOCKED",
     "system_file": "systems/aura.md",
     "bug_file": "bugs/aura.md",
     "test_file": "tests/aura.md",
     "verified_bug_ids": [
-      "BUG-AURA-001"
+      "BUG-AURA-001",
+      "BUG-AURA-002",
+      "BUG-AURA-003"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Map client -> packet -> server Aura open/check-in/check-out/accept contract.",
-      "Trace Aura ABSORB copy/destruction lifetime and persistence.",
-      "Trace Aura GROWTH table/material/EXP/socket arithmetic.",
-      "Trace Aura EVOLVE success/failure lifecycle.",
-      "Audit booster/eraser absorption-rate arithmetic.",
-      "Audit warp/disconnect/close locked-item cleanup.",
+      "Audit Aura booster timer/equip/unequip persistence and absorption-rate application.",
+      "Close forced-warp/disconnect/destructor locked-item cleanup.",
       "Audit opener lifetime and cross-window coexistence.",
-      "Map Aura visual/proto/client persistence surfaces.",
-      "Do not execute AURA-T01 or any runtime test without an explicit phase change."
+      "Verify wedding-item absorption policy against tracked proto/data.",
+      "Map Aura costume default socket initialization and refine chains.",
+      "Close Aura visual/proto/client persistence surfaces.",
+      "Consolidate Aura runtime ownership and decide STATIC COMPLETE.",
+      "Do not execute AURA-T01..AURA-T03 or any runtime test without an explicit phase change."
     ]
   },
   "startup": {
@@ -2019,7 +2020,9 @@
   "aura_mapping": {
     "status": "STATIC MAPPING IN PROGRESS",
     "verified_bug_ids": [
-      "BUG-AURA-001"
+      "BUG-AURA-001",
+      "BUG-AURA-002",
+      "BUG-AURA-003"
     ],
     "canonical_files": {
       "system": "systems/aura.md",
@@ -2027,10 +2030,12 @@
       "tests": "tests/aura.md"
     },
     "mapped_flows": [
-      "OpenAuraRefineWindow initial opener-distance check",
-      "AuraRefineWindowCheckIn/CheckOut/Accept gate structure",
-      "Aura slot TItemPos storage + inventory item locking",
-      "IsAuraRefineWindowCanRefine self-conflict with CanHandleItem -> BUG-AURA-001"
+      "client Aura check-in/check-out/accept/cancel -> server Aura state",
+      "server checked-in TItemPos locking and mode binding",
+      "ABSORB source/material copy and material removal",
+      "GROWTH refinement bands and EXP/material consumption",
+      "EVOLVE inventory-count validation vs checked-in-stack consumption",
+      "Aura Eraser generic socket2 mutation boundary"
     ],
     "canonical_tests": [
       "AURA-T01"
@@ -2045,6 +2050,15 @@
       "warp/disconnect/lock recovery",
       "cross-window/opening lifetime",
       "visual/proto persistence"
-    ]
+    ],
+    "runtime_tests": {
+      "status": "NOT RUN / EXECUTION LOCKED",
+      "canonical_test_ids": [
+        "AURA-T01",
+        "AURA-T02",
+        "AURA-T03"
+      ],
+      "first_live_gate_unchanged": "DUNGEON-T10"
+    }
   }
 }
