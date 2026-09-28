@@ -6,19 +6,19 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "runtime_gate_ready",
-    "display_name": "DUNGEON-T10 Runtime Gate Ready",
-    "status": "PREFLIGHT COMPLETE / EXECUTION LOCKED",
-    "system_file": null,
-    "bug_file": null,
-    "test_file": "DUNGEON_T10_HANDOFF.md",
+    "subsystem": "costume_appearance",
+    "display_name": "Costume / Appearance / ChangeLook",
+    "status": "STATIC MAPPING IN PROGRESS",
+    "system_file": "systems/costume_appearance.md",
+    "bug_file": "bugs/costume_appearance.md",
+    "test_file": "tests/costume_appearance.md",
     "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Runtime gate DUNGEON-T10 is fully documented and ready, but do not execute it until the user explicitly changes phase.",
-      "When execution is authorized, follow DUNGEON_T10_HANDOFF.md exactly and capture the required evidence before any fix.",
-      "After T10 evidence is recorded, stop before applying FIX-DUNGEON-010 unless source-change authorization is separately explicit.",
-      "Keep all source/game repositories read-only under the current phase."
+      "Map server costume equip/change-look visual state flow.",
+      "Map client PART_MAIN/SetArmor/VALUE3/MSM shape resolution.",
+      "Map item_proto and locale/item_list dependencies for costume creation.",
+      "Record findings only; do not execute runtime tests or modify source/game repositories."
     ]
   },
   "startup": {
@@ -188,7 +188,8 @@
     "RUNTIME.md::World Boss WB-T01-T16 readiness consolidated; execution locked",
     "RUNTIME.md::Sung Mahi SMT-T01-T06 readiness consolidated; runtime-readiness documentation milestone complete",
     "READINESS_AUDIT.md::global integrity audit complete; 21/21 coverage; DUNGEON namespaces qualified; Guild lifecycle folded coverage",
-    "DUNGEON_T10_HANDOFF.md::first live runtime gate preflight complete; execution locked"
+    "DUNGEON_T10_HANDOFF.md::first live runtime gate preflight complete; execution locked",
+    "ITEM_CREATION_AUTOMATION.md::conversation trigger item ekleyeceğiz canonicalized"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -1624,5 +1625,25 @@
     "runtime_test_ids": [
       "GUILD-T01"
     ]
+  },
+  "side_workflows": {
+    "item_creation": {
+      "status": "READY / DESIGN CANONICAL",
+      "trigger_phrases": [
+        "item ekleyeceğiz",
+        "item ekle",
+        "yeni item oluştur"
+      ],
+      "canonical_file": "ITEM_CREATION_AUTOMATION.md",
+      "source_write_policy": "LOCKED unless explicitly authorized",
+      "responsibilities": [
+        "reference-VNUM template selection",
+        "unused VNUM and ShapeIndex proposal",
+        "item_proto row generation",
+        "item_names/item_list companion generation when needed",
+        "MSM ShapeData generation for costume body/hair where applicable",
+        "ANTI_FLAG/WEAR_FLAG/LIMIT/APPLY/VALUE/MASK validation"
+      ]
+    }
   }
 }
