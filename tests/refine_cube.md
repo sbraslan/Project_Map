@@ -1,0 +1,35 @@
+# Refine / Cube / Crafting — Deferred Tests
+
+**Execution status:** LOCKED / NOT RUN
+
+## REFCUBE-T01 — Negative Cube Renewal multiplier
+Covers `BUG-REFCUBE-001`.
+
+Future isolated modified-client test:
+1. use a disposable recipe with a nonzero Yang and/or Gem cost;
+2. record currency and required materials;
+3. submit the normal recipe VNUM/material list with a negative multiplier;
+4. record material, reward and currency deltas;
+5. stop after one request.
+
+Static prediction:
+server-side requirement checks pass the negative products and currency mutation becomes a positive credit.
+
+Safety class: **Stage B isolated modified-client / economy mutation**.
+Never run against production economy.
+
+## REFCUBE-T02 — Normal Cube Renewal multiplier > 1 accounting
+Covers `BUG-REFCUBE-002`.
+
+Future controlled disposable-data test:
+1. choose a stackable-output recipe available in current `cube.txt`;
+2. prepare enough materials/currency for multiplier 2;
+3. use the normal UI to request multiplier 2;
+4. record before/after material, Yang/Gem and reward quantities.
+
+Static prediction:
+availability/currency follow multiplier 2, but removable materials and created reward use only the base recipe count.
+
+Safety class: **Stage A/B controlled disposable recipe**.
+
+Global execution remains locked; `DUNGEON-T10` is still the first future live gate.
