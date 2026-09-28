@@ -213,6 +213,36 @@ The global first live gate remains **DUNGEON-T10**.
 
 **Next documentation cluster:** Inventory / Item / Special Inventory runtime readiness.
 
+
+## Runtime-readiness consolidation — Inventory / Item / Special Inventory — 2026-09-28
+**Documentation status:** READY
+**Execution status:** LOCKED / NOT RUN
+
+Verified Item bug coverage:
+- ITEM-T02 -> BUG-ITEM-001
+- ITEM-T01 -> BUG-ITEM-002
+- ITEM-T03 -> BUG-ITEM-003
+- ITEM-T06 -> BUG-ITEM-004
+- ITEM-T09 + ITEM-T10 -> BUG-ITEM-006
+- ITEM-T11 -> BUG-ITEM-007
+- ITEM-T12 -> BUG-ITEM-008
+
+Observation/regression coverage:
+- ITEM-T05 -> OBS-ITEM-001
+- ITEM-T07 -> OBS-ITEM-002
+- ITEM-T04 -> ground persistence/lifecycle regression
+- ITEM-T08 -> Special Inventory type/range regression
+- ITEM-T13 -> item_proto dataset audit dependency
+
+No canonical BUG-ITEM-005 exists; the numbering gap is intentionally preserved.
+
+The mixed legacy Guild Storage/Switchbot sections in tests/inventory_items.md are not treated as Inventory ownership. Switchbot will be consolidated from its own canonical bug/test files next.
+
+Primary Inventory normal-path candidate: **ITEM-T01**.
+The global first live gate remains **DUNGEON-T10**.
+
+**Next documentation cluster:** Switchbot runtime readiness.
+
 ## Patch readiness
 First-cluster fix plan is ready at `fixes/dungeon_info.md`.
 
