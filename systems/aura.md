@@ -158,3 +158,119 @@ See `BUG-AURA-003`.
 5. map Aura costume creation/default socket initialization and refine chains;
 6. close visual PART_AURA/client asset dependencies;
 7. consolidate runtime ownership before STATIC COMPLETE promotion.
+
+
+## Proto / visual / booster closure pass — 2026-09-28
+
+### Current Aura proto families
+Tracked `Project_DumpProto/tr/item_proto.txt` confirms four complete Aura families:
+- `49001..49006`;
+- `49011..49016`;
+- `49021..49026`;
+- `49031..49036`.
+
+For every family:
+- type/subtype is `ITEM_COSTUME / COSTUME_AURA`;
+- grade 1..5 has `RefineSet=409` and `RefinedVnum` pointing to the next grade;
+- grade 6 has `RefineSet=409` and terminal `RefinedVnum=0`.
+
+This closes the earlier dataset-dependent EVOLVE-chain question: the server's `GetRefineSet()==409 ? GetRefinedVnum() : GetOriginalVnum()` branch follows the intended current family chain for all tracked Aura costumes.
+
+Creation initialization uses:
+`originalVnum % 10 -> grade -> LEVEL_MIN`
+and stores the Aura level/EXP encoding in socket 1.
+
+Current tracked Aura costume VNUMs all end in grade digits 1..6, so the grade-0 underflow candidate in the grade-index helper is not reachable from current Aura proto.
+
+### Current Aura resource / booster data
+Tracked Aura growth resources:
+- 49990: EXP 1;
+- 49991: EXP 10;
+- 49992: EXP 50;
+- 49993: EXP 100;
+- 49994: EXP 250;
+- 49995: EXP 500.
+
+Tracked booster family:
+- 49980: eraser;
+- 49981: booster index 1 / 86400 s;
+- 49982: index 2 / 259200 s;
+- 49983: index 3 / 432000 s;
+- 49984: index 5 / unlimited flag 1.
+
+The timed booster lifecycle is internally coherent:
+- equip / SetEquipped starts the Aura booster expire event;
+- unequip stops it and writes remaining seconds back into socket 2;
+- expiry removes the old boosted Aura points, clears socket 2, reapplies Aura points without the booster, recomputes battle points and updates the character packet.
+
+No stale boosted-stat defect was verified.
+
+### Terminal Radiant EVOLVE boundary
+Normal client EVOLVE MAIN eligibility rejects `curLevel >= AURA_MAX_LEVEL`.
+
+Server EVOLVE check-in instead accepts a MAIN item when:
+`level == table LEVEL_MAX && exp == table NEED_EXP`.
+
+The terminal Radiant row is level 250 / NEED_EXP 0, so a legitimate current grade-6 Aura satisfies the server predicate.
+
+The server then calls `__GetAuraRefineInfo()` for the preview. That helper divides the socket EXP by table NEED_EXP, which is zero for Radiant, and converts the non-finite result to `uint8_t`.
+
+Accept later rejects Radiant, but the arithmetic has already happened at check-in.
+
+See `BUG-AURA-006`.
+
+### Aura visual dependency
+Aura rendering is effect-driven rather than GR2/MSM-shape driven.
+
+Canonical client path:
+`PART_AURA`
+-> `CInstanceBase::SetAura(vnum)`
+-> `CItemManager::GetItemDataPointer(vnum)`
+-> `CItemData::GetAuraEffectID()`
+-> effect attachment on `Bip01 Spine2`.
+
+`item_list.txt` has special four-column `AURA` rows. `CItemManager::LoadItemList()` interprets the fourth column as an Aura `.mse` effect path and registers it through `SetAuraEffectID()`; it is not treated as a GR2 model.
+
+Current mapped examples:
+- 49001 -> `aura_01_49_001.mse`;
+- 49002 -> `aura_50_99_002.mse`;
+- ... through 49006 -> `aura_250_006.mse`;
+with equivalent 011/021/031 family variants.
+
+`item_scale.txt` supplies job/sex mesh/particle scale data. For COSTUME_AURA, `CItemManager::LoadItemScale()` propagates a family base row across six consecutive grades.
+
+Future Aura creation therefore requires:
+1. compatible COSTUME_AURA proto with grade-ending/refine-chain convention;
+2. an `item_list.txt` AURA -> MSE entry for every rendered grade;
+3. family scale/particle data in `item_scale.txt` where required;
+4. valid MSE/effect assets.
+
+A character MSM ShapeData/GR2 entry is not the primary Aura visual integration path.
+
+### Cross-window / item-type closure
+Aura can coexist at open-state level with ChangeLook because neither opener enforces a global window mutex.
+
+However the destructive alias seen in ChangeLook/Acce does not reproduce with current eligibility:
+- ChangeLook ITEM mode accepts weapon, ARMOR_BODY or COSTUME_BODY;
+- Aura ABSORB material accepts only ARMOR_SHIELD/WRIST/NECK/EAR;
+- Aura MAIN accepts COSTUME_AURA;
+- Aura GROWTH/EVOLVE SUB accepts Aura resources/evolution materials.
+
+Aura check-in also rejects already locked items and then locks its own stored items.
+
+No distinct Aura/ChangeLook same-item lifetime corruption was proven; the overlap remains a consistency observation.
+
+The client wedding-item filter is redundant for current server ABSORB eligibility: tracked wedding tuxedo/dress/bouquet VNUM classes do not satisfy the server's shield/wrist/neck/ear material predicate.
+
+## Current verified findings
+Canonical Aura findings are now:
+`BUG-AURA-001..BUG-AURA-006`.
+
+Canonical deferred tests:
+`AURA-T01..AURA-T06`.
+
+Remaining closure focus:
+- forced server-side warp / disconnect / descriptor-loss lock cleanup;
+- opener-null Lua boundary;
+- final persistence/check-in lifetime pass;
+- readiness consolidation.
