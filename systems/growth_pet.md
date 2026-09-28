@@ -69,3 +69,75 @@ See `BUG-GPET-001`.
 10. create verified bugs/tests only for reachable current paths.
 
 No runtime test is authorized. Global first future live gate remains `DUNGEON-T10`.
+
+
+## Packet trust / skill / revive / evolution pass — 2026-09-28
+
+### Feed request boundary
+The client packet fixes the feed-slot array at 9 cells, but carries a separate client-controlled count. Server forwarding does not cap that count and `ItemCubeFeed()` iterates it directly.
+
+See `BUG-GPET-002`.
+
+### Skill state shape and packet trust
+Persistent `TGrowthPetInfo` has exactly three skill entries across VNUM/level/spec/cooldown/formula arrays.
+
+Learn/upgrade/delete packets carry byte-sized slot indexes. Server actor methods use those indexes without a common `<3` guard.
+
+See `BUG-GPET-003`.
+
+The learn path also never verifies the selected inventory object is a `PET_SKILL` item and never bounds `GetValue(0)` to `PET_SKILL_MAX`. Current unrelated proto entries include Value0 values far above 23, so an invalid persistent skill VNUM can reach `pet_skill_table[skill_vnum][0]`.
+
+See `BUG-GPET-004`.
+
+### Premium revive
+Premium revive support is enabled and tracked proto contains PET_PREMIUM_FEEDSTUFF VNUM 55100.
+
+Server material validation rejects only wrong ITEM_PET subtypes rather than requiring ITEM_PET/PET_PREMIUM_FEEDSTUFF.
+
+Quantity validation uses the packet's claimed count, then subtracts the requirement from the actual item count. Because the count arithmetic is unsigned and `CItem::SetCount()` clamps huge values to `g_bItemCountLimit`, an undersized arbitrary stack can be inflated after underflow.
+
+See `BUG-GPET-005`.
+
+The helper `Revive()` separately mutates a local copy of `TGrowthPetInfo` for birthday/duration but never writes it back. Socket0 renewal survives; intended structured age metadata does not.
+
+See `BUG-GPET-007`.
+
+### Evolution material identity
+Server evolution requirements are represented as a seven-entry VNUM->count map. Validation counts matching input positions rather than distinct fulfilled requirement keys. Duplicate cells/VNUMs are not rejected.
+
+Repeating one exact-count required stack in all seven logical positions can therefore satisfy the validation count before consumption; after the first removal empties that cell, later duplicate positions disappear and evolution still executes.
+
+See `BUG-GPET-006`.
+
+### Specialist skill table
+`pet_skill_specialist_table` is declared `[][4]` but populated as a flat list and looked up via `for (auto table : ...)` plus `table->field`. Only the first struct of each four-entry aggregate is examined.
+
+See `BUG-GPET-008`.
+
+### HEAL skill
+HEAL computes an absolute target HP then sends that absolute value to delta-based `PointChange(POINT_HP, amount)`.
+
+See `BUG-GPET-009`.
+
+### Pet-name packet strings
+Both hatching and name-change first run unbounded `strlen()` over fixed network character arrays before any bounded `strnlen()`.
+
+See `BUG-GPET-010`.
+
+### Birth socket / final evolution age
+Hatching stores the pet's duration seconds in socket1. The final-evolution helper later treats socket1 as an absolute birth timestamp. This makes normally hatched pets appear far older than 30 days for the evolution-3 age condition.
+
+See `BUG-GPET-011`.
+
+## Current verified findings
+`BUG-GPET-001..BUG-GPET-011`.
+
+## Remaining static work
+1. finish summon/dismiss/death/real-time expiry/rewarp lifetime;
+2. audit EXP table and item/mob EXP arithmetic to level 105;
+3. audit active/passive skill execution beyond HEAL;
+4. audit name-change normal unsummoned branch;
+5. audit attribute determine/change state and material consumption beyond the 55713 OOB;
+6. close DB pet-table save/load/delete ownership and orphan lifecycle;
+7. close current pet race/proto/client asset coverage;
+8. consolidate runtime readiness and decide STATIC COMPLETE.
