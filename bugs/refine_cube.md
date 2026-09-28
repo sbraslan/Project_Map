@@ -126,3 +126,39 @@ The normal UI sends the improve-item slot directly and has no equivalent free-in
 **Impact:** a normal player can lose Cube chance-improvement items when attempting a craft with insufficient reward inventory space.
 
 **Runtime:** Stage A controlled disposable-item test. See `REFCUBE-T05`.
+
+
+## BUG-REFCUBE-006 — Cube recipe control fields are left uninitialized when directives are absent
+
+**Status:** VERIFIED STATIC / CURRENT DEPLOYMENT REACHABLE
+
+`CUBE_DATA` has a user-defined constructor:
+
+`CUBE_DATA() : set_value(0), gem_point(0) {}`
+
+It does **not** initialize at least:
+- `allow_copy`;
+- `not_remove`;
+- `percent`;
+- `gold` (later explicitly set to 0 at section start).
+
+During parsing, a field is assigned only when its matching directive exists. Craft execution then reads `allow_copy` and `not_remove` as transaction-control values.
+
+Current tracked `cube.txt` contains **3327 complete recipe sections**:
+- `allow_copy`: present in **0 / 3327** sections;
+- `not_remove`: present in **2815 / 3327** sections, absent in **512**;
+- `percent`: present in all 3327 sections.
+
+Therefore `allow_copy` is indeterminate for every current recipe, and `not_remove` is indeterminate for 512 current recipes.
+
+These values affect live behavior:
+- `allow_copy || SetVal` can skip normal removal of the first recipe material;
+- the same condition can invoke `CopyAllAttrTo()` from that first material into the reward;
+- later source-count handling changes based on `allow_copy`;
+- `NotRem` can suppress material removal or subsequent cleanup when treated as nonzero / matching a VNUM.
+
+Because reading an uninitialized scalar is undefined/indeterminate behavior, observed results can depend on allocator/stack/build state and are not a reliable implicit zero default.
+
+**Impact:** current Cube recipes can nondeterministically enter copy/not-remove semantics, causing incorrect material consumption and/or metadata copying even though the deployment never enables `allow_copy`.
+
+**Runtime:** Stage C debug/MemorySanitizer or deterministic initialization-comparison test only. See `REFCUBE-T06`.
