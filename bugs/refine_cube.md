@@ -423,3 +423,32 @@ The tracked names show continuous current Serpent refine families such as Snake 
 **Impact:** a successful Serpent refinement can replace an item carrying generated random-default base values with a new item whose random-default array is zero, changing base combat/stat behavior and permanently losing the rolled values.
 
 **Runtime:** Stage B disposable Serpent item test with before/after random-default capture; see `REFCUBE-T15`.
+
+
+## BUG-REFCUBE-016 — Refining a Basic starter item strips its persistent Basic restriction flag
+
+**Status:** VERIFIED STATIC / CURRENT NORMAL FLOW
+
+The current build has:
+- `ENABLE_GIVE_BASIC_ITEM` enabled;
+- `BLOCK_REFINE_ON_BASIC` commented out / disabled.
+
+Starter equipment is explicitly created with `is_basic = true`; tracked examples include starter body armor at +0.
+
+The Basic flag is persistent and is enforced by multiple item/economy paths, including:
+- private-shop placement;
+- dropping;
+- sealing/unsealing;
+- attribute-modification related paths;
+- other item-handling restrictions.
+
+Both `DoRefine()` and `DoRefineWithScroll()` contain a Basic-item rejection only under `#ifdef BLOCK_REFINE_ON_BASIC`, so that rejection is absent in this build.
+
+On successful refinement the new item is produced through `CreateItem()` + `ITEM_MANAGER::CopyAllAttrTo()`.
+`CopyAllAttrTo()` does not copy `IsBasicItem()/is_basic`; a newly created item starts with `is_basic = false`.
+
+Therefore a refinable Basic starter item can succeed into the next VNUM and emerge as an ordinary non-Basic item.
+
+**Impact:** Basic-item restrictions can be removed by refinement, allowing the transformed item to enter operations from which the original starter item was intentionally blocked.
+
+**Runtime:** Stage B disposable fresh-character starter-item test; see `REFCUBE-T16`.
