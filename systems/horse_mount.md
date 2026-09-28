@@ -215,3 +215,56 @@ This is a strong lifetime-laundering candidate, but promotion is deferred until 
 6. promote only verified reachable additional Horse/Mount bugs/tests.
 
 No runtime execution is authorized. Global first future live gate remains `DUNGEON-T10`.
+
+
+## Checkpoint — horse progression + expiry + Achievement ownership
+
+### BUG-HORSE-002 — tracked deployment has no normal-player horse-level progression producer
+Current deployment evidence:
+- `quest_list` loads exactly the tracked h_horse package already mapped.
+- recursive tracked quest/object state contains only the eight deployed horse/mount scripts; no horse level-up/mission/advance quest state exists.
+- no compiled `object/50050/use` handler exists.
+- `horse_exchange_ticket.quest` converts item 50005 into item 50050, but the tracked quest package contains no consumer that turns 50050 into horse level progression.
+- active horse scripts call `horse.get_level/get_grade` for gates but never call `horse.advance` or `horse.set_level`.
+- server Lua exposes `horse.advance` and `horse.set_level`, proving the engine-side capability exists.
+- the direct command `/horse_level` is registered at `GM_HIGH_WIZARD`, so it is not a normal-player progression path.
+- no hardcoded 50050/horse-level setter path was found in the mapped item-use surfaces.
+
+Result: within the tracked deployment, normal gameplay has horse-grade/level consumers but no producer. Existing characters with pre-populated DB horse levels can still use the system, but new/zero-level progression is not implemented by the tracked content.
+
+Promoted as `BUG-HORSE-002`.
+
+### Mount expiry lifecycle closed
+For equipped ride items / costume mounts:
+`real_time_expire_event` or `timer_based_on_wear_expire_event`
+-> `ITEM_MANAGER::RemoveItem`
+-> `CItem::RemoveFromCharacter`
+-> `CItem::Unequip`
+-> `ModifyPoints(false)`
+-> active mount-proto-affect branch re-evaluates `MountVnum(GetPoint(POINT_MOUNT))`.
+
+Therefore normal item expiry removes the mount point and synchronizes the visible mount VNUM. No separate stale-mount expiry bug was verified.
+
+### Achievement SUMMON_MOUNT ownership resolved
+Current `achievements.xml` contains configured `TYPE_SUMMON_MOUNT` tasks (including achievements 61, 62 and 63).
+
+Horse/mount summon/equip/ride paths contain no `CAchievementSystem::OnSummon(...TYPE_SUMMON_MOUNT...)` producer. PetSystem does call `OnSummon(...TYPE_SUMMON_PET...)`.
+
+This is already canonically owned by `BUG-ACH-006` in the completed Achievement subsystem. Horse/Mount mapping therefore cross-references that bug and does not create a duplicate Horse bug ID.
+
+### ChangeLook lifetime candidate status
+Static code still shows:
+- ChangeLook accept stores donor VNUM then destroys donor;
+- donor expiry metadata is not transferred;
+- costume-mount ChangeLook expiry event restart is not wired like horse-summon items.
+
+However, the tracked `Project_DumpProto/*/item_proto.txt` snapshot is not exposed by the current connector as decodable line text, so a deployed time-limited `COSTUME_MOUNT` row cannot be proven from repository data in this pass. The candidate remains unpromoted rather than inferred.
+
+## Exact next work
+1. close Additional Equipment Page interaction with UNIQUE ride items;
+2. close client mount packet/race/asset and horse-appearance coverage;
+3. audit horse name/appearance persistence + ChangeLook interaction;
+4. revisit ChangeLook lifetime only if a concrete time-limited COSTUME_MOUNT row becomes readable;
+5. decide Horse/Mount STATIC COMPLETE and prepare deferred runtime tests.
+
+No runtime execution is authorized. Global first future live gate remains `DUNGEON-T10`.
