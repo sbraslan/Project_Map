@@ -15,8 +15,8 @@
     "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Consolidate Shop / Premium Private Shop runtime readiness from bugs/shop.md and tests/shop.md without executing tests.",
-      "Preserve historical IDs but use canonical subsystem test IDs when legacy identifiers collide.",
+      "Consolidate Safebox / Mall runtime readiness from bugs/safebox_mall.md and tests/safebox_mall.md without executing tests.",
+      "Preserve canonical-versus-provisional status exactly and add unique test IDs only when needed.",
       "Keep DUNGEON-T10 as the first future live runtime gate.",
       "Preserve all source/game repositories as read-only until the user explicitly changes phase."
     ]
@@ -175,7 +175,8 @@
     "RUNTIME.md::Inventory Item T01-T13 readiness consolidated; execution locked",
     "RUNTIME.md::Switchbot SWB-T01-T07 canonical readiness consolidated; execution locked",
     "RUNTIME.md::Guild Storage GS-T01-T20 readiness consolidated; execution locked",
-    "RUNTIME.md::Exchange EXC-T01-T10 canonical readiness consolidated; execution locked"
+    "RUNTIME.md::Exchange EXC-T01-T10 canonical readiness consolidated; execution locked",
+    "RUNTIME.md::Shop SHP-T01-T14 canonical readiness consolidated; execution locked"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -344,7 +345,7 @@
       "SMT-T05",
       "SMT-T06"
     ],
-    "documentation_cursor": "shop",
+    "documentation_cursor": "safebox_mall",
     "completed_readiness_clusters": [
       "dungeon_info",
       "ticket",
@@ -355,7 +356,8 @@
       "inventory_items",
       "switchbot",
       "guild_storage",
-      "exchange"
+      "exchange",
+      "shop"
     ],
     "dungeon_info": {
       "status": "DOCUMENTATION READY / NOT RUN",
@@ -682,6 +684,80 @@
       "normal_path_candidates": [
         "EXC-T01",
         "EXC-T02"
+      ]
+    },
+    "shop": {
+      "status": "DOCUMENTATION READY / NOT RUN",
+      "canonical_test_ids": [
+        "SHP-T01",
+        "SHP-T02",
+        "SHP-T03",
+        "SHP-T04",
+        "SHP-T05",
+        "SHP-T06",
+        "SHP-T07",
+        "SHP-T08",
+        "SHP-T09",
+        "SHP-T10",
+        "SHP-T11",
+        "SHP-T12",
+        "SHP-T13",
+        "SHP-T14"
+      ],
+      "verified_bug_tests": {
+        "BUG-SHOP-001": [
+          "SHP-T01"
+        ],
+        "BUG-SHOP-002": [
+          "SHP-T02"
+        ],
+        "BUG-SHOP-003": [
+          "SHP-T03"
+        ],
+        "BUG-SHOP-004": [
+          "SHP-T04"
+        ],
+        "BUG-SHOP-005": [
+          "SHP-T05"
+        ],
+        "BUG-SHOP-006": [
+          "SHP-T06"
+        ],
+        "BUG-SHOP-007": [
+          "SHP-T07"
+        ],
+        "BUG-SHOP-008": [
+          "SHP-T08"
+        ],
+        "BUG-SHOP-009": [
+          "SHP-T09"
+        ],
+        "BUG-SHOP-010": [
+          "SHP-T10"
+        ]
+      },
+      "observation_tests": {
+        "OBS-SHOP-001": [
+          "SHP-T11"
+        ],
+        "OBS-SHOP-002": [
+          "SHP-T12"
+        ],
+        "OBS-SHOP-003": [
+          "SHP-T13"
+        ],
+        "OBS-SHOP-004": [
+          "SHP-T14"
+        ]
+      },
+      "historical_test_notes": {
+        "SHOP-T01": "observation-only after downgrade",
+        "SHOP-T02": "superseded by SHP-T03",
+        "SHOP-T03": "superseded by SHP-T01"
+      },
+      "normal_path_candidates": [
+        "SHP-T02",
+        "SHP-T03"
       ]
     }
   }
