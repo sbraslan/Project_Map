@@ -8,22 +8,22 @@
   "active": {
     "subsystem": "horse_mount",
     "display_name": "Horse / Mount / Riding",
-    "status": "STATIC MAPPING IN PROGRESS / 1 PROMOTED HORSE-MOUNT BUG / EXECUTION LOCKED",
+    "status": "STATIC MAPPING IN PROGRESS / 2 PROMOTED HORSE-MOUNT BUGS / EXECUTION LOCKED",
     "system_file": "systems/horse_mount.md",
     "bug_file": "bugs/horse_mount.md",
     "test_file": "tests/horse_mount.md",
     "verified_bug_ids": [
-      "BUG-HORSE-001"
+      "BUG-HORSE-001",
+      "BUG-HORSE-002"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Verify current deployed time-limited COSTUME_MOUNT data and close the ChangeLook lifetime candidate.",
-      "Locate or exclude non-h_horse active horse-level progression producers.",
-      "Close real-time and timer-based mount expiry paths.",
-      "Resolve Achievement SUMMON_MOUNT producer gap.",
-      "Close client race/proto/horse-appearance coverage.",
-      "Promote only verified reachable additional Horse/Mount bugs and tests.",
-      "Do not execute HORSE-T01 or any Horse/Mount runtime test without an explicit phase change."
+      "Close Additional Equipment Page interaction with UNIQUE ride items.",
+      "Close client mount packet/race/assets and horse appearance coverage.",
+      "Audit horse-name/appearance persistence and ChangeLook interaction.",
+      "Revisit ChangeLook lifetime only if a concrete time-limited COSTUME_MOUNT row becomes readable.",
+      "Decide Horse/Mount STATIC COMPLETE and consolidate deferred runtime tests.",
+      "Do not execute HORSE-T01/HORSE-T02 or any Horse/Mount runtime test without an explicit phase change."
     ]
   },
   "startup": {
@@ -2317,7 +2317,8 @@
       "tests": "tests/horse_mount.md"
     },
     "verified_bug_ids": [
-      "BUG-HORSE-001"
+      "BUG-HORSE-001",
+      "BUG-HORSE-002"
     ],
     "mapped_flows": [
       "CHorseRider level/health/stamina/riding state and timer events",
@@ -2336,20 +2337,24 @@
       "BUG-HORSE-001::POINT_MOUNT changes without MountVnum synchronization",
       "equipped ride item ModifyPoints -> explicit MountVnum add/remove lifecycle",
       "death UnEquipSpecialRideUniqueItem includes mount costume",
-      "restricted-map EnterGame -> IS_MOUNTABLE_ZONE -> Unmount"
+      "restricted-map EnterGame -> IS_MOUNTABLE_ZONE -> Unmount",
+      "tracked quest/object deployment -> no horse level-up/advance producer -> BUG-HORSE-002",
+      "real-time/timer-based mount expiry -> RemoveItem -> RemoveFromCharacter -> Unequip -> MountVnum cleanup",
+      "Achievement TYPE_SUMMON_MOUNT missing producer cross-reference -> BUG-ACH-006 ownership"
     ],
     "runtime_tests": {
       "status": "READY / EXECUTION LOCKED / NOT RUN",
       "canonical_test_ids": [
-        "HORSE-T01"
+        "HORSE-T01",
+        "HORSE-T02"
       ],
       "first_live_gate_unchanged": "DUNGEON-T10"
     },
     "candidates": [
-      "CTransmutation mount ChangeLook stores donor VNUM and destroys donor without mapped donor lifetime/socket2/event transfer; verify current time-limited COSTUME_MOUNT deployment.",
-      "Active h_horse scripts have horse level/grade gates but no horse.advance/set_level producer; exclude other active quest producers before promotion.",
+      "CTransmutation mount ChangeLook stores donor VNUM and destroys donor without mapped donor lifetime/socket2/event transfer; concrete deployed time-limited COSTUME_MOUNT row could not be proven from connector-readable data.",
       "DB-loaded THorseInfo.bLevel is copied without a clamp before c_aHorseStat access; no tracked malformed producer established.",
-      "Login SetHorseLevel(GetHorseLevel()) resets underlying HP/stamina/drop-time; current infinite-health/stamina build masks a distinct gameplay consequence."
+      "Login SetHorseLevel(GetHorseLevel()) resets underlying HP/stamina/drop-time; current infinite-health/stamina build masks a distinct gameplay consequence.",
+      "Additional Equipment Page UNIQUE ride item state synchronization remains open."
     ]
   }
 }
