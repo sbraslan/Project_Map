@@ -49,3 +49,7 @@ Open those only when needed.
 
 ## Legacy archive
 Full pre-migration maps/checkpoints are in `archive/`. They are fallback evidence, not startup context.
+
+
+## Runtime-readiness milestone — 2026-09-28
+All STATIC COMPLETE subsystem rows currently represented by the canonical mapping have deferred runtime-readiness coverage or an explicitly folded ownership path. Runtime execution remains locked. The active documentation cursor is now the global readiness integrity audit; first future live gate remains DUNGEON-T10.
