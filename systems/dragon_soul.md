@@ -146,16 +146,11 @@ See `BUG-DS-003`.
 
 ## Candidate / not yet promoted
 
-### Step refine equipped-first validation asymmetry
-`DoRefineGrade()` rejects equip positions before collection.
-`DoRefineStrength()` and `DoChangeAttr()` check `IsEquipped()` for every collected item.
+### Step refine equipped-first validation asymmetry — PROMOTED
 
-`DoRefineStep()` initializes type/grade/step from the first element of a `std::set<LPITEM>`, then checks `IsEquipped()` only inside `while (++it != end)`.
+`DoRefineStep()` accepts packet-supplied equipment positions, inserts item pointers into a `std::set`, and skips `IsEquipped()` for `set_items.begin()`.
 
-Therefore the first pointer in set ordering is never checked for equipped state.
-A crafted item grid containing an equipped DS can bypass this check only when that equipped pointer is the first sorted element and the material-count constraints also pass.
-
-Because pointer-order dependency affects reproducibility, this remains candidate-only for now.
+If the equipped Dragon Soul is first in pointer ordering, it reaches the destructive Step-refine consumption path. This is now `BUG-DS-008`.
 
 ### Data-boundary candidates
 - `GetBasePosition()` uses `row_type > DRAGON_SOUL_GRADE_MAX` rather than `>=`; malformed grade == max can cross the intended row bound.
@@ -254,3 +249,31 @@ The tracked `dragon_soul_table.txt` also contains:
 The mapped current server/client DragonSoulTable loaders do not expose corresponding consumers for these groups, and `DoChangeAttr()` uses hard-coded step counts plus the material proto VALUE0 fee instead.
 
 These groups are recorded as legacy/dead data in the current mapped implementation, not promoted as a bug without a required runtime consumer.
+
+
+## Grade / Step / Strength material semantics — current pass
+
+### Grade
+- rejects equipment positions before item resolution;
+- deduplicates repeated positions by item pointer;
+- requires exact distinct-item count from the table;
+- requires same DS type + grade across inputs;
+- consumes the required sources only after result item creation and fee validation.
+
+### Step
+- deduplicates by pointer and requires exact distinct-item count;
+- requires same DS type + grade + step;
+- consumption/result ordering otherwise mirrors Grade;
+- unlike Grade, it lacks the initial equipment-position rejection and skips `IsEquipped()` for the first pointer-sorted item.
+
+That validation difference is promoted as `BUG-DS-008`.
+
+### Strength
+- requires exactly one Dragon Soul pointer and one accepted refine-material pointer;
+- all collected items are checked for `IsEquipped()`;
+- table lookup by material subtype determines whether the chosen refine material is valid for the current strength level;
+- one refine material unit is consumed per attempt.
+
+No additional normal-data stack/material-count defect was promoted in this pass.
+
+Potential stacked-Dragon-Soul arithmetic in Grade/Step remains non-promoted because current mapping has not established a normal stackable DS producer/invariant violation in tracked data.
