@@ -98,3 +98,24 @@ Do not promote or test these until the missing producer/schema is recovered:
 
 ## Phase lock
 No runtime action has been performed. Source/game repositories remain read-only.
+
+
+## Sung Mahi Tower readiness consolidation — 2026-09-28
+- No Sung Mahi Tower runtime test was executed.
+- SMT-T01 -> BUG-SMT-001.
+- SMT-T02 -> BUG-SMT-002.
+- SMT-T03 -> BUG-SMT-003.
+- SMT-T04 -> BUG-SMT-004.
+- SMT-T05 -> BUG-SMT-005.
+- SMT-T06 -> BUG-SMT-006.
+- Primary normal/current-repository candidate: SMT-T01.
+- SMT-T05 is deterministic data validation and may not need runtime execution if static evidence is sufficient.
+- SMT-T06 is deployment/proto-load validation and must distinguish tracked-source state from any stale/external binary proto.
+- SMT-T02/T03/T04 require isolated time/state or ASan/debug environments.
+- The following remain **deferred findings, not verified bug IDs**:
+  - nullable `pc.mailbox_reward` mailbox pointer precondition;
+  - missing `smhgate_flower` 9100–9107 server monster folder without a tracked producer;
+  - ranking `player_login` versus character-name mailbox recipient semantics;
+  - malformed/out-of-range quest-produced `dungeonLevel`;
+  - `m_bDungeon_Difficulty` versus `dungeonLevel` synchronization dependency.
+- Overall first live runtime gate remains DUNGEON-T10.
