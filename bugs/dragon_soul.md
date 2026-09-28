@@ -210,7 +210,38 @@ With self-opener `/refine_open`, the pointer itself remains valid across the war
 
 ## Candidate / unpromoted refinements
 
-- `DoRefineStep()` skips `IsEquipped()` for the first pointer in its std::set; pointer-order dependence remains unresolved.
 - `GetBasePosition()` accepts grade == DRAGON_SOUL_GRADE_MAX due `>` rather than `>=`; malformed VNUM/proto required.
 - `DoChangeAttr()` indexes a five-element need-count array by VNUM-derived step without explicit bounds validation; malformed VNUM/proto required.
 - ChangeAttrStepTables / ChangeStone* groups are present in data but not consumed by the mapped current server/client implementation; treated as legacy/dead data, not a bug by itself.
+
+
+## BUG-DS-008 — Step refine skips equipped-state validation for the first pointer-sorted Dragon Soul
+
+**Status:** VERIFIED STATIC / ORDER-DEPENDENT REACHABILITY
+
+`DoRefineGrade()` explicitly rejects every packet grid position whose `TItemPos::IsEquipPosition()` is true before resolving the item.
+
+`DoRefineStep()` does not perform that packet-position check.
+
+Instead it:
+1. resolves all non-null grid positions;
+2. inserts the resulting item pointers into `std::set<LPITEM>`;
+3. uses `set_items.begin()` as the reference Dragon Soul;
+4. advances the iterator first with `while (++it != set_items.end())`;
+5. only inside that loop checks `pItem->IsEquipped()`.
+
+Therefore the first pointer-sorted item is never checked for `IsEquipped()`.
+
+The C2S refine packet carries full `TItemPos` entries, so a modified client can include an equipped Dragon Soul position. If that equipped item becomes `set_items.begin()`, it can pass the missing validation while later items satisfy matching type/grade/step and material-count requirements.
+
+The consumption phase later calls either:
+- `RemoveFromCharacter(); M2_DESTROY_ITEM(...)`; or
+- `SetCount(...)`.
+
+For an equipped Dragon Soul, `RemoveFromCharacter()` explicitly enters `Unequip()` before removal, so this is not merely a harmless reference to an equipped object: a successful/failed Step refine can consume an equipped Dragon Soul when the pointer ordering places it first.
+
+**Impact:** server-side equipped-item invariant for Step refine is order-dependent; a crafted refine grid can reach destructive refinement of an equipped Dragon Soul.
+
+**Reachability note:** which item is first depends on process pointer ordering, so a single attempt is not deterministic. The missing validation and destructive path are static facts.
+
+**Runtime:** Stage B/C isolated modified-client/state test only; never production.
