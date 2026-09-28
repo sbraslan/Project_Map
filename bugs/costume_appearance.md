@@ -193,3 +193,37 @@ Later server operations dereference the stale pointer:
 
 - Hide-costume body/weapon getters correctly prefer the underlying armor/weapon ChangeLook VNUM while the costume visual is hidden.
 - Initial same-type/subtype/anti-flag compatibility is internally consistent; the vulnerability is the later state transition in BUG-LOOK-005.
+
+
+## BUG-LOOK-007 — ChangeLook/Acce overlap can invalidate retained item pointers
+
+**Status:** VERIFIED STATIC
+
+Root cause:
+- renewed window registry has `W_ACCE` and `W_CHANGELOOK`;
+- `CTransmutation::Open()` does not check Acce state;
+- `OpenAcceCombination()` / `OpenAcceAbsorption()` do not check ChangeLook state.
+
+Therefore both server windows can be active simultaneously.
+
+ChangeLook stores raw `LPITEM` values and does not lock accepted items.
+
+Acce absorption accepts a normal inventory material and can consume eligible weapon/armor material using:
+`ITEM_MANAGER::RemoveItem(AcceMaterial, "ABSORBED (REFINE SUCCESS)")`.
+
+A weapon or body armor can therefore be:
+1. checked into ChangeLook;
+2. reused as Acce absorption material while ChangeLook remains open;
+3. destroyed by Acce;
+4. still referenced by `CTransmutation::m_Item[]`.
+
+A subsequent ChangeLook checkout/accept dereferences the invalid pointer.
+
+This is related to BUG-LOOK-006 but has a distinct root cause: **missing cross-window mutual exclusion**, not asynchronous expiry.
+
+**Impact:** deterministic cross-system use-after-free/core-crash candidate with disposable compatible items.
+
+**Runtime:** isolated/debug/sanitizer only.
+
+### Aura note
+Aura can also be opened concurrently with ChangeLook. Aura's own lock semantics reduce direct equivalence with Acce, so it remains a documented cross-window consistency issue rather than a separate verified bug in this pass.
