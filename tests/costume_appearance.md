@@ -36,3 +36,37 @@ Safety class:
 - commit/consumption: isolated disposable data.
 
 No test executed.
+
+
+## LOOK-T03 — Warp with ChangeLook window active
+Covers `BUG-LOOK-003`.
+
+Future controlled test:
+1. open ChangeLook normally;
+2. check in at least the left target;
+3. invoke a normal server-authorized same-core warp path;
+4. observe whether warp succeeds;
+5. after arrival inspect ChangeLook/UI state and attempt ordinary inventory movement;
+6. capture whether CANCEL/reopen/reconnect is needed to restore item handling.
+
+Static prediction:
+- `CanWarp()` does not reject `W_CHANGELOOK`;
+- `WarpSet()` does not clear `m_pkTransmutation`.
+
+Safety class: **Stage A/B controlled normal-flow**, depending on available same-core warp path.
+
+## LOOK-T04 — Sealed material server revalidation
+Covers `BUG-LOOK-004`.
+
+Future isolated modified-client test:
+1. use a disposable sealed/bound item that is otherwise type/subtype/anti-flag compatible as the right material;
+2. bypass the official client UI seal check and send normal ChangeLook check-in;
+3. verify server right-slot acceptance;
+4. do not commit against valuable data;
+5. in an isolated disposable setup, optionally Accept and verify consumption.
+
+Static prediction: server accepts because no `IsSealed()` validation exists in the transmutation path.
+
+Safety class: **Stage B isolated / modified client**.
+
+No test executed.
