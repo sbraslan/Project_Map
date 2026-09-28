@@ -269,3 +269,18 @@ This is independent of BUG-BFIELD-003:
 - 011 clears the cooldown entry entirely on reconnect, even before its first 60-second expiry.
 
 Temporary unbanked Battle Field score is also RAM-only and is forfeited on reconnect, but whether that forfeit is intentional is not classified separately.
+
+
+## Registry/readiness normalization — 2026-09-28
+
+Cross-system consistency correction:
+- `BUG-BFIELD-004` is **RETRACTED / RESERVED**. The earlier Battle Field audit missed the same transitive declaration path later closed in Ranking: global `LoadRanking(uint8_t)` is declared through the mapped include chain and implemented in `cmd_general.cpp`. This is the same false-positive class as retracted `BUG-RANK-006`.
+- `BUG-BFIELD-005` is not retained as an independent current Battle Field bug. Its stale weekly-winner-row defect is canonically owned by `BUG-RANK-003`.
+- `BUG-BFIELD-007` is not retained as an independent current Battle Field bug. Its online winner-flag refresh defect is canonically owned by `BUG-RANK-007`.
+
+Battle Field historical text is preserved for audit history. Runtime-readiness ownership uses:
+- unique active Battle Field bugs: `BUG-BFIELD-001`, `002`, `003`, `006`, `008`, `009`, `010`, `011`;
+- retracted/reserved: `BUG-BFIELD-004`;
+- cross-system aliases: `BUG-BFIELD-005 -> BUG-RANK-003`, `BUG-BFIELD-007 -> BUG-RANK-007`.
+
+No new bug IDs are created by this normalization.
