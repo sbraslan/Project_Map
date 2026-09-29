@@ -46,3 +46,9 @@ Important global ID rules:
 - `BUG-AURA-001` -> `aura.md`.
 - Status: STATIC MAPPING IN PROGRESS.
 - First verified finding: post-open Aura transaction distance gate bypass.
+
+
+## Messenger / Friend / Block ownership — 2026-09-29
+- `BUG-MSG-001..006` -> `messenger.md`.
+- Status: MAPPING IN PROGRESS / VERIFIED STATIC findings.
+- Deferred runtime ownership: `../tests/messenger.md` (`MSG-T01..MSG-T06`); execution locked.
