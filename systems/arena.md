@@ -1,6 +1,6 @@
 # Arena / PvP Duel — Static Map
 
-**Status:** STATIC MAPPING IN PROGRESS / 3 VERIFIED BUGS  
+**Status:** STATIC COMPLETE / 3 VERIFIED BUGS  
 **Phase:** Detection / Mapping Only  
 **Opened:** 2026-09-29  
 **Source/Game repositories:** READ-ONLY  
@@ -170,3 +170,17 @@ Keep BattleArena lifecycle separate from classic duel correctness.
 
 ## Runtime
 No Arena runtime test may be executed while the global execution lock is active. First future live gate remains `DUNGEON-T09`.
+
+
+## Final static closure
+Arena / PvP Duel static mapping is complete for the tracked snapshot with `BUG-ARENA-001..003`.
+
+Shadowed/deferred classic findings remain intentionally unpromoted:
+- timeout end/reset packet is sent to player A twice and never B;
+- observer packet/chat broadcast implementations are currently commented out/no-op;
+- EndDuel clears the observer map but does not explicitly clear each live observer's Arena pointer/observer modes;
+- map112 has no tracked MAP_ALLOW owner and StartDuel ignores WarpSet return values;
+- settings.lua loads map112 arena slots into each game process, but no current deployed owner exists, so cross-process post-deployment behavior must be re-audited if map112 is restored.
+
+BattleArena after-fix observations:
+- empire2/3 random-stone region Y bounds are reversed in source, but current maps 191/192 are absent, so this remains shadowed by BUG-ARENA-002.
