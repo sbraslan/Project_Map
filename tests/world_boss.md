@@ -78,4 +78,4 @@ Covers BUG-WB-016.
 - Client parser/UI-isolation: WB-T04, WB-T05, WB-T06, WB-T07.
 - Ranking/drop-shaping: WB-T03, WB-T10.
 - Controlled reward atomicity: WB-T08.
-- Overall first live runtime gate remains DUNGEON-T10.
+- Overall first live runtime gate remains DUNGEON-T09.
