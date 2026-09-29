@@ -175,4 +175,14 @@ After runtime is explicitly unlocked:
 4. inspect both friend-list directions, the block relation and persistent DB rows.
 
 Bug signature: the pending request is accepted despite the new block and the pair ends up simultaneously friend-related and blocked.
+
+## MSG-T16 — GM inverse-cache accumulation
+After runtime execution is explicitly unlocked:
+1. start a clean game process with GM messenger enabled;
+2. log in and out many distinct normal accounts without restarting the process;
+3. inspect `m_InverseGMRelation[gm]` cardinality after those accounts are offline;
+4. trigger the GM's login/logout presence and profile the fanout work.
+
+Bug signature: offline historical accounts remain in the GM inverse set and are still traversed on later GM presence changes.
+
 Do not run any MSG test while the project execution lock is active.
