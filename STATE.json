@@ -8,7 +8,7 @@
   "active": {
     "subsystem": "messenger",
     "display_name": "Messenger / Friend / Block",
-    "status": "MAPPING IN PROGRESS / 14 VERIFIED BUGS / EXECUTION LOCKED",
+    "status": "MAPPING IN PROGRESS / 15 VERIFIED BUGS / EXECUTION LOCKED",
     "system_file": "systems/messenger.md",
     "bug_file": "bugs/messenger.md",
     "test_file": "tests/messenger.md",
@@ -33,10 +33,10 @@
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Close channel-change/reconnect P2P ordering candidate around LOGIN(new) versus delayed LOGOUT(old).",
-      "Finish remaining GM messenger lifecycle checks after BUG-MSG-013.",
-      "Audit remaining messenger parser/state boundaries after BUG-MSG-012 and observer parity after BUG-MSG-014.",
-      "Check tracked quest usage/reachability of BUG-MSG-011 Lua helpers.",
+      "Finish remaining GM messenger cache/login/logout lifecycle after BUG-MSG-013.",
+      "Audit remaining client/server messenger packet validation after BUG-MSG-012.",
+      "Check tracked quest usage and practical reachability of BUG-MSG-011 Lua relation helpers.",
+      "Perform final Messenger relation/cache symmetry pass and decide STATIC COMPLETE.",
       "Do not execute runtime tests; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -2716,11 +2716,11 @@
       "CInputMain Messenger add-by-name/block-by-name -> normal uimessenger.py name dialogs -> observer-mode guard bypass",
       "PythonNetworkStreamPhaseGame.cpp outgoing messenger name fields -> 48-byte configured-name truncation/non-termination boundary",
       "Project_Game quest corpus search -> no tracked caller of pc.is_blocked / pc.is_friend",
-      "uimessenger.py add-by-name friend/block -> CInputMain::Messenger observer-mode parity bypass"
+      "uimessenger.py add-by-name friend/block -> CInputMain::Messenger observer-mode parity bypass",
+      "channel move old GG_LOGOUT + new WarpEnd GG_LOGIN -> third-core CCI descriptor overwrite/stale logout race"
     ],
     "candidates": [
-      "Battle Field friend-add parity: ADD_BY_NAME rejects battle-zone use but ADD_BY_VID has no equivalent server-side map check; normal target-board VID route is exposed and final UI/map reachability is under closure.",
-      "channel-change P2P ordering: LOGIN(new) can update an existing CCI, while a later LOGOUT(old) removes by name without validating source descriptor; runtime/order proof still pending"
+      "Battle Field friend-add parity: ADD_BY_NAME rejects battle-zone use but ADD_BY_VID has no equivalent server-side map check; normal target-board VID route is exposed and final UI/map reachability is under closure."
     ],
     "runtime_tests": {
       "status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN",
