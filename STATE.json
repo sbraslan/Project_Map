@@ -6,32 +6,19 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "monarch",
-    "display_name": "Monarch",
-    "status": "STATIC MAPPING IN PROGRESS / 12 VERIFIED BUGS / EXECUTION LOCKED",
-    "system_file": "systems/monarch.md",
-    "bug_file": "bugs/monarch.md",
-    "test_file": "tests/monarch.md",
-    "verified_bug_ids": [
-      "BUG-MON-001",
-      "BUG-MON-002",
-      "BUG-MON-003",
-      "BUG-MON-004",
-      "BUG-MON-005",
-      "BUG-MON-006",
-      "BUG-MON-007",
-      "BUG-MON-008",
-      "BUG-MON-009",
-      "BUG-MON-010",
-      "BUG-MON-011",
-      "BUG-MON-012"
-    ],
+    "subsystem": "attr6th7th",
+    "display_name": "6th/7th Attribute",
+    "status": "STATIC MAPPING OPEN / 0 VERIFIED BUGS / EXECUTION LOCKED",
+    "system_file": "systems/attr6th7th.md",
+    "bug_file": "bugs/attr6th7th.md",
+    "test_file": "tests/attr6th7th.md",
+    "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Audit AddMoney overflow/failure fanout symmetry.",
-      "Inspect monarch notice and remaining treasury producers for independent defects.",
-      "Close dormant Lua candidates explicitly.",
-      "Decide Monarch STATIC COMPLETE.",
+      "Map Attr6th7th manager lifecycle and item state transitions.",
+      "Map quest Lua bindings and deployed caller reachability.",
+      "Audit material/cost consumption ordering, success/failure, and item ownership/revalidation.",
+      "Trace client-visible request/result path if present.",
       "Keep runtime/fault-injection execution locked; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -407,7 +394,8 @@
     "aura",
     "refine_cube",
     "marriage",
-    "oxevent"
+    "oxevent",
+    "monarch"
   ],
   "ranking_closure": {
     "status": "STATIC COMPLETE",
@@ -2814,7 +2802,7 @@
       "exact source fetch"
     ],
     "context7_role": "supplementary external library/API documentation verification; not authoritative Metin2 source location",
-    "next_action": "finish Monarch AddMoney/notice/dormant closure; Context7 supplementary only"
+    "next_action": "start Attr6th7th static mapping from indexed roots; Context7 supplementary only"
   },
   "marriage_mapping": {
     "status": "STATIC COMPLETE / 14 VERIFIED BUGS",
@@ -3018,7 +3006,7 @@
     ]
   },
   "monarch_mapping": {
-    "status": "STATIC MAPPING IN PROGRESS / 12 VERIFIED BUGS",
+    "status": "STATIC COMPLETE / 11 VERIFIED BUGS",
     "canonical_files": {
       "system": "systems/monarch.md",
       "bugs": "bugs/monarch.md",
@@ -3035,8 +3023,7 @@
       "BUG-MON-008",
       "BUG-MON-009",
       "BUG-MON-010",
-      "BUG-MON-011",
-      "BUG-MON-012"
+      "BUG-MON-011"
     ],
     "mapped_flows": [
       "GM elect -> HEADER_GD_COME_TO_VOTE -> DB ComeToVote -> CMonarch::ElectMonarch -> no winner/state update -> BUG-MON-001",
@@ -3054,14 +3041,10 @@
       "CHARACTER recreation -> InitMC backdates cooldown timestamps by full limits -> relog makes enforced monarch cooldowns ready -> BUG-MON-009",
       "mtax -> SetMC(MI_TAX) without IsMCOK(MI_TAX) gate -> BUG-MON-010",
       "mto private target -> private index normalized for allow check -> coordinate-only WarpSet -> base map route + charge/cooldown -> BUG-MON-011",
-      "remote mtr from private map -> GG_TRANSFER(name,x,y) no map index -> receiver WarpSet(x,y) -> base map route + charge/cooldown -> BUG-MON-012"
+      "remote mtr from private map -> GG_TRANSFER(name,x,y) no map index -> receiver WarpSet(x,y) -> base map route + charge/cooldown -> BUG-MON-012",
+      "IsMonarchWarpZone(private) normalizes base index -> local mto WarpSet(x,y) / cross-core mtr GG_TRANSFER(x,y only) drop private map index -> base-map routing -> BUG-MON-011"
     ],
-    "candidates": [
-      "process-local PowerUp/DefenseUp plus wrong defense-event cast remain dormant because no current Project_Game caller is tracked.",
-      "takemonarchmoney validation is compiled out but no current Project_Game caller is tracked.",
-      "remaining AddMoney overflow/failure fanout symmetry.",
-      "remaining monarch notice and treasury-producer boundaries."
-    ],
+    "candidates": [],
     "runtime_tests": {
       "status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN",
       "canonical_test_ids": [
@@ -3075,14 +3058,20 @@
         "MON-T08",
         "MON-T09",
         "MON-T10",
-        "MON-T11",
-        "MON-T12"
+        "MON-T11"
       ],
       "first_live_gate_unchanged": "DUNGEON-T09"
     },
     "context7_notes": [
       "cppreference confirms default-initialized scalar storage used by new int[n] is indeterminate without value initialization.",
       "MySQL documentation confirms DML affected-row reporting uses mysql_affected_rows/ROW_COUNT; project libsql exposes this as uiAffectedRows while uiNumRows is result-set rows."
+    ],
+    "closure_notes": [
+      "Monarch static mapping complete with BUG-MON-001..011.",
+      "PowerUp/DefenseUp and takemonarchmoney remain dormant in current tracked quest deployment.",
+      "AddMoney 2B cap and monarch notice final pass produced no additional independent finding.",
+      "Context7 used only for supplementary C++/MySQL semantics; Metin2 source remains authoritative.",
+      "Runtime tests MON-T01..MON-T11 remain locked; first future live gate DUNGEON-T09."
     ]
   }
 }
