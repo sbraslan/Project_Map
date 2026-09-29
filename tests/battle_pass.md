@@ -46,4 +46,4 @@
 - Multiple tests may cover the same verified bug from different angles.
 - BP-T08 remains a broad lifecycle/regression check rather than a unique bug mapping.
 - BP-T02 is the primary normal-path observational candidate.
-- Overall first live runtime gate remains DUNGEON-T10.
+- Overall first live runtime gate remains DUNGEON-T09.
