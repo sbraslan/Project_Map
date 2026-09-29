@@ -146,3 +146,45 @@ Promoted as `BUG-FISH-005`.
 `GetFishCatchedVnum` takes `uint8_t normal_chance, uint8_t rare_chance`, while callers construct the rare value from `15 + POINT_FISHING_RARE + rod socket2`.
 
 The cast/wrap boundary is real, but no current tracked producer/value range proving a >255 or otherwise invalid reachable value has been established yet. Keep this as a candidate, not a promoted bug.
+
+
+## BUG-FISH-006 — renewed fishing event is not cancelled on death or warp
+The renewed event is explicitly cancelled by:
+- `fishing_new_stop()`;
+- character destruction/logout final teardown;
+- the event itself when rod/timeout conditions fail.
+
+But neither `CHARACTER::Dead()` nor `CHARACTER::WarpSet()` cancels `m_pkFishingNewEvent`.
+
+### Death path
+`Dead()` sets `POS_DEAD`, changes the descriptor to `PHASE_DEAD`, and cancels the stun event, but does not cancel renewed fishing.
+
+The fishing event itself does not check `IsDead()`.
+
+If the server has already accepted the third CATCH before death and `m_bFishCatch >= FISHING_NEED_CATCH`, the next fishing event tick calls `fishing_catch_decision(info->vnum)` even though the character is now dead. That decision path also has no death check and can execute the normal final reward roll.
+
+### Warp path
+`CanWarp()` does not consider `m_pkFishingNewEvent`, and `WarpSet()` does not cancel it.
+
+On a same-process/same-character warp, the renewed event therefore remains attached to the character. The event does not revalidate the original map/water location after warp, so the same fishing session can survive a map relocation until another stop condition fires.
+
+Promoted as `BUG-FISH-006`.
+
+## Logout/bait persistence candidate
+`Disconnect()` flushes equipped items before final character destruction; final `Destroy()` cancels `m_pkFishingNewEvent` directly rather than calling `fishing_new_stop()`.
+
+Because bait is stored in rod socket2 and `SetSocket` is persisted, a disconnect during active renewed fishing can save a non-zero bait socket before the event is destroyed. This is a plausible bait-persistence/abort semantic issue, but intended persistence semantics are not yet established, so it remains a candidate rather than a promoted bug.
+
+## Rod refine closure
+`ENABLE_FISHINGROD_RENEWAL` is active.
+
+`RefinableRod()` requires:
+- ITEM_ROD;
+- not equipped;
+- socket0 exactly equals Value2 mastery target.
+
+`RealRefineRod()`:
+- success creates RefinedVnum and replaces the old rod;
+- failure under the active renewal flag keeps the rod grade and subtracts 10% of current mastery socket0.
+
+No additional verified Fishing bug is promoted from the refine routine in this pass.
