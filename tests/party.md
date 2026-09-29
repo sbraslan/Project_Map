@@ -72,4 +72,4 @@ Covers BUG-PARTY-006.
 - Trusted/dev quest semantic validation: PARTY-T06.
 - BUG-PARTY-001 and BUG-PARTY-005 intentionally share the same leader-quit family but validate different failure effects.
 - Party Match is excluded from this file and remains a separate subsystem.
-- Overall first live runtime gate remains DUNGEON-T10.
+- Overall first live runtime gate remains DUNGEON-T09.
