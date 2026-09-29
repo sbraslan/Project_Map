@@ -1,6 +1,6 @@
 # Monarch — Static Map
 
-**Status:** STATIC MAPPING IN PROGRESS / 7 VERIFIED BUGS  
+**Status:** STATIC MAPPING IN PROGRESS / 9 VERIFIED BUGS  
 **Phase:** Detection / Mapping Only  
 **Opened:** 2026-09-29  
 **Source/Game repositories:** READ-ONLY  
@@ -201,3 +201,48 @@ These Lua APIs remain mapped but are not promoted as deployed gameplay bugs with
 3. close process-local power/defense as dormant vs deployed;
 4. inspect remaining monarch notice/warp and money-add boundaries;
 5. decide Monarch static closure.
+
+
+## BUG-MON-008 — DB restart discards persisted candidacy and vote state from runtime
+
+**Class:** restart reconstruction / election lifecycle  
+**Reachability:** VERIFIED.
+
+Candidacy and voting are persisted to:
+- `monarch_candidacy`
+- `monarch_election`
+
+But DB startup `CClientManager::InitializeMonarch()` calls only:
+`CMonarch::LoadMonarch()`.
+
+`LoadMonarch()` reads only the `monarch` table. The class has no loader for candidacy or election tables, and its constructor begins with empty `m_vec_MonarchCandidacy` and `m_map_MonarchElection`.
+
+After DB restart, persisted candidate/vote rows therefore remain in SQL but are absent from the in-memory election state used by `ElectMonarch`, `IsCandidacy` and boot candidacy fanout.
+
+Promoted as `BUG-MON-008`.
+
+## BUG-MON-009 — relog recreates all enforced monarch cooldowns as immediately ready
+
+**Class:** session lifecycle / cooldown persistence  
+**Reachability:** VERIFIED for monarch actions that use `IsMCOK`.
+
+Every new `CHARACTER` object calls `Initialize() -> InitMC()`.
+
+`InitMC()` initializes each cooldown timestamp to the current pulse and then subtracts the complete cooldown limit, intentionally making every category immediately usable:
+- heal;
+- warp;
+- transfer;
+- tax slot;
+- summon.
+
+These timestamps are not part of `TPlayerTable` or another mapped persistence path.
+
+A logout/login or character-object recreation therefore loses active cooldown history. This is independent of `BUG-MON-006`, where the tax command does not check its cooldown at all.
+
+Promoted as `BUG-MON-009`.
+
+## Remaining closure work
+- close PowerUp/DefenseUp and `takemonarchmoney` as deployed versus dormant;
+- inspect add-money edge handling;
+- inspect monarch notice and remaining warp edges;
+- decide STATIC COMPLETE.
