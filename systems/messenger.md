@@ -21,9 +21,11 @@
 
 ### Client / Binary
 - `Project_ClientSrc/UserInterface/PythonMessenger.cpp/.h` — local friend/guild/GM/block caches and Python callbacks.
-- `Project_ClientSrc/UserInterface/PythonNetworkStreamPhaseGame.cpp` — GC messenger receive path.
+- `Project_ClientSrc/UserInterface/PythonNetworkStreamPhaseGame.cpp` — GC messenger receive path plus block add/remove send paths.
+- `Project_ClientSrc/UserInterface/PythonCharacterManager.cpp` — VID lookup semantics (`GetInstancePtr` returns null for absent instances).
 - `Project_Binary/root/uimessenger.py` — friend/guild/GM/block UI groups and online/offline rendering.
 - `Project_Binary/root/game.py` — friend authorization dialog and `messenger.Destroy()` teardown.
+- `Project_Binary/root/uitarget.py` — block/unblock target-board confirmation and social target actions.
 
 ## Core flow
 
@@ -70,14 +72,16 @@ Do not execute runtime tests. Global first future live gate remains `DUNGEON-T09
 - Exchange, PvP and equipment-view paths also check messenger blocks.
 - The target-board “request to join party” path is different: `uitarget.py::__OnRequestParty -> /party_request -> do_party_request -> CHARACTER::RequestToParty`. The final server path never checks messenger block state. See BUG-MSG-008.
 - The previously suspected block-by-VID return-size mismatch is closed: `TPacketCGMessengerAddByVID` and `TPacketCGMessengerAddBlockByVID` are both a single `uint32_t vid`.
-- `RemoveAllBlockList` has asymmetric incoming-row cleanup semantics but remains unpromoted until an active caller is proven.
+- `RemoveAllBlockList` has asymmetric incoming-row cleanup semantics. Active reachability is proven through `questlua_pc.cpp::pc_change_name`; whether the subsequent rename/logout lifecycle fully masks or exposes the stale incoming RAM/P2P state remains under assessment.
+- The missing local `m_poMessengerHandler` guard in `OnBlockLogin` is closed as non-bug because `PyCallClassMemberFunc` performs its own null-class guard.
 
 ## Updated cursor
 Continue static audit of:
-- client messenger parser/state safety, especially block remove-by-VID pointer handling and optimistic local removal;
-- GM messenger cache lifecycle;
+- rename/remove-all lifecycle after the now-proven `pc_change_name -> RemoveAllList/RemoveAllBlockList` caller;
+- pending party/guild invite acceptance after a new messenger block is established;
+- GM messenger cache lifecycle beyond the already verified teardown leak;
 - channel-change/reconnect interaction with asynchronous loads and relation cache reconstruction;
-- active-call reachability of `RemoveAllBlockList`.
+- remaining client messenger parser/state boundaries after BUG-MSG-009.
 
 Do not execute runtime tests. Global first future live gate remains `DUNGEON-T09`.
 
@@ -86,3 +90,11 @@ Do not execute runtime tests. Global first future live gate remains `DUNGEON-T09
 The target-board unblock confirmation stores only the target VID across the confirmation delay. The eventual C++ remove-by-VID path resolves that VID again but does not validate the returned instance pointer before reading its name. This creates BUG-MSG-009 when the target disappears before confirmation.
 
 The same send path removes the local block entry immediately and has no positive server acknowledgement. If server-side `IsBlocked` has already false-negatived because of BUG-MSG-007, the server returns without deleting the persistent row while the client has already removed it from its local set. This is tracked as an explicit BUG-MSG-007 consequence for runtime verification.
+
+
+## Client unblock stale-VID pass
+- `uitarget.py::__OnBlockRemove` opens a confirmation dialog without snapshotting/validating the target identity at accept time.
+- `TargetBoard.Close -> __Initialize` resets `self.vid` to zero but does not close that confirmation.
+- `SendMessengerBlockRemoveByVIDPacket` resolves the VID through `CPythonCharacterManager::GetInstancePtr` and dereferences the result with no null check.
+- `GetInstancePtr` returns `nullptr` for a missing VID.
+- Result: verified `BUG-MSG-009`; deferred test `MSG-T09`.
