@@ -25,7 +25,7 @@
     },
     {
       "id": "oxevent",
-      "status": "STATIC COMPLETE / 7 VERIFIED BUGS",
+      "status": "STATIC COMPLETE / 5 VERIFIED BUGS",
       "evidence": [
         "Project_ServerSRC:game/src/OXEvent.cpp",
         "Project_ServerSRC:game/src/questlua_oxevent.cpp",
@@ -39,12 +39,17 @@
     },
     {
       "id": "arena",
-      "status": "SELECTED / OPEN",
+      "status": "SELECTED / OPEN / 1 VERIFIED BUG",
       "evidence": [
         "Project_ServerSRC:game/src/arena.cpp",
         "Project_ServerSRC:game/src/BattleArena.cpp",
         "Project_ServerSRC:game/src/questlua_arena.cpp",
         "Project_Game:share/locale/europe/quest/n_npc/arena_manager.quest"
+      ],
+      "canonical": [
+        "systems/arena.md",
+        "bugs/arena.md",
+        "tests/arena.md"
       ]
     },
     {
