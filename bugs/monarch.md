@@ -175,16 +175,20 @@ A DB restart during an election disconnects persistent vote/candidate rows from 
 5. The mapped player persistence structure contains no Monarch cooldown fields.
 
 ### Consequence
-Logging out and creating a fresh character session clears active cooldowns for heal, warp, transfer and summon. Tax is already separately affected by `BUG-MON-006` because its command never checks `MI_TAX`.
+Logging out and creating a fresh character session clears active cooldowns for heal, warp, transfer and summon. Tax is separately affected by `BUG-MON-010` because its command never checks `MI_TAX`.
 
 ### Deferred validation
 `MON-T09`.
 
-## Open candidates
-- process-local PowerUp/DefenseUp buffs; deployed caller closure pending;
-- unguarded `takemonarchmoney` Lua API while validation is compiled under `__UNIMPLEMENTED__`; deployed caller not yet proven;
+## Remaining candidates before final closure
 - add-money overflow/failure reporting symmetry;
-- legacy `SetMonarch` SQL column mismatch remains candidate until authoritative table schema is available.
+- remaining `mto/mtr` private-instance and WarpSet-result boundaries.
+
+The following were closed from candidate status:
+- SetMonarch persistence mismatch was promoted to `BUG-MON-006`;
+- DB restart election reconstruction was promoted to `BUG-MON-008`;
+- session-local cooldown reset was promoted to `BUG-MON-009`;
+- process-local PowerUp/DefenseUp and validation-disabled `takemonarchmoney` remain dormant because no tracked deployed quest caller exists.
 
 
 ## BUG-MON-010 — MI_TAX cooldown is written but never enforced
