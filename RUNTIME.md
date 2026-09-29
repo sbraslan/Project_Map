@@ -893,3 +893,17 @@ Updated normal-path order:
 
 `DUNGEON-T10` is historical/retracted and must not be run.
 Execution remains locked.
+
+
+## Dungeon Info normal-path handoffs complete — 2026-09-29
+Preflight reverified against current source/data snapshot:
+- `DUNGEON-T09` -> malformed Ranking SQL; first future live gate.
+- `DUNGEON-T11` -> numeric config flag type `1` is treated as PC while Blue Dragon uses global `dragon_lair_time`.
+- `DUNGEON-T12` -> no explicit COOLDOWN in current QUEST-backed blocks; expired/zero arithmetic can wrap to a huge unsigned cooldown.
+
+Canonical handoff files:
+- `DUNGEON_T09_HANDOFF.md`
+- `DUNGEON_T11_HANDOFF.md`
+- `DUNGEON_T12_HANDOFF.md`
+
+Execution remains locked.
