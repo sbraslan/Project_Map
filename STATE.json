@@ -6,26 +6,18 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "mining",
-    "display_name": "Mining / Pickaxe",
-    "status": "MAPPING IN PROGRESS / 5 VERIFIED BUGS / EXECUTION LOCKED",
-    "system_file": "systems/mining.md",
-    "bug_file": "bugs/mining.md",
-    "test_file": "tests/mining.md",
-    "verified_bug_ids": [
-      "BUG-MIN-001",
-      "BUG-MIN-002",
-      "BUG-MIN-003",
-      "BUG-MIN-004",
-      "BUG-MIN-005"
-    ],
+    "subsystem": null,
+    "display_name": "Static Mapping Coverage Complete",
+    "status": "MINING / PICKAXE STATIC COMPLETE / 31 EFFECTIVE STATIC-COMPLETE SUBSYSTEMS / EXECUTION LOCKED",
+    "system_file": null,
+    "bug_file": null,
+    "test_file": null,
+    "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Audit OreRefine payment ordering and locate deployed quest/object callers.",
-      "Audit ore ownership and Battle Field multiplayer contention semantics.",
-      "Cross-check pickaxe item proto/refine progression values.",
-      "Audit vein lifetime/despawn interaction with pending player events.",
-      "Do not execute Mining runtime tests; first future live gate remains DUNGEON-T09."
+      "Preserve runtime execution lock.",
+      "First future live runtime gate is DUNGEON-T09; DUNGEON-T10 is retracted and must not be run.",
+      "When continuation is requested, select the next independent unmapped gameplay subsystem and continue detection-only mapping."
     ]
   },
   "startup": {
@@ -310,7 +302,14 @@
     "game/src/char.cpp::CHARACTER::mining >1000 return precedes >2500 MINING_LOCATION HackLog -> BUG-MIN-005",
     "game/src/char.cpp::CanWarp/WarpSet omit mining lifecycle cleanup -> BUG-MIN-003",
     "game/src/mining.cpp::completion rebinds current pick -> BUG-MIN-004",
-    "game/src/char.cpp::MINING_LOCATION dead anti-hack branch -> BUG-MIN-005"
+    "game/src/char.cpp::MINING_LOCATION dead anti-hack branch -> BUG-MIN-005",
+    "Project_Game/share/locale/europe/quest/g_guild/guild_building_melt.quest::OreRefine gold precheck closure",
+    "game/src/char_manager.cpp::monotonic AllocVID closes stale vein VID reuse",
+    "Project_Game/map 357 no veins + EventManager map230/alternate map103 closes Battle Field ownership reachability",
+    "game/src/event_manager.cpp::SetMiningEvent map230 false-active deployment failure -> BUG-MIN-007",
+    "Project_Game/share/locale/europe/map/index::no map 230",
+    "missing runtime data/event/mining_event_regen_type_0.txt -> BUG-MIN-007",
+    "Mining / Pickaxe::STATIC COMPLETE"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -2572,7 +2571,7 @@
     ]
   },
   "mining_mapping": {
-    "status": "MAPPING IN PROGRESS",
+    "status": "STATIC COMPLETE",
     "system_file": "systems/mining.md",
     "bug_file": "bugs/mining.md",
     "test_file": "tests/mining.md",
@@ -2581,7 +2580,9 @@
       "BUG-MIN-002",
       "BUG-MIN-003",
       "BUG-MIN-004",
-      "BUG-MIN-005"
+      "BUG-MIN-005",
+      "BUG-MIN-006",
+      "BUG-MIN-007"
     ],
     "mapped_flows": [
       "deployed mining.quest -> __refine_pick -> RealRefinePick mastery boundary -> BUG-MIN-001",
@@ -2606,9 +2607,19 @@
         "MIN-T02",
         "MIN-T03",
         "MIN-T04",
-        "MIN-T05"
+        "MIN-T05",
+        "MIN-T06",
+        "MIN-T07"
       ],
       "first_live_gate_unchanged": "DUNGEON-T09"
-    }
+    },
+    "candidates_closed": [
+      "OreRefine internal ore-before-gold ordering not promoted because deployed guild_building_melt.quest checks exact gold cost first.",
+      "Battle Field no-ownership branch not reachable through mapped vein content on map 357.",
+      "Destroyed vein VID retarget not promoted under monotonic VID allocation.",
+      "InitializeMiningEvent missing data/event/mining/map_mining.txt retained as risk only because no active caller was established.",
+      "No Battle Pass/Achievement mining mission type exists.",
+      "Readable authoritative pickaxe proto rows unavailable; no numeric inference made."
+    ]
   }
 }
