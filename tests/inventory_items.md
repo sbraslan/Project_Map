@@ -476,4 +476,4 @@ Kodun mevcut invariant'ı: `IsEmptySpecialItemGrid(..., bSize > 1) -> false`. Da
 - There is no canonical BUG-ITEM-005 entry in bugs/inventory_items.md; the numbering gap is preserved and no bug is invented.
 - Legacy Guild Storage and duplicate SWITCHBOT test blocks remain in this file for history, but their readiness ownership belongs to their canonical subsystem clusters.
 - Primary normal-path candidate: ITEM-T01. ITEM-T02 is also reachable through the normal destroy flow but sanitizer/debug evidence is preferred for the use-after-free.
-- Overall first live runtime gate remains DUNGEON-T10.
+- Overall first live runtime gate remains DUNGEON-T09.
