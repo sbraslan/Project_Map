@@ -240,3 +240,29 @@ Closed/scoped:
 
 ## Runtime
 No Marriage runtime test may be executed while the global execution lock is active. First future live gate remains `DUNGEON-T09`.
+
+
+### BUG-MARR-009 — DB startup deletes every pending engagement from persistent storage
+DB startup calls `MarriageManager.Initialize()`. Before loading relations it executes:
+`DELETE FROM marriage WHERE is_married = 0`.
+
+Engagements are represented by the same marriage table with `is_married = 0`, so every pending engagement is permanently removed on each DB server restart.
+
+The deployed quest already contains a cleanup branch allowing a non-married player holding 70302 to discard the ring, but it does not reconstruct the relation or refund the engagement cost/resources.
+
+Promoted as `BUG-MARR-009`.
+
+### BUG-MARR-010 — Marriage Fast makes computed love points non-monotonic
+`GetMarriagePoint()` does not persist daily love-point accrual. It recomputes the entire time component from `get_global_time() - marry_time` using the **current** premium state:
+- normal: 1 point/day, max 30;
+- Marriage Fast active while both spouse pointers are local: 2 points/day, max 40.
+
+Therefore enabling Marriage Fast retroactively applies the doubled daily rate to all elapsed marriage days, while expiry (or loss of same-process `IsOnline()`) recomputes the same history at the slower rate and can reduce the displayed/effective marriage point.
+
+Example with zero stored kill points after 20 marriage days:
+- premium active: `50 + min(20*2,40) = 90`;
+- premium inactive: `50 + min(20,30) = 70`.
+
+A “points increase twice as fast” effect therefore can cause already-visible love points to drop later.
+
+Promoted as `BUG-MARR-010`.
