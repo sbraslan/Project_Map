@@ -47,10 +47,29 @@
   ],
   "counts": {
     "closed_subsystems": 38,
-    "open_subsystems": 0,
-    "total_canonical_subsystems": 38
+    "open_subsystems": 1,
+    "total_canonical_subsystems": 39
   },
-  "active": null,
+  "active": {
+    "id": "classic_dungeons",
+    "name": "Classic Quest Dungeons",
+    "status": "OPEN",
+    "evidence": {
+      "system": "systems/classic_dungeons.md",
+      "bugs": "bugs/classic_dungeons.md",
+      "tests": "tests/classic_dungeons.md"
+    },
+    "verified_bug_count": 0,
+    "test_plan_count": 0,
+    "cursor": [
+      "Map entry authorization, party/item/level requirements and private-map creation for Devil Tower, Devil Catacombs, Spider, Flame and Snow/Nemere.",
+      "Map quest flags/server timers and floor/stage progression.",
+      "Audit item/reward consumption, replay/duplicate behavior and failure rollback.",
+      "Audit disconnect/reconnect/party-change and timeout/exit cleanup.",
+      "Audit feature-specific calls into generic Dungeon Core for cross-system bug reachability.",
+      "Close deployment/data parity and promote only source-proven defects."
+    ]
+  },
   "closed": {
     "guild_storage": {
       "name": "Guild Storage + Guild lifecycle",
@@ -522,13 +541,41 @@
     "zodiac temple": "zodiac_temple",
     "zodiac": "zodiac_temple",
     "12zi": "zodiac_temple",
-    "12zi temple": "zodiac_temple"
+    "12zi temple": "zodiac_temple",
+    "classic_dungeons": "classic_dungeons",
+    "classic dungeons": "classic_dungeons",
+    "classic quest dungeons": "classic_dungeons",
+    "devil tower": "classic_dungeons",
+    "deviltower": "classic_dungeons",
+    "demon tower": "classic_dungeons",
+    "devil catacombs": "classic_dungeons",
+    "devil catacomb": "classic_dungeons",
+    "catacomb": "classic_dungeons",
+    "spider dungeon": "classic_dungeons",
+    "spider baroness": "classic_dungeons",
+    "flame dungeon": "classic_dungeons",
+    "razador": "classic_dungeons",
+    "snow dungeon": "classic_dungeons",
+    "nemere": "classic_dungeons"
   },
   "discovery": {
-    "status": "TARGETED_UNKNOWN_ONLY",
-    "queue": [],
-    "last_transition": "zodiac_temple CLOSED -> targeted UNKNOWN-only discovery started",
-    "next_after_active_close": "Discovery is in progress. Only feature families that do not resolve through alias_index may be inspected; CLOSED nodes remain locked."
+    "status": "PAUSED_WHILE_ACTIVE",
+    "queue": [
+      "dragon_lairs",
+      "yohara_progression",
+      "advanced_yohara_dungeons",
+      "defense_wave",
+      "elemental_world",
+      "event_minigames",
+      "economy_extensions",
+      "automation_vip",
+      "appearance_skill_extensions",
+      "client_service_layer",
+      "equipment_extensions"
+    ],
+    "last_transition": "final UNKNOWN-only discovery found additional enabled/deployed feature families -> classic_dungeons OPEN",
+    "next_after_active_close": "Resume queue in order; normalize each family/alias before opening it. CLOSED nodes remain locked.",
+    "criteria": "Canonical candidate = enabled and independently stateful/networked/persistent or quest-deployed gameplay feature family. Pure rendering/assets, compile-time fixes and small options remain dependencies/subfeatures rather than standalone nodes."
   },
   "lookup_indexes": {
     "authority": "NON_CANONICAL_ACCELERATOR_ONLY",
