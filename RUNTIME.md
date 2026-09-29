@@ -940,3 +940,9 @@ Execution remains locked.
 `BIO-T01` completion bridge was reverified and canonical handoff prepared at `BIO_T01_HANDOFF.md`.
 C++ completion flags and client event-quest request exist; the mapped Project_Game package still has no `biolog_manager` quest consumer, only legacy collect_* biolog quests. Actual mission/reward row values remain DB-data dependent.
 Execution remains locked.
+
+
+## Inventory / Item ITEM-T01 handoff — 2026-09-29
+`ITEM-T01` was reverified and canonical handoff prepared at `ITEM_T01_HANDOFF.md`.
+Fresh client audit confirms ordinary UI reachability: selected `dropCount` is forwarded into the destroy packet, but server `RemoveItem(..., bCount)` ignores bCount and removes the full stack object. Adjacent destroy UAF (BUG-ITEM-001) may preempt observation; if so ITEM-T01 should be marked inconclusive rather than conflated with ITEM-T02.
+Execution remains locked.
