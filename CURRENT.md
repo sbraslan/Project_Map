@@ -2,7 +2,7 @@
 
 **Active phase:** Detection / Mapping Only  
 **Active state:** Static mapping continuation  
-**Status:** MESSENGER / FRIEND / BLOCK — MAPPING IN PROGRESS / 15 VERIFIED BUGS / EXECUTION LOCKED  
+**Status:** MESSENGER / FRIEND / BLOCK — MAPPING IN PROGRESS / 19 VERIFIED BUGS / EXECUTION LOCKED  
 **Machine state:** `STATE.json`  
 **Active subsystem:** Messenger / Friend / Block  
 **System:** `systems/messenger.md`  
@@ -33,6 +33,8 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 - `BUG-MSG-015` — GM inverse watcher sets retain logged-out accounts and grow with historical process-visible accounts.
 - `BUG-MSG-016` — delayed old-core P2P logout can delete the newer same-name channel/session CCI and messenger presence.
 - `BUG-MSG-017` — outgoing name-based messenger CG packets truncate the configured 48-byte name boundary and long remove/unblock fields lack explicit final NUL termination.
+- `BUG-MSG-018` — Battle Field friend-add prohibition is bypassed by the target-board/add-by-VID route.
+- `BUG-MSG-019` — pending friend authorization does not revalidate a messenger block created after the request.
 
 ## Closed / scoped observations
 - Shout delivery checks the receiver's messenger block relation on both local and P2P fanout. BUG-MSG-007 can still undermine it after logout/relog cache loss.
@@ -42,8 +44,8 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 - `OnBlockLogin`'s missing local handler-null guard is closed as non-bug because `PyCallClassMemberFunc` safely rejects a null handler.
 
 ## Exact resume cursor
-1. Finish remaining GM messenger cache/login/logout lifecycle after BUG-MSG-013.
-2. Audit remaining client/server Messenger packet validation after BUG-MSG-012.
-3. Check practical quest usage/reachability of BUG-MSG-011.
-4. Run one final relation/cache/P2P symmetry pass and decide whether Messenger is STATIC COMPLETE.
+1. Audit remaining friend/block relation mutation surfaces and pending-token identity safety after `BUG-MSG-019`.
+2. Re-check residual P2P presence repair/resynchronization after `BUG-MSG-016`.
+3. Finish client/server messenger packet-boundary checks after `BUG-MSG-012/017`.
+4. Assess Messenger static-closure readiness.
 5. Do not execute runtime tests; global first future live gate remains `DUNGEON-T09`.
