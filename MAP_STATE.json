@@ -34,7 +34,8 @@
     "While an OPEN subsystem exists, do not run broad global rediscovery unless its cursor explicitly requires a targeted dependency lookup.",
     "Raw lookup indexes are accelerators only and can never change lifecycle state.",
     "Runtime/fault-injection tests remain locked until the user explicitly changes project phase.",
-    "Project_Map GitHub code-search results are non-authoritative because search indexing may lag behind deletions/updates; lifecycle checks must use direct MAP_STATE.json reads and direct evidence-file fetches."
+    "Project_Map GitHub code-search results are non-authoritative because search indexing may lag behind deletions/updates; lifecycle checks must use direct MAP_STATE.json reads and direct evidence-file fetches.",
+    "Do not create progress-derived acceleration indexes (features/symbols/packets/callgraph/candidates) from MAP_STATE; they duplicate lifecycle knowledge and can become stale."
   ],
   "resume_protocol": [
     "Read MAP_STATE.json only.",
@@ -535,9 +536,7 @@
     "authority": "NON_CANONICAL_ACCELERATOR_ONLY",
     "source_snapshot_required": true,
     "files": "index/files.json",
-    "symbols": "index/symbols.json",
-    "packets": "index/packets.json",
-    "callgraph": "index/callgraph.json",
-    "repositories": "index/repositories.json"
+    "repositories": "index/repositories.json",
+    "rule": "These two files contain source-tree inventory/metadata only. No state-derived symbols, packets, callgraph, features or candidate indexes are allowed."
   }
 }
