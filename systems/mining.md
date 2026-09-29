@@ -1,111 +1,112 @@
-# Mining / Pickaxe
+# Mining / Pickaxe System
 
-**Status:** MAPPING IN PROGRESS
+**Status:** MAPPING IN PROGRESS  
+**Phase:** Detection / Mapping Only  
+**Runtime:** EXECUTION LOCKED  
+**Started:** 2026-09-29
 
 ## Scope
-Independent static audit of the classic Mining / Pickaxe subsystem.
+Primary server roots:
+- `game/src/mining.cpp`
+- `game/src/mining.h`
+- `game/src/char.cpp::mining/mining_cancel/mining_take`
+- `game/src/questlua_global.cpp::_refine_pick`
+- `game/src/questlua_pc.cpp::pc_mining/pc_diamond_refine/pc_ore_refine`
 
-### Mapped roots
-- `Project_ServerSRC/game/src/mining.cpp/.h`
-- `Project_ServerSRC/game/src/char.cpp` — mining start/cancel/take, warp lifecycle, ore-vein lifetime
-- `Project_ServerSRC/game/src/char_state.cpp` — normal movement -> `Move()` -> `OnMove()` cancellation path
-- `Project_ServerSRC/game/src/char_battle.cpp::Dead`
-- `Project_ServerSRC/game/src/questlua_pc.cpp` — `pc.mining`, `pc.ore_refine`, `pc.diamond_refine`
-- `Project_ServerSRC/game/src/questlua_global.cpp` — `__refine_pick`
-- `Project_Game/share/locale/europe/quest/n_npc/mining.quest`
-- `Project_Game/share/locale/europe/quest/g_guild/guild_building_melt.quest`
-- `Project_DumpProto/{tr,en,de}/item_names.txt` — pickaxe family 29101..29110
-- `Project_ServerSRC/common/CommonDefines.h` — `ENABLE_PICKAXE_RENEWAL`
+Current game/config roots:
+- `share/locale/europe/quest/n_npc/mining.quest`
+- `share/locale/europe/quest/quest_list`
+- current pickaxe names VNUM 29101..29110
+- `ENABLE_PICKAXE_RENEWAL` active
 
-## Core mining flow
-`pc.mining()`
--> `CHARACTER::mining(current NPC/ore vein)`
--> validates same map, <=1000 distance, ore-vein VNUM and equipped ITEM_PICK
--> random work count 5..15
--> `CreateMiningEvent` for 10..30 seconds
--> event re-resolves player PID + vein VID
--> pick validation
--> mining success chance
+## Normal mining flow
+vein click / quest `pc.mining`
+-> `CHARACTER::mining(load)`
+-> same-map + <=1000 distance check
+-> valid ore race check
+-> equipped ITEM_PICK + subtype 0 check
+-> DIG_MOTION broadcast
+-> `CreateMiningEvent` delayed 10..30 seconds
+-> event resolves player/load by PID/VID
+-> current equipped pick is checked
+-> current mining skill + current pick grade determine ore chance
 -> `OreDrop`
--> raw ore ground drop with normal ownership
+-> ground item ownership
 -> `PracticePick`.
 
-Normal player movement is already covered correctly:
-`StateMove -> Move -> OnMove -> mining_cancel`.
+Normal movement calls `OnMove()`, which calls `mining_cancel()`.
 
-Character destruction also cancels `m_pkMiningEvent`.
+## Pickaxe refinement flow
+Current deployed quest:
+`n_npc/mining.quest`
+-> NPC 20015 take
+-> only when pick VNUM 29101..<29110 and socket0 == value2
+-> `__refine_pick(item.get_cell())`
+-> `questlua_global::_refine_pick`
+-> `mining::RealRefinePick`
+-> `Pick_Refinable`.
 
-Ore veins use the same per-character event field on the vein object for a 15-minute self-destroy timer; this is entity-local and is not itself a bug.
+`ENABLE_PICKAXE_RENEWAL` means failed refine retains grade and subtracts 10% mastery.
 
-## Success arithmetic
-Base mining chance: 20%.
-
-Mining skill contribution is table-driven for skill 0..40. Pickaxe grade contribution for +0..+9 is:
-`3, 5, 8, 11, 15, 20, 26, 32, 40, 50`.
-
-Nominal maximum mapped chance is 81%.
-
-Raw ore count uses the nine-entry fraction table and its probability weights sum to 100%.
-
-## BUG-MINE-001 — pickaxe NPC refine path is logically unreachable
-Current `mining.quest` calls `__refine_pick(item.get_cell())` only when:
+## BUG-MINE-001 — quest and C++ pickaxe-refine thresholds are mutually incompatible
+Current quest allows refine only when:
 `item.get_socket(0) == item.get_value(2)`.
 
-But server `Pick_Refinable()` returns false while:
+Server `Pick_Refinable` returns false when:
 `Pick_GetCurExp(item) <= Pick_GetMaxExp(item)`.
 
-Therefore `RealRefinePick()` accepts only `socket0 > value2`.
+Therefore the exact quest-approved state (`cur == max`) is rejected by C++.
 
-The two conditions do not overlap:
-- at `socket0 == value2`, quest calls C++ but C++ rejects;
-- once practice advances to `socket0 > value2`, the quest enters its not-ready branch and never calls C++.
+If practice later pushes mastery above max, the quest's first take branch (`socket0 != value2`) handles the item and does not invoke `__refine_pick`.
+
+The normal current quest path therefore has no mastery value that satisfies both layers.
 
 Promoted as `BUG-MINE-001`.
 
-## BUG-MINE-002 — active mining survives same-character warp
+## BUG-MINE-002 — mining event survives death/warp without completion revalidation
+Movement cancellation is implemented only via `OnMove()->mining_cancel()`.
+
+`Dead()` does not cancel `m_pkMiningEvent`.
 `CanWarp()` does not consider `m_pkMiningEvent`.
-`WarpSet()` calls `Stop()`, but `Stop()` does not call `mining_cancel()`.
-`WarpEnd()/Show()` also do not cancel mining.
+`WarpSet()` calls `Stop()`, but `Stop()` does not invoke `OnMove()` or `mining_cancel()`.
 
-The mining completion event does not re-check the player's current map or distance from the original vein.
+At delayed completion, `mining_event` does not check:
+- `IsDead()`;
+- current map equality with the original vein;
+- current distance to the vein.
 
-If a same-process/same-character warp completes while the original vein still exists, the event can resolve afterward. `OreDrop()` uses the player's current map/current coordinates, so successful ore can be dropped at the destination rather than the original vein.
+If the original vein still exists and a pick is equipped, the normal ore roll continues. `OreDrop` drops the ore at the player's current map/current coordinates.
+
+Consequences:
+- a player can complete a mining roll while dead;
+- a same-character warp can carry the pending mining result to another map and drop ore at the destination.
 
 Promoted as `BUG-MINE-002`.
 
-## BUG-MINE-003 — active mining survives player death
-`CHARACTER::Dead()` does not cancel `m_pkMiningEvent`.
-The mining event callback does not check `IsDead()`.
+## Open candidates
 
-As long as the character object, equipped pickaxe and source vein remain valid, the countdown can finish after death, perform the normal success roll, drop ore and practice the pickaxe.
+### OreRefine consumes ore before affordability check
+`OreRefine` executes:
+1. validate >=100 ore;
+2. `item->SetCount(item->GetCount() - 100)`;
+3. compute fee;
+4. only then test `GetGold() < iCost`.
 
-Promoted as `BUG-MINE-003`.
+If insufficient Yang, it returns false after the 100 ore are already removed.
 
-## Ore refinement status
-Current deployed caller is `guild_building_melt.quest`.
+The Lua bindings `pc.diamond_refine` / `pc.ore_refine` exist, but no current Project_Game quest caller was found in this pass. Keep as a statically real routine defect but do not promote as a current reachable deployment bug until a live caller is established.
 
-`OreRefine()` itself subtracts 100 raw ore before its internal Yang check. That ordering is dangerous in isolation, but the current quest checks the matching guild/empire-adjusted fee before invoking the Lua binding.
+### Unreachable MINING_LOCATION hack log
+`CHARACTER::mining` first returns when distance >1000, then later contains a >2500 `HackLog("MINING_LOCATION")` branch. The later branch is unreachable under the same coordinates. This is an observability/security-logging defect candidate, not a mining reward bypass.
 
-The quest's `GetOreRefineCost` currently matches `ComputeRefineFee` semantics:
-- same guild: 90%;
-- foreign empire: 3x;
-- otherwise base cost.
-
-Therefore the low-Yang deletion branch is **not promoted as a current normal-path bug** at this checkpoint. It remains a defense-in-depth/race candidate pending quest-yield and transaction-boundary audit.
-
-The non-diamond path validates the selected catalyst in quest as VNUM 28000..28299 before invoking `pc.ore_refine`.
-
-## Current next work
-1. Audit ore-refine quest yield/transaction boundaries and catalyst lifetime.
-2. Map pickaxe proto Value0..Value4 / RefinedVnum semantics and current grade data.
-3. Audit `ENABLE_MINING_EVENT` modifiers/rewards and mining-specific event hooks.
-4. Audit SKILL_MINING book progression and any Battle Pass/Achievement integration.
-5. Map client click/dig animation to quest/server trust boundaries.
-6. Close Battle Field ownership behavior and multiplayer ore pickup semantics.
-7. Audit channel-change versus same-process warp event ownership.
-8. Promote only verified reachable findings.
+## Exact next work
+1. map click/quest entry ownership and packet trust boundary;
+2. audit death/warp/logout/equipment-change cleanup in full;
+3. map pick mastery/refine item cell and extended-inventory behavior;
+4. establish current reachability of ore refining and validate fee/material atomicity;
+5. audit mining skill-book progression and cooldown;
+6. audit ore drop ownership, Battle Field behavior, and mining event interactions;
+7. promote only statically reachable findings.
 
 ## Runtime
-Execution remains locked. `MINE-T01..MINE-T03` are documentation-only until explicit phase change.
-
-Global first future live gate remains `DUNGEON-T09`.
+Do not execute Mining runtime tests while execution lock is active. Global first future live gate remains `DUNGEON-T09`.
