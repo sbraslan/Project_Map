@@ -334,3 +334,23 @@ A channel/core transition can make an affected process mark a still-online chara
 
 ### Deferred validation
 `MSG-T16`.
+---
+
+## BUG-MSG-014 — name-based messenger add paths bypass observer-mode restriction
+
+**Class:** path-dependent authorization / observer-mode bypass  
+**Reachability:** VERIFIED through the normal Messenger window name-entry actions.
+
+### Proof
+1. `HEADER_CG_MESSENGER` is dispatched even while the character is in observer mode; there is no dispatcher-level observer gate for the whole Messenger handler.
+2. `MESSENGER_SUBHEADER_CG_ADD_BY_VID` explicitly returns when `ch->IsObserverMode()` is true.
+3. `MESSENGER_SUBHEADER_CG_BLOCK_ADD_BY_VID` has the same explicit observer-mode guard.
+4. The equivalent `MESSENGER_SUBHEADER_CG_ADD_BY_NAME` and `MESSENGER_SUBHEADER_CG_BLOCK_ADD_BY_NAME` branches contain no `IsObserverMode()` check.
+5. `uimessenger.py` exposes ordinary Add Friend and Add Block name-entry dialogs that call `SendMessengerAddByNamePacket(text)` and `SendMessengerBlockAddByNamePacket(text)`.
+
+### Consequence
+An observer/spectator can use the Messenger window's name-based controls to create friend requests or block relations even though the VID-based forms explicitly forbid those actions in observer mode.
+
+### Deferred validation
+`MSG-T14`.
+
