@@ -83,7 +83,7 @@ This needs fault injection for deterministic reproduction, but the durability sp
 - Sınıf: unreachable progression / dead achievement content
 
 Current `achievements.xml` contains live tasks for:
-- TYPE_SUMMON_MOUNT: 13 tasks
+- TYPE_SUMMON_MOUNT: 16 tasks
 - TYPE_SPEND_SEARCH_SHOP: 5 tasks
 - TYPE_SPEND_SHOP: 3 tasks
 - TYPE_WITHDRAW: 5 tasks.
