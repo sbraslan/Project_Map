@@ -37,6 +37,8 @@ Item count yalnız `>0` kontrol ediliyor ve ardından item objesi tamamen destro
 Sonuç:
 UI/API partial destroy count gönderse bile tüm stack silinir.
 
+Fresh client audit confirms normal-flow reachability: `root/game.py` carries the user-selected `dropCount` into `SendItemDestroyPacket`, so this is not limited to crafted packets or modified clients.
+
 ### BUG-ITEM-003 — AddToGround başarısızlığında DropItem rollback yok
 - Statik durum: **yüksek güven / hata yolu doğrulandı**
 
