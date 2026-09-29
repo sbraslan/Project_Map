@@ -202,12 +202,12 @@ Mining / Pickaxe is the active 31st subsystem candidate. It is **MAPPING IN PROG
 ## Active continuation — Mining / Pickaxe — 2026-09-29
 Fishing Renewal closure leaves **30 STATIC COMPLETE** subsystem rows plus folded Guild lifecycle.
 
-Mining / Pickaxe is now the active mapping cursor:
+Mining / Pickaxe is now **STATIC COMPLETE**:
 - `systems/mining.md`;
 - `bugs/mining.md`;
 - `tests/mining.md`.
 
-Initial verified findings: `BUG-MINE-001..002`. Mining is not yet counted as STATIC COMPLETE. Runtime remains locked and `DUNGEON-T09` remains the first future live gate.
+Verified findings: `BUG-MIN-001..006`. Effective static-complete subsystem count is now **31**. Runtime remains locked and `DUNGEON-T09` remains the first future live gate.
 
 
 ## Mining / Pickaxe STATIC COMPLETE — 2026-09-29
