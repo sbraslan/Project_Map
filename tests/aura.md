@@ -19,7 +19,7 @@ Static prediction:
 
 Safety class: Stage A observation for check-in/check-out; destructive accept only isolated Stage B.
 
-Global first future live gate remains `DUNGEON-T10`.
+Global first future live gate remains `DUNGEON-T09`.
 
 
 ## AURA-T02 — EVOLVE undersized checked-in material stack
