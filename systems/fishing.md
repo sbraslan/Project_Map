@@ -108,3 +108,41 @@ Promoted as `BUG-FISH-003`.
 
 ## Packet boundary closure
 `HEADER_CG_FISHING_NEW` is registered in `packet_info.cpp` as fixed-size `sizeof(TPacketFishingNew)`, so no separate variable-length packet-size defect is promoted here.
+
+
+## BUG-FISH-004 — renewed fishing does not server-lock movement or revalidate fishing position
+`fishing_new_start()` starts the renewed fishing event but does not set the character to `POS_FISHING` or otherwise install a movement lock.
+
+`CHARACTER::CanMove()` does not check `m_pkFishingNewEvent`, and `CInputMain::Move` therefore accepts normal movement while the renewed event is active.
+
+The periodic renewed fishing event checks only:
+- character still exists;
+- catch count;
+- rod still equipped;
+- timeout/fail counters.
+
+It does not revalidate:
+- current map/sectree fishing attribute;
+- distance from the original fishing position;
+- whether the player has moved away from water.
+
+A modified client can therefore move during an active renewed fishing session while preserving the event and continue submitting catches.
+
+Promoted as `BUG-FISH-004`.
+
+## BUG-FISH-005 — Carbon rod special catch bonus branch is unreachable
+Current deployment includes item VNUM `27591` = Carbon rod.
+
+In `fishing_catch_decision()`, the intended special handling is:
+`if (dwVnum == 27591 && dwVnum >= 27400 && dwVnum <= 27490)`
+
+No value can satisfy both `dwVnum == 27591` and `dwVnum <= 27490`.
+
+Therefore Carbon rod always falls into the normal `else` branch and receives only `rod->GetValue(0) / 10` rather than the explicit doubled special-case bonus.
+
+Promoted as `BUG-FISH-005`.
+
+## Probability arithmetic status
+`GetFishCatchedVnum` takes `uint8_t normal_chance, uint8_t rare_chance`, while callers construct the rare value from `15 + POINT_FISHING_RARE + rod socket2`.
+
+The cast/wrap boundary is real, but no current tracked producer/value range proving a >255 or otherwise invalid reachable value has been established yet. Keep this as a candidate, not a promoted bug.
