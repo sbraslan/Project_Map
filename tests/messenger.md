@@ -101,4 +101,22 @@ After runtime is explicitly unlocked in a test quest:
 3. compare the Lua return values with the actual messenger relations and server error log.
 
 Bug signature: the helper takes the numeric-argument error path / returns no intended boolean for a normal player-name string.
+
+## MSG-T12 — long messenger name receive
+After runtime is explicitly unlocked in an isolated test client:
+1. use a valid character name longer than 24 bytes and within the configured 48-character limit;
+2. trigger friend list/login/logout delivery;
+3. repeat for block and, where available, GM/mobile messenger branches;
+4. observe client stability and use memory diagnostics if enabled.
+
+Bug signature: the packet length exceeds the 25-byte local `char_name` buffer in `RecvMessenger`, causing memory corruption/crash.
+
+## MSG-T13 — WIZARD authority missing from GM messenger list
+After runtime is explicitly unlocked:
+1. configure a staff character with `mAuthority = 'WIZARD'` and verify the server recognizes it as `GM_WIZARD`;
+2. log in another account that receives the GM messenger list;
+3. compare visibility/presence of WIZARD with LOW_WIZARD, HIGH_WIZARD, GOD and IMPLEMENTOR entries.
+
+Bug signature: the WIZARD staff character is absent from the GM messenger list because the login SQL does not select that authority.
+
 Do not run any MSG test while the project execution lock is active.
