@@ -113,3 +113,12 @@ Runtime remains locked; no live test was executed.
 - reproduction requires character level >=91 before reopening Hunting.
 - canonical handoff: `HUNT_T04_HANDOFF.md`.
 - global first live gate remains `DUNGEON-T09`; no Hunting runtime test executed.
+
+
+## Battle Pass normal-path preflight — 2026-09-29
+- `BP-T02` mission-update packet omission reverified across all mapped send paths.
+- `bMissionType` is never assigned before send.
+- client forwards it unchanged; progress may still update because HaveMission matches by index only.
+- selected mission detail can consume the undefined mission type via SetMissionInfo.
+- canonical handoff: `BP_T02_HANDOFF.md`.
+- global first live gate remains `DUNGEON-T09`; no Battle Pass runtime test executed.
