@@ -357,7 +357,22 @@
       "test_file": "tests/marriage.md",
       "state_section": "marriage_mapping",
       "status": "STATIC MAPPING IN PROGRESS",
-      "verified_bug_ids": []
+      "verified_bug_ids": [
+        "BUG-MARR-001",
+        "BUG-MARR-002",
+        "BUG-MARR-003",
+        "BUG-MARR-004",
+        "BUG-MARR-005",
+        "BUG-MARR-006",
+        "BUG-MARR-007",
+        "BUG-MARR-008",
+        "BUG-MARR-009",
+        "BUG-MARR-010",
+        "BUG-MARR-011",
+        "BUG-MARR-012",
+        "BUG-MARR-013"
+      ],
+      "runtime_status": "EXECUTION LOCKED / NOT RUN"
     },
     {
       "id": "messenger",
