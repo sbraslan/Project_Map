@@ -1,6 +1,6 @@
 # Horse / Mount / Riding — Static Map
 
-**Status:** STATIC MAPPING IN PROGRESS  
+**Status:** STATIC COMPLETE  
 **Phase:** Detection / Mapping Only  
 **Source policy:** read-only source repos; only Project_Map may be edited.
 
