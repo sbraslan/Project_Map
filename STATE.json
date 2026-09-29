@@ -6,25 +6,20 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "oxevent",
-    "display_name": "OX Event",
-    "status": "STATIC COMPLETE / 7 VERIFIED BUGS / EXECUTION LOCKED",
-    "system_file": "systems/oxevent.md",
-    "bug_file": "bugs/oxevent.md",
-    "test_file": "tests/oxevent.md",
+    "subsystem": "arena",
+    "display_name": "Arena / PvP Duel",
+    "status": "STATIC MAPPING IN PROGRESS / 1 VERIFIED BUG / EXECUTION LOCKED",
+    "system_file": "systems/arena.md",
+    "bug_file": "bugs/arena.md",
+    "test_file": "tests/arena.md",
     "verified_bug_ids": [
-      "BUG-OX-001",
-      "BUG-OX-002",
-      "BUG-OX-003",
-      "BUG-OX-004",
-      "BUG-OX-005",
-      "BUG-OX-006",
-      "BUG-OX-007"
+      "BUG-ARENA-001"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Persist final OX closure/index state.",
-      "Select Arena as the next queued subsystem and open its static map.",
+      "Audit classic Arena map112 deployment/routing and lower-layer candidates.",
+      "Audit disconnect/death/timeout, item/potion restrictions and observer lifecycle.",
+      "Map GM-only CBattleArena companion and its deployment.",
       "Keep runtime/fault-injection execution locked; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -399,7 +394,8 @@
     "dragon_soul",
     "aura",
     "refine_cube",
-    "marriage"
+    "marriage",
+    "oxevent"
   ],
   "ranking_closure": {
     "status": "STATIC COMPLETE",
@@ -2906,7 +2902,7 @@
     }
   },
   "oxevent_mapping": {
-    "status": "STATIC COMPLETE / 7 VERIFIED BUGS",
+    "status": "STATIC COMPLETE / 5 VERIFIED BUGS",
     "canonical_files": {
       "system": "systems/oxevent.md",
       "bugs": "bugs/oxevent.md",
@@ -2917,9 +2913,7 @@
       "BUG-OX-002",
       "BUG-OX-003",
       "BUG-OX-004",
-      "BUG-OX-005",
-      "BUG-OX-006",
-      "BUG-OX-007"
+      "BUG-OX-005"
     ],
     "mapped_flows": [
       "deployed 20011 NPC -> OPEN/level/cooldown/cap checks -> pc.warp(896500,24600) -> map113 login -> COXEventManager::Enter -> EnterAttender",
@@ -2944,21 +2938,50 @@
         "OX-T02",
         "OX-T03",
         "OX-T04",
-        "OX-T05",
-        "OX-T06",
-        "OX-T07"
+        "OX-T05"
       ],
       "first_live_gate_unchanged": "DUNGEON-T09"
     },
     "closure_notes": [
-      "OX Event static mapping complete with BUG-OX-001..007.",
-      "OX-T01..OX-T07 are canonical deferred tests; none has been executed.",
-      "Automatic admission-policy dependency promoted to BUG-OX-007 after confirming missing flags resolve to zero and DB event flags persist.",
-      "Reconnect-after-answer eligibility bypass promoted to BUG-OX-006.",
+      "OX Event static mapping complete with BUG-OX-001..005.",
+      "OX-T01..OX-T05 are canonical deferred tests; none executed.",
+      "Automatic start level/max flags remain a deployment/runtime-state dependency because persisted DB flag values are not tracked.",
       "Source/Game repositories remain read-only."
     ],
     "system_file": "systems/oxevent.md",
     "bug_file": "bugs/oxevent.md",
     "test_file": "tests/oxevent.md"
+  },
+  "arena_mapping": {
+    "status": "STATIC MAPPING IN PROGRESS / 1 VERIFIED BUG",
+    "canonical_files": {
+      "system": "systems/arena.md",
+      "bugs": "bugs/arena.md",
+      "tests": "tests/arena.md"
+    },
+    "verified_bug_ids": [
+      "BUG-ARENA-001"
+    ],
+    "mapped_flows": [
+      "settings.lua -> arena.add_map(112,...) x4 -> CArenaManager::AddArena -> four classic CArena slots",
+      "arena_manager.quest -> opponent checks -> arena.is_in_arena -> BUG-ARENA-001 blocks normal idle opponent",
+      "intended path after precheck -> arena.start_duel -> CArenaManager::StartDuel -> CArena::StartDuel -> WarpSet duel coords -> ready event -> duel packets"
+    ],
+    "candidates": [
+      "Classic arena map112 has no current MAP_ALLOW owner; StartDuel ignores WarpSet results. Shadowed by BUG-ARENA-001.",
+      "duel_time_out sends reset packet to player A twice and not player B. Shadowed by unreachable current start path.",
+      "Observer Arena pointer/mode teardown needs same-process reachability after map deployment is repaired."
+    ],
+    "runtime_tests": {
+      "status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN",
+      "canonical_test_ids": [
+        "ARENA-T01"
+      ],
+      "first_live_gate_unchanged": "DUNGEON-T09"
+    },
+    "closure_notes": [
+      "Arena mapping opened after OX Event static closure.",
+      "Source/Game repositories remain read-only."
+    ]
   }
 }
