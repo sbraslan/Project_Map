@@ -125,3 +125,52 @@ Canonical test: `FISH-T05`.
 
 ### Deferred validation
 Canonical test: `FISH-T06`.
+
+
+## BUG-FISH-007 — renewed fishing log VNUM is a reroll, not the session fish
+**Class:** telemetry/audit integrity  
+**Reachability:** VERIFIED.
+
+The real fish is selected at start and stored in event info, but success/failure logging calls `GetFishCatchedVnum()` again. The rod bait socket has already been zeroed, so this second RNG call can differ both by randomness and by probability inputs.
+
+### Consequence
+`fish_new_log` can report a fish VNUM different from the actual selected/rewarded fish, corrupting operational/audit statistics.
+
+### Deferred validation
+`FISH-T07`.
+
+## BUG-FISH-008 — renewed catches bypass TYPE_FISH Achievement progression
+**Class:** missing gameplay hook  
+**Reachability:** VERIFIED.
+
+Legacy successful fishing calls Achievement `TYPE_FISH`; renewed successful fishing does not. Current achievements.xml contains live TYPE_FISH tasks.
+
+### Consequence
+Fishing achievements do not progress from the enabled renewed fishing success path.
+
+### Deferred validation
+`FISH-T08`.
+
+## BUG-FISH-009 — renewed fishing advances FISH_CATCH instead of FISH_FISHING
+**Class:** Battle Pass semantic/hook mismatch  
+**Reachability:** VERIFIED.
+
+Current normal/premium Battle Pass configs contain separate `FISH_FISHING`, `FISH_GRILL`, and `FISH_CATCH` missions. Legacy successful fishing updates `FISH_FISHING`; legacy fish-use processing updates `FISH_CATCH`. Renewed successful fishing updates `FISH_CATCH`.
+
+### Consequence
+Actual renewed fishing may fail to progress the fishing mission while incorrectly progressing the distinct catch/use mission family.
+
+### Deferred validation
+`FISH-T09`.
+
+## BUG-FISH-010 — active-session logout persists consumed bait on rod
+**Class:** persistence/lifecycle economy defect  
+**Reachability:** VERIFIED.
+
+Bait use consumes the bait item and saves its value in rod socket2. Disconnect flushes equipped items while socket2 is still non-zero; final teardown cancels the fishing event without `fishing_new_stop()`, so socket2 is never cleared first.
+
+### Consequence
+A bait already consumed from inventory can survive logout on the rod and be reused after relog.
+
+### Deferred validation
+`FISH-T10`.
