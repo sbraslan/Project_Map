@@ -38,3 +38,7 @@
 - TICKET-T07 is the normal-path UI validation target.
 - TICKET-T01..T06 remain isolated/adversarial tests requiring controlled conditions.
 - Overall first live runtime gate remains DUNGEON-T09; Ticket does not preempt it.
+
+
+### TICKET-T07 preflight — 2026-09-29
+Current source reverified: server sends/cache payload capacity 40, C++ normal cache copies 10, Python UI expects 20 rows/page and 10 pages. Normal AppendLogs calls GetLogByID only for 0..9, so TICKET-T07 does not directly trigger BUG-TICKET-005; rows 10+ fail at the Python cache/pagination layer. Canonical handoff: `../TICKET_T07_HANDOFF.md`.
