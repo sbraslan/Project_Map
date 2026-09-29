@@ -78,3 +78,7 @@ Covers BUG-ACH-002.
 - ACH-T09 added to cover previously untested BUG-ACH-002.
 - Primary legitimate normal-path candidates: ACH-T03 and ACH-T04.
 - Overall first live runtime gate remains DUNGEON-T09.
+
+
+### ACH-T03/T04 preflight — 2026-09-29
+Current config/source reverified. Current XML contains TYPE_SUMMON_MOUNT=16, TYPE_SPEND_SEARCH_SHOP=5, TYPE_SPEND_SHOP=3, TYPE_WITHDRAW=5 and TYPE_EXPLORE=29 task rows. No mapped gameplay caller exists for the four BUG-ACH-006 families. OnLogin explicitly calls OnVisitMap, while mapped normal warp/map-transition paths do not. Canonical handoffs: `../ACH_T03_HANDOFF.md`, `../ACH_T04_HANDOFF.md`.
