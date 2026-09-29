@@ -1,6 +1,6 @@
 # Zodiac Temple / 12ZI — Static System Map
 
-**Status:** STATIC MAPPING OPEN / 7 VERIFIED BUGS  
+**Status:** STATIC MAPPING CLOSED / 9 VERIFIED BUGS  
 **Mode:** detection / mapping only  
 **Execution:** LOCKED / NOT RUN  
 **Source policy:** Project_ClientSrc, Project_ServerSRC, Project_Binary, Project_Game and Project_DumpProto are read-only.
@@ -60,7 +60,7 @@ client floor controls
 - `Project_Game/share/data/dungeon/zodiac/zodiac_seller.txt`
 - `Project_Game/share/locale/europe/map/metin2_12zi_stage/*`
 
-## Current audit cursor
+## Audit coverage completed
 1. Verify deployment/quest entry path and portal validation.
 2. Map instance ownership, party membership, reconnect/logout and destruction lifecycle.
 3. Audit `/cz_check_box`, `/cz_reward`, revive and floor commands as player-authorized server entry points.
@@ -77,13 +77,20 @@ client floor controls
 - `BUG-ZOD-005`: `m_pkZodiacSkill1..11` event handles are raw/uninitialized.
 - `BUG-ZOD-006`: delayed Zodiac skill events are not cancelled on character destruction and retain raw character pointers.
 - `BUG-ZOD-007`: non-channel-99 Zodiac manager initialization falls off a non-void function.
+- `BUG-ZOD-008`: the `zodiac_disconnect_member_2` branch erases the current set element and then increments an invalidated iterator.
+- `BUG-ZOD-009`: bead catch-up resets the regeneration timestamp to now, discards the elapsed-hour remainder and sends a stale negative remaining-time value.
 
 ## Reward/command boundary findings
 The Python UI applies useful client-side state (disabling completed cells and enabling gold reward only when both color counters exceed the displayed paired value), but all authoritative actions are plain player chat commands. Server code therefore must independently enforce those UI invariants. It currently does not for duplicate cell selection, gold-pair eligibility, or same-instance revive.
 
-## Current audit cursor
-1. Resolve actual Zodiac deployment/entry ownership: server-time portals vs missing tracked quest source.
-2. Audit `DecMember` event-flag branch and party/reconnect teardown.
-3. Audit private-map/floor timer destruction ordering.
-4. Audit bead regeneration/persistence and 12ZI shop-limit accounting.
-5. Close remaining client/server parity and decide whether additional bugs are promoted.
+## Closing findings
+- **Deployment/entry ownership:** channel 99 owns portal spawning through the server-time scheduler and day regen files. The Lua binding `zodiac_temple.starttemple(portal)` is present, but the tracked Game snapshot has no Zodiac entry in `quest_list`, no portal-NPC quest source, and no compiled `quest/object` path for NPCs 20439-20450. This is recorded as a deployment/source-completeness gap, not promoted as a runtime bug.
+- **Party/reconnect lifecycle:** the normal/default path is internally coherent. `CHARACTER::Destroy -> SetZodiac(nullptr)` removes membership, and `CParty::Link` restores Zodiac association only when the reconnecting character is on the same private map. Missing event flags default to zero. The alternate `zodiac_disconnect_member_2` branch is separately promoted as `BUG-ZOD-008`.
+- **Private-map/timer teardown:** manager-owned floor/remaining/exit events are cancelled before teardown; manager lookup entries are removed before the private map is destroyed, so later map-index callbacks fail closed. Character teardown occurs while the `CZodiac` object is still alive. No additional source-proven defect was promoted here.
+- **Regen lifetime:** `ClearRegen()` is not called, but the tracked Zodiac caller uses `SpawnRegen("...zodiac_seller.txt")` with the default one-shot mode, so the persistent heap/event regen path is not reached by the mapped deployment. No bug promoted.
+- **Bead persistence:** login executes `BeadTime()`; catch-up accounting discards the modulo-hour remainder and sends the pre-reset negative timer after elapsed time exceeds one hour. Promoted as `BUG-ZOD-009`.
+- **12ZI shop accounting:** `ENABLE_12ZI_SHOP_LIMIT` is disabled in the tracked source snapshot, so the active path is the legacy DB-backed `zodiac_npc / zodiac_npc_sold` path. The spawned Zodiac seller is tracked, but its authoritative shop inventory/count configuration is not present in the tracked Game shop table, so no additional defect is promoted without deployment evidence.
+- **Client/server parity:** `PythonNetworkStreamCommand.cpp` routes `ZodiacTime`, `ZodiacTimeClear`, `Bead_count`, `Bead_time` and `OpenReviveDialog` to the corresponding Python game/UI callbacks. No additional parity defect was found.
+
+## Static-map result
+All five closing cursor items are resolved for the pinned source snapshot. Zodiac Temple / 12ZI is ready to transition to CLOSED; runtime tests remain locked.
