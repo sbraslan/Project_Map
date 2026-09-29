@@ -64,7 +64,8 @@
     {
       "name": "HEADER_DG_MARRIAGE_REMOVE",
       "references": [
-        "marriage_mapping.mapped_flows.3"
+        "marriage_mapping.mapped_flows.3",
+        "BUG-MARR-014"
       ]
     },
     {
@@ -103,7 +104,8 @@
     {
       "name": "HEADER_GD_MARRIAGE_REMOVE",
       "references": [
-        "marriage_mapping.mapped_flows.3"
+        "marriage_mapping.mapped_flows.3",
+        "BUG-MARR-014"
       ]
     },
     {
@@ -139,7 +141,8 @@
     {
       "name": "HEADER_DG_WEDDING_END",
       "references": [
-        "marriage_mapping"
+        "marriage_mapping",
+        "BUG-MARR-014"
       ]
     },
     {
