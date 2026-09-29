@@ -294,21 +294,21 @@ Observer-mode restrictions are path-dependent: friend/block add actions rejected
 
 ---
 
-## BUG-MSG-015 — GM inverse watcher sets retain logged-out accounts indefinitely
+## BUG-MSG-015 — inverse watcher sets retain logged-out accounts indefinitely
 
 **Class:** server lifecycle / stale-cache accumulation / memory-performance leak  
-**Reachability:** VERIFIED for the synthetic GM messenger relation.
+**Reachability:** VERIFIED for persistent friend/block relations and the synthetic GM messenger relation.
 
 ### Proof
-1. Every `MessengerManager::Login(account)` schedules `LoadGMList`, including remote players entering through `P2PLogin -> Login`.
-2. `LoadGMList` inserts `m_GMRelation[account].insert(gm)` and `m_InverseGMRelation[gm].insert(account)` for each selected GM.
-3. `MessengerManager::Logout(account)` removes the account's outgoing GM relation but never removes that account from the corresponding `m_InverseGMRelation[gm]` watcher sets.
-4. Unlike persistent friend/block relations, these GM edges are synthesized from the global GM query on every login rather than representing a user-managed persistent relationship.
-5. `MessengerManager::Destroy()` is empty, so historical account names remain in the inverse GM sets for the lifetime of the process.
-6. Later GM presence fanout iterates those historical watchers; send helpers only discard them after a local `FindPC`/descriptor miss.
+1. Friend loading records both `m_Relation[account]` and `m_InverseRelation[companion]`; block loading similarly records `m_BlockRelation` and `m_InverseBlockRelation`; GM loading records `m_GMRelation` and `m_InverseGMRelation`.
+2. `MessengerManager::Logout(account)` removes the departing account from the login set, erases its outgoing relation maps, and erases the departing name from values in other outgoing maps.
+3. Logout does not remove the departing account from inverse watcher sets created by its own outgoing friend/block/GM relations.
+4. Explicit relation-removal helpers do prune their inverse edges, but ordinary logout does not invoke those removals for the departing account's full relation set.
+5. Repeated login/logout of distinct accounts therefore leaves historical watcher names resident in the inverse maps; later presence fanout traverses them and send helpers only no-op after local character/descriptor lookup fails.
+6. `MessengerManager::Destroy()` is empty, so those historical inverse memberships survive for the process lifetime unless the relation is explicitly removed.
 
 ### Consequence
-Long-running cores accumulate historical account names in each GM inverse watcher set. GM presence changes repeatedly scan stale offline recipients, causing avoidable resident-memory and fanout growth proportional to distinct accounts observed by the process.
+Long-running cores can accumulate stale historical watcher names in friend, block and GM inverse maps. Presence changes repeatedly traverse offline recipients, increasing resident cache size and fanout work over uptime.
 
 ### Deferred validation
 `MSG-T15`.
@@ -443,3 +443,6 @@ Unpromoted robustness notes:
 - deliberately malformed fixed-width CG name fields can stress C-string parsing beyond the ordinary packet contract; the normal long-name boundary defect is already owned by `BUG-MSG-017`, and no separate crafted-packet bug is promoted.
 
 Runtime validation remains locked. Canonical deferred tests are `MSG-T01..MSG-T21`; global first future live gate remains `DUNGEON-T09`.
+
+### Mobile/SMS scope — not promoted
+The exported client `SendMobileMessagePacket` binding is a no-op stub, but `uigameoption.py` keeps `MOBILE = False` unless `localeInfo.IsYMIR()` is true. The current Europe build therefore hides the normal mobile-message UI. This remains a dormant/Ymir-only compatibility observation rather than a current Europe bug ID.
