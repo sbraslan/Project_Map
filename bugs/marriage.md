@@ -1,6 +1,6 @@
 # Marriage / Wedding — Bug Registry
 
-**Status:** STATIC MAPPING IN PROGRESS / 2 VERIFIED BUGS  
+**Status:** STATIC MAPPING IN PROGRESS / 6 VERIFIED BUGS  
 **Execution:** LOCKED / NOT RUN
 
 ## BUG-MARR-001 — engagement resource transaction commits before authoritative marriage creation
@@ -48,6 +48,82 @@ A single wedding can produce duplicate map instances and duplicate scheduling wh
 
 ### Deferred validation
 `MARR-T02`.
+
+## BUG-MARR-003 — mutual divorce rejects an exactly sufficient 500,000 Yang balance
+
+**Class:** boundary condition / gameplay availability  
+**Reachability:** VERIFIED through deployed `marriage_manage.quest`.
+
+### Proof
+- Mutual divorce defines `MONEY_NEED_FOR_ONE = 500000`.
+- Initial checks use `pc.gold > MONEY_NEED_FOR_ONE` and partner `pc.get_gold() > MONEY_NEED_FOR_ONE`.
+- Post-confirm checks repeat the same strict-greater comparison.
+- Successful processing deducts exactly `MONEY_NEED_FOR_ONE`.
+
+### Consequence
+A player with exactly 500,000 Yang has the exact required fee but is rejected as insufficient, blocking mutual divorce until the balance exceeds the documented/debited amount.
+
+### Deferred validation
+`MARR-T03`.
+
+## BUG-MARR-004 — stale old-core P2P logout can force a false lover-offline state after a fresh login
+
+**Class:** cross-core ordering / session state desynchronization  
+**Reachability:** VERIFIED from the existing name-keyed CCI handoff race plus Marriage logout integration.
+
+### Proof
+1. `P2P_MANAGER::Login` reuses an existing CCI by name and updates its `pkDesc`/channel/map to the newest login.
+2. `CInputP2P::Logout` discards its source descriptor and calls `P2P_MANAGER::Logout(p->szName)`.
+3. Name-only logout removes whichever CCI is current for that name, even if the packet came from the previous core.
+4. `P2P_MANAGER::Logout(CCI*)` always calls `marriage::CManager::Logout(pid)`.
+5. Married `TMarriage::Logout` emits `lover_logout` to available local/relayed spouse descriptors.
+6. Client `game.py::__LogoutLover` calls messenger `OnLogoutLover()` and hides lover state.
+
+### Consequence
+After LOGIN(new) has already established the fresh state, delayed LOGOUT(old) can mark the spouse offline again. Because the fresh login occurred first, no later corrective lover-login event is guaranteed.
+
+### Deferred validation
+`MARR-T04`.
+
+## BUG-MARR-005 — ExitToSavedLocation ignores the actual saved exit position
+
+**Class:** warp/lifecycle / wrong state field  
+**Reachability:** VERIFIED through normal wedding entry and end.
+
+### Proof
+1. Wedding warp calls `SaveExitLocation()`.
+2. `SaveExitLocation()` stores current coordinates/map in `m_posExit` and `m_lExitMapIndex`.
+3. After normal warp completion, `WarpEnd()` clears `m_posWarp` and `m_lWarpMapIndex`.
+4. Wedding end calls `WeddingMap::WarpAll()`.
+5. `WarpAll()` calls `CHARACTER::ExitToSavedLocation()`.
+6. `ExitToSavedLocation()` incorrectly calls `WarpSet(m_posWarp.x, m_posWarp.y, m_lWarpMapIndex)`, not the saved exit fields.
+7. It then clears `m_posExit/m_lExitMapIndex`.
+
+### Consequence
+The normal wedding shutdown path does not warp players back to the pre-wedding location saved for that purpose and destroys the only stored exit location afterward.
+
+### Deferred validation
+`MARR-T05`.
+
+## BUG-MARR-006 — same-core wedding exit leaves stale membership and later destroys the already-exited player
+
+**Class:** membership lifecycle / delayed teardown  
+**Reachability:** VERIFIED for same-process exit warps.
+
+### Proof
+1. Wedding membership is removed only through `SetWeddingMap(nullptr) -> WeddingMap::DecMember`.
+2. `WarpSet()` does not clear `m_pWeddingMap` or call `DecMember`.
+3. End step 0 executes `WarpAll() -> ExitToSavedLocation()/WarpSet()`.
+4. End step 1 runs 15 seconds later and calls `DestroyWeddingMap() -> DestroyAll()`.
+5. `DestroyAll()` destroys every character still present in `m_set_pkChr`.
+6. A same-process warp keeps the CHARACTER alive, so without explicit detachment it remains in that set.
+7. Deployed map ownership allows same-core source destinations on map-81 hosting cores.
+
+### Consequence
+A player who successfully leaves the wedding map via a same-core warp can still be destroyed/disconnected by the wedding teardown 15 seconds later.
+
+### Deferred validation
+`MARR-T06`.
 
 ## Open candidates
 - `WeddingManager::__CreateWeddingMap` inserts a WeddingMap/private map before checking whether `GetMap(dwMapIndex)` succeeds; the failure return currently has no cleanup. Keep unpromoted until realistic failure reachability is established.
