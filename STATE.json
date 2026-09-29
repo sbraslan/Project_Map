@@ -6,19 +6,23 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": null,
-    "display_name": "Static Mapping Coverage Complete",
-    "status": "CLASSIC PET STATIC COMPLETE / 29 EFFECTIVE STATIC-COMPLETE SUBSYSTEMS / EXECUTION LOCKED",
-    "system_file": null,
-    "bug_file": null,
-    "test_file": null,
-    "verified_bug_ids": [],
+    "subsystem": "fishing",
+    "display_name": "Fishing Renewal",
+    "status": "MAPPING IN PROGRESS / 2 VERIFIED BUGS / EXECUTION LOCKED",
+    "system_file": "systems/fishing.md",
+    "bug_file": "bugs/fishing.md",
+    "test_file": "tests/fishing.md",
+    "verified_bug_ids": [
+      "BUG-FISH-001",
+      "BUG-FISH-002"
+    ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Preserve runtime execution lock.",
-      "First future live runtime gate is DUNGEON-T09; DUNGEON-T10 is retracted and must not be run.",
-      "When runtime is explicitly unlocked, execute only the canonical DUNGEON-T09 handoff first.",
-      "When a new subsystem or feature is requested, open only its canonical mapping files and continue detection-only mapping."
+      "Map renewed fishing packet registration and size validation.",
+      "Audit catch/fail timing, replay and trust boundaries.",
+      "Close bait and POINT_FISHING_RARE probability arithmetic.",
+      "Audit success/log/Battle Pass/Achievement and lifecycle cleanup.",
+      "Do not execute Fishing runtime tests; global first future live gate remains DUNGEON-T09."
     ]
   },
   "startup": {
@@ -274,7 +278,12 @@
     "Horse / Mount / Riding::MAPPING IN PROGRESS",
     "game/src/horse_rider.cpp/.h::horse health stamina riding state",
     "game/src/char_horse.cpp::horse summon dismiss ride death revive",
-    "game/src/item.cpp + char_item.cpp::mount ride-item and affect integration"
+    "game/src/item.cpp + char_item.cpp::mount ride-item and affect integration",
+    "game/src/char_fishing.cpp::Fishing Renewal start/stop/catch/event/reward lifecycle",
+    "game/src/fishing.cpp::GetFishCatchedVnum second-table bounds -> BUG-FISH-001",
+    "game/src/char_fishing.cpp::CreateItem(50187) inventory probe lifetime -> BUG-FISH-002",
+    "Project_Binary/root/uifishing.py::renewed fishing minigame UI",
+    "Project_DumpProto/tr/item_names.txt::rod family 27400..27591"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -2472,5 +2481,37 @@
       "No Classic Pet runtime test has been executed.",
       "Global first future live gate remains DUNGEON-T09."
     ]
+  },
+  "fishing_mapping": {
+    "status": "MAPPING IN PROGRESS",
+    "canonical_files": {
+      "system": "systems/fishing.md",
+      "bugs": "bugs/fishing.md",
+      "tests": "tests/fishing.md"
+    },
+    "verified_bug_ids": [
+      "BUG-FISH-001",
+      "BUG-FISH-002"
+    ],
+    "mapped_flows": [
+      "HEADER_CG_FISHING_NEW -> CInputMain::FishingNew -> CHARACTER::fishing_new_start/stop/catch",
+      "renewed fishing UI -> CatchFishingNew/CatchFishingFailed",
+      "rod/bait validation -> GetFishCatchedVnum -> fishing event -> fishing_catch_decision",
+      "current rod names 27400..27591 split at 27490",
+      "second normal table bounds defect -> BUG-FISH-001",
+      "temporary CreateItem(50187) inventory probe lifetime -> BUG-FISH-002"
+    ],
+    "candidates": [
+      "Carbon rod bonus condition is logically impossible as written; intended semantics not yet closed.",
+      "Probability arithmetic can narrow normal_chance-rare_chance to uint8_t; current reachable value domain still under audit."
+    ],
+    "runtime_tests": {
+      "status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN",
+      "canonical_test_ids": [
+        "FISH-T01",
+        "FISH-T02"
+      ],
+      "first_live_gate_unchanged": "DUNGEON-T09"
+    }
   }
 }
