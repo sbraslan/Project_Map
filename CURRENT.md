@@ -2,7 +2,7 @@
 
 **Active phase:** Detection / Mapping Only  
 **Active state:** 6th/7th Attribute static mapping  
-**Status:** ATTR6TH7TH — STATIC MAPPING OPEN / 8 VERIFIED BUGS / EXECUTION LOCKED  
+**Status:** ATTR6TH7TH — STATIC MAPPING OPEN / 9 VERIFIED BUGS / EXECUTION LOCKED  
 **Machine state:** `STATE.json`  
 **Active subsystem:** 6th/7th Attribute — OPEN  
 **System:** `systems/attr6th7th.md`  
@@ -18,15 +18,14 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 ## Recent static closure
 - Monarch is closed with `BUG-MON-001..013`.
 - Deferred Monarch tests are `MON-T01..MON-T13`; none executed.
-- Attr67 mapping has verified `BUG-ATTR67-001..008`; runtime remains locked.
+- Attr67 mapping has verified `BUG-ATTR67-001..009`; runtime remains locked.
 - Context7 supplied supplementary C++/MySQL semantics checks only.
 
 ## Exact resume cursor
-1. Finish Attr67 private-shop/shop/material cross-window boundary pass.
-2. Audit NPC_STORAGE delayed retrieval plus reconnect/restart reconstruction.
-3. Audit percent/support bounds and rare-attribute mutation.
-4. Close deployment-shadowed client/server parity candidates.
-5. Decide STATIC COMPLETE; source/game repos stay read-only and runtime stays locked.
+1. Close remaining deployment-shadowed Attr67 client/server parity findings.
+2. Re-check dormant retrieval candidates for any non-quest/native caller.
+3. Decide Attr67 STATIC COMPLETE.
+4. Source/game repos stay read-only and runtime stays locked.
 
 ## Mapping acceleration index
 - Status: **READY / ACTIVE**
