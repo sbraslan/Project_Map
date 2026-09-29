@@ -1,6 +1,6 @@
 # Classic Quest Dungeons — Static System Map
 
-**Status:** STATIC MAPPING OPEN / 4 VERIFIED BUGS  
+**Status:** STATIC MAPPING CLOSED / 4 VERIFIED BUGS  
 **Mode:** detection / mapping only  
 **Execution:** LOCKED / NOT RUN  
 **Source policy:** Project_ClientSrc, Project_ServerSRC, Project_Binary, Project_Game and Project_DumpProto are read-only.
@@ -134,3 +134,25 @@ This cursor was a narrow dependency lookup only; the CLOSED Dungeon Core and Par
 - This is recorded as **Classic Catacomb -> Dungeon Core -> BUG-PARTY-001 reachability**, not assigned a duplicate `BUG-CLD-*` ID.
 
 No new Classic-specific bug was promoted in this dependency cursor.
+
+
+## Final deployment/data parity closure
+- ServerSRC enables `ENABLE_DEVIL_TOWER`, `ENABLE_DEVIL_CATACOMBS`, `ENABLE_SPIDER_DUNGEON`, `ENABLE_FLAME_DUNGEON` and `ENABLE_SNOW_DUNGEON`.
+- The active Game `quest_list` deploys Devil Tower, Devil Catacombs, both Spider quests, Flame Dungeon and Snow Dungeon.
+- Compiled `quest/object` handlers are present for the mapped entry NPCs/items, kill events, login/logout hooks and timer callbacks.
+- Matching map and dungeon-data trees are present: Devil Tower regen/map data, Catacomb dc_1f..dc_7f data, Spider dungeon maps/objects, Flame fd_* data/maps, and Snow sd_1..sd_10 data/map.
+- No additional source-proven deployment/data mismatch was found.
+
+## Static closure
+Classic Quest Dungeons is **STATIC MAPPING CLOSED** for the pinned source snapshot.
+
+Verified feature-specific bugs:
+- `BUG-CLD-001` — Spider Baroness unsuffixed global boss VID causes cross-channel identity collision.
+- `BUG-CLD-002` — Snow leader valid rejoin does not cancel stale leader-out shutdown timer.
+- `BUG-CLD-003` — Catacomb entry item is consumed before fallible private-map creation with no rollback.
+- `BUG-CLD-004` — Snow non-timer progression events use stale singleton `get_server_timer_arg()` as the next-stage instance key.
+
+Cross-system reachability retained without duplicate ID:
+- Devil Catacomb -> Dungeon Core item-group exit -> `BUG-PARTY-001`.
+
+Runtime execution remains locked.
