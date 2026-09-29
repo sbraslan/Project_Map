@@ -1,6 +1,6 @@
 # OX Event — Bug Registry
 
-**Status:** STATIC MAPPING IN PROGRESS / 5 VERIFIED BUGS  
+**Status:** STATIC COMPLETE / 5 VERIFIED BUGS  
 **Execution:** LOCKED / NOT RUN
 
 ## BUG-OX-001 — renewal quiz timer collides with the 35-second outer scheduler
@@ -73,7 +73,7 @@ A player admitted just before the source-side registration cutoff can arrive aft
 ### Deferred validation
 `OX-T03`.
 
-## BUG-OX-004 — automatic round restart does not reset the deployed admission counter
+## BUG-OX-004 — automatic event/round restart does not reset the deployed admission counter
 
 **Class:** multi-round state reset / quest-manager integration  
 **Reachability:** VERIFIED in the intended automatic three-round OX path.
@@ -85,7 +85,7 @@ A player admitted just before the source-side registration cutoff can arrive aft
 4. Outer state is changed back to OPEN and registration countdown is reset.
 5. No server OX path resets `ox_map_login_counter`.
 6. The deployed quest resets that counter only in its manual `cleanup_event()` helper / force-management path.
-7. New entrants still use `check_limit()` against the stale cumulative counter.
+7. New entrants still use `check_limit()` against the stale cumulative counter. The same omission exists in automatic `SetOXEvent(true/false)`, so stale admission usage can also survive into a later automatic OX run unless manual quest cleanup reset it.
 
 ### Consequence
 Later automatic rounds inherit earlier-round admission usage. A full first round can make round 2 registration reject everyone; partial rounds expose only the remaining cumulative slots.
@@ -112,6 +112,12 @@ An OX event reported/forced as ended can partially resurrect from its still-live
 
 ### Deferred validation
 `OX-T05`.
+
+## Closed / deferred candidates
+- Automatic Event Manager OX does not initialize `ox_map_level_min/max` or `ox_map_player_max`; no tracked persisted runtime event-flag values are available, so current deployment breakage cannot be asserted.
+- `Quiz(level == m_vec_quiz.size())` remains API-only/unpromoted with current level-1 callers/table.
+- Offline-winner reward persistence is unspecified; no bug promoted.
+- Same-map `Show()` audience relocation was mapped and no independent lifecycle defect was proven.
 
 ## Open candidates
 - Automatic Event Manager OX does not initialize the deployed quest's `ox_map_level_min/max`, `ox_map_player_max`, or login counter; current DB event-table/flag values are required before declaring this deployed breakage.
