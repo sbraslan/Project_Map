@@ -163,3 +163,17 @@ Expected bug signature: timeout state is lost and manual end is rejected because
 Covers `BUG-MARR-012`.
 
 Do not run these tests while the global execution lock is active.
+
+
+## MARR-T13 — unilateral divorce while spouses are on different cores
+After runtime is explicitly unlocked:
+1. place married spouses on maps hosted by different game cores;
+2. on spouse A, execute the deployed unilateral divorce route;
+3. confirm DB relation removal and DG MARRIAGE_REMOVE fanout;
+4. observe both clients' Messenger family group and lover affect icon without relogging.
+
+Expected bug signature: relation is removed server-side but neither client receives `lover_divorce`, leaving stale lover UI until a later reset.
+
+Covers `BUG-MARR-013`.
+
+Do not run this test while the global execution lock is active.
