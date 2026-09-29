@@ -111,3 +111,17 @@ Expected signature: the action is immediately allowed because the new `CHARACTER
 Covers `BUG-MON-009`.
 
 Do not run these tests while the global execution lock is active.
+
+
+## MON-T10 — tax cooldown enforcement
+After runtime is explicitly unlocked:
+1. use the active monarch and issue a valid `mtax` change;
+2. confirm `MI_TAX` is written;
+3. immediately issue a second valid tax change before seven days elapse;
+4. inspect `trade_tax` and cooldown state.
+
+Expected bug signature: the second change is accepted because `do_monarch_tax` never checks `IsMCOK(MI_TAX)`.
+
+Covers `BUG-MON-010`.
+
+Do not run this test while the global execution lock is active.
