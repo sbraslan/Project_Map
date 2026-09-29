@@ -2,7 +2,7 @@
 
 **Active phase:** Detection / Mapping Only  
 **Active state:** Marriage / Wedding static mapping  
-**Status:** MARRIAGE / WEDDING — STATIC MAPPING IN PROGRESS / 2 VERIFIED BUGS / EXECUTION LOCKED  
+**Status:** MARRIAGE / WEDDING — STATIC MAPPING IN PROGRESS / 6 VERIFIED BUGS / EXECUTION LOCKED  
 **Machine state:** `STATE.json`  
 **Active subsystem:** Marriage / Wedding — OPEN  
 **System:** `systems/marriage.md`  
@@ -18,7 +18,11 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 ## Verified findings
 - `BUG-MARR-001` — engagement Yang/ring mutations are committed before the authoritative marriage request and an intervening `wait()` creates an interruption window with no rollback.
 - `BUG-MARR-002` — map 81 is enabled on both ch2/core4 and ch99/core99 while DB wedding requests are broadcast to all game peers, allowing duplicate wedding-map producers/READY paths.
-- Deferred Marriage tests: `MARR-T01`, `MARR-T02`; not executed.
+- `BUG-MARR-003` — mutual divorce incorrectly rejects an exactly sufficient 500,000 Yang balance.
+- `BUG-MARR-004` — delayed old-core P2P logout can overwrite a fresh lover-online state.
+- `BUG-MARR-005` — wedding exit ignores the actual saved exit fields and uses warp fields instead.
+- `BUG-MARR-006` — same-core wedding exit does not detach membership, allowing delayed teardown to disconnect an already-exited player.
+- Deferred Marriage tests: `MARR-T01..MARR-T06`; none executed.
 
 - `BUG-MSG-001..021` are canonical in `bugs/messenger.md`.
 - Latest additions: `BUG-MSG-020` 16-bit list-size framing overflow; `BUG-MSG-021` GM-to-GM block route-policy mismatch.
@@ -47,11 +51,11 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 - Global first future live gate remains `DUNGEON-T09`.
 
 ## Exact resume cursor
-1. Close legacy `HEADER_GD_BREAK_MARRIAGE / HEADER_DG_BREAK_MARRIAGE`.
-2. Audit mutual/unilateral divorce transaction ordering.
-3. Continue marriage login/logout + near-check/love-point lifecycle.
-4. Audit wedding membership/teardown and duplicate READY consequences.
-5. Keep source/game repositories read-only and runtime execution locked.
+1. Finish mutual-divorce stale-target/reselection audit.
+2. Close near-check/love-point lifecycle.
+3. Close wedding end + membership interactions after BUG-MARR-005/006.
+4. Audit remaining Lua state assumptions and marriage unique-item bonus semantics.
+5. Decide STATIC COMPLETE readiness; keep runtime locked.
 
 ## Mapping acceleration index — 2026-09-29
 - Status: **READY**
