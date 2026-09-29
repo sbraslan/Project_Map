@@ -1,6 +1,6 @@
 # Classic Quest Dungeons — Static System Map
 
-**Status:** STATIC MAPPING OPEN / 3 VERIFIED BUGS  
+**Status:** STATIC MAPPING OPEN / 4 VERIFIED BUGS  
 **Mode:** detection / mapping only  
 **Execution:** LOCKED / NOT RUN  
 **Source policy:** Project_ClientSrc, Project_ServerSRC, Project_Binary, Project_Game and Project_DumpProto are read-only.
@@ -91,3 +91,16 @@ The C++ `d.new_jump_party` binding can fail when `CDungeonManager::Create` / pri
 Promoted as `BUG-CLD-003`.
 
 Flame ticket handling was separately checked: initial party validation is rechecked on private-map login while `dungeon_enter == 0`; a missing ticket schedules removal from the dungeon rather than silently granting a valid paid entry.
+
+
+## Cursor 3 finding — Snow stage timers use stale global server-timer context
+
+Four Snow Dungeon transitions call `server_timer(..., get_server_timer_arg())` from handlers that are **not** server-timer callbacks:
+- `LEVEL2_KEY.use` -> floor 3;
+- `LEVEL8_KEY.use` -> floor 9;
+- `LEVEL5_CUBE.take` -> floor 6;
+- `LEVEL6_STONE.kill` -> floor 7.
+
+The C++ quest manager sets `m_dwServerTimerArg` only in `CQuestManager::ServerTimer(npc,arg)`. The value is singleton manager state and is not reset for normal item/take/kill events. Therefore these handlers do not obtain the current Snow private-map index; they reuse whichever server-timer arg most recently ran on that game process.
+
+Promoted as `BUG-CLD-004`.
