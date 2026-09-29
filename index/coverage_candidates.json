@@ -54,11 +54,16 @@
     },
     {
       "id": "monarch",
-      "status": "SELECTED / OPEN",
+      "status": "ACTIVE / 4 VERIFIED BUGS",
       "evidence": [
         "Project_ServerSRC:db/src/Monarch.cpp",
         "Project_ServerSRC:game/src/monarch.cpp",
         "Project_ServerSRC:game/src/questlua_monarch.cpp"
+      ],
+      "canonical": [
+        "systems/monarch.md",
+        "bugs/monarch.md",
+        "tests/monarch.md"
       ]
     },
     {
