@@ -946,3 +946,9 @@ Execution remains locked.
 `ITEM-T01` was reverified and canonical handoff prepared at `ITEM_T01_HANDOFF.md`.
 Fresh client audit confirms ordinary UI reachability: selected `dropCount` is forwarded into the destroy packet, but server `RemoveItem(..., bCount)` ignores bCount and removes the full stack object. Adjacent destroy UAF (BUG-ITEM-001) may preempt observation; if so ITEM-T01 should be marked inconclusive rather than conflated with ITEM-T02.
 Execution remains locked.
+
+
+## Inventory / Item ITEM-T02 handoff — 2026-09-29
+`ITEM-T02` was reverified against current server source and canonical handoff prepared at `ITEM_T02_HANDOFF.md`.
+`CHARACTER::RemoveItem` calls ITEM_MANAGER destruction first; the manager path reaches `M2_DELETE(item)`, after which the caller still evaluates `item->GetName()` for ChatPacket. Normal destroy UI can reach the sequence. Runtime evidence should prefer ASan/debug lifetime instrumentation because a non-crashing run can still dereference readable freed memory.
+Execution remains locked.
