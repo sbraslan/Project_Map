@@ -1,6 +1,6 @@
 # Arena / PvP Duel — Static Map
 
-**Status:** STATIC MAPPING IN PROGRESS / 1 VERIFIED BUG  
+**Status:** STATIC MAPPING IN PROGRESS / 3 VERIFIED BUGS  
 **Phase:** Detection / Mapping Only  
 **Opened:** 2026-09-29  
 **Source/Game repositories:** READ-ONLY  
@@ -121,16 +121,52 @@ EndDuel:
 - clear observer map and arena PID/score state.
 
 ## BattleArena companion
-`CBattleArena` is a separate GM-operated invasion event using maps 190/191/192. Current direct caller found in `cmd_gm.cpp` (start/force-end); no deployed normal-player quest caller found yet.
+`CBattleArena` is a separate GM-operated invasion event.
 
-Keep separate from classic duel correctness.
+Deployed command:
+`weeklyevent [empire]`
+→ `do_weeklyevent`
+→ permission `GM_LOW_WIZARD`
+→ when not running: `CBattleArena::Start(empire)`
+→ when running: `CBattleArena::ForceEnd()`.
+
+Configured target maps:
+- empire 1 -> 190
+- empire 2 -> 191
+- empire 3 -> 192
+
+### BUG-ARENA-002 — deployed Weekly/BattleArena command targets nonexistent, unhosted maps
+Current tracked deployment has:
+- no map-index entries 190/191/192;
+- no `metin2_map_battlearena01/02/03` map data;
+- no core CONFIG with MAP_ALLOW 190/191/192.
+
+`CBattleArena::Start` performs no map availability validation. It sets status BATTLE, schedules the event, writes `battle_arena = targetMap` and returns success.
+
+The registered GM command consequently reports “Weekly Event Start” even though the target event map has no deployed route/data.
+
+Promoted as `BUG-ARENA-002`.
+
+### BUG-ARENA-003 — ForceEnd does not force the BattleArena state machine to end
+`CBattleArena::ForceEnd`:
+- sets `m_bForceEnd = true`;
+- cancels the current event;
+- creates a new `battle_arena_event` beginning at **state 3**.
+
+But `m_bForceEnd` is never consulted by `battle_arena_event`.
+
+State 3 is the normal monster-wave monitoring state. With monsters present it can continue 5-minute loops and spawn stones before eventually advancing to purge/end. Even when called through `weeklyevent`, the GM is immediately told “Weekly Event End” while the server event can remain running.
+
+Promoted as `BUG-ARENA-003`.
+
+Keep BattleArena lifecycle separate from classic duel correctness.
 
 ## Current audit cursor
-1. map classic arena startup/map routing and determine whether Candidate A can be promoted independently;
-2. audit duel disconnect/death/timeout and potion/item restrictions;
-3. audit observer lifecycle/reconnect;
-4. audit BattleArena GM command permissions, map ownership and event lifecycle;
-5. decide whether classic Arena closes with one reachable bug plus shadowed lower-layer candidates.
+1. audit duel disconnect/death/timeout and potion/item restrictions;
+2. audit observer lifecycle/reconnect;
+3. close classic map112 deployment candidate classification under BUG-ARENA-001 shadow;
+4. finish BattleArena event-state edge cases after BUG-ARENA-002/003;
+5. decide STATIC COMPLETE readiness.
 
 ## Runtime
 No Arena runtime test may be executed while the global execution lock is active. First future live gate remains `DUNGEON-T09`.
