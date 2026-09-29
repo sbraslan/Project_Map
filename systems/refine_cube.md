@@ -85,7 +85,7 @@ See `BUG-REFCUBE-002`.
 7. audit socket/attribute/Yohara/element/set metadata preservation across refine;
 8. validate current `cube.txt` and refine-table deployment data.
 
-No runtime test is authorized. Global first future live gate remains `DUNGEON-T10`.
+No runtime test is authorized. Global first future live gate remains `DUNGEON-T09`.
 
 
 ## Cube authorization / improve-item pass — 2026-09-28
