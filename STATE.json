@@ -8,7 +8,7 @@
   "active": {
     "subsystem": "monarch",
     "display_name": "Monarch",
-    "status": "STATIC MAPPING IN PROGRESS / 4 VERIFIED BUGS / EXECUTION LOCKED",
+    "status": "STATIC MAPPING IN PROGRESS / 7 VERIFIED BUGS / EXECUTION LOCKED",
     "system_file": "systems/monarch.md",
     "bug_file": "bugs/monarch.md",
     "test_file": "tests/monarch.md",
@@ -16,14 +16,17 @@
       "BUG-MON-001",
       "BUG-MON-002",
       "BUG-MON-003",
-      "BUG-MON-004"
+      "BUG-MON-004",
+      "BUG-MON-005",
+      "BUG-MON-006",
+      "BUG-MON-007"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Close treasury request/ack concurrency and failed-deduction semantics.",
-      "Audit takemonarchmoney caller/authorization reachability.",
-      "Audit PowerUp/DefenseUp caller deployment and cross-core replication.",
-      "Audit monarch warp/transfer charge-on-failure ordering.",
+      "Audit SetMonarch SQL column/schema consistency if an authoritative schema becomes available.",
+      "Audit candidacy/election persistence reconstruction across DB restart.",
+      "Close process-local PowerUp/DefenseUp as deployed or dormant.",
+      "Audit remaining monarch notice/warp/money-add boundaries.",
       "Keep runtime/fault-injection execution locked; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -2806,7 +2809,7 @@
       "exact source fetch"
     ],
     "context7_role": "supplementary external library/API documentation verification; not authoritative Metin2 source location",
-    "next_action": "continue Monarch treasury/multicore static audit; use Context7 only for external C++/library semantics"
+    "next_action": "continue Monarch persistence/restart and remaining boundary closure; Context7 supplementary only"
   },
   "marriage_mapping": {
     "status": "STATIC COMPLETE / 14 VERIFIED BUGS",
@@ -3010,7 +3013,7 @@
     ]
   },
   "monarch_mapping": {
-    "status": "STATIC MAPPING IN PROGRESS / 4 VERIFIED BUGS",
+    "status": "STATIC MAPPING IN PROGRESS / 7 VERIFIED BUGS",
     "canonical_files": {
       "system": "systems/monarch.md",
       "bugs": "bugs/monarch.md",
@@ -3020,21 +3023,27 @@
       "BUG-MON-001",
       "BUG-MON-002",
       "BUG-MON-003",
-      "BUG-MON-004"
+      "BUG-MON-004",
+      "BUG-MON-005",
+      "BUG-MON-006",
+      "BUG-MON-007"
     ],
     "mapped_flows": [
       "GM elect -> HEADER_GD_COME_TO_VOTE -> DB ComeToVote -> CMonarch::ElectMonarch -> no winner/state update -> BUG-MON-001",
       "GM setmonarch -> HEADER_GD_SETMONARCH -> DB SetMonarch -> wrong HEADER_DG_RMCANDIDACY/no UPDATE_MONARCH_INFO -> stale game-core state -> BUG-MON-002",
       "GM rmmonarch -> DB RMMonarch -> DelMonarch called twice -> success fanout lost/no UPDATE_MONARCH_INFO -> BUG-MON-003",
-      "player mtax -> IsMonarch -> invalid-range chat without return -> SetEventFlag(trade_tax, invalid) -> BUG-MON-004"
+      "player mtax -> IsMonarch -> invalid-range chat without return -> SetEventFlag(trade_tax, invalid) -> BUG-MON-004",
+      "SQL wrapper: DELETE -> uiAffectedRows, uiNumRows=0 -> DelMonarch false/stale runtime state -> strengthened BUG-MON-003",
+      "mtr + mmob distinct cooldowns -> same stale local treasury precheck -> effects before DB auth -> rejected second DecMoney has no rollback -> BUG-MON-005",
+      "mtax SetMC(MI_TAX) with no IsMCOK(MI_TAX) gate -> BUG-MON-006",
+      "remote mtr -> GG_TRANSFER -> receiver FindPC may fail -> no ACK while source already charges/cooldowns -> BUG-MON-007"
     ],
     "candidates": [
-      "multi-core treasury race/effect-before-authoritative-deduction",
-      "process-local PowerUp/DefenseUp buffs; deployed caller closure pending",
-      "takemonarchmoney authorization code is compiled out under __UNIMPLEMENTED__; caller closure pending",
-      "warp/transfer cost and cooldown can be committed without authoritative success acknowledgement",
-      "SetMonarch SQL/schema consistency",
-      "DelMonarch DELETE-result interpretation"
+      "SetMonarch SQL uses REPLACE columns (empire, name, windate, money) while LoadMonarch reads a.pid; authoritative table schema is not tracked.",
+      "process-local PowerUp/DefenseUp buffs; no current Project_Game caller found for oh.monarchpowerup/oh.monarchdefenseup.",
+      "takemonarchmoney authorization/precheck code is compiled out, but no current Project_Game caller was found.",
+      "election/candidacy persistence reconstruction across DB restart is still open.",
+      "remaining warp failure and AddMoney overflow/reporting boundaries."
     ],
     "runtime_tests": {
       "status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN",
@@ -3042,7 +3051,10 @@
         "MON-T01",
         "MON-T02",
         "MON-T03",
-        "MON-T04"
+        "MON-T04",
+        "MON-T05",
+        "MON-T06",
+        "MON-T07"
       ],
       "first_live_gate_unchanged": "DUNGEON-T09"
     },
