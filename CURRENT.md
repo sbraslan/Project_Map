@@ -2,7 +2,7 @@
 
 **Active phase:** Detection / Mapping Only  
 **Active state:** Static mapping continuation  
-**Status:** MESSENGER / FRIEND / BLOCK — MAPPING IN PROGRESS / 14 VERIFIED BUGS / EXECUTION LOCKED  
+**Status:** MESSENGER / FRIEND / BLOCK — MAPPING IN PROGRESS / 17 VERIFIED BUGS / EXECUTION LOCKED  
 **Machine state:** `STATE.json`  
 **Active subsystem:** Messenger / Friend / Block  
 **System:** `systems/messenger.md`  
@@ -32,6 +32,7 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 - `BUG-MSG-014` — name-based friend/block add paths bypass the observer-mode rejection enforced by the VID paths.
 - `BUG-MSG-015` — GM inverse watcher sets retain logged-out accounts and grow with historical process-visible accounts.
 - `BUG-MSG-016` — delayed old-core P2P logout can delete the newer same-name channel/session CCI and messenger presence.
+- `BUG-MSG-017` — outgoing name-based messenger CG packets truncate the configured 48-byte name boundary and long remove/unblock fields lack explicit final NUL termination.
 
 ## Closed / scoped observations
 - Shout delivery checks the receiver's messenger block relation on both local and P2P fanout. BUG-MSG-007 can still undermine it after logout/relog cache loss.
@@ -41,8 +42,8 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 - `OnBlockLogin`'s missing local handler-null guard is closed as non-bug because `PyCallClassMemberFunc` safely rejects a null handler.
 
 ## Exact resume cursor
-1. Continue channel-change/reconnect P2P ordering candidate without promoting timing-dependent behavior.
-2. Audit fixed-width Messenger name payload termination/length handling on server and client.
-3. Finish remaining GM messenger lifecycle/inverse-cache semantics.
-4. Check tracked quest usage of BUG-MSG-011 Lua helpers.
+1. Close Battle Field friend-add parity: `ADD_BY_NAME` rejects battle-zone use while `ADD_BY_VID` does not.
+2. Re-check residual P2P resynchronization after `BUG-MSG-016` against `BUG-MSG-003/007`.
+3. Run the final friend/block/GM relation symmetry and packet-boundary pass.
+4. Assess Messenger static-closure readiness.
 5. Do not execute runtime tests; global first future live gate remains `DUNGEON-T09`.
