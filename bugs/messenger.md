@@ -294,27 +294,26 @@ Observer-mode restrictions are path-dependent: friend/block add actions rejected
 
 ---
 
-## BUG-MSG-015 — GM inverse watcher sets retain logged-out accounts indefinitely
+## BUG-MSG-015 — inverse watcher sets retain logged-out accounts indefinitely
 
 **Class:** server lifecycle / stale-cache accumulation / memory-performance leak  
-**Reachability:** VERIFIED for accounts loaded into the synthetic GM messenger relation, including remote accounts observed through P2P login.
+**Reachability:** VERIFIED for friend, block and synthetic GM messenger relations.
 
 ### Proof
-1. Every `MessengerManager::Login(account)` schedules `LoadGMList` with a query that returns configured GM names for that account.
-2. `LoadGMList` stores both directions: `m_GMRelation[account].insert(gm)` and `m_InverseGMRelation[gm].insert(account)`.
-3. `MessengerManager::Logout(account)` erases the account's outgoing `m_GMRelation[account]` and removes the account from values inside `m_GMRelation`.
-4. The logout path never erases `account` from `m_InverseGMRelation[gm]`.
-5. No inverse-GM cleanup/clear path is present in `messenger_manager.cpp`; `MessengerManager::Destroy()` is empty.
-6. Newly observed remote P2P characters also reach `P2PLogin -> Login`, so they can contribute to the same inverse watcher sets.
+1. Friend loading stores `m_Relation[account]` plus `m_InverseRelation[companion]`; block loading stores `m_BlockRelation[account]` plus `m_InverseBlockRelation[companion]`; GM loading stores `m_GMRelation[account]` plus `m_InverseGMRelation[gm]`.
+2. `MessengerManager::Logout(account)` erases the account's outgoing friend/GM/block relations and removes the departing name from values in the corresponding outgoing maps.
+3. Logout does not erase the departing account from the inverse sets representing that account as a watcher of its own friends, blocked names or GM entries.
+4. Relation-specific remove helpers do prune inverse edges, but ordinary logout does not invoke them for the departing account's full outgoing relation set.
+5. Repeated logins reinsert the same set members, so one account does not duplicate itself, but unique historical accounts remain resident for the process lifetime unless the underlying relation is explicitly removed.
+6. Presence fanout iterates these inverse sets and attempts sends to stale/offline watcher names; send helpers later no-op when no local descriptor exists.
 
 ### Consequence
-For each GM, the inverse watcher set can grow toward all unique accounts observed during the process lifetime instead of the currently relevant accounts. GM login/logout fanout repeatedly traverses stale names; offline recipients are eventually discarded by send helpers, but resident memory and fanout work keep accumulating.
+Friend, block and GM inverse watcher maps grow toward historical process-visible accounts rather than only currently useful watchers. Presence events repeatedly traverse stale names, increasing resident cache size and fanout work over long uptimes.
 
 ### Deferred validation
 `MSG-T15`.
 
 ---
-
 ## BUG-MSG-016 — delayed old-core P2P logout can delete a newer channel/session presence
 
 **Class:** multi-core ordering / lifecycle race  
