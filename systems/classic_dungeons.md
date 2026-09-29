@@ -1,6 +1,6 @@
 # Classic Quest Dungeons — Static System Map
 
-**Status:** STATIC MAPPING OPEN / 2 VERIFIED BUGS  
+**Status:** STATIC MAPPING OPEN / 3 VERIFIED BUGS  
 **Mode:** detection / mapping only  
 **Execution:** LOCKED / NOT RUN  
 **Source policy:** Project_ClientSrc, Project_ServerSRC, Project_Binary, Project_Game and Project_DumpProto are read-only.
@@ -76,3 +76,18 @@ Promoted as `BUG-CLD-002`.
 - Snow leader absence/rejoin timer behavior produced `BUG-CLD-002`.
 
 No additional timer/stage defect was promoted in this cursor.
+
+
+## Cursor 3 finding — Catacomb entry item rollback
+
+Devil Catacombs consumes the rag/golden-lock entry item before the private dungeon exists:
+1. `item.remove()`;
+2. two dialog `wait()` suspensions;
+3. `d.new_jump_party(...)`;
+4. dungeon state/regen initialization.
+
+The C++ `d.new_jump_party` binding can fail when `CDungeonManager::Create` / private-map creation fails, but it returns no Lua success value and the quest has no rollback path. The consumed entry item therefore cannot be restored by this flow.
+
+Promoted as `BUG-CLD-003`.
+
+Flame ticket handling was separately checked: initial party validation is rechecked on private-map login while `dungeon_enter == 0`; a missing ticket schedules removal from the dungeon rather than silently granting a valid paid entry.
