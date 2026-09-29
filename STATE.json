@@ -29,9 +29,10 @@
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Perform final Marriage/Wedding closure pass over client UI, Lua caller guards, and unpromoted candidates.",
-      "If no new independent finding is proven, mark Marriage/Wedding STATIC COMPLETE.",
-      "Refresh acceleration indexes/checkpoint and select the next queued subsystem.",
+      "Audit remaining wedding Lua null/map-state assumptions against deployed callers.",
+      "Close relation removal versus active wedding-map lifecycle.",
+      "Audit cross-core lover-info/love-point refresh behavior beyond the already promoted notification bugs.",
+      "Reconcile Project_Map index feature/symbol/callgraph seeds with Marriage findings.",
       "Keep runtime/fault-injection execution locked; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -2813,7 +2814,7 @@
       "exact source fetch"
     ],
     "context7_role": "supplementary external library/API documentation verification; not authoritative Metin2 source location",
-    "next_action": "final Marriage/Wedding closure pass; then select next indexed subsystem"
+    "next_action": "continue Marriage/Wedding static mapping with GitHub index + Context7 external semantics: wedding Lua/map-state guards, active-wedding removal lifecycle, cross-core refresh closure"
   },
   "marriage_mapping": {
     "status": "STATIC MAPPING IN PROGRESS / 13 VERIFIED BUGS",
@@ -2896,7 +2897,13 @@
       "wedding_is_playing_music missing pWeddingInfo guard not promoted independently: deployed caller first requires marriage.in_my_wedding().",
       "IsNear same-map-only behavior not promoted without a deployed proximity invariant; historical distance/party code is commented out.",
       "Legacy HEADER_GD_BREAK_MARRIAGE has no active mapped sender and delegates to normal relation Remove path."
-    ]
+    ],
+    "context7_verification": {
+      "library": "Lua",
+      "library_id": "/websites/lua",
+      "topic": "coroutine yield/resume preserves execution stack/local variables and resumes from yield point",
+      "use": "supplementary support for BUG-MARR-001 stale quest-local window; project source remains authoritative"
+    }
   },
   "oxevent_mapping": {
     "status": "STATIC MAPPING IN PROGRESS",
