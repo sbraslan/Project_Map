@@ -43,6 +43,27 @@ Bruce can dereference a freed item object after a concurrent manual pickup, prod
 ### Deferred validation
 Canonical runtime test: `PET-T02`.
 
+## BUG-PET-003 — REAL_TIME PET_PAY expiry can leave the pet summoned after its item is destroyed
+
+**Class:** lifecycle / stale actor / forced-removal cleanup defect  
+**Reachability:** VERIFIED — current deployed classic PET_PAY families, including Bruce 53233, use `REAL_TIME` limits.
+
+### Static proof
+1. Current decoded item proto contains many `ITEM_PET / PET_PAY` rows with `REAL_TIME`; item 53233 is `WEAR_PET`, `REAL_TIME 2592000`, race 34055.
+2. `CItem::StartRealTimeExpireEvent()` starts the real-time event for `LIMIT_REAL_TIME`.
+3. At expiry, `real_time_expire_event` calls `ITEM_MANAGER::RemoveItem(item, "REAL_TIME_EXPIRE")`; classic PET_PAY is not exempt.
+4. Forced lower-level removal unequips/destroys the item without calling `CHARACTER::PetUnsummon()`.
+5. `CPetActor::Update()` detects the missing summon-item VID but immediately returns `false` when lookup fails, before `Unsummon()`.
+6. `CPetSystem::Update()` does not delete/unsummon that actor on the false return.
+7. `petsystem_update_event` ignores the `CPetSystem::Update()` return value and continues scheduling at the normal interval.
+8. Owner teardown eventually closes the state: `CHARACTER::Destroy()` destroys the pet system, and actor destruction calls `Unsummon()`.
+
+### Consequence
+A classic pet can remain spawned/summoned after its real-time summon item has expired and been destroyed, until a later pet-system/owner cleanup path removes it. The actor/update event can therefore continue in a state whose authoritative summon item no longer exists.
+
+### Deferred validation
+Canonical runtime test: `PET-T03`.
+
 ## Open candidates
 - legacy Lua `pet.summon` argument/signature mismatch; needs tracked active quest producer;
-- missing summon-item VID branch in `CPetActor::Update` returns false before Unsummon; item-destruction callers must be closed before promotion.
+- Achievement `pet.summon_time` is reset only when `Unsummon()` can still resolve the summon item; exact visible accounting consequence after abnormal cleanup still needs closure.
