@@ -8,7 +8,7 @@
   "active": {
     "subsystem": "messenger",
     "display_name": "Messenger / Friend / Block",
-    "status": "MAPPING IN PROGRESS / 21 VERIFIED BUGS / EXECUTION LOCKED",
+    "status": "STATIC COMPLETE / 21 VERIFIED BUGS / EXECUTION LOCKED",
     "system_file": "systems/messenger.md",
     "bug_file": "bugs/messenger.md",
     "test_file": "tests/messenger.md",
@@ -37,10 +37,9 @@
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Audit remaining friend/block remove and inverse-cache symmetry after BUG-MSG-019/021.",
-      "Re-check residual P2P resynchronization after BUG-MSG-016.",
-      "Finish remaining client/server messenger parser and framing boundaries after BUG-MSG-012/017/020.",
-      "Perform final Messenger relation/cache/P2P symmetry pass and decide STATIC COMPLETE.",
+      "Messenger / Friend / Block static mapping is closed with BUG-MSG-001..021.",
+      "MSG-T01..MSG-T21 remain documented and unexecuted.",
+      "Open the next independent subsystem for detection-only mapping.",
       "Do not execute runtime tests; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -2673,7 +2672,7 @@
     ]
   },
   "messenger_mapping": {
-    "status": "MAPPING IN PROGRESS",
+    "status": "STATIC COMPLETE",
     "system_file": "systems/messenger.md",
     "bug_file": "bugs/messenger.md",
     "test_file": "tests/messenger.md",
@@ -2777,7 +2776,11 @@
       "Battle Field friend-add parity promoted to BUG-MSG-018.",
       "Battle Field friend-add VID parity promoted to BUG-MSG-018.",
       "Oversized friend/block list framing promoted to BUG-MSG-020.",
-      "GM-to-GM block path parity promoted to BUG-MSG-021."
+      "GM-to-GM block path parity promoted to BUG-MSG-021.",
+      "Final friend/block remove and P2P mutation symmetry pass produced no additional independent finding.",
+      "Pending friend-token CRC collision remains theoretical-only and unpromoted without a concrete ordinary-flow collision.",
+      "Malformed fixed-width Messenger parser concerns beyond the configured long-name defects are adversarial-only/unpromoted.",
+      "Pre-existing messenger block versus later marriage/engagement is a semantic-policy ambiguity, not promoted without an explicit invariant requiring automatic unblock or marriage rejection."
     ]
   }
 }
