@@ -109,3 +109,30 @@ Expected bug signature: B receives the advertised shared effect when both are re
 Covers `BUG-MARR-008`.
 
 Do not run while the execution lock is active.
+
+
+## MARR-T09 — DB restart with pending engagement
+After runtime is explicitly unlocked in an isolated environment:
+1. create a valid engagement but do not complete `set_to_marriage`;
+2. verify the `marriage` SQL row has `is_married=0`;
+3. restart only the DB cache/server process;
+4. inspect the row and both game-core relation states after reconnect/setup;
+5. inspect player rings/Yang.
+
+Expected bug signature: the SQL row is deleted at DB initialization and the engagement cannot be reconstructed/refunded.
+
+Covers `BUG-MARR-009`.
+
+## MARR-T10 — Marriage Fast monotonicity
+After runtime is explicitly unlocked:
+1. use a controlled marriage age and zero/known stored love_point;
+2. record `GetMarriagePoint()` without Marriage Fast;
+3. activate Marriage Fast and record again;
+4. let/force the premium condition expire without changing marriage age/storage;
+5. record the result again.
+
+Expected bug signature: point value jumps upward under the current premium calculation and then drops when the premium condition becomes false.
+
+Covers `BUG-MARR-010`.
+
+Do not run these tests while the global execution lock is active.
