@@ -1,6 +1,6 @@
 # Zodiac Temple / 12ZI — Static System Map
 
-**Status:** STATIC MAPPING OPEN / 0 VERIFIED BUGS  
+**Status:** STATIC MAPPING OPEN / 7 VERIFIED BUGS  
 **Mode:** detection / mapping only  
 **Execution:** LOCKED / NOT RUN  
 **Source policy:** Project_ClientSrc, Project_ServerSRC, Project_Binary, Project_Game and Project_DumpProto are read-only.
@@ -67,3 +67,23 @@ client floor controls
 4. Audit reward item lifetime, quest-flag arithmetic and duplicate/replay behavior.
 5. Audit floor/event timers, mob event raw pointers and private-map destruction.
 6. Map client/server UI parity and packet/command boundaries.
+
+
+## Verified bug cluster — first pass
+- `BUG-ZOD-001`: player-triggerable temporary item-object leak in check-box/reward helpers.
+- `BUG-ZOD-002`: asymmetric reward counters can pass a zero pair count into item creation and yield one gold box.
+- `BUG-ZOD-003`: replayed check-box uses arithmetic addition and corrupts/forges the intended bitmask.
+- `BUG-ZOD-004`: revive validates only Zodiac map *range*, not the same private instance.
+- `BUG-ZOD-005`: `m_pkZodiacSkill1..11` event handles are raw/uninitialized.
+- `BUG-ZOD-006`: delayed Zodiac skill events are not cancelled on character destruction and retain raw character pointers.
+- `BUG-ZOD-007`: non-channel-99 Zodiac manager initialization falls off a non-void function.
+
+## Reward/command boundary findings
+The Python UI applies useful client-side state (disabling completed cells and enabling gold reward only when both color counters exceed the displayed paired value), but all authoritative actions are plain player chat commands. Server code therefore must independently enforce those UI invariants. It currently does not for duplicate cell selection, gold-pair eligibility, or same-instance revive.
+
+## Current audit cursor
+1. Resolve actual Zodiac deployment/entry ownership: server-time portals vs missing tracked quest source.
+2. Audit `DecMember` event-flag branch and party/reconnect teardown.
+3. Audit private-map/floor timer destruction ordering.
+4. Audit bead regeneration/persistence and 12ZI shop-limit accounting.
+5. Close remaining client/server parity and decide whether additional bugs are promoted.
