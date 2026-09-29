@@ -1,6 +1,6 @@
 # 6th/7th Attribute — Bug Registry
 
-**Status:** STATIC MAPPING OPEN / 8 VERIFIED BUGS  
+**Status:** STATIC MAPPING OPEN / 9 VERIFIED BUGS  
 **Execution:** LOCKED / NOT RUN
 
 ## BUG-ATTR67-001 — action packets bypass OPEN/window authorization
@@ -151,6 +151,25 @@ The latter portion of the skillbook special inventory cannot be represented corr
 
 ### Deferred validation
 `ATTR67-T08`.
+
+## BUG-ATTR67-009 — server eligibility ignores existing rare attributes and retrieval can report a false success
+
+**Class:** attribute-state validation / ignored mutation result  
+**Reachability:** VERIFIED statically; retrieval consequence is deployment-shadowed by BUG-ATTR67-007.
+
+### Proof
+1. Attr67 target validation calls `CItem::GetAttributeCount()` and accepts counts `>= 5 && < 7`.
+2. `CItem::GetAttributeCount()` iterates only `MAX_NORM_ATTR_NUM` normal-attribute slots; it does not count the rare 6th/7th slots.
+3. An item with five normal attributes and both rare attributes already present therefore still reports normal count 5 and passes server-side Attr67 validation.
+4. On a successful retrieval roll, `GetItemAttr` calls `item->AddRareAttribute()`.
+5. `AddRareAttribute()` returns `false` when `GetRareAttrCount() >= ITEM_ATTRIBUTE_RARE_NUM`.
+6. `GetItemAttr` ignores that boolean return, resets Attr67 time/percent state, sets `*bResult = 1`, and returns the item as though a rare attribute was added.
+
+### Consequence
+A fully 7-attribute item can enter the server Attr67 pipeline. If the success roll is reached, the operation can be reported as successful even though no new rare attribute was written. Materials/wait state can therefore be consumed for a no-op mutation.
+
+### Deferred validation
+`ATTR67-T09`.
 
 ## Deployment-shadowed findings
 Not promoted independently while the legitimate quest entry is absent:
