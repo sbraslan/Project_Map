@@ -33,7 +33,7 @@ availability/currency follow multiplier 2, but removable materials and created r
 
 Safety class: **Stage A/B controlled disposable recipe**.
 
-Global execution remains locked; `DUNGEON-T10` is still the first future live gate.
+Global execution remains locked; `DUNGEON-T09` is still the first future live gate.
 
 
 ## REFCUBE-T03 — Craft after Cube close / out of NPC range
