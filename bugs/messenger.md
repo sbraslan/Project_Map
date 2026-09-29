@@ -171,7 +171,7 @@ When A targets B while B is already in a party, A can use the normal target-boar
 - Shout fanout checks `IsBlocked(receiver,sender)` on every process, including P2P shout delivery. Logout cache corruption from BUG-MSG-007 can still make this check false later; this is an impact extension of BUG-MSG-007, not a separate finding.
 - Guild invite, direct party invite, exchange, PvP and equipment-view paths observed in this pass contain messenger block checks.
 - The block-add-by-VID branches that sometimes return `sizeof(TPacketCGMessengerAddByVID)` are equal-sized to `TPacketCGMessengerAddBlockByVID` in this snapshot (both contain one `uint32_t vid`), so the suspected packet-consumption mismatch is closed as non-bug.
-- `RemoveAllBlockList(account)` deletes SQL rows where account is either endpoint but iterates/P2P-removes only `m_BlockRelation[account]`. Active reachability is now proven through `pc.change_name`; final rename/logout lifecycle impact remains under assessment.
+- `RemoveAllBlockList(account)` is actively reached by `pc.change_name` and is internally asymmetric, but the deployed successful rename quest immediately executes `command("quit")`; P2P logout routes to `MessengerManager::Logout`, which removes the old name from every outgoing relation/block cache. The suspected persistent rename desync is therefore closed as a transient/non-promoted observation.
 
 
 ---
