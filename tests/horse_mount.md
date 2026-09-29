@@ -36,3 +36,23 @@ Expected static result: no tracked normal-player progression from horse level 0.
 
 ## Cross-system note
 Configured mount-summon Achievement tasks are already covered by `BUG-ACH-006`; no duplicate Horse test ID is created for that defect.
+
+
+## HORSE-T03 — newer mount race combat classification
+
+**Owner bug:** `BUG-HORSE-003`  
+**Execution state:** NOT RUN / LOCKED
+
+When runtime phase is explicitly opened:
+1. use one current mount from 71259..71266;
+2. confirm rendered race 20276..20283;
+3. attempt normal mounted auto-attack and manual attack;
+4. attempt horse/mount skill use where the character otherwise qualifies;
+5. compare against a known classified modern mount from the existing supported set.
+
+Expected static result:
+- affected race renders as a mount;
+- client mount-level lookup returns NONE;
+- mounted combat/skill eligibility is rejected client-side.
+
+No Horse/Mount runtime test has been executed.
