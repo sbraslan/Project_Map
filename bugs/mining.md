@@ -85,3 +85,23 @@ Out-of-range mining attempts are rejected, but the intended explicit MINING_LOCA
 
 ### Deferred validation
 `MIN-T05`.
+
+
+## BUG-MIN-006 — mining event can resolve against an already-dead vein
+
+**Class:** lifecycle / event shutdown race  
+**Reachability:** VERIFIED for an in-progress attempt overlapping scheduled Mining Event shutdown.
+
+### Static proof
+1. `SetMiningEvent(false)` kills veins through `FKillSectree -> Dead()`.
+2. Normal non-PC `Dead()` keeps the dead character registered until a 10-second `dead_event` destroys it.
+3. Player `m_pkMiningEvent` is not cancelled by the event shutdown.
+4. `mining_event` resolves the vein by stored VID.
+5. It checks only `if (!load)`; it does not reject `load->IsDead()`.
+6. Dead vein race remains usable by `OreDrop()`.
+
+### Consequence
+A mining attempt already underway can still award ore and pickaxe practice during the dead-vein retention window after the Mining Event has been stopped.
+
+### Deferred validation
+`MIN-T06`.
