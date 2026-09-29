@@ -142,6 +142,6 @@ Coverage:
 - LOOK-T07 -> BUG-LOOK-007 — Stage C cross-window lifetime/sanitizer.
 
 Primary non-destructive future observations are LOOK-T02 eligibility-only and LOOK-T03.
-They do **not** supersede the global first live gate: DUNGEON-T10 remains first.
+They do **not** supersede the global first live gate: DUNGEON-T09 remains first.
 
 No test executed.
