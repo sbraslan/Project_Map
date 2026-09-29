@@ -290,3 +290,20 @@ If DB restarts after a wedding has started, the one-hour end queue and running m
 A still-running game-side wedding map therefore has no automatic or DB-mediated termination path after that restart.
 
 Promoted as `BUG-MARR-012`.
+
+
+### BUG-MARR-013 — cross-core divorce does not clear lover UI state
+Relation removal is broadcast to all game cores and each core deletes its local `TMarriage`.
+
+`TMarriage::~TMarriage()` sends the client command `lover_divorce` only inside `if (IsOnline())`, where `IsOnline()` means both local `ch1 && ch2` pointers exist in the same process.
+
+The deployed unilateral-divorce quest does not require the spouse to be locally present. When spouses are on different game cores, each core normally has only its own local spouse pointer, so both destructors skip `lover_divorce`.
+
+The server relation is removed, but the client handlers that clear Messenger family state and LovePoint affect state are never invoked until another session/UI reset.
+
+Promoted as `BUG-MARR-013`.
+
+## Final closure observations
+- Client LoverInfo duplication candidate closed: same-process WarpEnd does not call marriage Login; full phase/game teardown destroys messenger/UI state before a new session.
+- Lua `marriage.in_my_wedding` and `wedding_is_playing_music` have weak standalone null assumptions, but current deployed quest callers guard them through engaged/married + in-wedding conditions. No independent deployed bug promoted.
+- `WeddingManager::__CreateWeddingMap` has a cleanup gap after a successful private-map allocation followed by a failed map lookup; no realistic current failure producer was proven, so it remains unpromoted.
