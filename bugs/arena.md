@@ -1,6 +1,6 @@
 # Arena / PvP Duel — Bug Registry
 
-**Status:** STATIC MAPPING IN PROGRESS / 3 VERIFIED BUGS  
+**Status:** STATIC COMPLETE / 3 VERIFIED BUGS  
 **Execution:** LOCKED / NOT RUN
 
 ## BUG-ARENA-001 — deployed arena quest rejects normal eligible opponents before duel creation
@@ -77,3 +77,10 @@ All four classic arenas are registered on map112 by loaded `settings.lua`; no tr
 Current deployment/start path prevents ordinary validation; revisit after Arena001/map112 repair.
 
 These classic candidates remain intentionally unnumbered until current-player reachability is established.
+
+
+## Final closure notes
+- Classic timeout A→A reset packet asymmetry remains shadowed by the unreachable current classic duel start.
+- Classic observer packet/chat broadcast functions are no-op/commented out; current classic duel reachability/deployment blockers prevent independent promotion.
+- Observer pointer/mode teardown remains an after-fix probe.
+- BattleArena empire2/3 random-stone region ordering remains shadowed by the missing-map deployment bug.
