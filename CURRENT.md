@@ -2,7 +2,7 @@
 
 **Active phase:** Detection / Mapping Only  
 **Active state:** Fishing Renewal mapping in progress  
-**Status:** 29 STATIC COMPLETE / FISHING ACTIVE / 3 VERIFIED BUGS / EXECUTION LOCKED  
+**Status:** 29 STATIC COMPLETE / FISHING ACTIVE / 5 VERIFIED BUGS / EXECUTION LOCKED  
 **Machine state:** `STATE.json`  
 **Active subsystem:** Fishing Renewal  
 **System:** `systems/fishing.md`  
@@ -27,6 +27,8 @@ Promoted:
 - `BUG-FISH-001` — second normal fish table has 5 entries but is indexed with `number(0,6)`; normal renewed fishing with +11..+20/Carbon rods reaches `second=true`.
 - `BUG-FISH-002` — `fishing_new_start()` creates temporary item 50187 for inventory probing and never destroys it; repeated starts can accumulate ownerless registered items.
 - `BUG-FISH-003` — renewed fishing successful-hit validation is client-authoritative; server accepts timed CATCH packets without verifying the UI hit test.
+- `BUG-FISH-004` — renewed fishing does not server-lock movement or revalidate fishing position after start.
+- `BUG-FISH-005` — Carbon rod 27591 special doubled chance branch is impossible because the same condition also requires `dwVnum <= 27490`.
 
 Open candidate:
 - Carbon-rod bonus branch is impossible as written: `dwVnum == 27591 && dwVnum >= 27400 && dwVnum <= 27490`. Intended effect still needs semantic closure.
@@ -40,4 +42,4 @@ Open candidate:
 6. audit rod refine/current proto values;
 7. promote only verified reachable additional findings.
 
-Do not execute `FISH-T01`, `FISH-T02` or `FISH-T03`. Global first live gate remains `DUNGEON-T09`.
+Do not execute `FISH-T01`..`FISH-T05`. Global first live gate remains `DUNGEON-T09`.
