@@ -1,6 +1,6 @@
 # Classic Quest Dungeons — Static System Map
 
-**Status:** STATIC MAPPING OPEN / 1 VERIFIED BUG  
+**Status:** STATIC MAPPING OPEN / 2 VERIFIED BUGS  
 **Mode:** detection / mapping only  
 **Execution:** LOCKED / NOT RUN  
 **Source policy:** Project_ClientSrc, Project_ServerSRC, Project_Binary, Project_Game and Project_DumpProto are read-only.
@@ -51,3 +51,18 @@ Promoted as `BUG-CLD-001`.
 
 ### Next cursor
 Quest flags, server timers and floor/stage progression for the five dungeon families.
+
+
+## Cursor 2 finding — Snow Dungeon leader reconnect timer
+
+Snow Dungeon starts `snow_dungeon_leader_out_timer` for the private-map index whenever the party leader logs out. The configured `REJOIN_LIMIT_TIME` is 5 minutes.
+
+The same quest explicitly permits rejoin within that 5-minute window, but neither:
+- the private-map `when login` path, nor
+- the ENTRY_MAN rejoin path
+
+clears `snow_dungeon_leader_out_timer`.
+
+When the original timer expires it unconditionally schedules `snow_dungeon_end_timer`, which then clears the instance timers and calls `d.exit_all()`. A leader can therefore successfully reconnect/rejoin and still have the active run forcibly terminated by the stale absence timer.
+
+Promoted as `BUG-CLD-002`.
