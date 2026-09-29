@@ -920,3 +920,9 @@ Execution remains locked.
 `HUNT-T04` was reverified against current source and canonical handoff prepared at `HUNT_T04_HANDOFF.md`.
 Critical precondition: after legitimate mission-90 claim, the character itself must be level >=91 so normal open reaches `OpenHuntingWindowSelect()` with hunting level 91. A lower-level character takes the zero-data branch and is not a valid reproduction.
 Execution remains locked.
+
+
+## Battle Pass BP-T02 handoff — 2026-09-29
+`BP-T02` was reverified and canonical handoff prepared at `BP_T02_HANDOFF.md`.
+All mapped MISSION_UPDATE send sites omit `bMissionType`. Client forwards the undefined byte; current HaveMission ignores mission type, so the refined runtime target is packet mismatch/uninitialized-byte evidence plus possible selected-mission detail corruption rather than guaranteed missing progress.
+Execution remains locked.
