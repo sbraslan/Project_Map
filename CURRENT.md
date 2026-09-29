@@ -1,15 +1,15 @@
 # CURRENT — Canonical Active Checkpoint
 
 **Active phase:** Detection / Mapping Only  
-**Active state:** Classic Pet System Static Mapping  
-**Status:** STATIC MAPPING IN PROGRESS / 4 PROMOTED CLASSIC-PET BUGS / EXECUTION LOCKED  
+**Active state:** Static Mapping Coverage Complete  
+**Status:** CLASSIC PET STATIC COMPLETE / 4 VERIFIED BUGS / EXECUTION LOCKED  
 **Machine state:** `STATE.json`  
-**Active subsystem:** Classic Pet System  
+**Active subsystem:** none — latest completed: Classic Pet System  
 **System:** `systems/pet.md`  
 **Bugs:** `bugs/pet.md`  
 **Tests:** `tests/pet.md`  
-**Last completed subsystem:** Horse / Mount / Riding  
-**Effective completed/readiness-covered subsystems:** 28  
+**Last completed subsystem:** Classic Pet System  
+**Effective completed/readiness-covered subsystems:** 29  
 **First future live gate:** `DUNGEON-T10`  
 **Last updated:** 2026-09-29
 
@@ -62,3 +62,17 @@ GitHub state is canonical.
 4. decide Classic Pet STATIC COMPLETE.
 
 Do not execute `PET-T01`..`PET-T04`.
+
+
+## Classic Pet final closure
+- 143 current PET_PAY rows -> 135 unique pet races.
+- 135/135 race VNUMs exist in server mob_proto.
+- 135/135 race VNUMs exist in client npclist.
+- raw client asset packs are only partially tracked; missing raw folders are deployment validation, not a promoted defect.
+- owner death cleanup, same-process warp relocation, teardown and login `CheckPet` reconstruction are statically closed.
+- PET_AUTO_PICKUP final collection revalidates item VID, sectree and ownership.
+- no new bug beyond `BUG-PET-001..004`.
+
+**Classic Pet System: STATIC COMPLETE.**
+
+Runtime remains locked. First future live gate remains `DUNGEON-T10`.
