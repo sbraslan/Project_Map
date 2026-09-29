@@ -8,7 +8,7 @@
   "active": {
     "subsystem": "messenger",
     "display_name": "Messenger / Friend / Block",
-    "status": "MAPPING IN PROGRESS / 19 VERIFIED BUGS / EXECUTION LOCKED",
+    "status": "MAPPING IN PROGRESS / 21 VERIFIED BUGS / EXECUTION LOCKED",
     "system_file": "systems/messenger.md",
     "bug_file": "bugs/messenger.md",
     "test_file": "tests/messenger.md",
@@ -31,14 +31,16 @@
       "BUG-MSG-016",
       "BUG-MSG-017",
       "BUG-MSG-018",
-      "BUG-MSG-019"
+      "BUG-MSG-019",
+      "BUG-MSG-020",
+      "BUG-MSG-021"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Audit remaining friend/block remove and inverse-cache symmetry after BUG-MSG-019.",
-      "Finish remaining GM messenger lifecycle and parser boundaries.",
-      "Review fixed-width Messenger name parsing as malformed-packet candidate without promoting unproven reachability.",
-      "Perform final Messenger relation/cache/P2P symmetry pass and decide STATIC COMPLETE.",
+      "Audit friend/block remove and inverse-cache symmetry after BUG-MSG-019.",
+      "Review remaining Messenger packet boundaries after BUG-MSG-012/017/020.",
+      "Review residual P2P presence reconstruction after BUG-MSG-016.",
+      "Perform final static-closure pass and decide Messenger STATIC COMPLETE.",
       "Do not execute runtime tests; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -2694,7 +2696,9 @@
       "BUG-MSG-016",
       "BUG-MSG-017",
       "BUG-MSG-018",
-      "BUG-MSG-019"
+      "BUG-MSG-019",
+      "BUG-MSG-020",
+      "BUG-MSG-021"
     ],
     "mapped_flows": [
       "input_login.cpp -> MessengerManager::Login -> asynchronous friend/GM/block SQL callbacks",
@@ -2749,7 +2753,9 @@
         "MSG-T16",
         "MSG-T17",
         "MSG-T18",
-        "MSG-T19"
+        "MSG-T19",
+        "MSG-T20",
+        "MSG-T21"
       ],
       "first_live_gate_unchanged": "DUNGEON-T09"
     },
