@@ -129,14 +129,15 @@ After runtime is explicitly unlocked:
 
 Bug signature: name-based friend/block actions proceed in observer mode while the VID-based equivalents are server-rejected.
 
-## MSG-T15 — inverse watcher accumulation
+## MSG-T15 — GM inverse watcher accumulation
 After runtime is explicitly unlocked in an isolated environment:
-1. establish representative friend, block and GM-list relations for a sequence of unique accounts;
-2. log those accounts out while keeping the same game process alive;
-3. inspect `m_InverseRelation`, `m_InverseBlockRelation` and `m_InverseGMRelation` after logout;
-4. trigger presence changes for the watched friend/block/GM names and trace watcher iteration.
+1. choose a GM entry G returned by the GM messenger query;
+2. log in and out many distinct normal accounts while keeping the same game process alive;
+3. inspect `m_InverseGMRelation[G]` after those accounts are offline;
+4. trigger G login/logout presence and trace watcher iteration/fanout cost.
 
-Bug signature: logged-out watcher accounts disappear from outgoing relation maps but remain in the inverse watcher sets, so resident sets and fanout work grow with historical unique accounts.
+Bug signature: historical offline accounts remain in the synthetic GM inverse watcher set and are traversed on later GM presence changes.
+
 ## MSG-T16 — stale old-core logout after newer channel login
 After runtime is explicitly unlocked in a controlled multi-core environment:
 1. keep an observer core C connected to both source core A and destination core B;
