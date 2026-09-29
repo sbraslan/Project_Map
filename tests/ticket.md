@@ -37,4 +37,4 @@
 - TICKET-T01..T07 map one-to-one to BUG-TICKET-001..007.
 - TICKET-T07 is the normal-path UI validation target.
 - TICKET-T01..T06 remain isolated/adversarial tests requiring controlled conditions.
-- Overall first live runtime gate remains DUNGEON-T10; Ticket does not preempt it.
+- Overall first live runtime gate remains DUNGEON-T09; Ticket does not preempt it.
