@@ -45,6 +45,7 @@ This is the navigation index. Normal continuation starts at `STATE.json`, then `
 | Classic Pet System | STATIC COMPLETE | `systems/pet.md` |
 | Fishing Renewal | STATIC COMPLETE | `systems/fishing.md` |
 | Mining / Pickaxe | STATIC COMPLETE | `systems/mining.md` |
+| Messenger / Friend / Block | MAPPING IN PROGRESS | `systems/messenger.md` |
 
 ## Current phase
 - **Detection / mapping only.** Source and game repositories remain read-only.
@@ -214,3 +215,14 @@ Verified findings: `BUG-MIN-001..006`. Effective static-complete subsystem count
 Mining / Pickaxe is closed statically with **7 verified bugs** and deferred tests `MIN-T01..MIN-T07`.
 Effective static-complete subsystem count is now **31**.
 Runtime remains locked; global first future live gate remains `DUNGEON-T09`.
+
+
+## Active continuation — Messenger / Friend / Block — 2026-09-29
+Mining / Pickaxe remains **STATIC COMPLETE** with 7 verified bugs and effective completed subsystem count **31**.
+
+Messenger / Friend / Block is now the active mapping cursor:
+- `systems/messenger.md`;
+- `bugs/messenger.md`;
+- `tests/messenger.md`.
+
+Current verified findings: `BUG-MSG-001..006`. Messenger is not yet counted as STATIC COMPLETE. Runtime execution remains locked and `DUNGEON-T09` remains the first future live gate.
