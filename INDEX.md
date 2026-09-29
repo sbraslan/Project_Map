@@ -46,6 +46,11 @@ This is the navigation index. Normal continuation starts at `STATE.json`, then `
 | Fishing Renewal | STATIC COMPLETE | `systems/fishing.md` |
 | Mining / Pickaxe | STATIC COMPLETE | `systems/mining.md` |
 | Messenger / Friend / Block | STATIC COMPLETE | `systems/messenger.md` |
+| Marriage / Wedding | STATIC COMPLETE | `systems/marriage.md` |
+| OX Event | STATIC COMPLETE | `systems/oxevent.md` |
+| Arena / PvP Duel | STATIC COMPLETE | `systems/arena.md` |
+| Monarch System | STATIC COMPLETE | `systems/monarch.md` |
+| 6th/7th Attribute | STATIC COMPLETE | `systems/attr6th7th.md` |
 
 ## Current phase
 - **Detection / mapping only.** Source and game repositories remain read-only.
@@ -234,3 +239,11 @@ Messenger / Friend / Block is statically closed with **21 verified bugs** and ca
 Effective STATIC COMPLETE subsystem count is now **32**, plus the folded Guild lifecycle companion. The next static cursor is global source-feature coverage discovery to identify any subsystem not yet represented in this index.
 
 Runtime execution remains locked; global first future live gate remains `DUNGEON-T09`.
+
+
+## 6th/7th Attribute STATIC COMPLETE — 2026-09-29
+6th/7th Attribute is statically closed with **9 verified bugs** and deferred tests `ATTR67-T01..ATTR67-T09`.
+
+The subsystem table now contains **37 STATIC COMPLETE rows** plus the folded Guild lifecycle companion. The next cursor is global source-feature coverage discovery; this is still mapping/detection only and does not authorize runtime execution.
+
+Runtime remains locked; global first future live gate remains `DUNGEON-T09`.
