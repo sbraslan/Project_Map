@@ -87,10 +87,10 @@ Do not execute runtime tests. Global first future live gate remains `DUNGEON-T09
 
 ## Updated cursor
 Continue static audit of:
-- Battle Field friend-add path parity: name path rejects battle-zone use while VID path currently has no equivalent server gate;
-- residual P2P presence resynchronization after BUG-MSG-016 and interaction with BUG-MSG-003/007;
-- final friend/block/GM relation symmetry and packet-boundary pass after BUG-MSG-017;
-- Messenger static-closure readiness.
+- remaining friend/block relation mutation surfaces and pending-token identity safety after BUG-MSG-019;
+- residual P2P presence resynchronization after BUG-MSG-016;
+- final client/server messenger packet-boundary pass after BUG-MSG-012/017;
+- static-closure readiness.
 
 Do not execute runtime tests. Global first future live gate remains `DUNGEON-T09`.
 
@@ -138,3 +138,7 @@ Friend/block add-by-VID rejects observer-mode characters. The corresponding name
 - `/messenger_auth y` reaches `AuthToAdd`, which checks only the token and then creates both friend edges.
 - No `IsBlocked` revalidation occurs at acceptance time.
 - Result: verified `BUG-MSG-019`; deferred test `MSG-T19`.
+
+
+### Friend-authorization TOCTOU
+The initial add-by-VID/name branches enforce block state, but the pending request token survives later block creation. `AuthToAdd` checks only token existence and then writes both friend directions. This is `BUG-MSG-019`, independent of the block-add validation typo in `BUG-MSG-001`.
