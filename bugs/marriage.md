@@ -271,3 +271,28 @@ The authoritative marriage relation disappears while both clients may continue s
 
 ### Deferred validation
 `MARR-T13`.
+
+
+## BUG-MARR-014 — divorce during an active wedding prevents private-map teardown
+
+**Class:** relation lifecycle / scheduler coupling / orphaned instance  
+**Reachability:** VERIFIED through ordinary recall item + deployed unilateral-divorce route.
+
+### Proof
+1. A running wedding is tracked in DB `m_mapRunningWedding` and has a scheduled end event.
+2. Wedding-map players can leave before the wedding ends through the normal `USE_TALISMAN`/memory recall path:
+   - wedding maps are not blocked in the talisman map checks;
+   - they are not normal `GetDungeon()` instances;
+   - stored recall coordinates call `ProcessRecallItem() -> WarpSet(...)`.
+3. The deployed unilateral-divorce quest can then call `marriage.remove()`.
+4. DB `CManager::Remove` deletes the marriage relation but does not remove the pair from `m_mapRunningWedding` or the wedding-end priority queue.
+5. At scheduled timeout DB still sends `HEADER_DG_WEDDING_END` and erases its running-wedding entry.
+6. Game `CManager::WeddingEnd` first looks up `TMarriage`.
+7. Because the divorce already removed the relation, it returns immediately with `wrong marriage`.
+8. `WeddingManager::End(pWeddingInfo->dwMapIndex)` is therefore never called.
+
+### Consequence
+The authoritative marriage can be gone while the private WeddingMap remains alive/orphaned on its game core, including its members/event state, until some unrelated process teardown/core restart removes it.
+
+### Deferred validation
+`MARR-T14`.
