@@ -26,10 +26,10 @@
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Audit AddMoney overflow/failure fanout symmetry.",
-      "Audit remaining mto/mtr private-map and WarpSet failure boundaries.",
-      "Inspect monarch notice path and treasury producers for independent defects.",
-      "Keep dormant Lua PowerUp/DefenseUp/takemonarchmoney unpromoted unless a deployed caller appears.",
+      "Audit registered mto/mtr private-instance and map-index semantics.",
+      "Audit remaining WarpSet result handling and AddMoney boundaries.",
+      "Keep Lua-only PowerUp/DefenseUp/takemonarchmoney dormant unless a deployed caller is proven.",
+      "Decide Monarch STATIC COMPLETE and select the next subsystem.",
       "Keep runtime/fault-injection execution locked; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -2812,7 +2812,7 @@
       "exact source fetch"
     ],
     "context7_role": "supplementary external library/API documentation verification; not authoritative Metin2 source location",
-    "next_action": "continue Monarch AddMoney/warp/notice boundary closure; Context7 supplementary only"
+    "next_action": "continue Monarch mto/mtr private-instance and final boundary closure; Context7 supplementary only"
   },
   "marriage_mapping": {
     "status": "STATIC COMPLETE / 14 VERIFIED BUGS",
@@ -3041,7 +3041,7 @@
       "player mtax -> IsMonarch -> invalid-range chat without return -> SetEventFlag(trade_tax, invalid) -> BUG-MON-004",
       "SQL wrapper: DELETE -> uiAffectedRows, uiNumRows=0 -> DelMonarch false/stale runtime state -> strengthened BUG-MON-003",
       "mtr + mmob distinct cooldowns -> same stale local treasury precheck -> effects before DB auth -> rejected second DecMoney has no rollback -> BUG-MON-005",
-      "mtax SetMC(MI_TAX) with no IsMCOK(MI_TAX) gate -> BUG-MON-006",
+      "mtax SetMC(MI_TAX) with no IsMCOK(MI_TAX) gate -> BUG-MON-010",
       "remote mtr -> GG_TRANSFER -> receiver FindPC may fail -> no ACK while source already charges/cooldowns -> BUG-MON-007",
       "DB startup InitializeMonarch -> LoadMonarch(monarch table only) -> candidacy/election containers remain empty despite SQL rows -> BUG-MON-008",
       "new CHARACTER -> Initialize -> InitMC -> timestamps backdated by full limits -> no player persistence -> relog resets enforced monarch cooldowns -> BUG-MON-009",
@@ -3051,10 +3051,9 @@
       "mtax -> SetMC(MI_TAX) without IsMCOK(MI_TAX) gate -> BUG-MON-010"
     ],
     "candidates": [
-      "process-local PowerUp/DefenseUp and wrong defense-event cast remain dormant because no current Project_Game caller is tracked.",
-      "takemonarchmoney validation is compiled out but no current Project_Game caller is tracked.",
-      "remaining AddMoney overflow/failure fanout symmetry.",
-      "remaining mto/mtr private-map and WarpSet failure boundaries."
+      "remaining AddMoney overflow/failure reporting symmetry",
+      "remaining mto/mtr private-instance and WarpSet result boundaries",
+      "PowerUp/DefenseUp and takemonarchmoney remain dormant in current tracked Project_Game deployment"
     ],
     "runtime_tests": {
       "status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN",
