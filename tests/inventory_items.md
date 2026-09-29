@@ -481,3 +481,7 @@ Kodun mevcut invariant'ı: `IsEmptySpecialItemGrid(..., bSize > 1) -> false`. Da
 
 ### ITEM-T01 preflight — 2026-09-29
 Current packet/client/server path reverified. Normal Binary destroy flow forwards the selected dropCount into SendItemDestroyPacket; TPacketCGItemDestroy carries count; CInputMain forwards it to CHARACTER::RemoveItem; RemoveItem never applies bCount and destroys the full item object. ITEM-T01 is therefore a genuine normal-flow candidate. Adjacent BUG-ITEM-001 UAF may interrupt the observation and should be recorded separately. Canonical handoff: `../ITEM_T01_HANDOFF.md`.
+
+
+### ITEM-T02 preflight — 2026-09-29
+Current server source reverified. `CHARACTER::RemoveItem` destroys/removes the item through ITEM_MANAGER before its final `ChatPacket(..., item->GetName())`; ITEM_MANAGER destruction reaches `M2_DELETE(item)`. The path is reachable through ordinary destroy flow. A non-crashing release run is not sufficient to clear the bug because freed memory may remain readable; sanitizer/debug allocator evidence is preferred. Canonical handoff: `../ITEM_T02_HANDOFF.md`.
