@@ -61,13 +61,15 @@ Expected bug signature: both effects occur while DB accepts only one deduction; 
 
 Covers `BUG-MON-005`.
 
-## MON-T06 — tax cooldown enforcement
-After runtime is explicitly unlocked:
-1. issue a valid `mtax` change as monarch;
-2. immediately issue another valid `mtax` change;
-3. inspect MI_TAX timestamps and resulting `trade_tax` flag.
+## MON-T06 — setmonarch persistence/reload contract
+After runtime is explicitly unlocked in an isolated DB:
+1. record the target player's PID and current monarch row;
+2. invoke `setmonarch <target>`;
+3. inspect the resulting `pid` and `name` fields;
+4. restart/reload DB monarch state;
+5. compare `TMonarchInfo` before and after reload.
 
-Expected bug signature: second tax change succeeds during the configured MI_TAX cooldown.
+Expected bug signature: legacy set persists the selected identity through `name` while authoritative reload resolves identity through `pid`.
 
 Covers `BUG-MON-006`.
 
