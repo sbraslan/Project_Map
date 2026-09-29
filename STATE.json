@@ -8,22 +8,20 @@
   "active": {
     "subsystem": "horse_mount",
     "display_name": "Horse / Mount / Riding",
-    "status": "STATIC MAPPING IN PROGRESS / 2 PROMOTED HORSE-MOUNT BUGS / EXECUTION LOCKED",
+    "status": "STATIC COMPLETE / 3 PROMOTED HORSE-MOUNT BUGS / EXECUTION LOCKED",
     "system_file": "systems/horse_mount.md",
     "bug_file": "bugs/horse_mount.md",
     "test_file": "tests/horse_mount.md",
     "verified_bug_ids": [
       "BUG-HORSE-001",
-      "BUG-HORSE-002"
+      "BUG-HORSE-002",
+      "BUG-HORSE-003"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Close Additional Equipment Page interaction with UNIQUE ride items.",
-      "Close client mount packet/race/assets and horse appearance coverage.",
-      "Audit horse-name/appearance persistence and ChangeLook interaction.",
-      "Revisit ChangeLook lifetime only if a concrete time-limited COSTUME_MOUNT row becomes readable.",
-      "Decide Horse/Mount STATIC COMPLETE and consolidate deferred runtime tests.",
-      "Do not execute HORSE-T01/HORSE-T02 or any Horse/Mount runtime test without an explicit phase change."
+      "Select the next unmapped static subsystem from Project_Map and continue detection-only mapping.",
+      "Keep Horse runtime tests HORSE-T01..HORSE-T03 locked until an explicit phase change.",
+      "Global first future live gate remains DUNGEON-T10."
     ]
   },
   "startup": {
@@ -2310,7 +2308,7 @@
     ]
   },
   "horse_mount_mapping": {
-    "status": "STATIC MAPPING IN PROGRESS",
+    "status": "STATIC COMPLETE",
     "canonical_files": {
       "system": "systems/horse_mount.md",
       "bugs": "bugs/horse_mount.md",
@@ -2318,7 +2316,8 @@
     },
     "verified_bug_ids": [
       "BUG-HORSE-001",
-      "BUG-HORSE-002"
+      "BUG-HORSE-002",
+      "BUG-HORSE-003"
     ],
     "mapped_flows": [
       "CHorseRider level/health/stamina/riding state and timer events",
@@ -2340,21 +2339,36 @@
       "restricted-map EnterGame -> IS_MOUNTABLE_ZONE -> Unmount",
       "tracked quest/object deployment -> no horse level-up/advance producer -> BUG-HORSE-002",
       "real-time/timer-based mount expiry -> RemoveItem -> RemoveFromCharacter -> Unequip -> MountVnum cleanup",
-      "Achievement TYPE_SUMMON_MOUNT missing producer cross-reference -> BUG-ACH-006 ownership"
+      "Achievement TYPE_SUMMON_MOUNT missing producer cross-reference -> BUG-ACH-006 ownership",
+      "server MountVnum -> actor reinsert -> client AdditionalInfo -> NetworkActorManager recreate -> MountHorse",
+      "packed item_proto MIPX/TEA/LZO parity decode between Project_Binary and Project_DumpProto",
+      "71259..71266 COSTUME_MOUNT -> APPLY_MOUNT 20276..20283",
+      "client GetMountLevelByVnum omission -> mounted combat/skill gating -> BUG-HORSE-003",
+      "horse_name DB persistence/request/expiry validation",
+      "horse_appearance player persistence -> GetMyHorseVnum preference"
     ],
     "runtime_tests": {
       "status": "READY / EXECUTION LOCKED / NOT RUN",
       "canonical_test_ids": [
         "HORSE-T01",
-        "HORSE-T02"
+        "HORSE-T02",
+        "HORSE-T03"
       ],
       "first_live_gate_unchanged": "DUNGEON-T10"
     },
     "candidates": [
-      "CTransmutation mount ChangeLook stores donor VNUM and destroys donor without mapped donor lifetime/socket2/event transfer; concrete deployed time-limited COSTUME_MOUNT row could not be proven from connector-readable data.",
+      "Time-limited COSTUME_MOUNT donor lifetime/socket2 is not transferred by ChangeLook Accept; packed proto proves timed donors exist, but no tracked normal-player game.open_transmutation producer is proven.",
       "DB-loaded THorseInfo.bLevel is copied without a clamp before c_aHorseStat access; no tracked malformed producer established.",
-      "Login SetHorseLevel(GetHorseLevel()) resets underlying HP/stamina/drop-time; current infinite-health/stamina build masks a distinct gameplay consequence.",
-      "Additional Equipment Page UNIQUE ride item state synchronization remains open."
+      "Login SetHorseLevel(GetHorseLevel()) resets underlying HP/stamina/drop-time; infinite-health/stamina build masks a distinct gameplay consequence.",
+      "Additional Equipment UNIQUE ride remove helper has an IsEquipped check after m_bEquipped=false, but no tracked live remove-side producer was established.",
+      "Raw MSM/GR2 assets for 20276..20283 are not versioned; client pack presence requires deployment/runtime validation."
+    ],
+    "closure_notes": [
+      "Horse / Mount / Riding static mapping complete.",
+      "Current packed item_proto parity confirmed between Project_Binary and Project_DumpProto.",
+      "Achievement TYPE_SUMMON_MOUNT missing producer remains owned by BUG-ACH-006.",
+      "No Horse/Mount runtime test has been executed.",
+      "Global first future live gate remains DUNGEON-T10."
     ]
   }
 }
