@@ -2,7 +2,7 @@
 
 **Active phase:** Detection / Mapping Only  
 **Active state:** Static mapping continuation  
-**Status:** MESSENGER / FRIEND / BLOCK — MAPPING IN PROGRESS / 13 VERIFIED BUGS / EXECUTION LOCKED  
+**Status:** MESSENGER / FRIEND / BLOCK — MAPPING IN PROGRESS / 14 VERIFIED BUGS / EXECUTION LOCKED  
 **Machine state:** `STATE.json`  
 **Active subsystem:** Messenger / Friend / Block  
 **System:** `systems/messenger.md`  
@@ -30,6 +30,7 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 - `BUG-MSG-011` — `pc.is_blocked` / `pc.is_friend` reject ordinary player-name strings because they require `lua_isnumber` before `FindPC(name)`.
 - `BUG-MSG-012` — `RecvMessenger()` still uses a 25-byte legacy name buffer while the server permits 48-character names, allowing stack overwrite on longer messenger names.
 - `BUG-MSG-013` — the GM messenger SQL omits the valid `WIZARD` authority even though DB admin loading maps it to `GM_WIZARD`.
+- `BUG-MSG-014` — name-based friend/block add paths bypass the observer-mode rejection enforced by the VID paths.
 
 ## Closed / scoped observations
 - Shout delivery checks the receiver's messenger block relation on both local and P2P fanout. BUG-MSG-007 can still undermine it after logout/relog cache loss.
