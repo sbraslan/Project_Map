@@ -71,3 +71,30 @@ Expected bug signature: outer `m_pOXEvent` survives the force-end and resumes OX
 Covers `BUG-OX-005`.
 
 Do not run while the execution lock is active.
+
+
+## OX-T06 — disconnect before answer, reconnect afterward
+After runtime is explicitly unlocked:
+1. join as an attendee and remain at the fixed attendee spawn;
+2. disconnect before `CheckAnswer`;
+3. let `CheckAnswer` remove the unresolved PID;
+4. reconnect while status is QUIZ/CLOSE;
+5. inspect `m_map_attender`.
+
+Expected bug signature: input-login `Enter` accepts the active state and reinserts the PID after evaluation.
+
+Covers `BUG-OX-006`.
+
+## OX-T07 — clean/stale automatic admission policy
+After runtime is explicitly unlocked:
+1. first test with the OX admission flags absent/zero;
+2. start OX through Event Manager;
+3. attempt normal NPC entry;
+4. then set manual min/max/player-max values, end the event, and start a later automatic OX without rewriting them;
+5. inspect the inherited admission rules.
+
+Expected bug signature: clean automatic OX rejects entry with zero policy; later automatic OX reuses stale manual policy.
+
+Covers `BUG-OX-007`.
+
+Do not run while the global execution lock is active.
