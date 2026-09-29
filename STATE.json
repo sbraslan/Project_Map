@@ -8,22 +8,22 @@
   "active": {
     "subsystem": "pet",
     "display_name": "Classic Pet System",
-    "status": "STATIC MAPPING IN PROGRESS / 2 PROMOTED CLASSIC-PET BUGS / EXECUTION LOCKED",
+    "status": "STATIC MAPPING IN PROGRESS / 3 PROMOTED CLASSIC-PET BUGS / EXECUTION LOCKED",
     "system_file": "systems/pet.md",
     "bug_file": "bugs/pet.md",
     "test_file": "tests/pet.md",
     "verified_bug_ids": [
       "BUG-PET-001",
-      "BUG-PET-002"
+      "BUG-PET-002",
+      "BUG-PET-003"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Close current PET_PAY real-time/timer-based expiry reachability and decide the stale-pet candidate.",
-      "Audit CPetSystem update-event, actor-map teardown and owner logout/destruction.",
-      "Locate or exclude active pet.summon quest producers and resolve legacy Lua signature mismatch.",
-      "Map current PET_PAY item families, race assets and client UI.",
-      "Audit Achievement TYPE_SUMMON_PET time accounting under missing-item and abnormal unsummon paths.",
-      "Do not execute PET-T01, PET-T02 or any Classic Pet runtime test without an explicit phase change."
+      "Locate or exclude active pet.summon quest producers and resolve the legacy Lua signature mismatch.",
+      "Map remaining current PET_PAY item families, race assets and client UI.",
+      "Close Achievement TYPE_SUMMON_PET time-accounting consequence under missing-item/abnormal unsummon.",
+      "Audit remaining classic-pet death/warp/login restoration edges.",
+      "Do not execute PET-T01, PET-T02, PET-T03 or any Classic Pet runtime test without an explicit phase change."
     ]
   },
   "startup": {
@@ -2382,7 +2382,8 @@
     },
     "verified_bug_ids": [
       "BUG-PET-001",
-      "BUG-PET-002"
+      "BUG-PET-002",
+      "BUG-PET-003"
     ],
     "mapped_flows": [
       "ITEM_PET/PET_PAY use -> EquipItem -> CHARACTER::PetSummon -> CPetSystem::Summon",
@@ -2393,18 +2394,21 @@
       "Bruce target selection -> raw LPITEM cache -> multi-tick BringItem movement",
       "manual owner pickup can M2_DESTROY_ITEM cached Bruce target -> BUG-PET-002",
       "forced PET_PAY RemoveItem -> CItem::Unequip without CHARACTER::PetUnsummon candidate",
-      "CPetActor missing summon-item branch returns false; update event ignores return candidate"
+      "CPetActor missing summon-item branch returns false; update event ignores return candidate",
+      "current Project_DumpProto PET_PAY families -> REAL_TIME limits, including 53233 Bruce",
+      "REAL_TIME expire -> RemoveItem without PetUnsummon -> missing summon-item Update false -> event reschedules -> BUG-PET-003",
+      "CHARACTER::Destroy -> CPetSystem::Destroy -> actor destructor/Unsummon teardown boundary"
     ],
     "candidates": [
-      "Forced PET_PAY expiry/removal can bypass PetUnsummon, while CPetActor::Update returns false on missing summon item without Unsummon; current deployed expiry producer still needs closure.",
       "questlua_pet pet.summon uses legacy four-argument call against ENABLE_PET_SYSTEM signature; active quest producer not yet established.",
-      "Achievement summon-time cleanup when summon item disappears before Unsummon remains open."
+      "Achievement pet.summon_time reset depends on resolving the summon item during Unsummon; exact externally visible consequence after abnormal cleanup remains open."
     ],
     "runtime_tests": {
       "status": "READY / EXECUTION LOCKED / NOT RUN",
       "canonical_test_ids": [
         "PET-T01",
-        "PET-T02"
+        "PET-T02",
+        "PET-T03"
       ],
       "first_live_gate_unchanged": "DUNGEON-T10"
     }
