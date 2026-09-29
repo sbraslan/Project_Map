@@ -104,3 +104,13 @@ Four Snow Dungeon transitions call `server_timer(..., get_server_timer_arg())` f
 The C++ quest manager sets `m_dwServerTimerArg` only in `CQuestManager::ServerTimer(npc,arg)`. The value is singleton manager state and is not reset for normal item/take/kill events. Therefore these handlers do not obtain the current Snow private-map index; they reuse whichever server-timer arg most recently ran on that game process.
 
 Promoted as `BUG-CLD-004`.
+
+
+## Cursor 3 checkpoint — item/reward consumption / rollback
+- Devil Tower key/map drops and Snow key/cube progression were traced through their consume/success/failure branches.
+- Snow's wrong-order cube/key consumption is explicit quest behavior and was not promoted as a defect without contrary deployment/design evidence.
+- Flame entry tickets are validated before instance creation and revalidated on private-map login before the run is started; the mission NPC then consumes valid tickets from the in-map party and ejects a member lacking a ticket.
+- Devil Catacombs' consume-before-create transaction produced `BUG-CLD-003`.
+- Snow's misuse of stale `get_server_timer_arg()` in non-timer progression events produced `BUG-CLD-004`.
+
+No additional source-proven item/reward duplicate or rollback defect was promoted.
