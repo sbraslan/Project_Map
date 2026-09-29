@@ -1,14 +1,14 @@
 # CURRENT — Canonical Active Checkpoint
 
 **Active phase:** Detection / Mapping Only  
-**Active state:** Static mapping continuation  
-**Status:** MESSENGER / FRIEND / BLOCK — MAPPING IN PROGRESS / 21 VERIFIED BUGS / EXECUTION LOCKED  
+**Active state:** Messenger static closure / global coverage discovery next  
+**Status:** MESSENGER / FRIEND / BLOCK — STATIC COMPLETE / 21 VERIFIED BUGS / EXECUTION LOCKED  
 **Machine state:** `STATE.json`  
-**Active subsystem:** Messenger / Friend / Block  
+**Active subsystem:** Messenger / Friend / Block — CLOSED  
 **System:** `systems/messenger.md`  
 **Bugs:** `bugs/messenger.md`  
 **Tests:** `tests/messenger.md`  
-**Previous completed subsystem:** Mining / Pickaxe  
+**Previous completed subsystem:** Messenger / Friend / Block  
 **First future live gate:** `DUNGEON-T09`  
 **Last updated:** 2026-09-29
 
@@ -36,8 +36,7 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 - `OnBlockLogin`'s missing local handler-null guard is closed as non-bug because `PyCallClassMemberFunc` safely rejects a null handler.
 
 ## Exact resume cursor
-1. Close pending friend-token identity/collision review; keep theoretical-only cases unpromoted.
-2. Close malformed/fixed-width messenger packet parsing review; require ordinary server-generated reachability for promotion.
-3. Perform the final relation/cache/P2P symmetry pass after `BUG-MSG-015/016`.
-4. Decide Messenger STATIC COMPLETE.
-5. Do not execute runtime tests; global first future live gate remains `DUNGEON-T09`.
+1. Messenger / Friend / Block is STATIC COMPLETE with `BUG-MSG-001..021` and `MSG-T01..MSG-T21`.
+2. Do not execute runtime/fault-injection tests; global first future live gate remains `DUNGEON-T09`.
+3. Continue with a global source-feature coverage discovery pass to identify the next subsystem not yet represented in `INDEX.md`.
+4. Preserve source/game repositories as read-only; only `Project_Map` may be updated.
