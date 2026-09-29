@@ -599,6 +599,14 @@
       "robustness_unpromoted": [
         "HUNT-T07",
         "HUNT-T08"
+      ],
+      "handoff": "HUNT_T04_HANDOFF.md",
+      "preflight_notes": [
+        "HUNTING_MISSION_COUNT is 90; mission/reward table valid domain is 0..90.",
+        "ReciveHuntingRewards unconditionally increments hunting_system.level; legitimate mission 90 claim stores 91.",
+        "OpenHuntingWindowSelect indexes mission/reward tables by hunting level with no terminal guard.",
+        "Reproduction requires character level >=91; below 91 the open path sends zero-data instead of indexing level 91.",
+        "HUNT-T04 remains ordered after Dungeon Info and Ticket normal-path gates."
       ]
     },
     "battle_pass": {
