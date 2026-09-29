@@ -1,6 +1,6 @@
 # 6th/7th Attribute — Deferred Runtime Tests
 
-**Status:** DOCUMENTED / EXECUTION LOCKED / NOT RUN  
+**Status:** STATIC COMPLETE TEST PLAN / EXECUTION LOCKED / NOT RUN  
 **Global first future live gate:** DUNGEON-T09
 
 ## ATTR67-T01 — direct action without OPEN
