@@ -76,4 +76,13 @@ After runtime is explicitly unlocked:
 
 Bug signature: the `/party_request <vid>` route reaches B despite the messenger block.
 
+## MSG-T09 — unblock confirmation after target disappears
+After runtime is explicitly unlocked:
+1. block B from A;
+2. target B and open the unblock confirmation dialog;
+3. before accepting, make B leave the visible instance through logout, warp, channel/map change or range removal;
+4. accept the unblock dialog.
+
+Bug signature: `GetInstancePtr(vid)` returns null and the client dereferences it in `SendMessengerBlockRemoveByVIDPacket`, producing a client crash.
+
 Do not run any MSG test while the project execution lock is active.
