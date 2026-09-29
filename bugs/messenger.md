@@ -355,3 +355,23 @@ Messenger name-based operations are not round-trip safe at the configured charac
 
 ### Deferred validation
 `MSG-T17`.
+---
+
+## BUG-MSG-014 — observer-mode restriction is bypassed by name-based friend/block add paths
+
+**Class:** authorization/path-parity defect  
+**Reachability:** VERIFIED through the normal Messenger window name-entry actions.
+
+### Proof
+1. `MESSENGER_SUBHEADER_CG_ADD_BY_VID` rejects the request when `ch->IsObserverMode()` is true.
+2. `MESSENGER_SUBHEADER_CG_BLOCK_ADD_BY_VID` applies the same observer-mode rejection.
+3. The corresponding `ADD_BY_NAME` and `BLOCK_ADD_BY_NAME` branches contain no observer-mode check.
+4. `Project_Binary/root/uimessenger.py` exposes normal Messenger-window actions that call `SendMessengerAddByNamePacket(text)` and `SendMessengerBlockAddByNamePacket(text)`.
+5. `HEADER_CG_MESSENGER` itself is not globally gated by observer mode in `CInputMain::Analyze`.
+
+### Consequence
+An observer who is intentionally blocked from adding a visible target by VID can perform the same friend/block add operation by typing the target's name in the Messenger UI.
+
+### Deferred validation
+`MSG-T14`.
+
