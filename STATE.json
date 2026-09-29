@@ -8,7 +8,7 @@
   "active": {
     "subsystem": "monarch",
     "display_name": "Monarch",
-    "status": "STATIC MAPPING IN PROGRESS / 9 VERIFIED BUGS / EXECUTION LOCKED",
+    "status": "STATIC MAPPING IN PROGRESS / 10 VERIFIED BUGS / EXECUTION LOCKED",
     "system_file": "systems/monarch.md",
     "bug_file": "bugs/monarch.md",
     "test_file": "tests/monarch.md",
@@ -21,14 +21,15 @@
       "BUG-MON-006",
       "BUG-MON-007",
       "BUG-MON-008",
-      "BUG-MON-009"
+      "BUG-MON-009",
+      "BUG-MON-010"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Close PowerUp/DefenseUp and takemonarchmoney as deployed versus dormant.",
-      "Audit add-money overflow/failure reporting symmetry.",
-      "Audit remaining monarch notice and warp boundaries.",
-      "Decide Monarch static completion and select next subsystem.",
+      "Audit AddMoney overflow/failure fanout symmetry.",
+      "Audit remaining mto/mtr private-map and WarpSet failure boundaries.",
+      "Inspect monarch notice path and treasury producers for independent defects.",
+      "Keep dormant Lua PowerUp/DefenseUp/takemonarchmoney unpromoted unless a deployed caller appears.",
       "Keep runtime/fault-injection execution locked; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -2811,7 +2812,7 @@
       "exact source fetch"
     ],
     "context7_role": "supplementary external library/API documentation verification; not authoritative Metin2 source location",
-    "next_action": "continue Monarch persistence/restart and remaining boundary closure; Context7 supplementary only"
+    "next_action": "continue Monarch AddMoney/warp/notice boundary closure; Context7 supplementary only"
   },
   "marriage_mapping": {
     "status": "STATIC COMPLETE / 14 VERIFIED BUGS",
@@ -3015,7 +3016,7 @@
     ]
   },
   "monarch_mapping": {
-    "status": "STATIC MAPPING IN PROGRESS / 9 VERIFIED BUGS",
+    "status": "STATIC MAPPING IN PROGRESS / 10 VERIFIED BUGS",
     "canonical_files": {
       "system": "systems/monarch.md",
       "bugs": "bugs/monarch.md",
@@ -3030,7 +3031,8 @@
       "BUG-MON-006",
       "BUG-MON-007",
       "BUG-MON-008",
-      "BUG-MON-009"
+      "BUG-MON-009",
+      "BUG-MON-010"
     ],
     "mapped_flows": [
       "GM elect -> HEADER_GD_COME_TO_VOTE -> DB ComeToVote -> CMonarch::ElectMonarch -> no winner/state update -> BUG-MON-001",
@@ -3042,13 +3044,17 @@
       "mtax SetMC(MI_TAX) with no IsMCOK(MI_TAX) gate -> BUG-MON-006",
       "remote mtr -> GG_TRANSFER -> receiver FindPC may fail -> no ACK while source already charges/cooldowns -> BUG-MON-007",
       "DB startup InitializeMonarch -> LoadMonarch(monarch table only) -> candidacy/election containers remain empty despite SQL rows -> BUG-MON-008",
-      "new CHARACTER -> Initialize -> InitMC -> timestamps backdated by full limits -> no player persistence -> relog resets enforced monarch cooldowns -> BUG-MON-009"
+      "new CHARACTER -> Initialize -> InitMC -> timestamps backdated by full limits -> no player persistence -> relog resets enforced monarch cooldowns -> BUG-MON-009",
+      "GM setmonarch -> REPLACE writes selected PID through name while authoritative LoadMonarch reads pid -> BUG-MON-006",
+      "VoteMonarch/AddCandidacy -> persistent rows + process-local containers -> DB restart InitializeMonarch only LoadMonarch(monarch) -> BUG-MON-008",
+      "CHARACTER recreation -> InitMC backdates cooldown timestamps by full limits -> relog makes enforced monarch cooldowns ready -> BUG-MON-009",
+      "mtax -> SetMC(MI_TAX) without IsMCOK(MI_TAX) gate -> BUG-MON-010"
     ],
     "candidates": [
-      "process-local PowerUp/DefenseUp buffs; deployed caller closure pending",
-      "takemonarchmoney validation is compiled under __UNIMPLEMENTED__; deployed caller not yet proven",
-      "add-money overflow/failure reporting symmetry",
-      "legacy SetMonarch SQL column mismatch remains candidate until authoritative table schema is available"
+      "process-local PowerUp/DefenseUp and wrong defense-event cast remain dormant because no current Project_Game caller is tracked.",
+      "takemonarchmoney validation is compiled out but no current Project_Game caller is tracked.",
+      "remaining AddMoney overflow/failure fanout symmetry.",
+      "remaining mto/mtr private-map and WarpSet failure boundaries."
     ],
     "runtime_tests": {
       "status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN",
@@ -3061,12 +3067,14 @@
         "MON-T06",
         "MON-T07",
         "MON-T08",
-        "MON-T09"
+        "MON-T09",
+        "MON-T10"
       ],
       "first_live_gate_unchanged": "DUNGEON-T09"
     },
     "context7_notes": [
-      "cppreference default-initialization semantics confirm new int[n] leaves fundamental elements indeterminate without value initialization."
+      "cppreference confirms default-initialized scalar storage used by new int[n] is indeterminate without value initialization.",
+      "MySQL documentation confirms DML affected-row reporting uses mysql_affected_rows/ROW_COUNT; project libsql exposes this as uiAffectedRows while uiNumRows is result-set rows."
     ]
   }
 }
