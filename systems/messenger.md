@@ -56,6 +56,7 @@ Remote target: target is represented by P2P `CCI` and relay descriptor while `pk
 - `BUG-MSG-010` — pending party/guild invitations can still be accepted after a messenger block is established because acceptance does not revalidate block state.
 - `BUG-MSG-011` — `pc.is_blocked` and `pc.is_friend` are registered Lua name-query helpers but gate their first argument with `lua_isnumber` before calling `FindPC(name)`.
 - `BUG-MSG-013` — the server recognizes `WIZARD` as `GM_WIZARD`, but the Messenger GM-list SQL omits `mAuthority='WIZARD'`.
+- `BUG-MSG-014` — add-by-name friend/block paths omit the observer-mode rejection enforced by their VID counterparts, and both name paths are exposed by the Messenger UI.
 
 ## Current cursor
 Continue static audit of:
