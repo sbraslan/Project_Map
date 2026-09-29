@@ -1,6 +1,6 @@
 # Horse / Mount / Riding — Static Bug Registry
 
-**Status:** ACTIVE STATIC MAPPING
+**Status:** STATIC COMPLETE EVIDENCE
 
 ## BUG-HORSE-001 — `pc.mount()` updates POINT_MOUNT without synchronizing `MountVnum`
 
