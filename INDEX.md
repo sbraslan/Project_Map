@@ -41,7 +41,8 @@ This is the navigation index. Normal continuation starts at `STATE.json`, then `
 | Aura System | STATIC COMPLETE | `systems/aura.md` |
 | Refine / Cube / Crafting | STATIC COMPLETE | `systems/refine_cube.md` |
 | Growth Pet System | STATIC COMPLETE | `systems/growth_pet.md` |
-| Horse / Mount / Riding | MAPPING IN PROGRESS | `systems/horse_mount.md` |
+| Horse / Mount / Riding | STATIC COMPLETE | `systems/horse_mount.md` |
+| Classic Pet System | MAPPING IN PROGRESS | `systems/pet.md` |
 
 ## Current phase
 - **Detection / mapping only.** Source and game repositories remain read-only.
@@ -153,5 +154,18 @@ The active mapping cursor is now **Horse / Mount / Riding**:
 - `systems/horse_mount.md`;
 - `bugs/horse_mount.md`;
 - `tests/horse_mount.md`.
+
+Runtime execution remains locked and `DUNGEON-T10` remains the first future live gate.
+
+
+## Post-audit extension — Horse / Mount / Riding — 2026-09-29
+Horse / Mount / Riding is now **STATIC COMPLETE** with verified `BUG-HORSE-001..003` and canonical deferred tests `HORSE-T01..HORSE-T03`.
+
+Current effective static-complete/readiness coverage is **28/28** subsystem rows plus the folded Guild lifecycle companion.
+
+The active mapping cursor is now **Classic Pet System**:
+- `systems/pet.md`;
+- `bugs/pet.md`;
+- `tests/pet.md`.
 
 Runtime execution remains locked and `DUNGEON-T10` remains the first future live gate.
