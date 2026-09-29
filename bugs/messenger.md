@@ -232,4 +232,42 @@ Quest code using the natural form `pc.is_blocked("PlayerName")` or `pc.is_friend
 
 ### Deferred validation
 `MSG-T11`.
+---
+
+## BUG-MSG-012 — messenger receive buffer is still fixed at the legacy 24-character name limit
+
+**Class:** client memory corruption / stack-buffer overflow  
+**Reachability:** VERIFIED for friend, GM, block and mobile messenger name packets longer than 24 bytes.
+
+### Proof
+1. The canonical server character-name limit is `CHARACTER_NAME_MAX_LEN = 48`.
+2. Server messenger send paths serialize `companion.size()` into a one-byte length and then send the full name bytes.
+3. Client `CPythonNetworkStream::RecvMessenger()` still declares `char char_name[24 + 1]{}`.
+4. Friend list/login/logout, GM list/login/logout, block list/login/logout and mobile branches call `Recv(length, char_name)` with the packet-provided length and then write `char_name[length] = 0`.
+5. Those branches do not bound the received length to the 25-byte destination.
+
+### Consequence
+A valid character name longer than the legacy 24-byte limit can overwrite the client stack while messenger state is received. Depending on the packet and name length this can corrupt state or crash the client.
+
+### Deferred validation
+`MSG-T12`.
+
+---
+
+## BUG-MSG-013 — GM messenger query omits the valid WIZARD authority
+
+**Class:** GM list completeness / authorization-model mismatch  
+**Reachability:** VERIFIED from the server's canonical GM authority parser and messenger SQL.
+
+### Proof
+1. `EGMLevels` contains `GM_WIZARD` between `GM_LOW_WIZARD` and `GM_HIGH_WIZARD`.
+2. DB admin loading explicitly maps `mAuthority = 'WIZARD'` to `GM_WIZARD`.
+3. `MessengerManager::Login` builds the GM messenger list with a SQL predicate containing only `IMPLEMENTOR`, `HIGH_WIZARD`, `GOD` and `LOW_WIZARD`.
+4. `WIZARD` is therefore a valid GM authority that can never enter `LoadGMList` through this query.
+
+### Consequence
+Staff accounts using the `WIZARD` authority are omitted from the GM messenger group and its presence display even though the server recognizes them as GMs.
+
+### Deferred validation
+`MSG-T13`.
 
