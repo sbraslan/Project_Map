@@ -6,26 +6,26 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "mining",
-    "display_name": "Mining / Pickaxe",
-    "status": "PAUSED / MAPPING IN PROGRESS / 5 VERIFIED BUGS / EXECUTION LOCKED",
-    "system_file": null,
-    "bug_file": null,
-    "test_file": null,
+    "subsystem": "messenger",
+    "display_name": "Messenger / Friend / Block",
+    "status": "MAPPING IN PROGRESS / 6 VERIFIED BUGS / EXECUTION LOCKED",
+    "system_file": "systems/messenger.md",
+    "bug_file": "bugs/messenger.md",
+    "test_file": "tests/messenger.md",
     "verified_bug_ids": [
-      "BUG-MIN-001",
-      "BUG-MIN-002",
-      "BUG-MIN-003",
-      "BUG-MIN-004",
-      "BUG-MIN-005"
+      "BUG-MSG-001",
+      "BUG-MSG-002",
+      "BUG-MSG-003",
+      "BUG-MSG-004",
+      "BUG-MSG-005",
+      "BUG-MSG-006"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Resume without re-auditing BUG-MIN-001..005.",
-      "Finish ENABLE_MINING_EVENT dynamic vein spawn audit, especially Battle Field map 357 reachability.",
-      "Close Battle Field ore ownership reachability.",
-      "Cross-check pickaxe proto/value progression only if authoritative readable proto rows are available.",
-      "Reassess Mining STATIC COMPLETE status.",
+      "Continue Messenger relation symmetry and remove-all lifecycle audit.",
+      "Audit P2P presence and block enforcement on non-whisper social surfaces.",
+      "Audit client messenger packet-length/state handling and GM cache lifecycle.",
+      "Close reconnect/channel-change boundaries and remaining candidates.",
       "Do not execute runtime tests; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -328,7 +328,19 @@
     "Project_Game/share/locale/europe/map/index::no map 230 -> BUG-MIN-006",
     "Project_Game quest/guild_building_melt.quest::OreRefine precheck closure",
     "Project_Game map357 data::no mining veins; Battle Field ownership exception closed",
-    "Project_DumpProto item_names::29101..29109 pickaxe +0..+8"
+    "Project_DumpProto item_names::29101..29109 pickaxe +0..+8",
+    "common/CommonDefines.h::ENABLE_MESSENGER_BLOCK and ENABLE_GM_MESSENGER_LIST enabled",
+    "game/src/messenger_manager.cpp/.h::friend/block DB caches, async load, request/auth lifecycle",
+    "game/src/input_main.cpp::Messenger packet validation and Whisper block enforcement",
+    "game/src/input_login.cpp + char.cpp::Messenger login/logout lifecycle",
+    "game/src/p2p.cpp + input_p2p.cpp::Messenger P2P presence/relation replication",
+    "game/src/cmd.cpp + cmd_general.cpp::messenger_auth player command path",
+    "game/src/db.cpp::FuncQuery asynchronous callback lifecycle",
+    "Project_ClientSrc/UserInterface/PythonMessenger.cpp/.h::friend/GM/block client caches",
+    "Project_ClientSrc/UserInterface/PythonNetworkStreamPhaseGame.cpp::RecvMessenger",
+    "Project_Binary/root/uimessenger.py + game.py::messenger UI/auth/teardown",
+    "BUG-MSG-001..006::Messenger canonical verified findings",
+    "tests/messenger.md::MSG-T01..MSG-T06 deferred validation; execution locked"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -2590,7 +2602,7 @@
     ]
   },
   "mining_mapping": {
-    "status": "PAUSED / MAPPING IN PROGRESS",
+    "status": "STATIC COMPLETE",
     "system_file": "systems/mining.md",
     "bug_file": "bugs/mining.md",
     "test_file": "tests/mining.md",
@@ -2599,7 +2611,9 @@
       "BUG-MIN-002",
       "BUG-MIN-003",
       "BUG-MIN-004",
-      "BUG-MIN-005"
+      "BUG-MIN-005",
+      "BUG-MIN-006",
+      "BUG-MIN-007"
     ],
     "mapped_flows": [
       "deployed mining.quest -> __refine_pick -> RealRefinePick mastery boundary -> BUG-MIN-001",
@@ -2628,7 +2642,8 @@
         "MIN-T03",
         "MIN-T04",
         "MIN-T05",
-        "MIN-T06"
+        "MIN-T06",
+        "MIN-T07"
       ],
       "first_live_gate_unchanged": "DUNGEON-T09"
     },
@@ -2638,20 +2653,48 @@
       "Vein despawn/VID lifecycle cleanly aborts and normal VID reuse alias was not established.",
       "InitializeMiningEvent map-103 global NPC cleanup remains dead-path risk because no active caller was found.",
       "Pickaxe item_proto values unavailable as readable text; item-name deployment confirms 29101..29109 +0..+8."
+    ]
+  },
+  "messenger_mapping": {
+    "status": "MAPPING IN PROGRESS",
+    "system_file": "systems/messenger.md",
+    "bug_file": "bugs/messenger.md",
+    "test_file": "tests/messenger.md",
+    "verified_bug_ids": [
+      "BUG-MSG-001",
+      "BUG-MSG-002",
+      "BUG-MSG-003",
+      "BUG-MSG-004",
+      "BUG-MSG-005",
+      "BUG-MSG-006"
     ],
-    "pause_checkpoint": {
-      "reason": "User requested progress save because conversation/tool flow was repeatedly interrupted.",
-      "closed_without_promotion": [
-        "OreRefine internal ore-before-gold ordering: deployed guild_building_melt.quest prechecks affordability before Lua call; no current deployed insufficient-gold loss path proven.",
-        "Vein VID reuse: no practical reuse path proven in normal process lifetime; AllocVID is monotonic and destroyed characters are removed from VID map.",
-        "Battle Field static map 357 contains no mining veins in regen/npc/boss; stone.txt contains non-mining stones."
+    "mapped_flows": [
+      "input_login.cpp -> MessengerManager::Login -> asynchronous friend/GM/block SQL callbacks",
+      "char.cpp disconnect -> MessengerManager::Logout",
+      "friend add packet -> RequestToAdd -> m_set_requestToAdd -> messenger_auth -> AuthToAdd -> symmetric AddToList",
+      "block add packet -> AddToBlockList -> DB/local cache/P2P replication",
+      "p2p.cpp + input_p2p.cpp -> cross-core login/logout and relation replication",
+      "Whisper local target vs remote CCI relay block enforcement",
+      "PythonNetworkStreamPhaseGame.cpp -> RecvMessenger -> CPythonMessenger",
+      "PythonMessenger.cpp -> uimessenger.py online/offline callbacks",
+      "game.py Close -> messenger.Destroy session teardown"
+    ],
+    "candidates": [
+      "add-by-name friend path observer-mode parity with add-by-VID remains under assessment",
+      "remove-all and inverse-only relation cleanup symmetry remains under assessment",
+      "OnBlockLogin handler-null safety remains unpromoted pending helper semantics"
+    ],
+    "runtime_tests": {
+      "status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN",
+      "canonical_test_ids": [
+        "MSG-T01",
+        "MSG-T02",
+        "MSG-T03",
+        "MSG-T04",
+        "MSG-T05",
+        "MSG-T06"
       ],
-      "open_cursor": [
-        "Finish ENABLE_MINING_EVENT dynamic spawn audit for Battle Field map 357.",
-        "Close Battle Field ore ownership reachability.",
-        "Close pickaxe proto/value progression if readable authoritative data is available.",
-        "Decide whether Mining can become STATIC COMPLETE."
-      ]
+      "first_live_gate_unchanged": "DUNGEON-T09"
     }
   }
 }
