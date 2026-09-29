@@ -1,6 +1,6 @@
 # Zodiac Temple / 12ZI — Bug Registry
 
-**Status:** STATIC MAPPING OPEN / 7 VERIFIED BUGS  
+**Status:** STATIC MAPPING CLOSED / 9 VERIFIED BUGS  
 **Execution:** LOCKED / NOT RUN
 
 No runtime reproduction has been executed. Every promoted item below has a reachable static source chain or a deterministic C++ lifetime/state proof.
@@ -123,8 +123,44 @@ Execution on a non-99 core reaches the end of a value-returning function without
 ### Deferred validation
 `ZOD-T07`.
 
-## Active candidates under verification
-- `DecMember` has an erase-while-iterating branch gated by `zodiac_disconnect_member_2`; deployment/default flag state is still being mapped.
-- Zodiac deployment/entry ownership is still being mapped because `quest_list` has no visible Zodiac quest source while server-time portal spawn is enabled.
-- Floor/event timer and private-map teardown ordering remains under review.
-- 12ZI shop-limit and bead regeneration/persistence paths remain under review.
+## BUG-ZOD-008 — alternate DecMember branch increments an invalidated set iterator
+
+**Class:** conditional iterator invalidation / C++ undefined behavior
+
+### Proof
+- `CZodiac::DecMember` normally uses `find(ch)` followed by `erase(it)` when `zodiac_disconnect_member_2 == 0`.
+- When `zodiac_disconnect_member_2 != 0`, it instead iterates `m_set_pkCharacter` with a `for (...; ++it)` loop.
+- On a matching element it calls `m_set_pkCharacter.erase(*it)`. Erasing that element invalidates the iterator that currently refers to it.
+- Control then reaches the loop increment expression `++it` on the invalidated iterator, which is undefined behavior.
+- An absent event flag resolves to zero, so the source default takes the safe branch. However the normal GM `event_flag` command accepts arbitrary flag names and can set `zodiac_disconnect_member_2` at runtime, making the defective branch reachable without a rebuild.
+
+### Consequence
+If the alternate disconnect flag is enabled and a tracked Zodiac member is removed, disconnect/teardown can execute undefined iterator operations. Depending on STL/debug/allocator behavior this can manifest as a crash, corrupted iteration state or apparently successful execution.
+
+### Deferred validation
+`ZOD-T08`.
+
+## BUG-ZOD-009 — bead catch-up discards partial-hour progress and publishes a stale negative timer
+
+**Class:** persistent time accounting / client synchronization
+
+### Proof
+- The login flow calls `CHARACTER::BeadTime()`.
+- `BeadTime` computes `remainTime = 3600 - (now - lastTime)` before performing catch-up.
+- When elapsed time is greater than one hour it grants `iCount = elapsed / 3600` beads, then writes `12zi_temple.beadtime = now`.
+- Resetting the timestamp to `now` discards `elapsed % 3600` seconds of already-earned progress. Example: after 7199 seconds, one bead is granted but the remaining 3599 seconds toward the next bead are lost.
+- The same branch then sends the previously calculated `remainTime`, which is negative whenever elapsed time exceeded 3600 seconds.
+- The client consumes `Bead_time` through `PythonNetworkStreamCommand.cpp -> NextBeadUpdateTime`; the Python UI clamps a past target time to zero, so the displayed next-bead timer is also inconsistent until another authoritative update.
+
+### Consequence
+Offline/login catch-up regenerates the correct number of whole beads but systematically delays the next bead by throwing away the partial-hour remainder, while the immediate client countdown can show no pending regeneration because it received a negative interval.
+
+### Deferred validation
+`ZOD-T09`.
+
+## Closed candidates / non-promotions
+- Portal spawning is source-proven on channel 99, but the tracked Game snapshot lacks the quest/object binding that would invoke `zodiac_temple.starttemple`; this is a deployment/source-completeness gap rather than a source-proven runtime defect.
+- Normal party/reconnect teardown is coherent with the default event-flag state. The skip flags can suppress cleanup, but their intended operational semantics are not documented strongly enough in the tracked deployment to promote a separate defect beyond `BUG-ZOD-008`.
+- Private-map/floor timer ordering was traced through manager erasure, event cancellation and synchronous map destruction; no additional source-proven lifetime defect was found.
+- `ENABLE_12ZI_SHOP_LIMIT` is disabled. The active legacy seller path depends on shop inventory/count data not present in the tracked snapshot, so no speculative accounting bug is promoted.
+- Client Zodiac command routing for timers, beads and revive UI is present in `PythonNetworkStreamCommand.cpp`; no additional parity bug was found.
