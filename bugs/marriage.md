@@ -250,3 +250,24 @@ A wedding map that survives a DB-only restart can remain orphaned/running becaus
 
 ### Deferred validation
 `MARR-T12`.
+
+
+## BUG-MARR-013 — unilateral/cross-core divorce leaves stale lover UI on both clients
+
+**Class:** multi-core client-state synchronization  
+**Reachability:** VERIFIED through deployed unilateral divorce.
+
+### Proof
+1. The deployed unilateral-divorce quest requires only the current player to be married; it does not require the spouse to be local/near.
+2. It calls `marriage.remove()`, leading to DB relation deletion and DG MARRIAGE_REMOVE broadcast.
+3. Every game core deletes its local `TMarriage`.
+4. `TMarriage::~TMarriage()` sends `lover_divorce` only if `IsOnline()` is true.
+5. `IsOnline()` is local-process `ch1 && ch2`, not global P2P presence.
+6. With spouses on different cores, each relation object has at most one local spouse pointer, so neither destructor sends `lover_divorce`.
+7. Client `game.py::__LoverDivorce` is the path that calls `ClearLoverInfo()` and `ClearLoverState()`.
+
+### Consequence
+The authoritative marriage relation disappears while both clients may continue showing the old spouse/family/love-point UI until relog/session reset.
+
+### Deferred validation
+`MARR-T13`.
