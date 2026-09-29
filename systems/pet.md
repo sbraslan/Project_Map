@@ -96,7 +96,7 @@ Promoted as `BUG-PET-001`.
 6. audit Achievement TYPE_SUMMON_PET time accounting under abnormal unsummon paths;
 7. create additional bugs/tests only for verified reachable paths.
 
-No Classic Pet runtime test is authorized. Global first future live gate remains `DUNGEON-T10`.
+No Classic Pet runtime test is authorized. Global first future live gate remains `DUNGEON-T09`.
 
 
 ## Checkpoint — Bruce pickup lifetime + PET_PAY removal boundary
@@ -151,7 +151,7 @@ This is a strong stale-pet candidate. Promotion is deferred until a concrete cur
 5. audit Achievement TYPE_SUMMON_PET accounting under missing-item and abnormal unsummon paths;
 6. promote only verified reachable additional Classic Pet bugs/tests.
 
-No runtime execution is authorized. Global first future live gate remains `DUNGEON-T10`.
+No runtime execution is authorized. Global first future live gate remains `DUNGEON-T09`.
 
 
 ## Checkpoint — REAL_TIME PET_PAY expiry reachability closed
@@ -191,7 +191,7 @@ So the stale classic pet is not proven permanent across owner teardown. The veri
 4. audit remaining death/warp/login restoration edges;
 5. promote only verified reachable additional bugs/tests.
 
-No Classic Pet runtime test is authorized. Global first future live gate remains `DUNGEON-T10`.
+No Classic Pet runtime test is authorized. Global first future live gate remains `DUNGEON-T09`.
 
 
 ## Checkpoint — legacy Lua producer excluded + Achievement time-loss closed
@@ -233,7 +233,7 @@ This makes the lost accounting externally visible: real accumulated classic-pet 
 3. inspect pet auto-pickup ownership-expiry/re-target behavior for any additional reachable lifetime bug;
 4. close Classic Pet static mapping when no further reachable candidates remain.
 
-No Classic Pet runtime test is authorized. Global first future live gate remains `DUNGEON-T10`.
+No Classic Pet runtime test is authorized. Global first future live gate remains `DUNGEON-T09`.
 
 
 ## Final static closure — PET_PAY coverage, lifecycle and pickup retarget
@@ -306,4 +306,4 @@ Canonical deferred runtime tests:
 - `PET-T03`
 - `PET-T04`
 
-No runtime test has been executed. Global first future live gate remains `DUNGEON-T10`.
+No runtime test has been executed. Global first future live gate remains `DUNGEON-T09`.
