@@ -80,67 +80,69 @@ A monarch can write out-of-range tax state despite being told the value is inval
 ### Deferred validation
 `MON-T04`.
 
-## Open candidates
-- treasury multi-core race;
-- process-local power/defense buffs;
-- unguarded `takemonarchmoney` Lua API while security block is compiled under `__UNIMPLEMENTED__`;
-- warp/transfer charge-on-failure ordering;
-- SetMonarch SQL/schema mismatch;
-- DelMonarch DELETE-result interpretation.
+## BUG-MON-005 — asynchronous treasury deduction permits effect-before-payment race
 
-
-## BUG-MON-005 — stale local treasury prechecks can grant an unpaid monarch effect
-
-**Class:** async transaction ordering / treasury consistency  
-**Reachability:** VERIFIED through registered `mtr` and `mmob` commands.
+**Class:** treasury concurrency / stale cached balance  
+**Reachability:** VERIFIED through registered monarch actions.
 
 ### Proof
-1. Treasury prechecks use each game core's cached `TMonarchInfo.money`.
-2. `SendtoDBDecMoney` sends an async GD request and does not reserve/decrement local balance.
-3. `mtr` and `mmob` use distinct cooldown slots, MI_TRANSFER and MI_SUMMON.
-4. Their gameplay effects are applied/sent before authoritative DB deduction is confirmed.
-5. A second command can therefore pass against the same old balance before the first DG delta returns.
-6. DB `DecMonarchMoney` ignores the return value of authoritative `CMonarch::DecMoney`.
-7. It broadcasts a DEC packet even if the DB deduction was rejected for insufficient funds.
-8. There is no rollback/failure ACK for the gameplay effect.
+1. Each game core caches `TMonarchInfo.money`.
+2. `SendtoDBDecMoney` checks the cached balance but does not reserve/decrement it.
+3. Actions such as transfer/warp/summon apply or dispatch their gameplay effect before the DB response arrives.
+4. Distinct monarch actions use distinct cooldown categories, so one action does not serialize all treasury spending.
+5. Two requests can therefore pass the same cached balance before either DG decrement updates the core.
+6. DB `CMonarch::DecMoney` can reject the later request if authoritative money is insufficient.
+7. `CClientManager::DecMonarchMoney` ignores that boolean result and broadcasts the decrement packet anyway.
+8. The already-triggered gameplay effect has no rollback.
 
 ### Consequence
-At a treasury boundary, one of two rapid different monarch actions can complete without an authoritative treasury charge.
+A monarch can receive multiple treasury-backed effects while authoritative persistence pays for fewer of them under a tight asynchronous request window.
 
 ### Deferred validation
 `MON-T05`.
 
-## BUG-MON-006 — MI_TAX cooldown is never checked by mtax
+## BUG-MON-006 — setmonarch persists PID to `name` instead of `pid`
 
-**Class:** cooldown enforcement  
-**Reachability:** VERIFIED through registered `mtax` command.
+**Class:** persistence/schema contract  
+**Reachability:** VERIFIED through registered `setmonarch` GM command.
 
 ### Proof
-- `InitMC` defines a cooldown limit for MI_TAX.
-- `do_monarch_tax` calls `SetMC(MI_TAX)`.
-- The command contains no `IsMCOK(MI_TAX)` precheck.
-- Other monarch commands explicitly check their corresponding cooldown before acting.
+1. DB resolves the selected player and stores the correct ID in `m_MonarchInfo.pid[Empire]`.
+2. It persists:
+   `REPLACE INTO monarch (empire, name, windate, money) VALUES(..., p->pid[Empire], ...)`.
+3. It does not write column `pid`.
+4. `LoadMonarch` reconstructs identity from `a.pid` and joins `a.pid=b.id`.
+5. The newer `ChangeMonarchLord` path correctly executes `UPDATE monarch SET pid=...`.
+6. The REPLACE is asynchronous and its failure/result is not checked.
 
 ### Consequence
-A monarch can repeatedly change tax without respecting the configured tax cooldown.
+The legacy GM set path can establish an in-memory monarch while failing to persist the selected identity in the column used at the next authoritative reload.
 
 ### Deferred validation
 `MON-T06`.
 
-## BUG-MON-007 — remote mtr charges before knowing whether target still exists
+## BUG-MON-007 — cross-core monarch transfer is charged without delivery acknowledgement
 
-**Class:** P2P race / charge-on-failure  
-**Reachability:** VERIFIED through registered `mtr` remote-target path.
+**Class:** P2P lifecycle / transaction ordering  
+**Reachability:** VERIFIED through registered `mtr` player command for a valid monarch.
 
 ### Proof
-1. Source core finds a remote target CCI and sends `HEADER_GG_TRANSFER`.
-2. Source immediately sends treasury DEC request and sets MI_TRANSFER cooldown.
-3. Receiving core resolves target by name at packet handling time.
-4. If target is absent, receiver performs no warp and sends no failure response.
-5. No transfer success acknowledgement exists.
+1. Source core resolves a remote target through P2P CCI and validates cached empire/channel/map state.
+2. It broadcasts `HEADER_GG_TRANSFER`.
+3. It immediately sends the treasury deduction request and sets `MI_TRANSFER` cooldown.
+4. Remote `CInputP2P::Transfer` looks up the target by name.
+5. If the target is absent it silently does nothing.
+6. If present, it calls `WarpSet` without returning success to the source.
+7. There is no P2P transfer ACK and no charge/cooldown rollback.
 
 ### Consequence
-A disconnect/core-handoff race can consume treasury and cooldown while the requested transfer never occurs.
+A target logout/core handoff or warp failure after the source-side CCI check can consume treasury funds and cooldown while no transfer occurs.
 
 ### Deferred validation
 `MON-T07`.
+
+## Open candidates
+- process-local PowerUp/DefenseUp buffs; deployed caller closure pending;
+- unguarded `takemonarchmoney` Lua API while validation is compiled under `__UNIMPLEMENTED__`; deployed caller not yet proven;
+- add-money overflow/failure broadcast symmetry;
+- monarch cooldown persistence across reconnect/core moves.
