@@ -6,31 +6,19 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "fishing",
-    "display_name": "Fishing Renewal",
-    "status": "MAPPING IN PROGRESS / 10 VERIFIED BUGS / EXECUTION LOCKED",
-    "system_file": "systems/fishing.md",
-    "bug_file": "bugs/fishing.md",
-    "test_file": "tests/fishing.md",
-    "verified_bug_ids": [
-      "BUG-FISH-001",
-      "BUG-FISH-002",
-      "BUG-FISH-003",
-      "BUG-FISH-004",
-      "BUG-FISH-005",
-      "BUG-FISH-006",
-      "BUG-FISH-007",
-      "BUG-FISH-008",
-      "BUG-FISH-009",
-      "BUG-FISH-010"
-    ],
+    "subsystem": null,
+    "display_name": "Static Mapping Coverage Complete",
+    "status": "FISHING RENEWAL STATIC COMPLETE / 30 EFFECTIVE STATIC-COMPLETE SUBSYSTEMS / EXECUTION LOCKED",
+    "system_file": null,
+    "bug_file": null,
+    "test_file": null,
+    "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Map renewed fishing packet registration and size validation.",
-      "Audit catch/fail timing, replay and trust boundaries.",
-      "Close bait and POINT_FISHING_RARE probability arithmetic.",
-      "Audit success/log/Battle Pass/Achievement and lifecycle cleanup.",
-      "Do not execute Fishing runtime tests; global first future live gate remains DUNGEON-T09."
+      "Preserve runtime execution lock.",
+      "First future live runtime gate is DUNGEON-T09; DUNGEON-T10 is retracted and must not be run.",
+      "When runtime is explicitly unlocked, execute only the canonical DUNGEON-T09 handoff first.",
+      "When continuation is requested, select the next independent unmapped gameplay subsystem and continue detection-only mapping."
     ]
   },
   "startup": {
@@ -2501,7 +2489,7 @@
     ]
   },
   "fishing_mapping": {
-    "status": "MAPPING IN PROGRESS",
+    "status": "STATIC COMPLETE",
     "canonical_files": {
       "system": "systems/fishing.md",
       "bugs": "bugs/fishing.md",
@@ -2517,7 +2505,8 @@
       "BUG-FISH-007",
       "BUG-FISH-008",
       "BUG-FISH-009",
-      "BUG-FISH-010"
+      "BUG-FISH-010",
+      "BUG-FISH-011"
     ],
     "mapped_flows": [
       "HEADER_CG_FISHING_NEW -> CInputMain::FishingNew -> CHARACTER::fishing_new_start/stop/catch",
@@ -2551,9 +2540,14 @@
         "FISH-T07",
         "FISH-T08",
         "FISH-T09",
-        "FISH-T10"
+        "FISH-T10",
+        "FISH-T11"
       ],
       "first_live_gate_unchanged": "DUNGEON-T09"
-    }
+    },
+    "candidates_closed": [
+      "POINT_FISHING_RARE uint8 narrowing not promoted: no current reachable producer/value range proves overflow.",
+      "CATCH_FAILED uint32 overflow not separately promoted: practical multiplayer amplification captured by BUG-FISH-011."
+    ]
   }
 }
