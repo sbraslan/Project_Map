@@ -1543,6 +1543,96 @@
       "references": [
         "marriage_mapping.mapped_flows.1"
       ]
+    },
+    {
+      "name": "TMarriage::Login",
+      "references": [
+        "marriage_mapping"
+      ]
+    },
+    {
+      "name": "TMarriage::Logout",
+      "references": [
+        "marriage_mapping"
+      ]
+    },
+    {
+      "name": "TMarriage::GetMarriagePoint",
+      "references": [
+        "marriage_mapping"
+      ]
+    },
+    {
+      "name": "TMarriage::GetBonus",
+      "references": [
+        "marriage_mapping"
+      ]
+    },
+    {
+      "name": "TMarriage::~TMarriage",
+      "references": [
+        "marriage_mapping"
+      ]
+    },
+    {
+      "name": "CManager::RequestRemove",
+      "references": [
+        "marriage_mapping"
+      ]
+    },
+    {
+      "name": "CManager::Remove",
+      "references": [
+        "marriage_mapping"
+      ]
+    },
+    {
+      "name": "CManager::WeddingEnd",
+      "references": [
+        "marriage_mapping"
+      ]
+    },
+    {
+      "name": "WeddingManager::End",
+      "references": [
+        "marriage_mapping"
+      ]
+    },
+    {
+      "name": "WeddingMap::WarpAll",
+      "references": [
+        "marriage_mapping"
+      ]
+    },
+    {
+      "name": "WeddingMap::DestroyAll",
+      "references": [
+        "marriage_mapping"
+      ]
+    },
+    {
+      "name": "CHARACTER::SaveExitLocation",
+      "references": [
+        "marriage_mapping"
+      ]
+    },
+    {
+      "name": "CHARACTER::ExitToSavedLocation",
+      "references": [
+        "marriage_mapping"
+      ]
+    },
+    {
+      "name": "P2P_MANAGER::Login",
+      "references": [
+        "marriage_mapping"
+      ]
+    },
+    {
+      "name": "P2P_MANAGER::Logout",
+      "references": [
+        "marriage_mapping"
+      ]
     }
   ]
 }
