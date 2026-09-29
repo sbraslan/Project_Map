@@ -48,3 +48,19 @@ Goal: validate `BUG-FISH-005`.
 With runtime explicitly unlocked, compare Carbon rod 27591 final catch chance behavior against the intended doubled branch and a normal rod with equivalent Value0. Instrumentation/logging is preferred to avoid statistical ambiguity.
 
 Do not run while execution lock is active.
+
+
+## FISH-T06 — death/warp lifecycle cleanup
+Goal: validate `BUG-FISH-006`.
+
+Death branch:
+- with runtime explicitly unlocked, reach the required renewed catch count;
+- trigger death before the next fishing-event decision tick;
+- verify whether the event still resolves the final reward path while the character is dead.
+
+Warp branch:
+- start renewed fishing normally;
+- trigger a same-character/same-process warp before event completion;
+- verify `m_pkFishingNewEvent` survives and whether catch/event processing continues on the destination map without water-position revalidation.
+
+Do not run while execution lock is active.
