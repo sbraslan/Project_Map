@@ -8,7 +8,7 @@
 
 `TPacketGCExtBattlePassMissionUpdate` contains `bMissionType`.
 Character update/set code creates non-zero-initialized packet and assigns header/passType/missionIndex/newProgress but not missionType.
-Client reads missionType and uses it in `HaveMission(...)`/UI selection.
+Client forwards this byte into `UpdateMission`. Fresh UI audit shows `HaveMission(...)` currently ignores its mission-type argument and matches by mission index, so ordinary progress can still update; however, when the mission is selected, the undefined mission type is passed into `SetMissionInfo(...)`, and the packet also leaks one uninitialized stack byte. Runtime impact is therefore protocol/data-leak plus possible selected-mission detail mismatch, not guaranteed total progress-update failure.
 
 ### BUG-BPASS-002 — SetExtBattlePassMissionProgress can re-award an already completed mission
 - Statik durum: **doğrulandı; caller reachability audit açık**
