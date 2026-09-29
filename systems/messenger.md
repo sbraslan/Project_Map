@@ -57,7 +57,7 @@ Remote target: target is represented by P2P `CCI` and relay descriptor while `pk
 - `BUG-MSG-011` — `pc.is_blocked` and `pc.is_friend` are registered Lua name-query helpers but gate their first argument with `lua_isnumber` before calling `FindPC(name)`.
 - `BUG-MSG-013` — the server recognizes `WIZARD` as `GM_WIZARD`, but the Messenger GM-list SQL omits `mAuthority='WIZARD'`.
 - `BUG-MSG-014` — add-by-name friend/block paths omit the observer-mode rejection enforced by their VID counterparts, and both name paths are exposed by the Messenger UI.
-- `BUG-MSG-015` — GM inverse watcher sets retain logged-out accounts because logout does not prune `m_InverseGMRelation[gm]`.
+- `BUG-MSG-015` — friend/block/GM inverse watcher sets retain logged-out accounts because logout clears outgoing maps without pruning the departing account from inverse watcher sets.
 - `BUG-MSG-016` — delayed old-core P2P logout can remove a newer same-name CCI/session presence after channel/core handoff.
 - `BUG-MSG-017` — client→server name-based messenger packets use a 48-byte field for a configured 48-byte name, truncating add/block-add to 47 bytes and leaving long remove/unblock fields without an explicit final NUL.
 - `BUG-MSG-018` — Battle Field blocks friend add-by-name but the normal target-board add-by-VID path lacks the map restriction.
