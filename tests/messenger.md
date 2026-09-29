@@ -119,25 +119,7 @@ After runtime is explicitly unlocked:
 
 Bug signature: the WIZARD staff character is absent from the GM messenger list because the login SQL does not select that authority.
 
-## MSG-T14 — GM inverse watcher accumulation
-After runtime is explicitly unlocked in an isolated environment:
-1. choose a known GM entry G that is returned by the GM messenger query;
-2. log in and out a sequence of unique normal accounts while observing the same game process;
-3. inspect `m_GMRelation` and `m_InverseGMRelation[G]` after those accounts log out;
-4. trigger G login/logout presence and measure/trace the watcher iteration.
-
-Bug signature: each logged-out account disappears from its outgoing GM relation but remains in `m_InverseGMRelation[G]`, so the inverse set and fanout work grow with historical unique accounts.
-
-## MSG-T15 — stale old-core logout after newer channel login
-After runtime is explicitly unlocked in a controlled multi-core environment:
-1. keep an observer core C connected to both source core A and destination core B;
-2. move player P from A to B;
-3. delay/reorder delivery to C so C processes B's `GG_LOGIN(P)` before A's old `GG_LOGOUT(P)`;
-4. inspect C's P2P CCI and MessengerManager login/relation state after both packets.
-
-Bug signature: the delayed old logout resolves P only by name, deletes the CCI that was already updated to B, and invokes messenger logout for the still-online destination session.
-
-## MSG-T16 — observer-mode name-path friend/block add
+## MSG-T14 — observer-mode name-path friend/block add
 After runtime is explicitly unlocked:
 1. enter observer mode with A while B is online;
 2. verify target/VID friend and block add attempts are rejected;
@@ -146,5 +128,23 @@ After runtime is explicitly unlocked:
 5. inspect friend-request/block state and DB rows.
 
 Bug signature: name-based friend/block actions proceed in observer mode while the VID-based equivalents are server-rejected.
+
+## MSG-T15 — GM inverse watcher accumulation
+After runtime is explicitly unlocked in an isolated environment:
+1. choose a known GM entry G returned by the GM messenger query;
+2. log in and out a sequence of unique normal accounts while observing the same game process;
+3. inspect `m_GMRelation` and `m_InverseGMRelation[G]` after those accounts log out;
+4. trigger G login/logout presence and measure/trace the watcher iteration.
+
+Bug signature: each logged-out account disappears from its outgoing GM relation but remains in `m_InverseGMRelation[G]`, so the inverse set and fanout work grow with historical unique accounts.
+
+## MSG-T16 — stale old-core logout after newer channel login
+After runtime is explicitly unlocked in a controlled multi-core environment:
+1. keep an observer core C connected to both source core A and destination core B;
+2. move player P from A to B;
+3. delay/reorder delivery to C so C processes B's `GG_LOGIN(P)` before A's old `GG_LOGOUT(P)`;
+4. inspect C's P2P CCI and MessengerManager login/relation state after both packets.
+
+Bug signature: the delayed old logout resolves P only by name, deletes the CCI already updated to B and invokes messenger logout for the still-online destination session.
 
 Do not run any MSG test while the project execution lock is active.
