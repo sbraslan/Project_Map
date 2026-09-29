@@ -82,3 +82,29 @@ is impossible because 27591 cannot also be <=27490. The exact intended Carbon-ro
 7. promote only verified reachable findings.
 
 No Fishing runtime test is authorized. Global first future live gate remains `DUNGEON-T09`.
+
+
+## BUG-FISH-003 — server trusts client-declared successful minigame catches
+The renewed client UI decides whether the moving fish is inside the target area. On a visual hit it sends `FISHING_SUBHEADER_NEW_CATCH`; on a miss it sends `...CATCH_FAILED`.
+
+Server `CInputMain::FishingNew` forwards a CATCH directly to `CHARACTER::fishing_new_catch()`.
+
+Server-side acceptance checks are only:
+- a renewed fishing event exists;
+- `GetLastCatchTime() <= get_global_time()`.
+
+An accepted packet increments `m_bFishCatch`. Once the count reaches `FISHING_NEED_CATCH` (3), the periodic event calls `fishing_catch_decision(info->vnum)`.
+
+The server does not reproduce/validate:
+- fish position;
+- target-circle position;
+- client hit-test;
+- mouse position;
+- a server-issued challenge token/state proving that a visual hit occurred.
+
+Therefore a modified client can submit one CATCH per accepted time interval and satisfy the three-hit minigame without performing the UI hit test.
+
+Promoted as `BUG-FISH-003`.
+
+## Packet boundary closure
+`HEADER_CG_FISHING_NEW` is registered in `packet_info.cpp` as fixed-size `sizeof(TPacketFishingNew)`, so no separate variable-length packet-size defect is promoted here.
