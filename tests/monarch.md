@@ -125,3 +125,29 @@ Expected bug signature: the second change is accepted because `do_monarch_tax` n
 Covers `BUG-MON-010`.
 
 Do not run this test while the global execution lock is active.
+
+
+## MON-T11 — mto target inside an allowed private instance
+After runtime is explicitly unlocked:
+1. place the target in an allowed private instance whose base map is not denied by `IsMonarchWarpZone`;
+2. invoke `mto <target>`;
+3. record the target's full private map index and the monarch's final map index;
+4. inspect treasury and MI_WARP.
+
+Expected bug signature: monarch arrives on the base/public map rather than the target's private instance while treasury/cooldown are consumed.
+
+Covers `BUG-MON-011`.
+
+## MON-T12 — remote mtr while monarch is inside a private instance
+After runtime is explicitly unlocked on a multi-core setup:
+1. place the monarch in an allowed private instance;
+2. keep the same-empire target on another core of the same channel;
+3. invoke `mtr <target>`;
+4. trace `TPacketGGTransfer` and the receiver's coordinate-only `WarpSet`;
+5. compare the target's final full map index with the monarch's private map index.
+
+Expected bug signature: target reaches the base/public map instead of the monarch's private instance while treasury/cooldown are consumed.
+
+Covers `BUG-MON-012`.
+
+Do not run these tests while the global execution lock is active.
