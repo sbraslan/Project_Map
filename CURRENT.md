@@ -30,11 +30,12 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 - Shout delivery checks the receiver's messenger block relation on both local and P2P fanout. BUG-MSG-007 can still undermine it after logout/relog cache loss.
 - Normal party invite, guild invite, exchange, PvP and equipment-view entry points contain messenger block guards.
 - Block-add-by-VID return paths using `sizeof(TPacketCGMessengerAddByVID)` are not a packet-consumption bug in this snapshot because both VID payload structs are one `uint32_t` and therefore equal-sized.
-- `RemoveAllBlockList` has a DB-vs-cache/P2P asymmetry for incoming block rows, but no active call site has yet been established; keep it candidate-only.
+- `RemoveAllBlockList` has a DB-vs-cache/P2P asymmetry for incoming block rows; active reachability is now proven through `questlua_pc.cpp::pc_change_name`. Final impact across the required rename/logout lifecycle remains candidate-only.
+- `OnBlockLogin`'s missing local handler-null guard is closed as non-bug because `PyCallClassMemberFunc` safely rejects a null handler.
 
 ## Exact resume cursor
-1. Continue client messenger parser/state safety: list-length accounting and optimistic unblock/server-ack behavior.
-2. Finish GM messenger cache/login/logout lifecycle symmetry.
-3. Re-check channel-change boundaries against BUG-MSG-003/007 and P2P presence reconstruction.
-4. Resolve the dormant `RemoveAllBlockList` call-site question before any promotion.
-5. Do not execute runtime tests; global first future live gate remains `DUNGEON-T09`.
+1. Close rename/logout behavior around the proven `pc_change_name -> RemoveAllList/RemoveAllBlockList` caller.
+2. Audit pending party/guild invite acceptance after either side establishes a messenger block.
+3. Finish GM messenger cache/login/logout lifecycle symmetry.
+4. Re-check channel-change boundaries against BUG-MSG-003/007 and P2P presence reconstruction.
+5. Continue remaining client parser/state boundaries after BUG-MSG-009; do not execute runtime tests. Global first future live gate remains `DUNGEON-T09`.
