@@ -863,3 +863,20 @@ Closure candidates left unpromoted:
 Refine / Cube / Crafting is a **post-audit extension**. Current effective static-complete/readiness coverage is **26/26**, plus the folded Guild lifecycle companion.
 
 The global first future live gate remains **DUNGEON-T10**. No REFCUBE test has been executed.
+
+
+## Classic Pet runtime readiness extension
+**Static status:** STATIC COMPLETE  
+**Execution:** LOCKED / NOT RUN
+
+Canonical tests:
+- `PET-T01` — Bruce pickup range Y-axis defect.
+- `PET-T02` — Bruce cached raw ground-item pointer lifetime/UAF.
+- `PET-T03` — REAL_TIME PET_PAY expiry while summoned.
+- `PET-T04` — lost TYPE_SUMMON_PET elapsed achievement time after forced expiry.
+
+Readiness notes:
+- current PET_PAY item/race registration coverage is closed at 143 rows / 135 races;
+- 135/135 races exist in server mob_proto and client npclist;
+- runtime asset presence remains a deployment check because raw client packs are not fully versioned;
+- execution order is unchanged: do not run these before the global first live gate `DUNGEON-T10`.
