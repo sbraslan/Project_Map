@@ -68,7 +68,7 @@ See `BUG-GPET-001`.
 9. map current 55701..55713 proto/race/client visual coverage;
 10. create verified bugs/tests only for reachable current paths.
 
-No runtime test is authorized. Global first future live gate remains `DUNGEON-T10`.
+No runtime test is authorized. Global first future live gate remains `DUNGEON-T09`.
 
 
 ## Packet trust / skill / revive / evolution pass — 2026-09-28
@@ -193,7 +193,7 @@ The generic player item-destroy path also dereferences a destroyed item name. Th
 
 **Execution state:** READY / EXECUTION LOCKED / NOT RUN.
 
-The global first future live gate remains `DUNGEON-T10`; Growth Pet runtime tests do not change that ordering.
+The global first future live gate remains `DUNGEON-T09`; Growth Pet runtime tests do not change that ordering.
 
 ## Static closure
 Growth Pet System is **STATIC COMPLETE** for the tracked source/data snapshot.
