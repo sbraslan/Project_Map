@@ -123,3 +123,25 @@ A request can remain authorizable long after its original UI/request lifetime, i
 - add-by-name friend path differs from add-by-VID observer validation; gameplay impact not yet closed.
 - remove-all and inverse-only relation cleanup semantics need symmetry audit.
 - `OnBlockLogin` lacks the handler-null guard used by nearby callbacks; safety of the Python-call helper has not yet been proven.
+
+
+---
+
+## BUG-MSG-007 — companion logout destroys persistent outgoing friend/block cache for online users
+
+**Class:** lifecycle / relation-cache corruption  
+**Reachability:** VERIFIED when A remains online while B logs out and later reconnects.
+
+### Proof
+1. `Logout(B)` iterates every `m_Relation` entry and executes `erase(B)`, then erases `m_Relation[B]`.
+2. With messenger block enabled it performs the same global erase of B from every `m_BlockRelation` entry, then erases `m_BlockRelation[B]`.
+3. The inverse maps are retained to send B's offline/online presence to observers.
+4. When B reconnects, `LoadList(B)` and `LoadBlockList(B)` load only rows whose **account is B**.
+5. They do not reload A's outgoing relation/block rows, so `m_Relation[A][B]` and `m_BlockRelation[A][B]` stay missing while A remains online.
+6. `IsBlocked(A,B)` and `IsInList(A,B)` read those outgoing maps.
+
+### Consequence
+Persistent relationships in SQL diverge from the live server cache after the companion logs out. Most critically, if A blocked B, B logging out and reconnecting can make `IsBlocked(A,B)` false until A itself reloads its list. This creates a same-core block-enforcement bypass in addition to the separate cross-core whisper bypass in BUG-MSG-002. Friend membership checks/duplicate prevention can also observe a false-negative cache.
+
+### Deferred validation
+`MSG-T07`.
