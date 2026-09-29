@@ -1,6 +1,6 @@
 # Marriage / Wedding — Static Map
 
-**Status:** STATIC MAPPING IN PROGRESS / 7 VERIFIED BUGS  
+**Status:** STATIC COMPLETE / 8 VERIFIED BUGS  
 **Phase:** Detection / Mapping Only  
 **Opened:** 2026-09-29  
 **Source/Game repositories:** READ-ONLY  
@@ -201,17 +201,42 @@ Therefore the entire EXP-derived update is zero for level 26+ regardless of EXP 
 
 Promoted as `BUG-MARR-007`.
 
+### BUG-MARR-008 — marriage item sharing breaks when spouses are on different cores
+The tracked locale item descriptions for 71069..71074 explicitly state that when one spouse wears the item, the effect applies to **both spouses**.
+
+Server implementation:
+- `GetMarriageBonus` delegates to `TMarriage::GetBonus(..., bShare=true)`.
+- Shared bonus checks only local `ch1/ch2` pointers and their equipped items.
+- Those pointers are populated by `marriage::CManager::Login(ch)` for characters local to that game process.
+- P2P login updates CCI/guild/party/messenger state but does not populate remote Marriage character pointers.
+
+Therefore when spouse A and spouse B are online on different game cores:
+- A's core can see A's equipped marriage item but not B;
+- B's core can see B but not A;
+- if only A wears the item, B's `GetMarriageBonus` returns no shared effect.
+
+This contradicts the deployed item description's both-spouses behavior and makes the bonus dependent on process placement rather than marriage/equipment state.
+
+Promoted as `BUG-MARR-008`.
+
 ## Closed / scoped observations
 - Legacy `HEADER_GD_BREAK_MARRIAGE` is a DB-side two-PID compatibility entry that calls the normal DB marriage remove routine. No separate active quest/client sender was established in the tracked deployed flow; `HEADER_DG_BREAK_MARRIAGE` has no independent Marriage gameplay consequence in the mapped path.
 - Marriage critical/penetration/EXP bonus consumers are server-side. No separate item-bonus defect is promoted in this pass.
 - Mutual-divorce stale-target/double-mutation candidate is closed for the normal confirmation path: `CQuestManager::Confirm` resumes the suspended quest synchronously inside the confirmation handler, and the post-confirm mutual-divorce branch contains no additional suspension before its target re-check/mutations. This differs from BUG-MARR-001, where a later explicit `wait()` creates a real interruption window.
 
-## Current audit cursor
-Continue with:
-1. close remaining unique-item bonus/near-state semantics;
-2. close remaining Lua relation/wedding null-state callers;
-3. reconcile duplicate READY with wedding-end/orphan-map cleanup;
-4. decide STATIC COMPLETE readiness.
+## Static closure
+Marriage / Wedding static mapping is complete for the tracked source/deployment snapshot.
+
+Verified bugs:
+- `BUG-MARR-001..008`.
+
+Closed/scoped:
+- legacy BREAK_MARRIAGE is a compatibility DB remove entry, not an independent active gameplay flow;
+- mutual-divorce stale-target double-mutation is not reachable in the ordinary confirm path because confirm resumes synchronously and no later suspension occurs;
+- deployed Marriage Lua calls guard the obvious null-state paths through quest predicates; no additional independent Lua crash was promoted;
+- post-insert WeddingMap GetMap failure cleanup remains low-probability/deferred without a demonstrated ordinary producer;
+- active-wedding relation removal/orphaning remains unpromoted without an ordinary deployed path that reaches outside divorce NPCs during the active private-map window;
+- marriage item consumers for attack/defense/transfer/critical/penetration/EXP are present; the cross-core sharing defect is owned by BUG-MARR-008.
 
 ## Runtime
 No Marriage runtime test may be executed while the global execution lock is active. First future live gate remains `DUNGEON-T09`.
