@@ -1,54 +1,42 @@
 # Mining / Pickaxe — Bug Registry
 
-## BUG-MINE-001 — pickaxe refine quest and C++ eligibility are mutually exclusive
-**Class:** unreachable gameplay progression / dead upgrade path  
-**Reachability:** VERIFIED — current `mining.quest` + registered `__refine_pick` binding.
+## BUG-MINE-001 — pickaxe refinement is unreachable through the current quest threshold
+
+**Class:** progression / quest-C++ contract mismatch  
+**Reachability:** VERIFIED — current `quest_list` includes `n_npc/mining.quest`.
 
 ### Static proof
-- Quest invokes `__refine_pick` only at `socket0 == value2`.
-- `__refine_pick` calls `mining::RealRefinePick`.
-- `RealRefinePick` requires `Pick_Refinable`.
-- `Pick_Refinable` returns false for every `socket0 <= value2`; it becomes true only when `socket0 > value2`.
-- Quest treats every `socket0 != value2`, including `socket0 > value2`, as not ready.
+1. Current mining quest handles pick VNUM 29101..<29110.
+2. The refine branch requires `item.get_socket(0) == item.get_value(2)`.
+3. It calls `__refine_pick(item.get_cell())`.
+4. The registered Lua function forwards to `mining::RealRefinePick`.
+5. `RealRefinePick` calls `Pick_Refinable`.
+6. `Pick_Refinable` rejects when `curExp <= maxExp`, so equality is rejected.
+7. When `curExp > maxExp`, the quest's non-equality branch runs instead and never calls refine.
 
 ### Consequence
-The normal NPC 20015 quest path cannot successfully refine a pickaxe.
+The normal deployed NPC quest cannot successfully reach the pickaxe-refine RNG path for +0..+8 pickaxes.
 
 ### Deferred validation
 `MINE-T01`.
 
-## BUG-MINE-002 — mining event survives same-character warp and can reward at destination
-**Class:** lifecycle/location validation defect  
-**Reachability:** VERIFIED for same-process/same-character warp paths.
+## BUG-MINE-002 — delayed mining completion ignores death and warp relocation
 
-### Static proof
-- `CanWarp()` does not block active mining.
-- `WarpSet()`, `WarpEnd()`, `Show()` and `Stop()` do not cancel `m_pkMiningEvent`.
-- Mining completion re-resolves the original vein VID but does not compare player map/distance again.
-- `OreDrop()` uses the player's current map and coordinates.
-
-### Consequence
-A mining operation started at one vein can survive relocation and, on success, create its ore drop at the destination map.
-
-### Deferred validation
-`MINE-T02`.
-
-## BUG-MINE-003 — mining event survives death and can resolve rewards while dead
-**Class:** lifecycle/state validation defect  
+**Class:** lifecycle/state revalidation defect  
 **Reachability:** VERIFIED.
 
 ### Static proof
-- `Dead()` has no mining-event cancellation.
-- Mining completion has no `IsDead()` check.
-- Completion requires only a live character object, equipped valid pickaxe and still-resolvable source vein.
+1. Mining starts only near a valid vein and schedules a delayed event.
+2. Ordinary movement cancels through `OnMove()->mining_cancel()`.
+3. `Dead()` does not cancel the event.
+4. `CanWarp()` does not block active mining.
+5. `WarpSet()->Stop()` does not invoke `OnMove` or cancel mining.
+6. Delayed `mining_event` does not check dead state, current map equality, or distance to vein.
+7. If the vein still resolves by VID and a pick remains equipped, it performs the normal ore chance and `OreDrop`.
+8. `OreDrop` uses the player's current map/coordinates.
 
 ### Consequence
-The event may perform success/reward and pickaxe-practice logic after the player has died.
+Pending mining can resolve after death, and a pending session can resolve after warp with ore dropped at the destination map.
 
 ### Deferred validation
-`MINE-T03`.
-
-## Candidate — raw ore is consumed before OreRefine internal Yang check
-`OreRefine()` deducts 100 raw ore before checking `GetGold() < iCost`.
-
-Current `guild_building_melt.quest` pre-checks the matching fee before calling the binding, so a straightforward legitimate insufficient-Yang path is currently guarded. Do not promote unless the remaining quest-yield/state audit proves a reachable balance change between the precheck and C++ transaction.
+`MINE-T02`.
