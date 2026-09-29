@@ -25,3 +25,11 @@ Preconditions:
 Repeatedly start/stop renewed fishing without receiving item 50187. Compare item-manager/allocated-item counts before and after.
 
 Do not run while execution lock is active.
+
+
+## FISH-T03 — client-declared catch bypass
+Goal: validate `BUG-FISH-003`.
+
+With runtime explicitly unlocked, use a controlled test client/harness during an active renewed fishing event. Send valid CATCH packets at the accepted timing interval without performing the UI target hit. Verify server catch count reaches `FISHING_NEED_CATCH` and enters the normal final reward roll.
+
+Do not run while execution lock is active.
