@@ -926,3 +926,11 @@ Execution remains locked.
 `BP-T02` was reverified and canonical handoff prepared at `BP_T02_HANDOFF.md`.
 All mapped MISSION_UPDATE send sites omit `bMissionType`. Client forwards the undefined byte; current HaveMission ignores mission type, so the refined runtime target is packet mismatch/uninitialized-byte evidence plus possible selected-mission detail corruption rather than guaranteed missing progress.
 Execution remains locked.
+
+
+## Achievement ACH-T03 / ACH-T04 handoffs — 2026-09-29
+Both primary normal-path Achievement candidates were reverified.
+- `ACH-T03`: current configured missing-hook families are mount=16, search-shop spend=5, shop spend=3, withdraw=5.
+- `ACH-T04`: current XML has 29 explore tasks; `OnLogin` calls `OnVisitMap`, but mapped map-transition paths do not.
+Canonical handoffs: `ACH_T03_HANDOFF.md`, `ACH_T04_HANDOFF.md`.
+Execution remains locked.
