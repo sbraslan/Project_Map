@@ -698,7 +698,17 @@
           "BIO-T11"
         ]
       },
-      "normal_path_candidate": "BIO-T01"
+      "normal_path_candidate": "BIO-T01",
+      "handoff": "BIO_T01_HANDOFF.md",
+      "preflight_notes": [
+        "C++ completion sets biolog_manager.can_do_sub_mission_<mission> or biolog_manager.can_select_reward_<mission>.",
+        "Client completion button calls SendRequestEventQuest(\"biolog_manager\").",
+        "Server exposes pc.biolog_* Lua helpers required for the intended bridge.",
+        "Current Project_Game quest_list contains only legacy collect_* Biolog quests and no biolog_manager quest.",
+        "Repository search found no biolog_manager quest implementation.",
+        "Actual biolog mission/reward row values remain external DB-data dependent.",
+        "BIO-T01 remains the primary Biolog normal-path candidate after Achievement gates."
+      ]
     },
     "inventory_items": {
       "status": "DOCUMENTATION READY / NOT RUN",
