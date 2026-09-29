@@ -313,3 +313,22 @@ Promoted as `BUG-MARR-013`.
 Context7 was used as a supplementary external-semantics check for Lua coroutine behavior. Lua coroutines preserve their own stack, local variables and instruction pointer across yield/resume; execution continues from the yield point. This independently supports the stale-local-state window used in `BUG-MARR-001`: quest locals such as `u_vid` survive a `wait()` suspension and are reused when the quest resumes.
 
 This does not replace Metin2 source evidence; GitHub/Project_Map remains authoritative for project behavior.
+
+
+### BUG-MARR-014 — divorce during a running wedding orphans the private wedding map
+A player can leave a private wedding map through ordinary recall/talisman handling: `USE_TALISMAN` does not block wedding maps, wedding maps are not `GetDungeon()`, and a stored memory destination reaches `ProcessRecallItem() -> WarpSet(...)`.
+
+The deployed unilateral-divorce route can then remove the marriage while DB still tracks the running wedding.
+
+DB `CManager::Remove` deletes only the marriage relation. It does not remove the pair from `m_mapRunningWedding` or its scheduled wedding-end queue.
+
+When the one-hour end later fires, DB broadcasts `HEADER_DG_WEDDING_END`. Game `CManager::WeddingEnd` first requires an existing `TMarriage`; because divorce already removed it, the function returns before `WeddingManager::End(mapIndex)`.
+
+The process-local private wedding map therefore never receives normal end/teardown from that scheduler path.
+
+Promoted as `BUG-MARR-014`.
+
+### Candidate — divorce cooldown anchor uses engagement time
+`marriage_manage.check_divorce_time()` checks 86400 seconds using `marriage.get_married_time()`, but that Lua binding returns `get_global_time() - pMarriage->marry_time`. The timestamp is created at engagement Add and `SetMarried()/EngageToMarriage` does not reset it.
+
+Thus a couple engaged for more than one day can satisfy the divorce-time check immediately after the ceremony. Keep as candidate until the intended locale/design rule is independently confirmed.
