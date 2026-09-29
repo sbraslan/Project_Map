@@ -8,23 +8,32 @@
   "active": {
     "subsystem": "oxevent",
     "display_name": "OX Event",
-    "status": "STATIC MAPPING IN PROGRESS / 5 VERIFIED BUGS / EXECUTION LOCKED",
+    "status": "STATIC MAPPING IN PROGRESS / 14 VERIFIED BUGS / EXECUTION LOCKED",
     "system_file": "systems/oxevent.md",
     "bug_file": "bugs/oxevent.md",
     "test_file": "tests/oxevent.md",
     "verified_bug_ids": [
-      "BUG-OX-001",
-      "BUG-OX-002",
-      "BUG-OX-003",
-      "BUG-OX-004",
-      "BUG-OX-005"
+      "BUG-MARR-001",
+      "BUG-MARR-002",
+      "BUG-MARR-003",
+      "BUG-MARR-004",
+      "BUG-MARR-005",
+      "BUG-MARR-006",
+      "BUG-MARR-007",
+      "BUG-MARR-008",
+      "BUG-MARR-009",
+      "BUG-MARR-010",
+      "BUG-MARR-011",
+      "BUG-MARR-012",
+      "BUG-MARR-013",
+      "BUG-MARR-014"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Audit eliminated-player Show()/audience movement and logout/relog lifecycle.",
-      "Audit winner reward delivery and offline winner handling.",
-      "Close Event Manager automatic-start dependency on persisted admission flags.",
-      "Decide OX Event STATIC COMPLETE readiness.",
+      "Close divorce cooldown anchor semantics (engagement time vs marriage time) without promotion until intent is proven.",
+      "Audit remaining wedding Lua null/map-state assumptions against deployed callers.",
+      "Audit cross-core lover-info/love-point refresh and Marriage Fast topology behavior.",
+      "Perform final Marriage packet/lifecycle symmetry pass before static closure.",
       "Keep runtime/fault-injection execution locked; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -2794,9 +2803,9 @@
     "counts": {
       "mapping_relevant_files": 10119,
       "systems": 35,
-      "symbol_seeds": 241,
-      "packet_seeds": 20,
-      "call_flow_edges": 278
+      "symbol_seeds": 256,
+      "packet_seeds": 24,
+      "call_flow_edges": 290
     },
     "lookup_order": [
       "index/features.json",
@@ -2806,10 +2815,10 @@
       "exact source fetch"
     ],
     "context7_role": "supplementary external library/API documentation verification; not authoritative Metin2 source location",
-    "next_action": "continue Marriage/Wedding static mapping with GitHub index + Context7 external semantics: wedding Lua/map-state guards, active-wedding removal lifecycle, cross-core refresh closure"
+    "next_action": "Marriage closure pass: cooldown anchor intent, deployed Lua null/map-state guards, cross-core refresh semantics"
   },
   "marriage_mapping": {
-    "status": "STATIC MAPPING IN PROGRESS / 13 VERIFIED BUGS",
+    "status": "STATIC MAPPING IN PROGRESS / 14 VERIFIED BUGS",
     "canonical_files": {
       "system": "systems/marriage.md",
       "bugs": "bugs/marriage.md",
@@ -2828,7 +2837,8 @@
       "BUG-MARR-010",
       "BUG-MARR-011",
       "BUG-MARR-012",
-      "BUG-MARR-013"
+      "BUG-MARR-013",
+      "BUG-MARR-014"
     ],
     "mapped_flows": [
       "marriage_manage.quest -> marriage.engage_to -> ALUA(marriage_engage_to) -> marriage::CManager::RequestAdd -> HEADER_GD_MARRIAGE_ADD -> DB CClientManager::MarriageAdd -> DB marriage::CManager::Add -> SQL INSERT marriage -> HEADER_DG_MARRIAGE_ADD -> game CInputDB::MarriageAdd -> game marriage::CManager::Add",
@@ -2852,10 +2862,12 @@
       "GetMarriagePoint total elapsed days * current premium rate -> premium activation/expiry recomputes history non-monotonically -> BUG-MARR-010",
       "DB OnSetup after game-core reconnect replays wedding READY/START without recreating WeddingManager private map -> later End failure -> BUG-MARR-011",
       "DB-only restart loses m_pqWeddingStart/m_pqWeddingEnd/m_mapRunningWedding -> automatic and manual END routing lost -> BUG-MARR-012",
-      "unilateral divorce -> marriage.remove -> DG MARRIAGE_REMOVE -> per-core TMarriage destructor -> IsOnline requires both local -> no lover_divorce across cores -> BUG-MARR-013"
+      "unilateral divorce -> marriage.remove -> DG MARRIAGE_REMOVE -> per-core TMarriage destructor -> IsOnline requires both local -> no lover_divorce across cores -> BUG-MARR-013",
+      "running wedding -> ordinary recall WarpSet out -> unilateral marriage.remove -> DB relation removed but m_mapRunningWedding retained -> scheduled DG WEDDING_END -> game WeddingEnd cannot find TMarriage -> WeddingManager::End skipped -> BUG-MARR-014"
     ],
     "candidates": [
-      "WeddingManager::__CreateWeddingMap post-allocation GetMap failure lacks explicit cleanup, but realistic current failure reachability remains unproven."
+      "WeddingManager::__CreateWeddingMap post-allocation GetMap failure lacks explicit cleanup, but realistic current failure reachability remains unproven.",
+      "Divorce cooldown uses marry_time captured at engagement Add; SetMarried does not reset it. Potential immediate post-ceremony divorce after >24h engagement; keep unpromoted until intended policy/locale is confirmed."
     ],
     "runtime_tests": {
       "status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN",
@@ -2872,7 +2884,8 @@
         "MARR-T10",
         "MARR-T11",
         "MARR-T12",
-        "MARR-T13"
+        "MARR-T13",
+        "MARR-T14"
       ],
       "first_live_gate_unchanged": "DUNGEON-T09"
     },
