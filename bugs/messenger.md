@@ -1,6 +1,6 @@
 # Messenger / Friend / Block — Verified Bugs
 
-**Status:** MAPPING IN PROGRESS / VERIFIED STATIC FINDINGS  
+**Status:** STATIC COMPLETE / VERIFIED STATIC  
 **Execution:** LOCKED
 
 ## BUG-MSG-001 — block-add friend validation duplicates the block predicate
@@ -120,7 +120,7 @@ A request can remain authorizable long after its original UI/request lifetime, i
 `MSG-T06`.
 
 ## Earlier candidate notes
-- add-by-name observer-mode parity is now promoted as `BUG-MSG-016`.
+- add-by-name observer-mode parity is now promoted as `BUG-MSG-014`.
 - remove-all / rename persistence was closed as transient because the deployed successful rename path immediately disconnects and P2P logout clears the old-name cache edges.
 - `OnBlockLogin`'s missing local handler-null guard is closed as non-bug because `PyCallClassMemberFunc` itself rejects a null class/handler safely.
 
@@ -431,3 +431,15 @@ The same GM-to-GM block operation is allowed through the target/VID surface but 
 
 ### Deferred validation
 `MSG-T21`.
+
+
+---
+
+## Static closure
+Messenger / Friend / Block static mapping is complete with canonical findings `BUG-MSG-001..021`.
+
+Unpromoted robustness notes:
+- the pending-friend authorization key is a 32-bit CRC-derived pair token, so theoretical pair collisions exist; practical ordinary-name exploit reachability was not established and no bug ID is assigned;
+- deliberately malformed fixed-width CG name fields can stress C-string parsing beyond the ordinary packet contract; the normal long-name boundary defect is already owned by `BUG-MSG-017`, and no separate crafted-packet bug is promoted.
+
+Runtime validation remains locked. Canonical deferred tests are `MSG-T01..MSG-T21`; global first future live gate remains `DUNGEON-T09`.
