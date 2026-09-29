@@ -35,10 +35,10 @@
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Audit remaining friend/block relation mutation surfaces and pending-token identity safety after BUG-MSG-019.",
-      "Re-check residual P2P presence repair/resynchronization after BUG-MSG-016.",
-      "Finish client/server messenger packet-boundary checks after BUG-MSG-012/017.",
-      "Assess Messenger static-closure readiness.",
+      "Audit remaining friend/block remove and inverse-cache symmetry after BUG-MSG-019.",
+      "Finish remaining GM messenger lifecycle and parser boundaries.",
+      "Review fixed-width Messenger name parsing as malformed-packet candidate without promoting unproven reachability.",
+      "Perform final Messenger relation/cache/P2P symmetry pass and decide STATIC COMPLETE.",
       "Do not execute runtime tests; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -2723,7 +2723,9 @@
       "uimessenger.py add-by-name friend/block -> CInputMain::Messenger observer-mode parity bypass",
       "channel move old GG_LOGOUT + new WarpEnd GG_LOGIN -> third-core CCI descriptor overwrite/stale logout race",
       "Battle Field target-board add-by-VID -> friend request without add-by-name map gate",
-      "pending friend request -> block relation created -> messenger_auth accept -> AuthToAdd without block revalidation"
+      "pending friend request -> block relation created -> messenger_auth accept -> AuthToAdd without block revalidation",
+      "Battle Field add-by-name restriction -> target-board add-by-VID path without equivalent server map gate",
+      "RequestToAdd pending friend token -> messenger_auth accept -> AuthToAdd without messenger-block revalidation"
     ],
     "candidates": [],
     "runtime_tests": {
@@ -2761,7 +2763,8 @@
       "Channel/core P2P LOGIN(new) vs delayed LOGOUT(old) ordering promoted to BUG-MSG-016.",
       "Project_Game contains no tracked caller of pc.is_blocked/pc.is_friend; BUG-MSG-011 remains a registered API defect with no current tracked quest dependency.",
       "Battle Field add-by-name vs add-by-VID parity promoted to BUG-MSG-018.",
-      "Pending friend authorization block revalidation promoted to BUG-MSG-019."
+      "Pending friend authorization block revalidation promoted to BUG-MSG-019.",
+      "Battle Field friend-add parity promoted to BUG-MSG-018."
     ]
   }
 }
