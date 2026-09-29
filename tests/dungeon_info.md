@@ -111,3 +111,11 @@ No later Dungeon Info live test may be marked executed before the DUNGEON-T10 re
 - DUNGEON-T10 retracted.
 - Current first future live gate: **DUNGEON-T09**.
 - Execution remains locked.
+
+
+### T11/T12 source revalidation — 2026-09-29
+**T11:** current parser uses `strcmp(szValue3, "GLOBAL") == 0`; numeric `1` becomes `QUEST_FLAG_PC`. Current Blue Dragon config uses `QUEST dragon_lair_access dragon_lair_time 1`, while the quest itself uses `game.get_event_flag("dragon_lair_time")` and `game.set_event_flag("dragon_lair_time", ...)`. Preflight remains valid.
+
+**T12:** current QUEST-backed config contains no explicit `COOLDOWN` lines, leaving `dwCooldown=0`. In the expired branch, `(dwFlagValue + dwCooldown) - get_global_time()` is assigned to `uint32_t`; negative results wrap positive. Preflight remains valid.
+
+Canonical handoffs: `../DUNGEON_T11_HANDOFF.md`, `../DUNGEON_T12_HANDOFF.md`.
