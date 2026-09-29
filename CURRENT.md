@@ -1,35 +1,40 @@
 # CURRENT — Canonical Active Checkpoint
 
 **Active phase:** Detection / Mapping Only  
-**Active state:** Mining / Pickaxe mapping in progress  
-**Status:** 30 STATIC COMPLETE / MINING ACTIVE / 5 VERIFIED BUGS / EXECUTION LOCKED  
+**Active state:** Static Mapping Coverage Complete  
+**Status:** MINING / PICKAXE STATIC COMPLETE / 7 VERIFIED BUGS / EXECUTION LOCKED  
 **Machine state:** `STATE.json`  
-**Active subsystem:** Mining / Pickaxe  
+**Active subsystem:** none  
+**Latest completed subsystem:** Mining / Pickaxe  
 **System:** `systems/mining.md`  
 **Bugs:** `bugs/mining.md`  
 **Tests:** `tests/mining.md`  
-**Last completed subsystem:** Fishing Renewal  
-**Effective completed/readiness-covered subsystems:** 30  
+**Effective completed/readiness-covered subsystems:** 31  
 **First future live gate:** `DUNGEON-T09`  
 **Last updated:** 2026-09-29
 
 ## Hard rule
 Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-only. Runtime/fault-injection execution remains locked until an explicit phase change.
 
-## Verified Mining findings
-- `BUG-MIN-001` — deployed mining quest requires pickaxe mastery socket0 == Value2, while C++ `Pick_Refinable()` accepts only socket0 > Value2; normal refine path is contradictory.
-- `BUG-MIN-002` — delayed mining event is not cancelled on death and does not check `IsDead()`, so ore/mastery can resolve after death.
-- `BUG-MIN-003` — delayed mining is not bound to the initiating pickaxe; a replacement pick controls final chance and receives mastery.
-- `BUG-MIN-004` — direct same-process warp can preserve mining; completion does not revalidate map/distance and can drop ore at destination.
-- `BUG-MIN-005` — `MINING_LOCATION` >2500 HackLog branch is unreachable because >1000 returns first.
+## Mining / Pickaxe closure
+Verified bug set:
+- `BUG-MIN-001` — deployed pickaxe refine quest and C++ disagree on mastery boundary.
+- `BUG-MIN-002` — delayed mining can resolve after player death.
+- `BUG-MIN-003` — same-process warp can carry active mining across maps and settle at destination.
+- `BUG-MIN-004` — delayed settlement uses the currently equipped pickaxe instead of the initiating pickaxe.
+- `BUG-MIN-005` — `MINING_LOCATION` >2500 anti-hack log is unreachable behind the earlier >1000 return.
+- `BUG-MIN-006` — scheduled Mining Event shutdown leaves dead veins manager-resolvable long enough for pending mining settlement.
+- `BUG-MIN-007` — scheduled Mining Event uses missing map 230 / missing regen data and sets `mining_event` active before start failure.
 
-## Exact next work
-1. close OreRefine resource/payment ordering against deployed/compiled quest reachability;
-2. audit mining skill-book delay/skill progression integration;
-3. audit vein spawn/despawn and concurrent-player contention;
-4. inspect Battle Pass/Achievement hooks for mining/ore actions;
-5. close logout/disconnect and cross-core warp behavior;
-6. cross-check pickaxe progression/proto values if an authoritative non-empty proto source becomes available;
-7. promote only statically verified reachable findings.
+Closed without promotion:
+- OreRefine internal payment ordering is shielded by deployed quest precheck.
+- Battle Field no-ownership branch has no mapped vein producer on map 357.
+- normal destroyed-vein VID reuse is not reachable under monotonic VID allocation.
+- alternate `InitializeMiningEvent()` missing `data/event/mining/map_mining.txt` lacks a proven active caller.
+- Battle Pass/Achievement define no mining mission/task type.
+- authoritative readable pickaxe proto rows unavailable; no numeric proto values inferred.
 
-Do not execute `MIN-T01`..`MIN-T05`. Global first live runtime gate remains `DUNGEON-T09`.
+## Next static action
+No active subsystem. On the next continuation, select the next independent unmapped gameplay subsystem from source/config coverage and open only its canonical files.
+
+Do not execute `MIN-T01..MIN-T07`. Global first live runtime gate remains `DUNGEON-T09`.
