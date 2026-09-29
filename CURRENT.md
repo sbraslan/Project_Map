@@ -2,7 +2,7 @@
 
 **Active phase:** Detection / Mapping Only  
 **Active state:** Static mapping continuation  
-**Status:** MESSENGER / FRIEND / BLOCK — MAPPING IN PROGRESS / 14 VERIFIED BUGS / EXECUTION LOCKED  
+**Status:** MESSENGER / FRIEND / BLOCK — MAPPING IN PROGRESS / 15 VERIFIED BUGS / EXECUTION LOCKED  
 **Machine state:** `STATE.json`  
 **Active subsystem:** Messenger / Friend / Block  
 **System:** `systems/messenger.md`  
@@ -42,8 +42,8 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 - `OnBlockLogin`'s missing local handler-null guard is closed as non-bug because `PyCallClassMemberFunc` safely rejects a null handler.
 
 ## Exact resume cursor
-1. Close Battle Field friend-add parity: `ADD_BY_NAME` rejects battle-zone use while `ADD_BY_VID` does not.
-2. Re-check residual P2P resynchronization after `BUG-MSG-016` against `BUG-MSG-003/007`.
-3. Run the final friend/block/GM relation symmetry and packet-boundary pass.
-4. Assess Messenger static-closure readiness.
+1. Finish remaining GM messenger cache/login/logout lifecycle after BUG-MSG-013.
+2. Audit remaining client/server Messenger packet validation after BUG-MSG-012.
+3. Check practical quest usage/reachability of BUG-MSG-011.
+4. Run one final relation/cache/P2P symmetry pass and decide whether Messenger is STATIC COMPLETE.
 5. Do not execute runtime tests; global first future live gate remains `DUNGEON-T09`.
