@@ -136,3 +136,30 @@ Expected bug signature: point value jumps upward under the current premium calcu
 Covers `BUG-MARR-010`.
 
 Do not run these tests while the global execution lock is active.
+
+
+## MARR-T11 — game-core restart during running wedding
+After runtime is explicitly unlocked:
+1. start a wedding and identify the core that owns its private map;
+2. keep DB running and restart only that game core;
+3. observe DB OnSetup replay of WEDDING_READY/START;
+4. verify whether `WeddingManager::Find(savedMapIndex)` exists afterward;
+5. let/send wedding END and inspect `pWeddingInfo` / `m_setWedding` cleanup.
+
+Expected bug signature: relation-side wedding state is replayed without recreating the private WeddingMap, and END fails on the map-owning core.
+
+Covers `BUG-MARR-011`.
+
+## MARR-T12 — DB restart during running wedding
+After runtime is explicitly unlocked:
+1. start a wedding and confirm it is in DB `m_mapRunningWedding`;
+2. restart only the DB process while game core/private map remains alive;
+3. verify the running wedding is absent from reconstructed DB state;
+4. wait beyond the original one-hour boundary or issue manual end;
+5. inspect whether DG WEDDING_END is ever emitted.
+
+Expected bug signature: timeout state is lost and manual end is rejected because DB no longer knows the running pair.
+
+Covers `BUG-MARR-012`.
+
+Do not run these tests while the global execution lock is active.
