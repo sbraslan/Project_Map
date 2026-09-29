@@ -8,7 +8,7 @@
   "active": {
     "subsystem": "messenger",
     "display_name": "Messenger / Friend / Block",
-    "status": "MAPPING IN PROGRESS / 11 VERIFIED BUGS / EXECUTION LOCKED",
+    "status": "MAPPING IN PROGRESS / 13 VERIFIED BUGS / EXECUTION LOCKED",
     "system_file": "systems/messenger.md",
     "bug_file": "bugs/messenger.md",
     "test_file": "tests/messenger.md",
@@ -23,14 +23,16 @@
       "BUG-MSG-008",
       "BUG-MSG-009",
       "BUG-MSG-010",
-      "BUG-MSG-011"
+      "BUG-MSG-011",
+      "BUG-MSG-012",
+      "BUG-MSG-013"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Finish GM messenger cache lifecycle beyond the verified teardown leak.",
-      "Re-check channel-change/reconnect ordering against BUG-MSG-003 and BUG-MSG-007.",
-      "Audit remaining client messenger parser/state boundaries after BUG-MSG-009.",
-      "Check current quest usage/reachability of the broken Lua relation helpers from BUG-MSG-011.",
+      "Close channel-change/reconnect ordering candidate around P2P LOGIN(new) versus delayed LOGOUT(old).",
+      "Finish remaining GM messenger lifecycle checks after BUG-MSG-013.",
+      "Audit remaining client messenger packet parser boundaries after BUG-MSG-012.",
+      "Check tracked quest usage/reachability of BUG-MSG-011 Lua helpers.",
       "Do not execute runtime tests; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -2678,7 +2680,9 @@
       "BUG-MSG-008",
       "BUG-MSG-009",
       "BUG-MSG-010",
-      "BUG-MSG-011"
+      "BUG-MSG-011",
+      "BUG-MSG-012",
+      "BUG-MSG-013"
     ],
     "mapped_flows": [
       "input_login.cpp -> MessengerManager::Login -> asynchronous friend/GM/block SQL callbacks",
@@ -2695,7 +2699,9 @@
       "questlua_pc.cpp pc_change_name -> RemoveAllList + RemoveAllBlockList",
       "input_p2p.cpp shout fanout -> receiver-side IsBlocked filter",
       "party/guild pending invite acceptance -> no messenger-block revalidation",
-      "questlua_pc.cpp -> registered pc.is_blocked/pc.is_friend numeric-gate vs FindPC(name)"
+      "questlua_pc.cpp -> registered pc.is_blocked/pc.is_friend numeric-gate vs FindPC(name)",
+      "PythonNetworkStreamPhaseGame.cpp RecvMessenger -> legacy 25-byte name buffer versus server 48-character names",
+      "MessengerManager::Login LoadGMList SQL -> valid WIZARD authority omitted"
     ],
     "candidates": [
       "add-by-name friend path observer-mode parity with add-by-VID remains under assessment"
@@ -2713,7 +2719,9 @@
         "MSG-T08",
         "MSG-T09",
         "MSG-T10",
-        "MSG-T11"
+        "MSG-T11",
+        "MSG-T12",
+        "MSG-T13"
       ],
       "first_live_gate_unchanged": "DUNGEON-T09"
     },
