@@ -6,25 +6,18 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "pet",
-    "display_name": "Classic Pet System",
-    "status": "STATIC MAPPING IN PROGRESS / 4 PROMOTED CLASSIC-PET BUGS / EXECUTION LOCKED",
-    "system_file": "systems/pet.md",
-    "bug_file": "bugs/pet.md",
-    "test_file": "tests/pet.md",
-    "verified_bug_ids": [
-      "BUG-PET-001",
-      "BUG-PET-002",
-      "BUG-PET-003",
-      "BUG-PET-004"
-    ],
+    "subsystem": null,
+    "display_name": "Static Mapping Coverage Complete",
+    "status": "CLASSIC PET STATIC COMPLETE / 29 EFFECTIVE STATIC-COMPLETE SUBSYSTEMS / EXECUTION LOCKED",
+    "system_file": null,
+    "bug_file": null,
+    "test_file": null,
+    "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Finish current PET_PAY item-family, race-asset and client UI coverage.",
-      "Audit remaining classic-pet death, warp and login restoration edges.",
-      "Audit remaining PET_AUTO_PICKUP ownership-expiry and re-target lifetime boundaries.",
-      "Decide Classic Pet STATIC COMPLETE when remaining candidates are closed.",
-      "Do not execute PET-T01 through PET-T04 or any Classic Pet runtime test without an explicit phase change."
+      "Preserve runtime execution lock.",
+      "First future live runtime gate remains DUNGEON-T10.",
+      "When a new subsystem or feature is requested, open only its canonical mapping files and continue detection-only mapping."
     ]
   },
   "startup": {
@@ -2375,7 +2368,7 @@
     ]
   },
   "pet_mapping": {
-    "status": "STATIC MAPPING IN PROGRESS",
+    "status": "STATIC COMPLETE",
     "canonical_files": {
       "system": "systems/pet.md",
       "bugs": "bugs/pet.md",
@@ -2402,11 +2395,20 @@
       "CHARACTER::Destroy -> CPetSystem::Destroy -> actor destructor/Unsummon teardown boundary",
       "Project_Game quest source + quest_list audit -> no active pet.summon/pet.unsummon producer; legacy Lua signature mismatch deferred",
       "achievements.xml Achievement 60 -> TYPE_SUMMON_PET time accumulation",
-      "REAL_TIME item loss -> Unsummon cannot resolve summon item -> elapsed time not credited -> logout clears stale flag -> BUG-PET-004"
+      "REAL_TIME item loss -> Unsummon cannot resolve summon item -> elapsed time not credited -> logout clears stale flag -> BUG-PET-004",
+      "current item_proto -> 143 PET_PAY rows -> 135 unique Value0 pet races",
+      "135/135 PET_PAY races -> current mob_proto coverage",
+      "135/135 PET_PAY races -> Project_Binary/root/npclist client registration coverage",
+      "owner death -> CPetActor::Update -> Unsummon when summon item exists",
+      "same-process warp -> _UpdateFollowAI distance>=4500 -> pet Show on owner map",
+      "CHARACTER teardown -> CPetSystem::Destroy -> actor cleanup + update-event cancel",
+      "EnterGame -> CheckPet -> equipped PET_PAY reconstruction",
+      "PET_AUTO_PICKUP final collection -> FindByVID + sectree + IsOwnership revalidation"
     ],
     "candidates": [
       "Legacy questlua_pet four-argument summon signature mismatch is compiled but no tracked active quest producer exists.",
-      "Remaining death/warp/login and PET_AUTO_PICKUP retarget boundaries require closure."
+      "Raw client model/motion asset packs are not fully versioned; npclist registration is complete but deployment asset presence remains runtime validation.",
+      "Automatic post-revive pet re-summon is not mapped; no requirement proving this is a defect."
     ],
     "runtime_tests": {
       "status": "READY / EXECUTION LOCKED / NOT RUN",
@@ -2417,6 +2419,13 @@
         "PET-T04"
       ],
       "first_live_gate_unchanged": "DUNGEON-T10"
-    }
+    },
+    "closure_notes": [
+      "Classic Pet System static mapping complete with BUG-PET-001..004.",
+      "143 PET_PAY rows reference 135 unique races; server mob_proto and client npclist coverage are both 135/135.",
+      "Ownership changes are revalidated at final pet pickup; stale raw LPITEM lifetime remains owned by BUG-PET-002.",
+      "No Classic Pet runtime test has been executed.",
+      "Global first future live gate remains DUNGEON-T10."
+    ]
   }
 }
