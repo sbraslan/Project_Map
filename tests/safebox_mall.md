@@ -138,4 +138,4 @@ Covers dormant BUG-SAFEBOX-002.
 - Historical OBS-SAFEBOX-001 is superseded by the stronger canonical BUG-SAFEBOX-005 evidence and is not treated as a separate current observation.
 - Current active build has ENABLE_SAFEBOX_MONEY off, so SFB-T11/SFB-T12 must remain disabled unless the feature is explicitly enabled in an isolated build.
 - There is no clean normal-player verified-bug candidate in the active Safebox set; the closest ordinary-flow policy observation is SFB-T09.
-- Overall first live runtime gate remains DUNGEON-T10.
+- Overall first live runtime gate remains DUNGEON-T09.
