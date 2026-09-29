@@ -914,3 +914,9 @@ Execution remains locked.
 It remains ordered after `DUNGEON-T09 -> DUNGEON-T11 -> DUNGEON-T12`.
 Normal T07 does not directly trigger BUG-TICKET-005 because C++ GetLogByID is called only for cached indices 0..9; the visible failure is pagination/data loss beyond the retained 10 rows.
 Execution remains locked.
+
+
+## Hunting HUNT-T04 handoff — 2026-09-29
+`HUNT-T04` was reverified against current source and canonical handoff prepared at `HUNT_T04_HANDOFF.md`.
+Critical precondition: after legitimate mission-90 claim, the character itself must be level >=91 so normal open reaches `OpenHuntingWindowSelect()` with hunting level 91. A lower-level character takes the zero-data branch and is not a valid reproduction.
+Execution remains locked.
