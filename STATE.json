@@ -8,7 +8,7 @@
   "active": {
     "subsystem": "messenger",
     "display_name": "Messenger / Friend / Block",
-    "status": "MAPPING IN PROGRESS / 6 VERIFIED BUGS / EXECUTION LOCKED",
+    "status": "MAPPING IN PROGRESS / 7 VERIFIED BUGS / EXECUTION LOCKED",
     "system_file": "systems/messenger.md",
     "bug_file": "bugs/messenger.md",
     "test_file": "tests/messenger.md",
@@ -18,11 +18,12 @@
       "BUG-MSG-003",
       "BUG-MSG-004",
       "BUG-MSG-005",
-      "BUG-MSG-006"
+      "BUG-MSG-006",
+      "BUG-MSG-007"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Continue Messenger relation symmetry and remove-all lifecycle audit.",
+      "Continue Messenger remove-all/inverse relation lifecycle audit after BUG-MSG-007.",
       "Audit P2P presence and block enforcement on non-whisper social surfaces.",
       "Audit client messenger packet-length/state handling and GM cache lifecycle.",
       "Close reconnect/channel-change boundaries and remaining candidates.",
@@ -340,7 +341,9 @@
     "Project_ClientSrc/UserInterface/PythonNetworkStreamPhaseGame.cpp::RecvMessenger",
     "Project_Binary/root/uimessenger.py + game.py::messenger UI/auth/teardown",
     "BUG-MSG-001..006::Messenger canonical verified findings",
-    "tests/messenger.md::MSG-T01..MSG-T06 deferred validation; execution locked"
+    "tests/messenger.md::MSG-T01..MSG-T06 deferred validation; execution locked",
+    "game/src/messenger_manager.cpp::Logout global outgoing relation/block erase -> BUG-MSG-007",
+    "BUG-MSG-007::companion logout destroys online observer outgoing block/friend cache"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -2666,7 +2669,8 @@
       "BUG-MSG-003",
       "BUG-MSG-004",
       "BUG-MSG-005",
-      "BUG-MSG-006"
+      "BUG-MSG-006",
+      "BUG-MSG-007"
     ],
     "mapped_flows": [
       "input_login.cpp -> MessengerManager::Login -> asynchronous friend/GM/block SQL callbacks",
@@ -2692,7 +2696,8 @@
         "MSG-T03",
         "MSG-T04",
         "MSG-T05",
-        "MSG-T06"
+        "MSG-T06",
+        "MSG-T07"
       ],
       "first_live_gate_unchanged": "DUNGEON-T09"
     }
