@@ -28,4 +28,4 @@ Do not execute runtime/fault-injection tests unless the user explicitly changes 
 - The generic SOLO category 2..7 dictionary gap remains documented-only because no active caller was found.
 - Primary normal-path candidates: RANK-T01, RANK-T02, RANK-T03 and RANK-T04.
 - RANK-T07 is isolated client-parser robustness testing.
-- Overall first live runtime gate remains DUNGEON-T10.
+- Overall first live runtime gate remains DUNGEON-T09.
