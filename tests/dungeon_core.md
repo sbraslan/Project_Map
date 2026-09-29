@@ -49,5 +49,5 @@ Do not execute during the current detection/mapping phase.
 - DCORE-T02/DCORE-T04 are controlled dungeon-script semantic/regression tests.
 - DCORE-T03 is isolated ASan/debug raw-pointer lifetime validation.
 - Primary legitimate/current-code candidates: DCORE-T01 and DCORE-T02.
-- Dungeon Core remains distinct from Dungeon Info; the global first live gate is still Dungeon Info DUNGEON-T10.
+- Dungeon Core remains distinct from Dungeon Info; the global first live gate is still Dungeon Info DUNGEON-T09.
 - Unnumbered defensive candidates from the static audit remain unpromoted and receive no invented runtime bug mapping.
