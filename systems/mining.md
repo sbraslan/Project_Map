@@ -1,6 +1,6 @@
 # Mining / Pickaxe
 
-**Status:** PAUSED / MAPPING IN PROGRESS / 5 VERIFIED BUGS / EXECUTION LOCKED
+**Status:** STATIC COMPLETE / 7 VERIFIED BUGS / EXECUTION LOCKED
 **Phase:** Detection / Mapping Only  
 **Source repos:** read-only  
 **Writable repo:** Project_Map only
