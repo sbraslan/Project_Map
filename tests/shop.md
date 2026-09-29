@@ -90,4 +90,4 @@ Validates OBS-SHOP-004 only.
 - Primary normal-path candidates: SHP-T02 (empty search) and SHP-T03 (premium tax accounting where the feature/tax is enabled).
 - SHP-T01/SHP-T07/SHP-T10 are persistence/fault-injection tests.
 - SHP-T04/SHP-T05/SHP-T06/SHP-T08/SHP-T13 require isolated crafted/corrupt state.
-- Overall first live runtime gate remains DUNGEON-T10.
+- Overall first live runtime gate remains DUNGEON-T09.
