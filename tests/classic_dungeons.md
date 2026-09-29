@@ -1,6 +1,6 @@
 # Classic Quest Dungeons — Deferred Runtime Tests
 
-**Status:** STATIC MAPPING OPEN / 3 TESTS DOCUMENTED / EXECUTION LOCKED / NOT RUN
+**Status:** STATIC MAPPING OPEN / 4 TESTS DOCUMENTED / EXECUTION LOCKED / NOT RUN
 
 Runtime/fault-injection execution remains globally locked.
 
@@ -27,3 +27,11 @@ Give a party member exactly one valid Catacomb rag/golden-lock entry item and fo
 Expected signature in the current code: the item is removed before the create attempt, no dungeon is entered, and no item is restored. A corrected transaction should consume only after successful instance creation/registration or compensate on failure.
 
 Covers `BUG-CLD-003`.
+
+
+## CLD-T04 — Snow stage transition under competing server-timer context
+Run two Snow private instances (A and B) on the same game process. Ensure a server timer for B is the most recent callback, then trigger one of A's affected non-timer transitions (for example `LEVEL2_KEY.use`).
+
+Expected signature in the current code: A registers the floor transition using the stale server-timer arg from B instead of A's `d.get_map_index()`. When the timer fires it selects B (or another stale map), leaving A stuck and potentially advancing the wrong instance. Repeat for the level-5 cube, level-6 stone and level-8 key paths.
+
+Covers `BUG-CLD-004`.
