@@ -8,21 +8,24 @@
   "active": {
     "subsystem": "mining",
     "display_name": "Mining / Pickaxe",
-    "status": "MAPPING IN PROGRESS / 2 VERIFIED BUGS / EXECUTION LOCKED",
+    "status": "MAPPING IN PROGRESS / 5 VERIFIED BUGS / EXECUTION LOCKED",
     "system_file": "systems/mining.md",
     "bug_file": "bugs/mining.md",
     "test_file": "tests/mining.md",
     "verified_bug_ids": [
       "BUG-MIN-001",
-      "BUG-MIN-002"
+      "BUG-MIN-002",
+      "BUG-MIN-003",
+      "BUG-MIN-004",
+      "BUG-MIN-005"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Close warp/map-change cleanup and distance revalidation.",
-      "Audit equipment swap/unequip during delayed mining.",
-      "Close MINING_LOCATION anti-hack distance branch reachability.",
-      "Audit OreRefine ordering plus deployed quest reachability.",
-      "Audit ore ownership/Battle Field multiplayer behavior.",
+      "Close OreRefine resource/payment ordering against deployed or compiled quest reachability.",
+      "Audit mining skill-book delay and skill progression integration.",
+      "Audit vein spawn/despawn and concurrent-player contention.",
+      "Inspect Battle Pass/Achievement hooks for mining and ore actions.",
+      "Close logout/disconnect and cross-core warp behavior.",
       "Do not execute Mining runtime tests; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -302,7 +305,10 @@
     "Project_Game/share/locale/europe/quest/g_guild/guild_building_melt.quest::ore refine caller mapped",
     "game/src/mining.cpp::Pick_Refinable/PracticePick/RealRefinePick -> BUG-MIN-001",
     "Project_Game/share/locale/europe/quest/n_npc/mining.quest equality gate -> BUG-MIN-001",
-    "game/src/mining.cpp::mining_event + char death cleanup gap -> BUG-MIN-002"
+    "game/src/mining.cpp::mining_event + char death cleanup gap -> BUG-MIN-002",
+    "game/src/mining.cpp::event stores no pick identity; completion re-reads WEAR_WEAPON -> BUG-MIN-003",
+    "game/src/char.cpp::CanWarp/WarpSet/Stop omit mining cancellation + mining_event lacks map-distance recheck -> BUG-MIN-004",
+    "game/src/char.cpp::CHARACTER::mining >1000 return precedes >2500 MINING_LOCATION HackLog -> BUG-MIN-005"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -2570,23 +2576,31 @@
     "test_file": "tests/mining.md",
     "verified_bug_ids": [
       "BUG-MIN-001",
-      "BUG-MIN-002"
+      "BUG-MIN-002",
+      "BUG-MIN-003",
+      "BUG-MIN-004",
+      "BUG-MIN-005"
     ],
     "mapped_flows": [
       "deployed mining.quest -> __refine_pick -> RealRefinePick mastery boundary -> BUG-MIN-001",
-      "CHARACTER::mining -> delayed mining_event -> death without cancellation -> BUG-MIN-002"
+      "CHARACTER::mining -> delayed mining_event -> death without cancellation -> BUG-MIN-002",
+      "delayed mining re-resolves current equipped pickaxe -> BUG-MIN-003",
+      "CanWarp/WarpSet preserve mining while event lacks map/distance revalidation -> BUG-MIN-004",
+      "early >1000 return makes MINING_LOCATION >2500 HackLog unreachable -> BUG-MIN-005"
     ],
     "candidates": [
-      "OreRefine consumes 100 raw ore before gold check; deployed caller reachability pending.",
-      "MINING_LOCATION >2500 anti-hack log appears unreachable because an earlier >1000 distance guard returns first.",
-      "Direct warp/map-change cleanup and event revalidation pending.",
-      "Equipment-change lifecycle pending."
+      "OreRefine consumes 100 raw ore before gold check; local defect verified but deployed caller reachability still unproven.",
+      "Authoritative pickaxe item_proto rows are unavailable because tracked DumpProto item_proto text files are empty.",
+      "Cross-core warp likely tears down the character/event; same-process warp defect is already captured by BUG-MIN-004."
     ],
     "runtime_tests": {
       "status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN",
       "canonical_test_ids": [
         "MIN-T01",
-        "MIN-T02"
+        "MIN-T02",
+        "MIN-T03",
+        "MIN-T04",
+        "MIN-T05"
       ],
       "first_live_gate_unchanged": "DUNGEON-T09"
     }
