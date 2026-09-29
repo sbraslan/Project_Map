@@ -224,19 +224,22 @@ Promoted as `BUG-MARR-008`.
 - Marriage critical/penetration/EXP bonus consumers are server-side. No separate item-bonus defect is promoted in this pass.
 - Mutual-divorce stale-target/double-mutation candidate is closed for the normal confirmation path: `CQuestManager::Confirm` resumes the suspended quest synchronously inside the confirmation handler, and the post-confirm mutual-divorce branch contains no additional suspension before its target re-check/mutations. This differs from BUG-MARR-001, where a later explicit `wait()` creates a real interruption window.
 
-## Static closure
-Marriage / Wedding static mapping is complete for the tracked source/deployment snapshot.
+## Closure status — current
+Marriage / Wedding remains **STATIC MAPPING IN PROGRESS** for the tracked source/deployment snapshot.
 
 Verified bugs:
-- `BUG-MARR-001..008`.
+- `BUG-MARR-001..014`.
 
 Closed/scoped:
-- legacy BREAK_MARRIAGE is a compatibility DB remove entry, not an independent active gameplay flow;
-- mutual-divorce stale-target double-mutation is not reachable in the ordinary confirm path because confirm resumes synchronously and no later suspension occurs;
-- deployed Marriage Lua calls guard the obvious null-state paths through quest predicates; no additional independent Lua crash was promoted;
-- post-insert WeddingMap GetMap failure cleanup remains low-probability/deferred without a demonstrated ordinary producer;
-- active-wedding relation removal/orphaning remains unpromoted without an ordinary deployed path that reaches outside divorce NPCs during the active private-map window;
-- marriage item consumers for attack/defense/transfer/critical/penetration/EXP are present; the cross-core sharing defect is owned by BUG-MARR-008.
+- legacy `BREAK_MARRIAGE` is a compatibility DB remove entry, not an independent active gameplay flow;
+- mutual-divorce stale-target double-mutation is not reachable in the ordinary confirm path because Metin2 `Confirm()` resumes the suspended quest immediately through `RunState()`, and Lua coroutine state is preserved across the suspension;
+- deployed Marriage Lua calls guard the obvious standalone null-state paths through quest predicates; no additional independent Lua crash is promoted;
+- `WeddingManager::__CreateWeddingMap` post-allocation `GetMap` failure cleanup remains unpromoted without a demonstrated ordinary producer;
+- marriage item consumers are present; cross-core spouse sharing is owned by `BUG-MARR-008`;
+- active-wedding relation removal is now promoted as `BUG-MARR-014` after ordinary recall-item reachability was proven.
+
+Open candidate:
+- divorce cooldown uses `marry_time` created at engagement rather than a timestamp reset at the marriage ceremony; intended policy/locale semantics still need independent confirmation.
 
 ## Runtime
 No Marriage runtime test may be executed while the global execution lock is active. First future live gate remains `DUNGEON-T09`.
