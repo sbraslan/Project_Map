@@ -1,152 +1,7 @@
-# inventory items — Runtime Tests
+# Inventory / Item / Special Inventory — Deferred Runtime Tests
 
-> Canonical split from legacy `09_TEST_PLAN.md`. Run only in isolated/dev data unless explicitly marked safe.
-
-## Guild Storage temel testleri
-
-### GS-T01 — Normal checkin
-- Geçerli inventory item
-- Geçerli guild storage slot
-- Beklenen: item taşınır, server ve client state eşleşir
-
-### GS-T02 — Normal checkout
-- Geçerli storage item
-- Geçerli inventory hedefi
-- Beklenen: item inventory'ye gelir
-
-### GS-T03 — Invalid slot
-- Sınır dışı slot
-- Beklenen: işlem reddedilir, state bozulmaz
-
-### GS-T04 — Permission
-- Yetkisiz karakter / rank
-- Beklenen: işlem reddedilir
-
-### GS-T05 — Logout race
-- İşlem sırasında logout
-- Beklenen: item duplicate / loss oluşmaz
-
-### GS-T06 — Reconnect
-- İşlem sonrası reconnect
-- Beklenen: kalıcı state doğru yüklenir
-
-### GS-T07 — Direct packet authorization
-- Guild storage UI açılmadan checkout packet'i gönderme senaryosu
-- Beklenen: server işlemi reddetmeli
-- Amaç: authorization yalnız UI/open aşamasına bağımlı mı kontrol etmek
-
-### GS-T08 — Cross-role checkout
-- Storage yetkisi olmayan guild rank ile packet gönderimi
-- Beklenen: server-side reddetme
-
-### GS-T09 — Concurrent checkout
-- Aynı guild storage slotuna iki guild üyesinin yakın zamanlı erişimi
-- Beklenen: yalnız bir işlem başarılı olmalı; duplicate/loss olmamalı
-
-### GS-T10 — Open request abort / stuck lock
-1. Guild storage open request başlat.
-2. DB cevabından önce çakışan bir pencere durumu oluşturulabilen senaryoyu dene veya kontrollü gecikme uygula.
-3. Load response'un abort yoluna girmesini sağla.
-4. Storage'ı tekrar açmayı dene.
-Beklenen güvenli davranış: lock temizlenmiş olmalı.
-Risk işareti: sürekli “already open”.
-
-### GS-T11 — Disconnect during pending load
-- Open request gönderildikten sonra, `HEADER_DG_GUILDSTORAGE_LOAD` gelmeden bağlantıyı kes.
-- Yeniden bağlan ve storage aç.
-- DB'de `guildstoragestate/guildstoragewho` kontrol et.
-Beklenen: state 0'a dönmeli.
-
-### GS-T12 — Cross-channel simultaneous open
-- Aynı guild'den iki yetkili karakteri farklı game core/channel'larda hazırla.
-- Aynı anda storage açmayı dene.
-Beklenen: yalnız biri açabilmeli.
-
-### GS-T13 — Guild ID / account ID collision
-- Guild ID ile aynı numeric ID'ye sahip account safebox satırı ve non-default safebox password bulunan kontrollü test DB'si kullan.
-- Guild storage aç.
-Beklenen: account safebox password'u guild storage'yı etkilememeli.
-
-### GS-T14 — Item award isolation
-- Test oyuncusuna alınmamış non-mall item_award tanımla.
-- Personal safebox yerine önce guild storage aç.
-- Award'ın hangi window/owner'a yazıldığını kontrol et.
-Beklenen: kişisel award guild bank'a taşınmamalı.
-
-### GS-T15 — SAFEBOX_MONEY guild-close regression
-**Yalnız test DB / yedekli ortamda.**
-- `ENABLE_SAFEBOX_MONEY` aktif build kullan.
-- Kişisel safebox gold değerini test amaçlı bilinen bir değere ayarla.
-- Guild Storage aç/kapat.
-- `safebox.gold` değerini tekrar kontrol et.
-Beklenen güvenli davranış: kişisel safebox gold değişmemeli.
-Mevcut statik kod beklentisi: 0'a yazılma riski var.
-
-### GS-T16 — Core restart while storage open
-- En az iki game core/channel bulunan kontrollü test ortamı.
-- Core A'da Guild Storage açık tutulur.
-- Core B yeniden başlatılır.
-- DB'de `guildstoragestate/guildstoragewho` gözlenir.
-- Core B veya üçüncü core'dan aynı guild storage açılmaya çalışılır.
-
-Beklenen güvenli davranış:
-Aktif Core A lock'ı korunmalı ve ikinci açılış reddedilmeli.
-
-Mevcut statik kod beklentisi:
-Core B startup DB state'i 0'a çeker; cross-core erişim riski oluşur.
-
-### GS-T17 — Bank auth revoke while storage open
-1. Oyuncu A'ya `GUILD_AUTH_BANK` ver.
-2. A Guild Storage açsın.
-3. Leader A'nın grade'ini bank yetkisiz grade'e değiştirsin veya mevcut grade'den bank auth bitini kaldırsın.
-4. A mevcut açık pencereden item checkin ve checkout denesin.
-
-Beklenen güvenli davranış:
-Session hemen kapanmalı veya sonraki packet reddedilmeli.
-
-Mevcut statik beklenti:
-İşlemler devam edebilir.
-
-### GS-T18 — Remove member while storage open
-1. A Guild Storage açsın.
-2. Yetkili B, A'yı guildden çıkarsın.
-3. A:
-   - item koymayı
-   - item çekmeyi
-   - storage kapatmayı
-   - logout/reconnect'i
-   ayrı ayrı denesin.
-4. Core log/core dump izle.
-
-Mevcut statik beklenti:
-Birden fazla null dereference/core crash yolu mevcut.
-
-### GS-T19 — Pending load + member removal
-1. DB load gecikmesi oluştur.
-2. A open request yollasın.
-3. Response gelmeden A guildden çıkarılsın.
-4. Response sonrası DB `guildstoragestate`, `guildstoragewho` ve karakter `m_bOpeningGuildstorage` davranışı kontrol edilsin.
-
-Risk:
-stuck lock.
-
-### GS-T20 — Disband with stored items
-1. Test guild bank'a benzersiz item ID'leri koy.
-2. Guild'i disband et.
-3. DB item tablosunda:
-   `owner_id=<oldGuildID> AND window='GUILDBANK'`
-   satırlarını kontrol et.
-
-Beklenen güvenli davranış:
-Item lifecycle açık bir politika ile cleanup/archive edilmeli.
-
-Mevcut statik beklenti:
-rows orphan kalıyor.
-
-### GUILD-T01 — Offline member remove with PulseManager
-- `ENABLE_PULSE_MANAGER` aktif test build.
-- Offline guild member'ı çıkar.
-- Core crash/log kontrolü.
+> Lifecycle authority: `../MAP_STATE.json`. This file contains Inventory/Item test evidence only.
+> Runtime remains locked until the project phase is explicitly changed.
 
 ### ITEM-T01 — Destroy count semantics
 - Stack count örneğin 50 olan test itemı kullan.
@@ -230,57 +85,6 @@ değerlerini kontrol et.
 Amaç:
 `SwapItem` shadowing için statik incelemede doğrudan runtime placement etkisi bulunmadı. Bu test artık sınıflandırma testi değil, page 0/page 1 occupied-slot swap için **regression doğrulaması** olarak tutulur.
 
-### SWITCHBOT-T01 — Cross-core warp memory leak
-- Switchbot manager oluşturmuş test karakteri.
-- İki game core/channel arasında tekrarlı warp/channel change.
-- Source core RSS/heap/LSan izle.
-- Her transfer sonrası Switchbot state target core'da doğrulanır.
-- Beklenen güvenli davranış: source object destroy edilmeli.
-- Statik beklenti: allocation birikir.
-
-### SWITCHBOT-T02 — Logout manager/event lifecycle
-1. Switchbot slotuna item koy.
-2. Aktif switch başlat.
-3. Logout ol.
-4. Server event/debug instrumentation ile PID'nin manager entry/event varlığını izle.
-5. Çok sayıda farklı test PID ile tekrarla.
-
-Kontrol:
-- map size
-- active event count
-- CPU tick
-- memory.
-
-### SWITCHBOT-T03 — Empty slot START
-Normal UI dışından kontrollü packet:
-- önce PID için Switchbot manager oluştur
-- slotu boşalt
-- START packetini boş slot için gönder
-- server manager table ve event state'ini izle.
-
-Beklenen güvenli davranış:
-START reject.
-
-Mevcut statik beklenti:
-active=true + persistent 0.2s event.
-
-### SWITCHBOT-T04 — Stale item ID
-Test instrumentation ile `table.items[slot]` runtime'da bulunmayan ID'ye ayarla ve active et.
-Eventin otomatik slot disable/cleanup yapıp yapmadığını gözle.
-Statik beklenti: sonsuz continue.
-
-### SWITCHBOT-T05 — Start/stop + movement invariants
-- active slotu ITEM_MOVE ile çıkarma → reject
-- active slotu UseItem ile çıkarma → reject
-- inactive slotu inventory'ye çıkarma → unregister
-- relog → SWITCHBOT DB item restore/RegisterItem
-- same-core warp ve cross-core warp ayrı test.
-
-### SWITCHBOT-T06 — UPDATE_ITEM vnum truncation observation
-VNUM >255 item kullan.
-Packet capture/debug ile server update.vnum truncation'ı doğrula.
-Client item index'in normal ITEM_SET state'i sayesinde doğru kalıp kalmadığını kontrol et.
-
 ### ITEM-T08 — Special Inventory type/range
 Kontrollü karakter üzerinde:
 - skillbook
@@ -298,66 +102,6 @@ Doğrula:
 Ek corruption testi:
 DB'de special itemı yanlış special subrange pos'a koy.
 Relog sonrası restore davranışını ve manuel move ile recovery'yi izle.
-
-### SWITCHBOT-T01 — Basic lifecycle
-1. uygun item INVENTORY → SWITCHBOT
-2. alternative configure
-3. Start
-4. attribute değişimi
-5. Stop/finish
-6. SWITCHBOT → INVENTORY
-7. relog.
-
-Kontrol:
-- DB window/pos
-- manager item ID
-- active/finished
-- client refresh
-- item attrs
-- save/load.
-
-### SWITCHBOT-T02 — Active item move lock
-Switchbot active iken itemı:
-- inventory'ye
-- başka switchbot slotuna
-taşımayı dene.
-
-Beklenen:
-server reddeder, item/persistence değişmez.
-
-### SWITCHBOT-T03 — Cross-core warp leak
-Test sunucusunda core/channel port değişimi üreten warp yap.
-
-Her tekrar öncesi/sonrası:
-- process RSS/heap
-- switchbot manager object count
-- active event count
-izlenir.
-
-Beklenen mevcut statik koda göre:
-source core'da erase edilen `CSwitchbot` object free edilmez.
-
-### SWITCHBOT-T04 — P2P state resume ordering
-Active switchbot ile cross-core warp:
-- table target core'a ulaşıyor mu
-- EnterGame öncesi/sonrası arrival sırası
-- active slot event yeniden başlıyor mu
-- duplicate event oluşuyor mu
-kontrol edilir.
-
-### SWITCHBOT-T05 — Invalid/empty START hardening
-Yalnız kontrollü test clientı ile:
-- manager var fakat seçilen slot boş
-- stale item ID
-- slot out-of-range
-START senaryoları gönder.
-
-Beklenen güvenli davranış:
-START reddedilmeli ve periyodik event bırakılmamalı.
-
-### SWITCHBOT-T06 — Client boundary
-Python binding'e slot == SWITCHBOT_SLOT_COUNT ile Start/Stop çağrısı ver.
-Server'ın range check ile işlemi reddettiğini ve state değişmediğini doğrula.
 
 ### ITEM-T09 — Storage TItemPos destination allowlist
 Kontrollü test clientı/Python console ile Safebox, Mall ve Guild Storage checkout için 3-arg window-aware binding kullan.
@@ -386,23 +130,6 @@ Kontrol:
 Beklenen güvenli tasarım:
 yalnız storage özelliğinin açıkça desteklediği destination windowları kabul edilmeli ve hedef window'un semantic validator'ı yeniden çalışmalı.
 
-### SWITCHBOT-T07 — Remove active item outside MoveItem
-Active tek slot ile:
-1. normal logout
-2. kontrollü SafeboxCheckin source=SWITCHBOT
-3. item expiration/removal mümkünse
-senaryoları ayrı test et.
-
-İzle:
-- `HasActiveSlots`
-- `IsSwitching`
-- event count
-- CPU/tick
-- manager map entry.
-
-Mevcut statik beklenti:
-Unregister active flag'i temizler fakat event Stop edilmediği için empty recurring event kalabilir.
-
 ### ITEM-T10 — Additional Equipment direct checkout
 `ENABLE_ADDITIONAL_EQUIPMENT_PAGE` build.
 
@@ -418,7 +145,6 @@ Uygun ve uygunsuz item ile:
 - page unlock state
 - relog persistence
 kontrol edilir.
-
 
 ### ITEM-T11 — Special Inventory bWindow bounds
 Yalnız izole development server'da test et.
@@ -458,7 +184,6 @@ için `size > 1` satırları ara.
 
 Kodun mevcut invariant'ı: `IsEmptySpecialItemGrid(..., bSize > 1) -> false`. Dataset'te böyle item varsa special auto-placement/movement uyumsuzluğu ayrıca sınıflandırılmalı.
 
-
 ### Readiness consolidation — 2026-09-28
 - Documentation-only pass completed; no Inventory/Item runtime test executed.
 - ITEM-T02 -> BUG-ITEM-001.
@@ -478,10 +203,8 @@ Kodun mevcut invariant'ı: `IsEmptySpecialItemGrid(..., bSize > 1) -> false`. Da
 - Primary normal-path candidate: ITEM-T01. ITEM-T02 is also reachable through the normal destroy flow but sanitizer/debug evidence is preferred for the use-after-free.
 - Overall first live runtime gate remains DUNGEON-T09.
 
-
 ### ITEM-T01 preflight — 2026-09-29
 Current packet/client/server path reverified. Normal Binary destroy flow forwards the selected dropCount into SendItemDestroyPacket; TPacketCGItemDestroy carries count; CInputMain forwards it to CHARACTER::RemoveItem; RemoveItem never applies bCount and destroys the full item object. ITEM-T01 is therefore a genuine normal-flow candidate. Adjacent BUG-ITEM-001 UAF may interrupt the observation and should be recorded separately. Canonical handoff: `../ITEM_T01_HANDOFF.md`.
-
 
 ### ITEM-T02 preflight — 2026-09-29
 Current server source reverified. `CHARACTER::RemoveItem` destroys/removes the item through ITEM_MANAGER before its final `ChatPacket(..., item->GetName())`; ITEM_MANAGER destruction reaches `M2_DELETE(item)`. The path is reachable through ordinary destroy flow. A non-crashing release run is not sufficient to clear the bug because freed memory may remain readable; sanitizer/debug allocator evidence is preferred. Canonical handoff: `../ITEM_T02_HANDOFF.md`.
