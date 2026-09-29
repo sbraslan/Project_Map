@@ -22,7 +22,7 @@
 - DUNGEON-T07 put a >QUEST_NAME_MAX_LEN token into an isolated dungeon_info.txt and reload under ASan; covers BUG-DUNGEON-007.
 - DUNGEON-T08 call Python getters with bonus index/type 255/65535 and required/boss slot 255 under ASan; covers BUG-DUNGEON-008.
 - DUNGEON-T09 request a valid ranking and capture the GAME SQL error; verify the missing whitespace before LEFT JOIN; covers BUG-DUNGEON-009.
-- DUNGEON-T10 load the current 9-dungeon config and open the UI; verify no list buttons are created despite GetCount()>0; covers BUG-DUNGEON-010.
+- DUNGEON-T10 — **RETRACTED / DO NOT RUN**. The underlying BUG-DUNGEON-010 was a false-positive indentation reading; current code creates list buttons for nonzero counts.
 - DUNGEON-T11 inspect `dragon_lair_access dragon_lair_time 1`; compare PC quest flag vs global event flag selection; covers BUG-DUNGEON-011.
 - DUNGEON-T12 with an unset/expired configured quest cooldown flag, open Dungeon Info and verify the wrapped huge cooldown; covers BUG-DUNGEON-012.
 
@@ -39,23 +39,10 @@
 
 ### Runtime preflight — 2026-09-26
 
-#### DUNGEON-T10 — LIVE PENDING, deterministic path confirmed
-Normal trigger path:
-`Minimap DungeonInfoShowButton -> ToggleDungeonInfoWindow -> DungeonInfoWindow.Open -> dungeonInfo.Open -> CG OPEN -> server SendInfo -> 9 GC SEND packets -> GC OPEN -> BINARY_DungeonInfoOpen -> DungeonInfoWindow.OnOpen -> Initialize`.
+#### DUNGEON-T10 — RETRACTED / DO NOT RUN
+Fresh 2026-09-29 source verification shows the list-button creation loop is outside the zero-count `else` branch. The former deterministic prediction was incorrect.
 
-Current checked-in data contains 9 dungeon blocks, so `CPythonDungeonInfo::GetCount()` becomes 9 before the final OPEN callback.
-
-In `DungeonInfoWindow.Initialize`, the list-button creation loop is inside the `else` branch for `GetCount() == 0`. Therefore the nonzero-count path unlocks controls but creates zero dungeon rows.
-
-Live evidence required:
-1. log in with current client/server;
-2. click the Dungeon Info button next to the minimap;
-3. capture the opened window;
-4. PASS-for-bug reproduction = window opens but dungeon list is empty/missing despite the 9-entry server config.
-
-No crafted packet or modified config is required.
-
-#### DUNGEON-T09 — LIVE PENDING, BLOCKED BY T10 on normal UI
+#### DUNGEON-T09 — LIVE PENDING, FIRST LIVE GATE
 Normal trigger after list population is restored:
 `select dungeon -> ranking button -> dungeonInfo.Ranking(index,type) -> CG RANK -> CDungeonInfoManager::Ranking`.
 
@@ -63,7 +50,6 @@ The current SQL literal boundary produces `dungeon_ranking\`LEFT JOIN` with no w
 - GAME DB/SQL error when ranking is requested;
 - ranking window receives no real rows.
 
-Until T10 is fixed/bypassed, the normal UI cannot select a dungeon/ranking button, so T09 is runtime-blocked by T10.
 
 #### DUNGEON-T11 — LIVE PENDING, current-data mismatch confirmed
 Current config line:
@@ -88,14 +74,13 @@ A negative result wraps to a very large positive uint32 and passes `dwRemainSec 
 Expected live evidence after T10 is fixed/bypassed:
 - a QUEST-backed dungeon with zero/expired flag displays an abnormally huge cooldown rather than zero/available.
 
-#### Dependency decision
-Runtime order is now:
-1. T10 live reproduction.
-2. Fix/bypass T10.
-3. T09 live ranking reproduction.
-4. T11/T12 live cooldown-source/value reproduction.
+#### Dependency decision — corrected 2026-09-29
+Runtime normal-path order is now:
+1. DUNGEON-T09 — first future live gate.
+2. DUNGEON-T11.
+3. DUNGEON-T12.
 
-Do not mark T09/T11/T12 runtime PASS before the client/server is actually run; current status is code-path preflight confirmed only.
+DUNGEON-T10 is retracted and must not be executed. Do not mark T09/T11/T12 runtime PASS before the client/server is actually run.
 
 
 ### Readiness consolidation — 2026-09-28
@@ -119,3 +104,10 @@ Current status:
 - mandatory stop: after first evidence capture, before any fix/bypass.
 
 No later Dungeon Info live test may be marked executed before the DUNGEON-T10 result is recorded.
+
+
+### 2026-09-29 preflight correction
+- BUG-DUNGEON-010 retracted.
+- DUNGEON-T10 retracted.
+- Current first future live gate: **DUNGEON-T09**.
+- Execution remains locked.
