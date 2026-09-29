@@ -59,8 +59,8 @@
       "bugs": "bugs/classic_dungeons.md",
       "tests": "tests/classic_dungeons.md"
     },
-    "verified_bug_count": 1,
-    "test_plan_count": 1,
+    "verified_bug_count": 2,
+    "test_plan_count": 2,
     "cursor": [
       "Map quest flags/server timers and floor/stage progression for Devil Tower, Devil Catacombs, Spider, Flame and Snow/Nemere.",
       "Audit item/reward consumption, replay/duplicate behavior and failure rollback.",
