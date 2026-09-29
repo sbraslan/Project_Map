@@ -168,3 +168,45 @@ If only one spouse wears a marriage bonus item, the remote spouse on another cor
 - `WeddingManager::__CreateWeddingMap` inserts a WeddingMap/private map before checking whether `GetMap(dwMapIndex)` succeeds; the failure return currently has no cleanup. Keep unpromoted until realistic failure reachability is established.
 - Several marriage Lua helpers trust quest-side state and dereference relation/wedding state with limited local validation. Audit all deployed callers before promotion.
 - Mutual divorce confirm/reselection ordering still requires event-resume semantics closure before any stale-VID conclusion.
+
+
+## BUG-MARR-009 — DB restart permanently deletes all pending engagements
+
+**Class:** persistence / operational lifecycle  
+**Reachability:** VERIFIED on every DB server startup with pending engagements.
+
+### Proof
+1. DB main starts and calls `MarriageManager.Initialize()`.
+2. `CManager::Initialize()` executes `DELETE FROM marriage WHERE is_married = 0`.
+3. Engagement rows are created with the not-yet-married state and only later transition to `is_married = 1`.
+4. The DELETE occurs before the startup SELECT/reconstruction.
+5. The deployed quest has a later cleanup path for non-married players holding 70302, but no relation reconstruction or refund.
+
+### Consequence
+Any DB restart during the engagement/wedding-before-marriage phase permanently destroys the engagement relation while player-side paid resources/rings are not restored.
+
+### Deferred validation
+`MARR-T09`.
+
+## BUG-MARR-010 — Marriage Fast daily calculation can decrease love points when the effect ends
+
+**Class:** progression arithmetic / non-monotonic derived state  
+**Reachability:** VERIFIED.
+
+### Proof
+1. `GetMarriagePoint()` derives the day component from total elapsed time since `marry_time`.
+2. With no current Marriage Fast it uses `point_per_day=1, max_limit=30`.
+3. With current Marriage Fast and same-process spouse pointers it uses `point_per_day=2, max_limit=40`.
+4. It does not track how many elapsed days were actually covered by premium.
+5. Thus the current premium state is retroactively applied to the whole marriage age.
+6. When the premium condition becomes false, recomputation can return a lower value.
+
+Example at day 20 with no stored kill points:
+- active premium => 90;
+- inactive premium => 70.
+
+### Consequence
+A supposedly faster-growth premium can grant retroactive points while active and then revoke already-visible/effective love points after expiry or topology change.
+
+### Deferred validation
+`MARR-T10`.
