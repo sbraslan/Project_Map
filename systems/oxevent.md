@@ -1,6 +1,6 @@
 # OX Event — Static Map
 
-**Status:** STATIC MAPPING IN PROGRESS / 3 VERIFIED BUGS  
+**Status:** STATIC MAPPING IN PROGRESS / 5 VERIFIED BUGS  
 **Phase:** Detection / Mapping Only  
 **Opened:** 2026-09-29  
 **Source/Game repositories:** READ-ONLY  
@@ -74,10 +74,12 @@ On map login/enter:
 
 The write is therefore asynchronous and is not an atomic reservation.
 
-### BUG-OX-002 — player cap can be exceeded by concurrent admissions
+### BUG-OX-002 — player cap accounting is non-authoritative and can be exceeded/corrupted
 Two players can both pass the source-side limit check while one slot remains. The target-side authoritative `EnterAttender` performs no cap check.
 
 Depending on DB-echo timing, the login counter either loses one increment or reaches max+1. Because `check_limit()` tests equality rather than `>=`, a max+1 counter also reopens future admission.
+
+There is also a deterministic duplicate-login path: a participant who disconnects/relogs while still at the exact attendee spawn is inserted into the same PID map entry again (no attendee growth) but the deployed `when login or enter` quest increments `ox_map_login_counter` again. The logout cooldown is only checked at the NPC entry flow, not on map relog. Repeating this can consume or push the counter beyond the configured cap without adding unique attendees.
 
 Promoted as `BUG-OX-002`.
 
@@ -138,6 +140,45 @@ Result: automatic renewal OX corrupts the question cadence; alternate questions 
 
 Promoted as `BUG-OX-001`.
 
+## Multi-round reset
+
+Automatic Event Manager is explicitly configured for `OX_ROUND_COUNT = 3`.
+
+When a round ends and rounds remain:
+`ox_event_process / FINISH`
+→ `COXEventManager::CloseEvent()`
+→ clear local OX participant containers
+→ set outer state OPEN
+→ reset registration countdown
+→ set OX status OPEN.
+
+The deployed entry quest's `ox_map_login_counter` is not reset by this path. That flag is reset only by the quest helper `cleanup_event()` / GM manual cleanup.
+
+### BUG-OX-004 — automatic round restart keeps the previous round's admission counter
+The automatic three-round scheduler resets local OX maps but not the quest's persistent admission counter. As a result, round 2/3 capacity is calculated from cumulative prior-round login count rather than the new round.
+
+If round 1 reached `ox_map_player_max`, the next OPEN round starts with `counter == max` and the deployed NPC blocks all new entrants. If the counter was below max, only the remaining cumulative difference is available.
+
+Promoted as `BUG-OX-004`.
+
+## Manual GM controls versus automatic scheduler
+The deployed GM quest exposes `oxevent.end_event()` and `oxevent.end_event_force()`.
+
+`end_event_force`:
+→ `COXEventManager::CloseEvent()`
+→ status FINISH.
+
+It does **not** call `CEventManager::SetOXEvent(false)` and cannot cancel the outer `m_pOXEvent` process event.
+
+Under active `ENABLE_EVENT_MANAGER`, `Initialize()` invoked by CloseEvent does not clear the loaded quiz vector.
+
+### BUG-OX-005 — deployed force-end can leave the automatic OX scheduler alive
+When OX was started by Event Manager, using the deployed GM force-end closes current players/inner timer and marks status FINISH, but the outer scheduler remains queued.
+
+At its next scheduled callback the outer state machine can continue its registration/quiz/round logic and set OX status again. Because quiz data remains loaded in the Event Manager build, this is not merely a stale empty scheduler.
+
+Promoted as `BUG-OX-005`.
+
 ## Answer flow
 `CheckAnswer(answer)`
 → iterate `m_map_attender`
@@ -165,13 +206,11 @@ The OX map has one tracked core owner, so no duplicate-map-manager bug comparabl
 - map 113 is single-core in the tracked deployment.
 
 ## Open work
-1. audit automatic three-round reset vs deployed quest counters/limits;
-2. audit manual GM quest controls while Event Manager OX is active;
-3. audit logout/relog and eliminated-player lifecycle;
-4. audit `Show()` based audience movement and map/state validation;
-5. audit reward path and participant list integrity;
-6. close remaining Event Manager / manual quest integration candidates;
-7. decide STATIC COMPLETE readiness.
+1. audit logout/relog and eliminated-player lifecycle beyond the cap-accounting path;
+2. audit `Show()` based audience movement and map/state validation;
+3. audit reward delivery/offline-winner behavior;
+4. close automatic-start dependency on persisted level/max flags;
+5. decide STATIC COMPLETE readiness.
 
 ## Runtime
 No OX runtime test may be executed while the global execution lock is active. First future live gate remains `DUNGEON-T09`.
