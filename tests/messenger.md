@@ -119,4 +119,15 @@ After runtime is explicitly unlocked:
 
 Bug signature: the WIZARD staff character is absent from the GM messenger list because the login SQL does not select that authority.
 
+
+## MSG-T14 — observer-mode name-path friend/block add
+After runtime is explicitly unlocked:
+1. enter observer mode with A while B is online;
+2. verify target/VID friend and block add attempts are rejected;
+3. use the Messenger window to type B's name and submit friend add;
+4. repeat with block add;
+5. inspect request/block state and DB rows.
+
+Bug signature: name-based friend/block actions proceed in observer mode while the VID-based equivalents are server-rejected.
+
 Do not run any MSG test while the project execution lock is active.
