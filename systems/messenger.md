@@ -47,10 +47,11 @@ Remote target: target is represented by P2P `CCI` and relay descriptor while `pk
 - `BUG-MSG-004` — client `OnBlockLogin` dispatches `OnLogout`, so online blocked users render offline.
 - `BUG-MSG-005` — client `Destroy()` leaves block and GM caches intact across game-window/session teardown.
 - `BUG-MSG-006` — pending friend authorization tokens have no server timeout/logout cleanup and can be consumed later.
+- `BUG-MSG-007` — logout erases the departing character from every online account's outgoing friend/block cache; reconnect reloads only the departing account, so persistent block/friend state is not restored for observers.
 
 ## Current cursor
 Continue static audit of:
-- relation symmetry and remove-all paths;
+- remaining relation symmetry and remove-all paths after BUG-MSG-007;
 - local vs P2P presence consistency;
 - block enforcement outside whisper (invite/social surfaces);
 - client packet-length/state handling;
