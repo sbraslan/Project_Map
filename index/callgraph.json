@@ -2033,6 +2033,41 @@
       "references": [
         "BUG-MARR-011"
       ]
+    },
+    {
+      "from": "USE_TALISMAN memory recall",
+      "to": "ProcessRecallItem -> WarpSet outside wedding",
+      "references": [
+        "BUG-MARR-014"
+      ]
+    },
+    {
+      "from": "unilateral marriage.remove",
+      "to": "DB CManager::Remove relation only",
+      "references": [
+        "BUG-MARR-014"
+      ]
+    },
+    {
+      "from": "DB wedding timeout",
+      "to": "HEADER_DG_WEDDING_END",
+      "references": [
+        "BUG-MARR-014"
+      ]
+    },
+    {
+      "from": "HEADER_DG_WEDDING_END",
+      "to": "game CManager::WeddingEnd",
+      "references": [
+        "BUG-MARR-014"
+      ]
+    },
+    {
+      "from": "game CManager::WeddingEnd without TMarriage",
+      "to": "return before WeddingManager::End",
+      "references": [
+        "BUG-MARR-014"
+      ]
     }
   ]
 }
