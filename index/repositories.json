@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "generated_at": "2026-09-29",
+  "owner": "sbraslan",
+  "source_repositories_read_only": true,
+  "repositories": {
+    "Project_ClientSrc": {
+      "full_name": "sbraslan/Project_ClientSrc",
+      "default_branch": "main",
+      "tree_sha": "19c1e08141eb8ff2bf22fd8b93df3e4f3a516d81",
+      "tree_truncated": false,
+      "total_entries": 841,
+      "total_files": 778,
+      "mapping_relevant_files": 711,
+      "extension_counts": {
+        ".c": 2,
+        ".h": 308,
+        ".txt": 44,
+        ".cpp": 357
+      }
+    },
+    "Project_ServerSRC": {
+      "full_name": "sbraslan/Project_ServerSRC",
+      "default_branch": "main",
+      "tree_sha": "321712c849aa01d3635b9fe6a9cde79cc0adcb64",
+      "tree_truncated": false,
+      "total_entries": 739,
+      "total_files": 716,
+      "mapping_relevant_files": 672,
+      "extension_counts": {
+        "Makefile": 16,
+        ".bat": 1,
+        ".h": 288,
+        ".cpp": 251,
+        ".hpp": 18,
+        ".py": 3,
+        ".sh": 2,
+        ".c": 82,
+        ".cc": 11
+      }
+    },
+    "Project_Binary": {
+      "full_name": "sbraslan/Project_Binary",
+      "default_branch": "main",
+      "tree_sha": "c87aea062f8c50e70a854d4e1dc0c75773960e27",
+      "tree_truncated": false,
+      "total_entries": 13392,
+      "total_files": 12815,
+      "mapping_relevant_files": 6069,
+      "extension_counts": {
+        ".sub": 4046,
+        ".py": 383,
+        ".txt": 1629,
+        ".msm": 9,
+        ".xml": 2
+      }
+    },
+    "Project_Game": {
+      "full_name": "sbraslan/Project_Game",
+      "default_branch": "main",
+      "tree_sha": "4f26f48e0b20b76825a5a6158c992b8c5670f44e",
+      "tree_truncated": false,
+      "total_entries": 13944,
+      "total_files": 12236,
+      "mapping_relevant_files": 2562,
+      "extension_counts": {
+        ".txt": 1451,
+        ".msm": 892,
+        ".lua": 18,
+        ".xml": 1,
+        ".py": 3,
+        ".sh": 2,
+        ".quest": 195
+      }
+    },
+    "Project_DumpProto": {
+      "full_name": "sbraslan/Project_DumpProto",
+      "default_branch": "main",
+      "tree_sha": "1066f4620af451c5f728260eb5f8a086672e6384",
+      "tree_truncated": false,
+      "total_entries": 144,
+      "total_files": 128,
+      "mapping_relevant_files": 105,
+      "extension_counts": {
+        ".bat": 36,
+        ".json": 5,
+        ".txt": 64
+      }
+    }
+  }
+}
