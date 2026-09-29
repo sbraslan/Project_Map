@@ -17,7 +17,7 @@ both current-data paths attempt an out-of-bounds read at index 12.
 
 Safety class: **Stage C memory-safety / ASan / disposable data only**.
 
-Global first future live gate remains `DUNGEON-T10`.
+Global first future live gate remains `DUNGEON-T09`.
 
 
 ## GPET-T02 — Oversized feed item count
