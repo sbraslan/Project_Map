@@ -1,6 +1,6 @@
 # Messenger / Friend / Block — Static Mapping
 
-**Status:** MAPPING IN PROGRESS  
+**Status:** STATIC COMPLETE  
 **Mode:** Detection / mapping only  
 **Runtime execution:** LOCKED  
 **Source repositories:** READ-ONLY  
@@ -57,7 +57,7 @@ Remote target: target is represented by P2P `CCI` and relay descriptor while `pk
 - `BUG-MSG-011` — `pc.is_blocked` and `pc.is_friend` are registered Lua name-query helpers but gate their first argument with `lua_isnumber` before calling `FindPC(name)`.
 - `BUG-MSG-013` — the server recognizes `WIZARD` as `GM_WIZARD`, but the Messenger GM-list SQL omits `mAuthority='WIZARD'`.
 - `BUG-MSG-014` — add-by-name friend/block paths omit the observer-mode rejection enforced by their VID counterparts, and both name paths are exposed by the Messenger UI.
-- `BUG-MSG-015` — friend/block/GM inverse watcher sets retain logged-out accounts because logout clears outgoing maps without pruning the departing account from inverse watcher sets.
+- `BUG-MSG-015` — synthetic GM inverse watcher sets retain historical logged-out accounts because logout does not prune `m_InverseGMRelation[gm]`.
 - `BUG-MSG-016` — delayed old-core P2P logout can remove a newer same-name CCI/session presence after channel/core handoff.
 - `BUG-MSG-017` — client→server name-based messenger packets use a 48-byte field for a configured 48-byte name, truncating add/block-add to 47 bytes and leaving long remove/unblock fields without an explicit final NUL.
 - `BUG-MSG-018` — Battle Field blocks friend add-by-name but the normal target-board add-by-VID path lacks the map restriction.
@@ -65,14 +65,19 @@ Remote target: target is represented by P2P `CCI` and relay descriptor while `pk
 - `BUG-MSG-020` — friend/block list serialization can exceed the 16-bit `TPacketGCMessenger::size` while the server still transmits the full buffer, desynchronizing client packet framing.
 - `BUG-MSG-021` — GM-to-GM block authorization differs between block-by-VID and block-by-name routes.
 
-## Current cursor
-Continue static audit of:
-- remaining relation symmetry and remove-all paths after BUG-MSG-007;
-- local vs P2P presence consistency;
-- block enforcement outside whisper (invite/social surfaces);
-- client packet-length/state handling;
-- GM messenger cache lifecycle;
-- logout/reconnect and channel-change boundaries.
+## Static closure
+Messenger / Friend / Block is **STATIC COMPLETE** with `BUG-MSG-001..021` and deferred tests `MSG-T01..MSG-T21`.
+
+Coverage closed across:
+- friend add/remove/request authorization and pending-token lifecycle;
+- block add/remove, enforcement and UI state;
+- local/P2P whisper and social interaction surfaces;
+- login/logout, async DB callbacks and relation-cache reconstruction;
+- cross-core/channel presence ordering;
+- GM messenger query/cache lifecycle;
+- client send/receive packet boundaries and long-name compatibility.
+
+Two theoretical robustness cases remain deliberately unpromoted: CRC-pair token collision and fully crafted non-terminated fixed-width CG fields beyond the ordinary client contract.
 
 Do not execute runtime tests. Global first future live gate remains `DUNGEON-T09`.
 
