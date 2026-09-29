@@ -8,7 +8,7 @@
   "active": {
     "subsystem": "messenger",
     "display_name": "Messenger / Friend / Block",
-    "status": "MAPPING IN PROGRESS / 13 VERIFIED BUGS / EXECUTION LOCKED",
+    "status": "MAPPING IN PROGRESS / 14 VERIFIED BUGS / EXECUTION LOCKED",
     "system_file": "systems/messenger.md",
     "bug_file": "bugs/messenger.md",
     "test_file": "tests/messenger.md",
@@ -25,15 +25,16 @@
       "BUG-MSG-010",
       "BUG-MSG-011",
       "BUG-MSG-012",
-      "BUG-MSG-013"
+      "BUG-MSG-013",
+      "BUG-MSG-014"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
       "Close channel-change/reconnect ordering candidate around P2P LOGIN(new) versus delayed LOGOUT(old).",
       "Finish remaining GM messenger lifecycle checks after BUG-MSG-013.",
-      "Audit remaining client messenger packet parser boundaries after BUG-MSG-012.",
+      "Audit remaining client messenger packet/parser boundaries after BUG-MSG-012.",
       "Check tracked quest usage/reachability of BUG-MSG-011 Lua helpers.",
-      "Do not execute runtime tests; first future live gate remains DUNGEON-T09."
+      "Assess static-closure readiness for Messenger without running runtime tests."
     ]
   },
   "startup": {
@@ -2682,7 +2683,8 @@
       "BUG-MSG-010",
       "BUG-MSG-011",
       "BUG-MSG-012",
-      "BUG-MSG-013"
+      "BUG-MSG-013",
+      "BUG-MSG-014"
     ],
     "mapped_flows": [
       "input_login.cpp -> MessengerManager::Login -> asynchronous friend/GM/block SQL callbacks",
@@ -2701,11 +2703,10 @@
       "party/guild pending invite acceptance -> no messenger-block revalidation",
       "questlua_pc.cpp -> registered pc.is_blocked/pc.is_friend numeric-gate vs FindPC(name)",
       "PythonNetworkStreamPhaseGame.cpp RecvMessenger -> legacy 25-byte name buffer versus server 48-character names",
-      "MessengerManager::Login LoadGMList SQL -> valid WIZARD authority omitted"
+      "MessengerManager::Login LoadGMList SQL -> valid WIZARD authority omitted",
+      "uimessenger.py name-based friend/block add -> server observer-mode parity bypass"
     ],
-    "candidates": [
-      "add-by-name friend path observer-mode parity with add-by-VID remains under assessment"
-    ],
+    "candidates": [],
     "runtime_tests": {
       "status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN",
       "canonical_test_ids": [
@@ -2721,7 +2722,8 @@
         "MSG-T10",
         "MSG-T11",
         "MSG-T12",
-        "MSG-T13"
+        "MSG-T13",
+        "MSG-T14"
       ],
       "first_live_gate_unchanged": "DUNGEON-T09"
     },
