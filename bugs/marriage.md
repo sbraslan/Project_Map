@@ -1,6 +1,6 @@
 # Marriage / Wedding — Bug Registry
 
-**Status:** STATIC MAPPING IN PROGRESS / 6 VERIFIED BUGS  
+**Status:** STATIC MAPPING IN PROGRESS / 7 VERIFIED BUGS  
 **Execution:** LOCKED / NOT RUN
 
 ## BUG-MARR-001 — engagement resource transaction commits before authoritative marriage creation
@@ -124,6 +124,26 @@ A player who successfully leaves the wedding map via a same-core warp can still 
 
 ### Deferred validation
 `MARR-T06`.
+
+## BUG-MARR-007 — level-26+ EXP love-point progression is truncated to zero
+
+**Class:** arithmetic / progression  
+**Reachability:** VERIFIED through normal EXP distribution for married players.
+
+### Proof
+1. The deployed marriage quest requires level 25 or higher.
+2. EXP distribution computes:
+   `static_cast<uint32_t>(2000.0L / level / level / 3) * static_cast<uint32_t>(iFinalExp)`.
+3. The fractional coefficient is converted to integer before multiplying by EXP.
+4. At level 25 the coefficient is >1 and truncates to 1.
+5. At level 26 and every higher level the coefficient is <1 and truncates to 0.
+6. `TMarriage::Update` ignores zero, so no love-point progress/save flag is produced from that EXP.
+
+### Consequence
+Almost every normally progressing married character above level 25 loses the EXP-based love-point progression path completely; only time-based contribution remains.
+
+### Deferred validation
+`MARR-T07`.
 
 ## Open candidates
 - `WeddingManager::__CreateWeddingMap` inserts a WeddingMap/private map before checking whether `GetMap(dwMapIndex)` succeeds; the failure return currently has no cleanup. Keep unpromoted until realistic failure reachability is established.
