@@ -59,3 +59,9 @@ Acce is STATIC COMPLETE. `ACCE-T01..ACCE-T08` are canonical deferred tests; none
 - `AURA-T` -> `aura.md`.
 
 Aura is mapping-in-progress. `AURA-T01` is deferred and has not been executed. Global first execution gate remains `DUNGEON-T09`.
+
+
+## Messenger / Friend / Block prefix ownership — 2026-09-29
+- `MSG-T` -> `messenger.md`.
+
+Messenger is mapping-in-progress. `MSG-T01..MSG-T06` are canonical deferred tests and have not been executed. Global first execution gate remains `DUNGEON-T09`.
