@@ -64,4 +64,4 @@ Aura is mapping-in-progress. `AURA-T01` is deferred and has not been executed. G
 ## Messenger / Friend / Block prefix ownership — 2026-09-29
 - `MSG-T` -> `messenger.md`.
 
-Messenger is mapping-in-progress. `MSG-T01..MSG-T09` are canonical deferred tests and have not been executed. Global first execution gate remains `DUNGEON-T09`.
+Messenger is mapping-in-progress. `MSG-T01..MSG-T11` are canonical deferred tests and have not been executed. Global first execution gate remains `DUNGEON-T09`.
