@@ -145,12 +145,32 @@ Thus BUG-DUNGEON-004/005/006/007 are real defensive/config-parser defects but ar
 - expired/zero cooldown subtraction wraps through uint32 -> BUG-DUNGEON-012.
 
 ### UI audit — COMPLETE
-- normal nonzero dungeon count skips list-button creation because the creation loop is inside the zero-count `else` branch -> BUG-DUNGEON-010.
+- CORRECTION 2026-09-29: the `for key in xrange(...)` list-button loop is aligned after the `if/else`, not nested inside the zero-count branch. `BUG-DUNGEON-010` is retracted.
 
 ## Static status
 Dungeon Info: **STATIC COMPLETE**.
 
-Verified bugs: `BUG-DUNGEON-001..012`.
+Verified bugs: `BUG-DUNGEON-001..009`, `BUG-DUNGEON-011`, `BUG-DUNGEON-012`. `BUG-DUNGEON-010` retracted.
 Runtime/ASan validation remains in `../tests/dungeon_info.md`.
 
 Next project phase: runtime / in-game bug validation.
+
+
+## Correction checkpoint — 2026-09-29
+
+A fresh preflight against the current tracked client snapshot disproved the old UI-control-flow finding.
+
+Current `root/uidungeoninfo.py::DungeonInfoWindow.Initialize`:
+- line 697 checks `dungeonInfo.GetCount() > 0`;
+- the zero-count `else` ends before the list construction loop;
+- line 709 `for key in xrange(min(...))` is at the function-body indentation level and therefore executes for nonzero counts.
+
+The checked-in `dungeon_info.txt` still contains 9 blocks, so normal OPEN should create list buttons.
+
+Decision:
+- `BUG-DUNGEON-010` = **RETRACTED / FALSE POSITIVE**;
+- `DUNGEON-T10` = **RETRACTED / DO NOT RUN**;
+- previous dependency claim that T09/T11/T12 were blocked by T10 is removed;
+- first future live gate moves to `DUNGEON-T09`.
+
+The SQL defect behind `BUG-DUNGEON-009` was reverified in current `game/src/DungeonInfo.cpp`: the query literal ends with `...dungeon_ranking`` and the immediately adjacent next literal starts `LEFT JOIN...` with no separating whitespace.
