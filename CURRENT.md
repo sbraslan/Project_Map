@@ -2,7 +2,7 @@
 
 **Active phase:** Detection / Mapping Only  
 **Active state:** Monarch static mapping  
-**Status:** MONARCH — STATIC MAPPING IN PROGRESS / 4 VERIFIED BUGS / EXECUTION LOCKED  
+**Status:** MONARCH — STATIC MAPPING IN PROGRESS / 7 VERIFIED BUGS / EXECUTION LOCKED  
 **Machine state:** `STATE.json`  
 **Active subsystem:** Monarch — OPEN  
 **System:** `systems/monarch.md`  
@@ -18,9 +18,12 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 ## Active Monarch findings
 - `BUG-MON-001` — registered election finalizer never selects/persists/publishes a winner; internal count uses voter PID and uninitialized scalar counters.
 - `BUG-MON-002` — `setmonarch` persists DB state but sends the wrong DG header and never refreshes live game-core monarch info.
-- `BUG-MON-003` — `rmmonarch` calls deletion twice, so a successful first removal cannot produce a successful second result/fanout.
+- `BUG-MON-003` — `DelMonarch` checks DELETE via `uiNumRows` instead of `uiAffectedRows`; persistent deletion can occur while runtime state remains stale, and RMMonarch calls it twice.
 - `BUG-MON-004` — `mtax` reports values outside 1..50 as invalid but still writes the invalid `trade_tax` flag and cooldown.
-- Deferred tests: `MON-T01..MON-T04`; none executed.
+- `BUG-MON-005` — different monarch actions can pass the same stale treasury balance before async DB deduction returns, producing an effect DB later cannot charge.
+- `BUG-MON-006` — MI_TAX is set but never checked, so tax cooldown is unenforced.
+- `BUG-MON-007` — remote `mtr` charges treasury/cooldown before any delivery acknowledgement; target disappearance makes it fail silently.
+- Deferred tests: `MON-T01..MON-T07`; none executed.
 
 ## Recent static closures
 - Arena / PvP Duel: `BUG-ARENA-001..003`.
@@ -28,10 +31,10 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 - Marriage / Wedding: canonical registry remains closed; runtime locked.
 
 ## Exact resume cursor
-1. Close treasury request/ack concurrency and failed-deduction semantics.
-2. Audit `takemonarchmoney` authorization/caller reachability.
-3. Audit process-local PowerUp/DefenseUp cross-core behavior and deployed callers.
-4. Audit monarch warp/transfer charge-on-failure ordering.
+1. Audit SetMonarch SQL schema/column consistency if authoritative schema is available.
+2. Audit candidacy/election persistence reconstruction across DB restart.
+3. Close process-local PowerUp/DefenseUp and takemonarchmoney as deployed vs dormant.
+4. Audit remaining monarch warp/notice/money-add boundaries.
 5. Keep source/game repositories read-only and runtime execution locked.
 
 ## Mapping acceleration index
