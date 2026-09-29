@@ -504,4 +504,4 @@ Validates OBS-SWITCHBOT-002 only; observation status is unchanged.
 - SWB-T06/SWB-T07 cover OBS-SWITCHBOT-001/002 without promoting them to verified bugs.
 - The duplicated legacy SWITCHBOT-T01..T06 identifiers above are non-canonical historical notes.
 - Primary legitimate runtime candidates: SWB-T01 and SWB-T03; both need monitoring/instrumentation rather than crafted packet input.
-- Overall first live runtime gate remains DUNGEON-T10.
+- Overall first live runtime gate remains DUNGEON-T09.
