@@ -129,3 +129,12 @@ Runtime remains locked; no live test was executed.
 - `ACH-T04` reverified: 29 explore tasks; progression hook is reached from login, not mapped normal map transitions.
 - canonical handoffs: `ACH_T03_HANDOFF.md`, `ACH_T04_HANDOFF.md`.
 - global first live gate remains `DUNGEON-T09`; no Achievement runtime test executed.
+
+
+## Biolog normal-path preflight — 2026-09-29
+- `BIO-T01` completion bridge reverified.
+- C++ sets `biolog_manager.*` completion flags and client requests event quest `biolog_manager`.
+- current Project_Game quest_list contains only legacy collect_* Biolog quests; no `biolog_manager` implementation was found.
+- canonical handoff: `BIO_T01_HANDOFF.md`.
+- actual biolog mission/reward values remain live-DB dependent.
+- global first live gate remains `DUNGEON-T09`; no Biolog runtime test executed.
