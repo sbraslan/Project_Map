@@ -118,4 +118,4 @@ No runtime action has been performed. Source/game repositories remain read-only.
   - ranking `player_login` versus character-name mailbox recipient semantics;
   - malformed/out-of-range quest-produced `dungeonLevel`;
   - `m_bDungeon_Difficulty` versus `dungeonLevel` synchronization dependency.
-- Overall first live runtime gate remains DUNGEON-T10.
+- Overall first live runtime gate remains DUNGEON-T09.
