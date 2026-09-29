@@ -42,7 +42,7 @@ This is the navigation index. Normal continuation starts at `STATE.json`, then `
 | Refine / Cube / Crafting | STATIC COMPLETE | `systems/refine_cube.md` |
 | Growth Pet System | STATIC COMPLETE | `systems/growth_pet.md` |
 | Horse / Mount / Riding | STATIC COMPLETE | `systems/horse_mount.md` |
-| Classic Pet System | MAPPING IN PROGRESS | `systems/pet.md` |
+| Classic Pet System | STATIC COMPLETE | `systems/pet.md` |
 
 ## Current phase
 - **Detection / mapping only.** Source and game repositories remain read-only.
@@ -169,3 +169,8 @@ The active mapping cursor is now **Classic Pet System**:
 - `tests/pet.md`.
 
 Runtime execution remains locked and `DUNGEON-T10` remains the first future live gate.
+
+
+Classic Pet System is now **STATIC COMPLETE** with verified `BUG-PET-001..004` and canonical deferred tests `PET-T01..PET-T04`.
+Current effective completed/readiness coverage is **29/29 STATIC COMPLETE subsystem rows** plus the folded Guild lifecycle companion.
+Runtime execution remains locked; first future live gate remains `DUNGEON-T10`.
