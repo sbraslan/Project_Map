@@ -66,3 +66,13 @@ clears `snow_dungeon_leader_out_timer`.
 When the original timer expires it unconditionally schedules `snow_dungeon_end_timer`, which then clears the instance timers and calls `d.exit_all()`. A leader can therefore successfully reconnect/rejoin and still have the active run forcibly terminated by the stale absence timer.
 
 Promoted as `BUG-CLD-002`.
+
+
+## Cursor 2 checkpoint — timers / stage progression
+- Devil Tower, Devil Catacombs, Flame and Snow private-map server-timer handlers select their instance with `d.select(get_server_timer_arg())` before dungeon state mutation.
+- Stage timers are keyed by the private map index and generic Dungeon teardown also cancels timers for the destroyed map index.
+- Spider Baroness uses process-local server timers for its single shared room while channel-suffixed event flags hold run state; the already-promoted unsuffixed `king_vid` remains the isolation exception.
+- Devil Catacombs contains `clear_server_timer("devilcatacomb_floor7_timer", 3, get_server_timer_arg())`; the Lua binding reads only name + second argument, so this call targets key 3. In the mapped normal flow the floor-7 transition timer has already fired before the exit handler reaches this line, so no independent runtime consequence is source-proven and it is not promoted.
+- Snow leader absence/rejoin timer behavior produced `BUG-CLD-002`.
+
+No additional timer/stage defect was promoted in this cursor.
