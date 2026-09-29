@@ -62,9 +62,7 @@
     "verified_bug_count": 4,
     "test_plan_count": 4,
     "cursor": [
-      "Audit disconnect/reconnect/party-change and timeout/exit cleanup for Devil Tower, Devil Catacombs, Spider, Flame and Snow/Nemere.",
-      "Audit feature-specific calls into generic Dungeon Core for cross-system bug reachability.",
-      "Close deployment/data parity and promote only source-proven defects."
+      "Close deployment/data parity for Devil Tower, Devil Catacombs, Spider, Flame and Snow/Nemere and promote only source-proven defects."
     ]
   },
   "closed": {
