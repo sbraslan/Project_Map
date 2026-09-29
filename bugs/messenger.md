@@ -395,3 +395,24 @@ The intended “cannot add friends in Battle Field” server restriction depends
 
 ### Deferred validation
 `MSG-T18`.
+---
+
+## BUG-MSG-015 — channel-change P2P login/logout can delete the newer presence record
+
+**Class:** distributed ordering race / stale logout  
+**Reachability:** VERIFIED statically for cross-channel movement; exact packet arrival order remains timing-dependent.
+
+### Proof
+1. The old game process eventually broadcasts `HEADER_GG_LOGOUT` by player name during disconnect.
+2. The destination game process broadcasts `HEADER_GG_LOGIN` from `CHARACTER::WarpEnd` after the player enters the new channel.
+3. These packets originate from different P2P TCP connections, so a third process has no single-stream ordering guarantee between them.
+4. `P2P_MANAGER::Login(d,p)` finds an existing CCI by name; when one exists it updates that same CCI's `pkDesc`, channel and map and deliberately does not call `MessengerManager::P2PLogin` (`UpdateP2P == false`).
+5. `CInputP2P::Logout(d,...)` ignores the source descriptor `d` and calls `P2P_MANAGER::Logout(name)`.
+6. `Logout(name)` deletes whichever CCI currently owns that name, with no check that its `pkDesc` still matches the old source connection.
+
+### Consequence
+If a third process receives LOGIN(new channel) before the delayed LOGOUT(old channel), the new CCI is first updated and then removed by the stale logout. Messenger presence is also driven offline through `MessengerManager::P2PLogout`, and subsequent remote lookup/relay state can remain wrong until another presence event reconstructs it.
+
+### Deferred validation
+`MSG-T15`.
+
