@@ -75,4 +75,14 @@ Expected signature: positions above 255 wrap/truncate.
 
 Covers `BUG-ATTR67-008`.
 
+## ATTR67-T09 — already-full rare-attribute target
+1. prepare an item with five normal attributes plus both rare slots already populated;
+2. submit it through the server Attr67 path under instrumentation;
+3. force/observe a successful percent roll at retrieval;
+4. compare rare-attribute count before/after and inspect the returned result code.
+
+Expected signature: server target validation accepts the item, `AddRareAttribute()` refuses the third rare attribute, but retrieval reports result 1.
+
+Covers `BUG-ATTR67-009`.
+
 Do not run any ATTR67 test while the global execution lock is active.
