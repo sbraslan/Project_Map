@@ -51,6 +51,7 @@ This is the navigation index. Normal continuation starts at `STATE.json`, then `
 | Arena / PvP Duel | STATIC COMPLETE | `systems/arena.md` |
 | Monarch System | STATIC COMPLETE | `systems/monarch.md` |
 | 6th/7th Attribute | STATIC COMPLETE | `systems/attr6th7th.md` |
+| Zodiac Temple / 12ZI | MAPPING IN PROGRESS | `systems/zodiac_temple.md` |
 
 ## Current phase
 - **Detection / mapping only.** Source and game repositories remain read-only.
@@ -247,3 +248,9 @@ Runtime execution remains locked; global first future live gate remains `DUNGEON
 The subsystem table now contains **37 STATIC COMPLETE rows** plus the folded Guild lifecycle companion. The next cursor is global source-feature coverage discovery; this is still mapping/detection only and does not authorize runtime execution.
 
 Runtime remains locked; global first future live gate remains `DUNGEON-T09`.
+
+
+## Zodiac Temple / 12ZI mapping opened — 2026-09-29
+Global feature coverage discovery found an enabled, dedicated Zodiac subsystem not represented by the previous static-complete table. `ENABLE_12ZI` is active and the source corpus contains dedicated server manager, character/combat, Lua, client UI and game-data roots.
+
+Zodiac Temple / 12ZI is now **MAPPING IN PROGRESS**. Existing **37 STATIC COMPLETE** subsystem rows remain closed; runtime remains locked and the global first future live gate remains `DUNGEON-T09`.
