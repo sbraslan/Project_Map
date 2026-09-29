@@ -63,4 +63,4 @@ This determines whether the ignored ground-insertion result is a reachable rewar
 - HUNT-T07 and HUNT-T08 remain robustness validations without promoted bug IDs.
 - Primary legitimate Hunting live candidate: HUNT-T04.
 - Crash/persistence validation remains deferred until runtime execution is explicitly enabled.
-- Overall first live runtime gate remains DUNGEON-T10.
+- Overall first live runtime gate remains DUNGEON-T09.
