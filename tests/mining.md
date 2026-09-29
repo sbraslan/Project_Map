@@ -1,33 +1,23 @@
-# Mining / Pickaxe — Runtime Tests
+# Mining / Pickaxe — Deferred Runtime Tests
 
-> Documentation only. Execution remains locked.
+**Execution status:** LOCKED / NOT RUN  
+**Global first future live gate:** DUNGEON-T09
 
-## MINE-T01 — current pickaxe refine threshold
-Using disposable data after runtime unlock:
-1. bring a 29101..29109 pickaxe to exactly `socket0 == value2`;
-2. give it to NPC 20015 through the normal mining quest;
-3. observe `__refine_pick` / return code and item state;
-4. separately test a controlled `socket0 > value2` state.
+## MIN-T01 — pickaxe mastery/refine boundary
+After runtime is explicitly unlocked:
+1. use a deployed pickaxe whose socket0 equals Value2;
+2. hand it to NPC 20015 through the deployed mining quest;
+3. confirm quest offers refine;
+4. record `__refine_pick` / `RealRefinePick` return.
 
-Bug indicator:
-- equality reaches quest refine UI but C++ returns failure;
-- greater-than state is rejected by quest before calling refine.
+Expected bug signature: quest reaches refine UI but C++ returns rejection because equality is not refinable.
 
-Covers `BUG-MINE-001`.
+Then, in an isolated test, raise socket0 to Value2+1 and confirm C++ accepts the boundary while the quest equality branch no longer opens.
 
-## MINE-T02 — mining death/warp lifecycle
-After runtime unlock in isolated/dev conditions:
+## MIN-T02 — death during delayed mining
+After runtime is explicitly unlocked:
+1. start normal mining;
+2. die before the delayed mining event fires without moving;
+3. observe whether ore roll/drop and pickaxe practice still execute.
 
-Death branch:
-- begin mining beside a valid vein;
-- die without ordinary movement before delayed completion;
-- verify whether ore roll/drop and pick practice still resolve.
-
-Warp branch:
-- begin mining beside a valid vein;
-- trigger a same-character warp before delayed completion;
-- verify event survival and whether ore drops at destination coordinates.
-
-Covers `BUG-MINE-002`.
-
-Global first future live gate remains `DUNGEON-T09`; do not run these now.
+Do not run while execution lock is active.
