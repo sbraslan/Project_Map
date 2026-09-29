@@ -1,13 +1,13 @@
 # CURRENT — Canonical Active Checkpoint
 
 **Active phase:** Detection / Mapping Only  
-**Active state:** Horse / Mount / Riding Static Complete  
-**Status:** STATIC COMPLETE / 3 PROMOTED HORSE-MOUNT BUGS / EXECUTION LOCKED  
+**Active state:** Classic Pet System Static Mapping  
+**Status:** STATIC MAPPING IN PROGRESS / 1 PROMOTED CLASSIC-PET BUG / EXECUTION LOCKED  
 **Machine state:** `STATE.json`  
-**Active subsystem:** Horse / Mount / Riding  
-**System:** `systems/horse_mount.md`  
-**Bugs:** `bugs/horse_mount.md`  
-**Tests:** `tests/horse_mount.md`  
+**Active subsystem:** Classic Pet System  
+**System:** `systems/pet.md`  
+**Bugs:** `bugs/pet.md`  
+**Tests:** `tests/pet.md`  
 **Last completed subsystem:** Horse / Mount / Riding  
 **Effective completed/readiness-covered subsystems:** 28  
 **First future live gate:** `DUNGEON-T10`  
@@ -16,29 +16,31 @@
 ## Hard rule
 Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-only. Runtime/fault-injection execution remains locked until an explicit phase change.
 
-## Horse / Mount final verified set
-- `BUG-HORSE-001` — active `horse_ride.quest -> pc.mount()` changes `POINT_MOUNT` without synchronizing `MountVnum`.
-- `BUG-HORSE-002` — tracked deployment has horse level/grade consumers but no normal-player horse-level progression producer.
-- `BUG-HORSE-003` — current mount items 71259..71266 map to races 20276..20283, but client `GetMountLevelByVnum()` has no cases for them and therefore blocks mounted combat/horse skills.
+## Horse closure
+Horse / Mount / Riding is STATIC COMPLETE:
+- BUG-HORSE-001..003
+- HORSE-T01..T03 deferred / not run.
 
-Deferred tests:
-- `HORSE-T01`
-- `HORSE-T02`
-- `HORSE-T03`
+## Classic Pet progress
+Active feature state:
+- `ENABLE_PET_SYSTEM` enabled;
+- `PET_AUTO_PICKUP` enabled;
+- `__PET_SYSTEM__` enabled;
+- PetSystem and questlua_pet are built.
 
-## Final closure notes
-- persistence/login/stamina-event lifecycle closed;
-- normal mount item/costume equip, unequip, death, warp and expiry cleanup closed;
-- client `MountVnum -> actor reinsert -> AdditionalInfo -> MountHorse` render path closed;
-- horse-name and horse-appearance persistence closed;
-- Achievement SUMMON_MOUNT caller gap remains owned by `BUG-ACH-006`;
-- current packed item_proto was decoded and matched between Project_Binary and Project_DumpProto;
-- time-limited ChangeLook mount donor lifetime transfer remains unpromoted because no tracked normal-player transmutation opener is proven;
-- newer mount raw client-pack MSM/GR2 assets are not versioned, so asset-presence verification is deferred.
+Promoted:
+- `BUG-PET-001` — Bruce auto-pickup range calculation ignores Y distance.
 
-No Horse/Mount runtime test has been run.
+Deferred test:
+- `PET-T01`.
 
-## Next
-Select the next unmapped static subsystem from Project_Map and continue detection-only mapping.
+Open:
+- Bruce raw pickup-item lifetime;
+- PET_PAY expiry/death/login cleanup;
+- CPetSystem event/actor lifetime;
+- Lua pet.summon legacy-signature mismatch reachability;
+- current PET_PAY family/race/client coverage;
+- Achievement summon-time abnormal cleanup.
 
+Do not execute `PET-T01`.
 GitHub state is canonical.
