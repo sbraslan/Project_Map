@@ -147,4 +147,15 @@ After runtime is explicitly unlocked in a controlled multi-core environment:
 
 Bug signature: the delayed old logout resolves P only by name, deletes the CCI already updated to B and invokes messenger logout for the still-online destination session.
 
+
+## MSG-T14 — observer name-path parity
+After runtime is explicitly unlocked:
+1. enter observer/spectator mode with A;
+2. confirm VID-based friend/block actions are rejected where exposed;
+3. open the Messenger window and use Add Friend by name against B;
+4. use Add Block by name against B;
+5. inspect B's friend authorization and A/B block relation.
+
+Bug signature: name-based friend/block creation succeeds from observer mode while the equivalent VID routes are explicitly rejected.
+
 Do not run any MSG test while the project execution lock is active.
