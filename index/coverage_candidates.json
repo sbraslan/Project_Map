@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "generated_at": "2026-09-29",
+  "source": "index/files.json coverage discovery",
+  "selected_next": "marriage",
+  "candidates": [
+    {
+      "id": "marriage",
+      "status": "SELECTED / OPEN",
+      "evidence": [
+        "Project_ServerSRC:db/src/Marriage.cpp",
+        "Project_ServerSRC:db/src/Marriage.h",
+        "Project_ServerSRC:game/src/marriage.cpp",
+        "Project_ServerSRC:game/src/marriage.h",
+        "Project_ServerSRC:game/src/questlua_marriage.cpp",
+        "Project_ServerSRC:game/src/wedding.cpp",
+        "Project_ServerSRC:game/src/wedding.h",
+        "Project_Game:share/locale/europe/quest/n_npc/marriage_manage.quest"
+      ]
+    },
+    {
+      "id": "oxevent",
+      "status": "QUEUED",
+      "evidence": [
+        "Project_ServerSRC:game/src/OXEvent.cpp",
+        "Project_ServerSRC:game/src/questlua_oxevent.cpp",
+        "Project_Game:share/locale/europe/quest/e_event/oxevent.quest"
+      ]
+    },
+    {
+      "id": "arena",
+      "status": "QUEUED",
+      "evidence": [
+        "Project_ServerSRC:game/src/arena.cpp",
+        "Project_ServerSRC:game/src/BattleArena.cpp",
+        "Project_ServerSRC:game/src/questlua_arena.cpp",
+        "Project_Game:share/locale/europe/quest/n_npc/arena_manager.quest"
+      ]
+    },
+    {
+      "id": "monarch",
+      "status": "QUEUED",
+      "evidence": [
+        "Project_ServerSRC:db/src/Monarch.cpp",
+        "Project_ServerSRC:game/src/monarch.cpp",
+        "Project_ServerSRC:game/src/questlua_monarch.cpp"
+      ]
+    },
+    {
+      "id": "attr6th7th",
+      "status": "QUEUED",
+      "evidence": [
+        "Project_ServerSRC:game/src/Attr6th7th.cpp",
+        "Project_ServerSRC:game/src/questlua_attr6th7th.cpp"
+      ]
+    },
+    {
+      "id": "skill_affect",
+      "status": "QUEUED",
+      "evidence": [
+        "Project_ServerSRC:game/src/skill.cpp",
+        "Project_ServerSRC:game/src/char_skill.cpp",
+        "Project_ServerSRC:game/src/affect.cpp",
+        "Project_ServerSRC:game/src/char_affect.cpp",
+        "Project_ClientSrc:UserInterface/PythonPlayerSkill.cpp",
+        "Project_Binary:root/uiaffectshower.py"
+      ]
+    }
+  ]
+}
