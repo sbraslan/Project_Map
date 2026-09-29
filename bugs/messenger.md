@@ -336,21 +336,22 @@ A channel/core transition can make an affected process mark a still-online chara
 `MSG-T16`.
 ---
 
-## BUG-MSG-014 — name-based messenger add paths bypass observer-mode restriction
+---
 
-**Class:** path-dependent authorization / observer-mode bypass  
-**Reachability:** VERIFIED through the normal Messenger window name-entry actions.
+## BUG-MSG-017 — name-based messenger CG packets do not faithfully encode the configured 48-byte name range
+
+**Class:** client/server protocol compatibility / string-boundary defect  
+**Reachability:** VERIFIED for configured long character names on the normal Messenger name-entry and remove paths.
 
 ### Proof
-1. `HEADER_CG_MESSENGER` is dispatched even while the character is in observer mode; there is no dispatcher-level observer gate for the whole Messenger handler.
-2. `MESSENGER_SUBHEADER_CG_ADD_BY_VID` explicitly returns when `ch->IsObserverMode()` is true.
-3. `MESSENGER_SUBHEADER_CG_BLOCK_ADD_BY_VID` has the same explicit observer-mode guard.
-4. The equivalent `MESSENGER_SUBHEADER_CG_ADD_BY_NAME` and `MESSENGER_SUBHEADER_CG_BLOCK_ADD_BY_NAME` branches contain no `IsObserverMode()` check.
-5. `uimessenger.py` exposes ordinary Add Friend and Add Block name-entry dialogs that call `SendMessengerAddByNamePacket(text)` and `SendMessengerBlockAddByNamePacket(text)`.
+1. The shared configured limit is `CHARACTER_NAME_MAX_LEN = 48`, and the player-create packet reserves `CHARACTER_NAME_MAX_LEN + 1` bytes for a character name.
+2. Europe uses `check_name_alphabet`, which validates content/minimum length but does not impose a smaller maximum in the server validator.
+3. `SendMessengerAddByNamePacket` and `SendMessengerBlockAddByNamePacket` allocate only `char szName[CHARACTER_NAME_MAX_LEN]`, copy at most `CHARACTER_NAME_MAX_LEN - 1`, force byte 47 to NUL, and send exactly 48 bytes. A 48-byte valid name therefore cannot be represented and is truncated to 47 bytes.
+4. `SendMessengerRemovePacket`, `SendMessengerBlockRemovePacket`, and `SendMessengerBlockRemoveByVIDPacket` also allocate only 48 bytes and copy at most 47 bytes, but do **not** explicitly write a terminator into the final byte.
+5. For 47-byte-or-longer names, the final transmitted byte can therefore remain uninitialized/stale while the server consumes the fixed 48-byte field and passes it to C-string handling via `strlcpy`.
 
 ### Consequence
-An observer/spectator can use the Messenger window's name-based controls to create friend requests or block relations even though the VID-based forms explicitly forbid those actions in observer mode.
+Messenger name-based operations are not round-trip safe at the configured character-name boundary. Maximum-length names cannot be targeted correctly by add/block-add, while remove/unblock packets for long names can carry a non-terminated or contaminated final byte, causing lookup failure/state divergence and leaking one byte of client stack contents into the packet.
 
 ### Deferred validation
-`MSG-T14`.
-
+`MSG-T17`.
