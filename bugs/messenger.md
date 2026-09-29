@@ -270,4 +270,23 @@ Staff accounts using the `WIZARD` authority are omitted from the GM messenger gr
 
 ### Deferred validation
 `MSG-T13`.
+---
+
+## BUG-MSG-014 — name-based friend/block add bypasses the observer-mode restriction
+
+**Class:** server authorization / path-parity defect  
+**Reachability:** VERIFIED through the normal Messenger-window name input surfaces.
+
+### Proof
+1. `MESSENGER_SUBHEADER_CG_ADD_BY_VID` rejects the action when `ch->IsObserverMode()` is true.
+2. `MESSENGER_SUBHEADER_CG_BLOCK_ADD_BY_VID` applies the same observer-mode rejection.
+3. The corresponding `ADD_BY_NAME` and `BLOCK_ADD_BY_NAME` server branches do not check `IsObserverMode()`.
+4. `uimessenger.py::OnAddFriend` normally exposes `SendMessengerAddByNamePacket(text)`.
+5. `uimessenger.py::OnAddBlock` normally exposes `SendMessengerBlockAddByNamePacket(text)`.
+
+### Consequence
+Observer-mode restrictions are path-dependent: friend/block add actions rejected through a VID target can still be initiated by typing the same online player's name in the Messenger UI.
+
+### Deferred validation
+`MSG-T14`.
 
