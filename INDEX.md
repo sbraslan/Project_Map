@@ -43,6 +43,7 @@ This is the navigation index. Normal continuation starts at `STATE.json`, then `
 | Growth Pet System | STATIC COMPLETE | `systems/growth_pet.md` |
 | Horse / Mount / Riding | STATIC COMPLETE | `systems/horse_mount.md` |
 | Classic Pet System | STATIC COMPLETE | `systems/pet.md` |
+| Fishing Renewal | MAPPING IN PROGRESS | `systems/fishing.md` |
 
 ## Current phase
 - **Detection / mapping only.** Source and game repositories remain read-only.
@@ -174,3 +175,14 @@ Runtime execution remains locked and `DUNGEON-T09` remains the first future live
 Classic Pet System is now **STATIC COMPLETE** with verified `BUG-PET-001..004` and canonical deferred tests `PET-T01..PET-T04`.
 Current effective completed/readiness coverage is **29/29 STATIC COMPLETE subsystem rows** plus the folded Guild lifecycle companion.
 Runtime execution remains locked; first future live gate remains `DUNGEON-T09`.
+
+
+## Active continuation — Fishing Renewal — 2026-09-29
+Classic Pet closure leaves **29/29 STATIC COMPLETE** subsystem rows plus the folded Guild lifecycle companion.
+
+Fishing Renewal is now the active mapping cursor:
+- `systems/fishing.md`;
+- `bugs/fishing.md`;
+- `tests/fishing.md`.
+
+Initial verified findings: `BUG-FISH-001..002`. Fishing is not yet counted as STATIC COMPLETE. Runtime remains locked and `DUNGEON-T09` remains the first future live gate.
