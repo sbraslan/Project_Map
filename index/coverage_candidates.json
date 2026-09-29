@@ -6,7 +6,7 @@
   "candidates": [
     {
       "id": "marriage",
-      "status": "SELECTED / OPEN",
+      "status": "ACTIVE / 2 VERIFIED BUGS",
       "evidence": [
         "Project_ServerSRC:db/src/Marriage.cpp",
         "Project_ServerSRC:db/src/Marriage.h",
@@ -16,6 +16,11 @@
         "Project_ServerSRC:game/src/wedding.cpp",
         "Project_ServerSRC:game/src/wedding.h",
         "Project_Game:share/locale/europe/quest/n_npc/marriage_manage.quest"
+      ],
+      "canonical": [
+        "systems/marriage.md",
+        "bugs/marriage.md",
+        "tests/marriage.md"
       ]
     },
     {
