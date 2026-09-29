@@ -2,7 +2,7 @@
 
 **Active phase:** Detection / Mapping Only  
 **Active state:** Static mapping continuation  
-**Status:** MESSENGER / FRIEND / BLOCK — MAPPING IN PROGRESS / 16 VERIFIED BUGS / EXECUTION LOCKED  
+**Status:** MESSENGER / FRIEND / BLOCK — MAPPING IN PROGRESS / 14 VERIFIED BUGS / EXECUTION LOCKED  
 **Machine state:** `STATE.json`  
 **Active subsystem:** Messenger / Friend / Block  
 **System:** `systems/messenger.md`  
@@ -41,8 +41,8 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 - `OnBlockLogin`'s missing local handler-null guard is closed as non-bug because `PyCallClassMemberFunc` safely rejects a null handler.
 
 ## Exact resume cursor
-1. Audit remaining client messenger packet/parser boundaries after BUG-MSG-012.
-2. Check tracked quest/deployed usage reachability of BUG-MSG-011 Lua helpers.
-3. Re-check residual P2P resynchronization paths after BUG-MSG-016 and interaction with BUG-MSG-003/007.
-4. Run a final static relation/presence symmetry pass and assess Messenger static-closure readiness.
+1. Continue channel-change/reconnect P2P ordering candidate without promoting timing-dependent behavior.
+2. Audit fixed-width Messenger name payload termination/length handling on server and client.
+3. Finish remaining GM messenger lifecycle/inverse-cache semantics.
+4. Check tracked quest usage of BUG-MSG-011 Lua helpers.
 5. Do not execute runtime tests; global first future live gate remains `DUNGEON-T09`.
