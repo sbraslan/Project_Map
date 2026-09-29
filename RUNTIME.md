@@ -934,3 +934,9 @@ Both primary normal-path Achievement candidates were reverified.
 - `ACH-T04`: current XML has 29 explore tasks; `OnLogin` calls `OnVisitMap`, but mapped map-transition paths do not.
 Canonical handoffs: `ACH_T03_HANDOFF.md`, `ACH_T04_HANDOFF.md`.
 Execution remains locked.
+
+
+## Biolog BIO-T01 handoff — 2026-09-29
+`BIO-T01` completion bridge was reverified and canonical handoff prepared at `BIO_T01_HANDOFF.md`.
+C++ completion flags and client event-quest request exist; the mapped Project_Game package still has no `biolog_manager` quest consumer, only legacy collect_* biolog quests. Actual mission/reward row values remain DB-data dependent.
+Execution remains locked.
