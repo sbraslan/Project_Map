@@ -1,6 +1,6 @@
 # OX Event — Bug Registry
 
-**Status:** STATIC COMPLETE / 7 VERIFIED BUGS  
+**Status:** STATIC COMPLETE / 8 VERIFIED BUGS  
 **Execution:** LOCKED / NOT RUN
 
 ## BUG-OX-001 — renewal quiz timer collides with the 35-second outer scheduler
@@ -118,3 +118,45 @@ An OX event reported/forced as ended can partially resurrect from its still-live
 - Offline-winner reward persistence is unspecified; no bug promoted.
 - Same-map `Show()` audience relocation was mapped and no independent lifecycle defect was proven.
 - Automatic admission-policy initialization is promoted as `BUG-OX-007`.
+
+
+## BUG-OX-006 — reconnect after answer evaluation can restore attendee eligibility
+
+**Class:** reconnect/state validation  
+**Reachability:** VERIFIED.
+
+### Proof
+1. A participant can disconnect before `CheckAnswer` while still saved at the fixed attendee spawn.
+2. Logout does not remove the PID from `m_map_attender`.
+3. `CheckAnswer` cannot resolve the offline character and removes that PID from attendee/character maps.
+4. The saved position remains the attendee spawn.
+5. A reconnect while OX is CLOSE/QUIZ reaches input-login `COXEventManager::Enter`.
+6. `Enter` rejects only FINISH and accepts CLOSE/QUIZ.
+7. The exact attendee spawn calls `EnterAttender`, reinserting the PID after evaluation.
+
+### Consequence
+A player removed from competition by the answer-evaluation pass can restore attendee state by reconnecting in the active event window.
+
+### Deferred validation
+`OX-T06`.
+
+
+## BUG-OX-008 — cancelled cleanup stage persists into the next OX event
+
+**Class:** cross-event state leakage / timer lifecycle  
+**Reachability:** VERIFIED through deployed force-end and any close path occurring after `CheckAnswer` but before stage-2 cleanup.
+
+### Proof
+1. `oxevent_timer` uses function-local `static uint8_t flag`.
+2. Stage 1 calls `CheckAnswer`, populates `m_map_miss`, increments `flag` to 2 and schedules the next callback.
+3. `CloseEvent` cancels the pending timer.
+4. `Initialize` clears `m_map_char` and `m_map_attender` but does not clear `m_map_miss`.
+5. No close/reset path writes `flag = 0`.
+6. C++ static-local semantics retain `flag` across later calls.
+7. The next `Quiz` creates a new timer; its first callback enters case 2 instead of case 0, running cleanup/status-close and skipping the new question's normal answer sequence.
+
+### Consequence
+Stopping one OX event during the post-answer cleanup window can corrupt the first question of a later OX event even when the automatic 35-second collision is absent.
+
+### Deferred validation
+`OX-T08`.
