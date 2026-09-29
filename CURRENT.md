@@ -46,3 +46,14 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 1. Open the next independent subsystem for detection-only mapping.
 2. Keep all source/game repositories read-only.
 3. Do not execute runtime or fault-injection tests.
+
+
+## Mapping acceleration index — 2026-09-29
+- Status: **READY**
+- Canonical directory: `index/`
+- Source repos remain **READ-ONLY**.
+- GitHub Code Search is no longer a hard dependency; recursive Git tree inventory + Project_Map machine index is the primary lookup path.
+- Indexed mapping-relevant files: **10,119**.
+- Seed coverage: **34 systems / 228 symbols / 234 call-flow edges**.
+- Context7 role: external dependency/API verification only.
+- Next mapping action: use the new index for global source-feature coverage discovery and choose the next unmapped/under-mapped subsystem.
