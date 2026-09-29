@@ -89,10 +89,10 @@ Do not execute runtime tests. Global first future live gate remains `DUNGEON-T09
 
 ## Updated cursor
 Continue static audit of:
-- remaining friend/block/GM relation mutation symmetry after BUG-MSG-019/021;
-- residual P2P presence resynchronization after BUG-MSG-016;
-- any remaining packet-boundary/framing paths after BUG-MSG-012/017/020;
-- static-closure readiness.
+- pending friend-token identity/collision characteristics (candidate only unless ordinary reachability is established);
+- malformed/fixed-width messenger packet parsing (candidate only unless ordinary server-generated reachability is established);
+- residual relation/cache/P2P symmetry after BUG-MSG-015/016;
+- final static-closure readiness.
 
 Do not execute runtime tests. Global first future live gate remains `DUNGEON-T09`.
 
@@ -154,3 +154,7 @@ The initial add-by-VID/name branches enforce block state, but the pending reques
 
 ### GM block route parity
 The block-by-VID branch rejects a GM target only when the requester is `GM_PLAYER`, while block-by-name rejects every GM target on non-test servers regardless of requester authority. Target-board and Messenger name-entry surfaces expose both routes and no common later guard reconciles them. This is `BUG-MSG-021`; deferred validation is `MSG-T21`.
+
+
+### Oversized list framing
+`TPacketGCMessenger::size` is 16-bit while friend/block list builders use a 128 KiB buffer and enforce no cumulative relation-count/packet-size ceiling. Once a list exceeds 65,535 bytes the advertised size wraps but the full buffer is still sent. This is `BUG-MSG-020`.
