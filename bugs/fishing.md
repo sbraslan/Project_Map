@@ -65,3 +65,41 @@ This does not bypass the final server-side reward chance roll, but it removes th
 
 ### Deferred validation
 Canonical test: `FISH-T03`.
+
+
+## BUG-FISH-004 — movement remains server-authorized during renewed fishing
+
+**Class:** state/lifecycle validation defect  
+**Reachability:** VERIFIED — active renewed fishing plus normal movement packet.
+
+### Static proof
+1. `fishing_new_start()` creates `m_pkFishingNewEvent` but does not set `POS_FISHING`.
+2. `CHARACTER::CanMove()` has no renewed-fishing event check.
+3. `CInputMain::Move` relies on `CanMove()` and accepts movement.
+4. The renewed fishing event does not revalidate fishing position/water/starting coordinates after start.
+5. Catch handling remains active as long as the event exists and rod stays equipped.
+
+### Consequence
+A modified client can move away while the renewed fishing minigame remains active and can continue the catch flow from a position that would not pass the original start constraints.
+
+### Deferred validation
+Canonical test: `FISH-T04`.
+
+## BUG-FISH-005 — Carbon rod special bonus condition can never be true
+
+**Class:** gameplay logic / dead condition  
+**Reachability:** VERIFIED — current deployment contains Carbon rod VNUM 27591.
+
+### Static proof
+The special branch requires simultaneously:
+- `dwVnum == 27591`;
+- `dwVnum >= 27400`;
+- `dwVnum <= 27490`.
+
+27591 is greater than 27490, so the branch is impossible.
+
+### Consequence
+Carbon rod never receives the explicit doubled `(rod->GetValue(0) / 10) * 2` chance bonus and always uses the generic single bonus.
+
+### Deferred validation
+Canonical test: `FISH-T05`.
