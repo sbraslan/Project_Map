@@ -25,10 +25,10 @@
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Continue client messenger parser/state safety and optimistic unblock/server-ack behavior.",
+      "Close rename/logout behavior around the proven pc_change_name -> RemoveAllList/RemoveAllBlockList caller.",
+      "Audit pending party/guild invite acceptance after either side establishes a messenger block.",
       "Finish GM messenger cache lifecycle and channel-change/reconnect boundaries.",
-      "Resolve active-call reachability of RemoveAllBlockList before promotion.",
-      "Keep BUG-MSG-008/009 paired with deferred MSG-T08/MSG-T09.",
+      "Continue remaining client parser/state boundaries after BUG-MSG-009.",
       "Do not execute runtime tests; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -2672,7 +2672,9 @@
       "BUG-MSG-004",
       "BUG-MSG-005",
       "BUG-MSG-006",
-      "BUG-MSG-007"
+      "BUG-MSG-007",
+      "BUG-MSG-008",
+      "BUG-MSG-009"
     ],
     "mapped_flows": [
       "input_login.cpp -> MessengerManager::Login -> asynchronous friend/GM/block SQL callbacks",
@@ -2683,12 +2685,17 @@
       "Whisper local target vs remote CCI relay block enforcement",
       "PythonNetworkStreamPhaseGame.cpp -> RecvMessenger -> CPythonMessenger",
       "PythonMessenger.cpp -> uimessenger.py online/offline callbacks",
-      "game.py Close -> messenger.Destroy session teardown"
+      "game.py Close -> messenger.Destroy session teardown",
+      "uitarget.py -> /party_request -> do_party_request -> CHARACTER::RequestToParty messenger-block bypass",
+      "uitarget.py unblock confirmation -> SendMessengerBlockRemoveByVIDPacket -> GetInstancePtr stale-VID/null-deref path",
+      "questlua_pc.cpp pc_change_name -> RemoveAllList + RemoveAllBlockList",
+      "input_p2p.cpp shout fanout -> receiver-side IsBlocked filter"
     ],
     "candidates": [
       "add-by-name friend path observer-mode parity with add-by-VID remains under assessment",
-      "remove-all and inverse-only relation cleanup symmetry remains under assessment",
-      "OnBlockLogin handler-null safety remains unpromoted pending helper semantics"
+      "RemoveAllBlockList incoming-row RAM/P2P asymmetry is actively reachable through pc_change_name; final rename/logout lifecycle impact remains under assessment",
+      "pending party/guild invite acceptance after a newly established messenger block remains under assessment",
+      "OnBlockLogin local handler-null guard concern closed as non-bug because PyCallClassMemberFunc guards null handlers"
     ],
     "runtime_tests": {
       "status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN",
@@ -2699,7 +2706,9 @@
         "MSG-T04",
         "MSG-T05",
         "MSG-T06",
-        "MSG-T07"
+        "MSG-T07",
+        "MSG-T08",
+        "MSG-T09"
       ],
       "first_live_gate_unchanged": "DUNGEON-T09"
     }
