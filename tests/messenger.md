@@ -157,15 +157,6 @@ After runtime is explicitly unlocked in an isolated test environment:
 Bug signature: 48-byte names are truncated by add/block-add to 47 bytes, while 47-byte-or-longer remove/unblock fields can transmit a non-terminated/stale final byte and fail to address the intended relation.
 
 
-## MSG-T14 — observer-mode name-path bypass
-After runtime is explicitly unlocked:
-1. place A in observer mode and keep B online;
-2. verify A cannot add/block B through the VID/target-board path;
-3. open the Messenger window and type B's name into Add Friend / Add Block;
-4. inspect the request/block state on both server and client.
-
-Bug signature: the name-based path succeeds while the VID-based path is rejected solely because A is in observer mode.
-
 ## MSG-T18 — Battle Field friend-add VID parity
 After runtime is explicitly unlocked:
 1. enter a Battle Field map with A and visible player B;
@@ -176,14 +167,12 @@ After runtime is explicitly unlocked:
 Bug signature: add-by-name is rejected on the Battle Field map while the target-board VID route creates the friend request.
 
 
-## MSG-T15 — channel-change stale logout race
-After runtime/fault-injection execution is explicitly unlocked:
-1. use at least three game processes/cores with P2P visibility;
-2. move player A from old channel/core X to new channel/core Y;
-3. on observer core Z, force/delay P2P delivery so `GG_LOGIN` from Y is processed before `GG_LOGOUT` from X;
-4. inspect Z's CCI for A and Messenger presence after both packets are processed;
-5. attempt a remote lookup/relay toward A.
+## MSG-T19 — block change during pending friend authorization
+After runtime is explicitly unlocked:
+1. A sends B a normal friend request;
+2. before B accepts, establish a messenger block between A and B in either direction;
+3. B accepts the original friend dialog with `/messenger_auth y A`;
+4. inspect both friend-list directions, the block relation and persistent DB rows.
 
-Bug signature: the delayed logout from X removes the CCI already updated to Y and emits Messenger P2P logout, leaving A falsely offline/missing on Z.
-
+Bug signature: the pending request is accepted despite the new block and the pair ends up simultaneously friend-related and blocked.
 Do not run any MSG test while the project execution lock is active.
