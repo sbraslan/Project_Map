@@ -8,17 +8,26 @@
   "active": {
     "subsystem": "attr6th7th",
     "display_name": "6th/7th Attribute",
-    "status": "STATIC MAPPING OPEN / 0 VERIFIED BUGS / EXECUTION LOCKED",
+    "status": "STATIC MAPPING OPEN / 8 VERIFIED BUGS / EXECUTION LOCKED",
     "system_file": "systems/attr6th7th.md",
     "bug_file": "bugs/attr6th7th.md",
     "test_file": "tests/attr6th7th.md",
-    "verified_bug_ids": [],
+    "verified_bug_ids": [
+      "BUG-ATTR67-001",
+      "BUG-ATTR67-002",
+      "BUG-ATTR67-003",
+      "BUG-ATTR67-004",
+      "BUG-ATTR67-005",
+      "BUG-ATTR67-006",
+      "BUG-ATTR67-007",
+      "BUG-ATTR67-008"
+    ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Map Attr6th7th manager lifecycle and item state transitions.",
-      "Map quest Lua bindings and deployed caller reachability.",
-      "Audit material/cost consumption ordering, success/failure, and item ownership/revalidation.",
-      "Trace client-visible request/result path if present.",
+      "Finish Attr67 private-shop/shop/material cross-window boundary pass.",
+      "Audit NPC_STORAGE delayed retrieval plus reconnect/restart reconstruction.",
+      "Audit percent/support bounds and rare-attribute mutation.",
+      "Close deployment-shadowed client/server parity candidates.",
       "Keep runtime/fault-injection execution locked; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -3006,7 +3015,7 @@
     ]
   },
   "monarch_mapping": {
-    "status": "STATIC COMPLETE / 11 VERIFIED BUGS",
+    "status": "STATIC COMPLETE / 13 VERIFIED BUGS",
     "canonical_files": {
       "system": "systems/monarch.md",
       "bugs": "bugs/monarch.md",
@@ -3023,7 +3032,9 @@
       "BUG-MON-008",
       "BUG-MON-009",
       "BUG-MON-010",
-      "BUG-MON-011"
+      "BUG-MON-011",
+      "BUG-MON-012",
+      "BUG-MON-013"
     ],
     "mapped_flows": [
       "GM elect -> HEADER_GD_COME_TO_VOTE -> DB ComeToVote -> CMonarch::ElectMonarch -> no winner/state update -> BUG-MON-001",
@@ -3058,7 +3069,9 @@
         "MON-T08",
         "MON-T09",
         "MON-T10",
-        "MON-T11"
+        "MON-T11",
+        "MON-T12",
+        "MON-T13"
       ],
       "first_live_gate_unchanged": "DUNGEON-T09"
     },
@@ -3067,11 +3080,75 @@
       "MySQL documentation confirms DML affected-row reporting uses mysql_affected_rows/ROW_COUNT; project libsql exposes this as uiAffectedRows while uiNumRows is result-set rows."
     ],
     "closure_notes": [
-      "Monarch static mapping complete with BUG-MON-001..011.",
+      "Monarch static mapping complete with BUG-MON-001..013.",
       "PowerUp/DefenseUp and takemonarchmoney remain dormant in current tracked quest deployment.",
       "AddMoney 2B cap and monarch notice final pass produced no additional independent finding.",
       "Context7 used only for supplementary C++/MySQL semantics; Metin2 source remains authoritative.",
       "Runtime tests MON-T01..MON-T11 remain locked; first future live gate DUNGEON-T09."
+    ]
+  },
+  "attr6th7th_mapping": {
+    "status": "STATIC MAPPING OPEN / 8 VERIFIED BUGS",
+    "canonical_files": {
+      "system": "systems/attr6th7th.md",
+      "bugs": "bugs/attr6th7th.md",
+      "tests": "tests/attr6th7th.md"
+    },
+    "verified_bug_ids": [
+      "BUG-ATTR67-001",
+      "BUG-ATTR67-002",
+      "BUG-ATTR67-003",
+      "BUG-ATTR67-004",
+      "BUG-ATTR67-005",
+      "BUG-ATTR67-006",
+      "BUG-ATTR67-007",
+      "BUG-ATTR67-008"
+    ],
+    "mapped_flows": [
+      "client UI -> CPythonNetworkStream -> HEADER_CG_ATTR_6TH_7TH -> CInputMain::Attr67Send -> OPEN/CLOSE/SKILLBOOK_COMB/GET_FRAGMENT/ADD",
+      "OPEN -> SetOpenSkillBookComb -> W_ATTR_6TH_7TH; action subheaders omit OPEN/window-state enforcement -> BUG-ATTR67-001",
+      "SKILLBOOK_COMB duplicate bCell values -> one physical book counted ten times -> reward after one destruction -> BUG-ATTR67-002",
+      "Exchange raw LPITEM + Attr67 missing IsExchanging/window gate -> item destruction leaves Exchange dangling pointer -> BUG-ATTR67-003",
+      "GET_FRAGMENT -> m_AttrItemAdded raw LPITEM -> destruction without back-reference cleanup -> later ADD dereference -> BUG-ATTR67-004",
+      "ADD fragment removal precedes additive validation -> invalid additive after committed fragment cost -> BUG-ATTR67-005",
+      "uniform_real_distribution [low,high) + uint32 truncation -> configured high skillbook VNUM never generated -> BUG-ATTR67-006",
+      "97/97 deployed quest_list sources contain no Attr67 open/retrieval caller -> BUG-ATTR67-007",
+      "special skillbook global slots 180..359 vs uint8 bCell -> slots 256..359 truncate -> BUG-ATTR67-008"
+    ],
+    "deployment_shadowed_findings": [
+      "Skillbook UI displays 1,000,000 Yang while server checks/charges 100,000.",
+      "Attr67 UI permits support-only submission while server requires fragments when support is present.",
+      "Native client subheader range checks use impossible conjunctions.",
+      "Native skillbook packet builder does not cap Python list size to the fixed ten-cell array."
+    ],
+    "dormant_candidates": [
+      "attr67_get_vnum null dereference when NPC_STORAGE is empty.",
+      "GetItemAttr converts negative empty position into uint16_t without its own free-slot guard.",
+      "GetItemAttr wait-time enforcement is caller-dependent."
+    ],
+    "runtime_tests": {
+      "status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN",
+      "canonical_test_ids": [
+        "ATTR67-T01",
+        "ATTR67-T02",
+        "ATTR67-T03",
+        "ATTR67-T04",
+        "ATTR67-T05",
+        "ATTR67-T06",
+        "ATTR67-T07",
+        "ATTR67-T08"
+      ],
+      "first_live_gate_unchanged": "DUNGEON-T09"
+    },
+    "context7_notes": [
+      "cppreference confirms std::uniform_real_distribution produces values in [a,b), supporting BUG-ATTR67-006.",
+      "Context7 is supplementary only; tracked Metin2 source remains authoritative."
+    ],
+    "next_actions": [
+      "Finish private-shop/shop/material cross-window pass.",
+      "Audit NPC_STORAGE reconnect/restart reconstruction.",
+      "Audit percent/support boundaries and rare-attribute mutation.",
+      "Close client/server parity candidates and decide STATIC COMPLETE."
     ]
   }
 }
