@@ -195,4 +195,4 @@ Canonical ownership:
 - DS-T11 -> BUG-DS-011
 
 No Dragon Soul test has been executed.
-The global first future live gate remains `DUNGEON-T10`.
+The global first future live gate remains `DUNGEON-T09`.
