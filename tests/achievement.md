@@ -77,4 +77,4 @@ Covers BUG-ACH-002.
 - ACH-T08 -> BUG-ACH-003.
 - ACH-T09 added to cover previously untested BUG-ACH-002.
 - Primary legitimate normal-path candidates: ACH-T03 and ACH-T04.
-- Overall first live runtime gate remains DUNGEON-T10.
+- Overall first live runtime gate remains DUNGEON-T09.
