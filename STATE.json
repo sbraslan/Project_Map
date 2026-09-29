@@ -6,22 +6,24 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "horse_mount",
-    "display_name": "Horse / Mount / Riding",
-    "status": "STATIC COMPLETE / 3 PROMOTED HORSE-MOUNT BUGS / EXECUTION LOCKED",
-    "system_file": "systems/horse_mount.md",
-    "bug_file": "bugs/horse_mount.md",
-    "test_file": "tests/horse_mount.md",
+    "subsystem": "pet",
+    "display_name": "Classic Pet System",
+    "status": "STATIC MAPPING IN PROGRESS / 1 PROMOTED CLASSIC-PET BUG / EXECUTION LOCKED",
+    "system_file": "systems/pet.md",
+    "bug_file": "bugs/pet.md",
+    "test_file": "tests/pet.md",
     "verified_bug_ids": [
-      "BUG-HORSE-001",
-      "BUG-HORSE-002",
-      "BUG-HORSE-003"
+      "BUG-PET-001"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Select the next unmapped static subsystem from Project_Map and continue detection-only mapping.",
-      "Keep Horse runtime tests HORSE-T01..HORSE-T03 locked until an explicit phase change.",
-      "Global first future live gate remains DUNGEON-T10."
+      "Trace Bruce pickup raw-item lifetime through manual pickup, stacking, deletion, warp and ownership expiry.",
+      "Close PET_PAY equip/unequip/real-time expiry/death/login restoration.",
+      "Audit CPetSystem update-event and actor-map cleanup.",
+      "Locate or exclude active pet.summon quest producers and resolve legacy Lua signature mismatch.",
+      "Map current PET_PAY item families/race assets/client UI.",
+      "Audit Achievement TYPE_SUMMON_PET time accounting under abnormal unsummon paths.",
+      "Do not execute PET-T01 or any Classic Pet runtime test without an explicit phase change."
     ]
   },
   "startup": {
@@ -2370,5 +2372,35 @@
       "No Horse/Mount runtime test has been executed.",
       "Global first future live gate remains DUNGEON-T10."
     ]
+  },
+  "pet_mapping": {
+    "status": "STATIC MAPPING IN PROGRESS",
+    "canonical_files": {
+      "system": "systems/pet.md",
+      "bugs": "bugs/pet.md",
+      "tests": "tests/pet.md"
+    },
+    "verified_bug_ids": [
+      "BUG-PET-001"
+    ],
+    "mapped_flows": [
+      "ITEM_PET/PET_PAY use -> EquipItem -> CHARACTER::PetSummon -> CPetSystem::Summon",
+      "WEAR_PET -> PetUnsummon on use/unequip",
+      "CPetSystem 4Hz update event -> CPetActor follow/lifetime",
+      "race 34055 Bruce -> PET_AUTO_PICKUP",
+      "packed item_proto 53233 -> PET_PAY(12) VALUE0 34055 -> BUG-PET-001"
+    ],
+    "candidates": [
+      "questlua_pet pet.summon uses legacy four-argument call against ENABLE_PET_SYSTEM signature; active quest producer not yet established.",
+      "Bruce pickup target is raw LPITEM; concurrent/manual pickup lifetime remains open.",
+      "CPetActor::Update returns false without Unsummon when summon item VID no longer resolves; destruction/expiry callers remain open."
+    ],
+    "runtime_tests": {
+      "status": "READY / EXECUTION LOCKED / NOT RUN",
+      "canonical_test_ids": [
+        "PET-T01"
+      ],
+      "first_live_gate_unchanged": "DUNGEON-T10"
+    }
   }
 }
