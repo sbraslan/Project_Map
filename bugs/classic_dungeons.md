@@ -1,6 +1,6 @@
 # Classic Quest Dungeons — Bug Registry
 
-**Status:** STATIC MAPPING OPEN / 3 VERIFIED BUGS  
+**Status:** STATIC MAPPING OPEN / 4 VERIFIED BUGS  
 **Execution:** LOCKED / NOT RUN
 
 Previously verified generic Dungeon Core or Party bugs are referenced rather than duplicated unless a distinct feature-specific defect is proven.
@@ -60,3 +60,25 @@ A failed instance-creation attempt can consume the Catacomb entry item without c
 
 ### Deferred validation
 `CLD-T03`.
+
+
+## BUG-CLD-004 — Snow non-timer events schedule stage transitions with stale `get_server_timer_arg()`
+
+**Class:** cross-instance state isolation / stale singleton context
+
+### Proof
+- `CQuestManager::ServerTimer(npc,arg)` writes `arg` into singleton member `m_dwServerTimerArg`.
+- `get_server_timer_arg()` simply returns that member.
+- The member is not set to the current dungeon map for normal item-use, take or kill quest events and is not reset after a server-timer callback.
+- Snow Dungeon nevertheless uses `get_server_timer_arg()` to key new stage timers from four non-server-timer handlers:
+  - `LEVEL2_KEY.use` -> `snow_dungeon_floor3_timer`;
+  - `LEVEL8_KEY.use` -> `snow_dungeon_floor9_timer`;
+  - `LEVEL5_CUBE.take` -> `snow_dungeon_floor6_timer`;
+  - `LEVEL6_STONE.kill` -> `snow_dungeon_floor7_timer`.
+- The resulting server-timer handlers later call `d.select(get_server_timer_arg())`, so the stale key directly determines which private instance is advanced.
+
+### Consequence
+With multiple active timer-driven systems/instances on one game process, a Snow action can register its next-floor timer under another instance's map index (or another stale value). The intended Snow run can stall, while a different valid dungeon map can receive an unintended stage transition if the stale identifier resolves there.
+
+### Deferred validation
+`CLD-T04`.
