@@ -119,10 +119,10 @@ A request can remain authorizable long after its original UI/request lifetime, i
 ### Deferred validation
 `MSG-T06`.
 
-## Open candidates / not promoted yet
-- add-by-name friend path differs from add-by-VID observer validation; gameplay impact not yet closed.
-- remove-all and inverse-only relation cleanup semantics need symmetry audit.
-- `OnBlockLogin` lacks a local handler-null guard, but this is closed as non-bug: `PyCallClassMemberFunc` itself rejects a null class/handler safely.
+## Earlier candidate notes
+- add-by-name observer-mode parity is now promoted as `BUG-MSG-016`.
+- remove-all / rename persistence was closed as transient because the deployed successful rename path immediately disconnects and P2P logout clears the old-name cache edges.
+- `OnBlockLogin`'s missing local handler-null guard is closed as non-bug because `PyCallClassMemberFunc` itself rejects a null class/handler safely.
 
 
 ---
