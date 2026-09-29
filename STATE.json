@@ -556,7 +556,15 @@
         "TICKET-T07"
       ],
       "isolated_adversarial_range": "TICKET-T01..TICKET-T06",
-      "first_ticket_live_gate": "TICKET-T07"
+      "first_ticket_live_gate": "TICKET-T07",
+      "handoff": "TICKET_T07_HANDOFF.md",
+      "preflight_notes": [
+        "Server MAX_LOGS_GENERAL and GC packet capacity are 40.",
+        "C++ client TICKET_MAX_LOGS_GENERAL is 10 and AddLogDetails copies only 0..9.",
+        "Python UI expects 20 rows per page across 10 normal-user pages.",
+        "Normal AppendLogs calls GetLogByID only for 0..9; TICKET-T07 does not directly trigger BUG-TICKET-005.",
+        "TICKET-T07 remains after the Dungeon Info normal-path cluster."
+      ]
     },
     "hunting": {
       "status": "DOCUMENTATION READY / NOT RUN",
