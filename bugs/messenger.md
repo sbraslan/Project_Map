@@ -194,3 +194,42 @@ A normal UI race — open “remove block”, let the targeted character leave/d
 
 ### Deferred validation
 `MSG-T09`.
+---
+
+## BUG-MSG-010 — pending party/guild invites do not revalidate a newly established messenger block
+
+**Class:** TOCTOU / authorization revalidation defect  
+**Reachability:** VERIFIED for the existing pending-invite acceptance handlers.
+
+### Proof
+1. `CInputMain::PartyInvite` checks `IsBlocked` in both directions before creating the party invite.
+2. The answer path is `PartyInviteAnswer -> CHARACTER::PartyInviteAccept`.
+3. `PartyInviteAccept` validates the pending event and mutable party conditions but never re-checks messenger block.
+4. Guild invite creation likewise checks both messenger-block directions before `CGuild::Invite`.
+5. `CGuild::InviteAccept` validates the pending invite event and guild join conditions but does not retain/re-check the original inviter's messenger-block relation.
+
+### Consequence
+An invite that was valid when created can still be accepted after either side establishes a messenger block during the pending window.
+
+### Deferred validation
+`MSG-T10`.
+
+---
+
+## BUG-MSG-011 — Lua friend/block query helpers reject ordinary player-name strings
+
+**Class:** Lua API / argument validation defect  
+**Reachability:** VERIFIED for the registered `pc.is_blocked` and `pc.is_friend` functions.
+
+### Proof
+1. Both helpers are registered under `ENABLE_MESSENGER_BLOCK`.
+2. Both start with `lua_isnumber(L, 1)` and return without a boolean if the check fails.
+3. Immediately afterward they call `lua_tostring(L, 1)` and `CHARACTER_MANAGER::FindPC(arg1)`.
+4. Their actual lookup therefore expects a character-name string, but a normal non-numeric player name is rejected by the numeric gate first.
+
+### Consequence
+Quest code using the natural form `pc.is_blocked("PlayerName")` or `pc.is_friend("PlayerName")` cannot obtain the intended relation boolean for ordinary character names.
+
+### Deferred validation
+`MSG-T11`.
+
