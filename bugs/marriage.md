@@ -210,3 +210,43 @@ A supposedly faster-growth premium can grant retroactive points while active and
 
 ### Deferred validation
 `MARR-T10`.
+
+
+## BUG-MARR-011 — active wedding map is not reconstructed after its game core restarts
+
+**Class:** runtime reconstruction / process-local instance lifecycle  
+**Reachability:** VERIFIED for game-core restart during a DB-tracked running wedding.
+
+### Proof
+1. Private `WeddingMap` objects exist only in game-process `WeddingManager::m_mapWedding`.
+2. DB keeps the running pair/map index in `m_mapRunningWedding`.
+3. On a game peer setup/reconnect DB replays WEDDING_READY and WEDDING_START.
+4. Game handlers restore `pWeddingInfo` and `m_setWedding` but never recreate the private `WeddingMap`.
+5. At END, a map-81-owning core calls `WeddingManager::End(savedMapIndex)`.
+6. After restart `Find(savedMapIndex)` is absent, so End returns false.
+7. Game `CManager::WeddingEnd` then returns before deleting relation-side wedding info.
+
+### Consequence
+A core restart can leave reconstructed relation-side wedding state pointing at a private map instance that no longer exists, and later END cleanup fails on that core.
+
+### Deferred validation
+`MARR-T11`.
+
+## BUG-MARR-012 — DB restart drops the running-wedding timer and prevents later DB-mediated end
+
+**Class:** DB runtime persistence / scheduler loss  
+**Reachability:** VERIFIED for DB restart during a running wedding.
+
+### Proof
+1. Wedding start/end timing lives in DB-process priority queues and `m_mapRunningWedding`.
+2. Marriage SQL stores relation/love-point/married state, not running-wedding scheduler state.
+3. DB `CManager::Initialize()` reconstructs only marriage rows.
+4. After restart, no one-hour wedding end event exists.
+5. Manual game `RequestEndWedding` sends the pair to DB.
+6. DB `EndWedding` requires the pair to exist in `m_mapRunningWedding`; after restart it does not, so the function returns without forwarding DG WEDDING_END.
+
+### Consequence
+A wedding map that survives a DB-only restart can remain orphaned/running because both automatic timeout and manual DB end routing have lost their authoritative running-wedding record.
+
+### Deferred validation
+`MARR-T12`.
