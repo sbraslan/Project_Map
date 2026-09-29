@@ -126,3 +126,6 @@ The outgoing messenger helpers do not reserve `CHARACTER_NAME_MAX_LEN + 1` like 
 
 ### Deployment/reachability qualification
 A repository-wide Project_Game search found no tracked quest caller for `pc.is_blocked` or `pc.is_friend`; `BUG-MSG-011` remains a verified registered Lua API defect, but no currently tracked deployed quest depends on it.
+
+### Observer-mode path parity
+Friend/block add-by-VID rejects observer-mode characters. The corresponding name-entry actions from `uimessenger.py` reach add-by-name server branches with no observer-mode guard, while `HEADER_CG_MESSENGER` is not globally observer-gated. This is verified `BUG-MSG-014`.
