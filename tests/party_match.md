@@ -68,4 +68,4 @@ This validates the documented non-atomic WarpSet-result weakness only. No bug ID
 - PMATCH-T01 requires controlled multi-core placement but otherwise normal search flow.
 - PMATCH-T02 requires a deliberately overlapping Exchange + Party Match state and debug/sanitizer observation.
 - Party core ownership remains separate from Party Match.
-- Overall first live runtime gate remains DUNGEON-T10.
+- Overall first live runtime gate remains DUNGEON-T09.
