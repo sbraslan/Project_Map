@@ -8,7 +8,7 @@
   "active": {
     "subsystem": "messenger",
     "display_name": "Messenger / Friend / Block",
-    "status": "MAPPING IN PROGRESS / 15 VERIFIED BUGS / EXECUTION LOCKED",
+    "status": "MAPPING IN PROGRESS / 19 VERIFIED BUGS / EXECUTION LOCKED",
     "system_file": "systems/messenger.md",
     "bug_file": "bugs/messenger.md",
     "test_file": "tests/messenger.md",
@@ -29,14 +29,16 @@
       "BUG-MSG-014",
       "BUG-MSG-015",
       "BUG-MSG-016",
-      "BUG-MSG-017"
+      "BUG-MSG-017",
+      "BUG-MSG-018",
+      "BUG-MSG-019"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Finish remaining GM messenger cache/login/logout lifecycle after BUG-MSG-013.",
-      "Audit remaining client/server messenger packet validation after BUG-MSG-012.",
-      "Check tracked quest usage and practical reachability of BUG-MSG-011 Lua relation helpers.",
-      "Perform final Messenger relation/cache symmetry pass and decide STATIC COMPLETE.",
+      "Audit remaining friend/block relation mutation surfaces and pending-token identity safety after BUG-MSG-019.",
+      "Re-check residual P2P presence repair/resynchronization after BUG-MSG-016.",
+      "Finish client/server messenger packet-boundary checks after BUG-MSG-012/017.",
+      "Assess Messenger static-closure readiness.",
       "Do not execute runtime tests; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -2690,7 +2692,9 @@
       "BUG-MSG-014",
       "BUG-MSG-015",
       "BUG-MSG-016",
-      "BUG-MSG-017"
+      "BUG-MSG-017",
+      "BUG-MSG-018",
+      "BUG-MSG-019"
     ],
     "mapped_flows": [
       "input_login.cpp -> MessengerManager::Login -> asynchronous friend/GM/block SQL callbacks",
@@ -2717,11 +2721,11 @@
       "PythonNetworkStreamPhaseGame.cpp outgoing messenger name fields -> 48-byte configured-name truncation/non-termination boundary",
       "Project_Game quest corpus search -> no tracked caller of pc.is_blocked / pc.is_friend",
       "uimessenger.py add-by-name friend/block -> CInputMain::Messenger observer-mode parity bypass",
-      "channel move old GG_LOGOUT + new WarpEnd GG_LOGIN -> third-core CCI descriptor overwrite/stale logout race"
+      "channel move old GG_LOGOUT + new WarpEnd GG_LOGIN -> third-core CCI descriptor overwrite/stale logout race",
+      "Battle Field target-board add-by-VID -> friend request without add-by-name map gate",
+      "pending friend request -> block relation created -> messenger_auth accept -> AuthToAdd without block revalidation"
     ],
-    "candidates": [
-      "Battle Field friend-add parity: ADD_BY_NAME rejects battle-zone use but ADD_BY_VID has no equivalent server-side map check; normal target-board VID route is exposed and final UI/map reachability is under closure."
-    ],
+    "candidates": [],
     "runtime_tests": {
       "status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN",
       "canonical_test_ids": [
@@ -2741,7 +2745,9 @@
         "MSG-T14",
         "MSG-T15",
         "MSG-T16",
-        "MSG-T17"
+        "MSG-T17",
+        "MSG-T18",
+        "MSG-T19"
       ],
       "first_live_gate_unchanged": "DUNGEON-T09"
     },
@@ -2753,7 +2759,9 @@
       "Observer-mode add-by-name friend/block parity promoted to BUG-MSG-014.",
       "GM inverse watcher lifecycle promoted to BUG-MSG-015.",
       "Channel/core P2P LOGIN(new) vs delayed LOGOUT(old) ordering promoted to BUG-MSG-016.",
-      "Project_Game contains no tracked caller of pc.is_blocked/pc.is_friend; BUG-MSG-011 remains a registered API defect with no current tracked quest dependency."
+      "Project_Game contains no tracked caller of pc.is_blocked/pc.is_friend; BUG-MSG-011 remains a registered API defect with no current tracked quest dependency.",
+      "Battle Field add-by-name vs add-by-VID parity promoted to BUG-MSG-018.",
+      "Pending friend authorization block revalidation promoted to BUG-MSG-019."
     ]
   }
 }
