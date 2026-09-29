@@ -234,3 +234,76 @@ This makes the lost accounting externally visible: real accumulated classic-pet 
 4. close Classic Pet static mapping when no further reachable candidates remain.
 
 No Classic Pet runtime test is authorized. Global first future live gate remains `DUNGEON-T10`.
+
+
+## Final static closure — PET_PAY coverage, lifecycle and pickup retarget
+
+### PET_PAY item/race/client coverage
+Current decoded `Project_DumpProto/tr/item_proto.txt` contains:
+- 143 `ITEM_PET / PET_PAY` rows;
+- 135 unique `Value0` pet race VNUMs;
+- families currently concentrated in `382xx`, `530xx`, `532xx`, `533xx`.
+
+Coverage checks:
+- all 135/135 referenced pet race VNUMs exist in current `mob_proto.txt`;
+- all 135/135 referenced pet race VNUMs exist in `Project_Binary/root/npclist.txt`.
+
+Therefore no missing current PET_PAY item -> server race or race -> client registration defect was verified.
+
+The raw client model/motion packs themselves are not fully versioned in the tracked repositories. Only 28/135 npclist model names have a matching tracked `Project_Game/share/data/monster/<name>/` folder, but this repository is not the authoritative client pack store for all pet assets. Missing raw folders are therefore a deployment/runtime validation boundary, not a promoted code/data bug.
+
+### Owner death lifecycle
+`CPetActor::Update` explicitly detects `m_pkOwner->IsDead()`.
+When the summon item still exists it calls `Unsummon()` and removes the actor.
+
+The PET_PAY item remains equipped. No revive hook calling `CheckPet()` was mapped.
+The pet therefore stays dismissed after death until a later normal user toggle/re-equip or login reconstruction.
+No static requirement establishing automatic post-revive re-summon was found, so this behavior is documented but not promoted as a bug.
+
+### Warp / channel / login lifecycle
+Same-process/same-character warp:
+- the actor remains owned by the existing `CPetSystem`;
+- `_UpdateFollowAI` detects owner distance >= 4500;
+- it relocates the pet with `m_pkChar->Show(m_pkOwner->GetMapIndex(), ownerX + offset, ownerY + offset)`.
+
+Character teardown / cross-core / logout:
+- `CHARACTER::Destroy` destroys `CPetSystem`;
+- actor destruction executes `Unsummon`;
+- update event is cancelled.
+
+Next EnterGame:
+- `input_login.cpp` calls `CHARACTER::CheckPet()`;
+- if `WEAR_PET` contains a valid `ITEM_PET/PET_PAY` and `CountSummoned()==0`, the pet is re-summoned.
+
+No additional warp/login lifetime defect was verified.
+
+### PET_AUTO_PICKUP ownership / retarget closure
+Candidate selection requires `item->IsOwnership(owner)`.
+Before final collection, `CHARACTER::PickupItemByPet(itemVID)` resolves the item again by VID and rechecks:
+- item still exists;
+- item still has a sectree;
+- `item->IsOwnership(this)`.
+
+Therefore an ownership timeout/change by itself does not allow Bruce to steal a now-ineligible item.
+
+If inventory is full or final pickup otherwise fails, `BringItem` has already cleared its pickup target; subsequent scans may retarget later. This is recoverable behavior, not a separately promoted bug.
+
+The lifetime defect remains `BUG-PET-002`: between scans/ticks, `CPetActor` stores a raw `LPITEM`; destruction of that item before `BringItem` dereferences it can produce a stale pointer. Manual owner pickup is one proven producer; other destruction routes are the same root defect and are not assigned duplicate IDs.
+
+## Final Classic Pet status
+
+**Classic Pet System: STATIC COMPLETE.**
+
+Verified bug set:
+- `BUG-PET-001`
+- `BUG-PET-002`
+- `BUG-PET-003`
+- `BUG-PET-004`
+
+Canonical deferred runtime tests:
+- `PET-T01`
+- `PET-T02`
+- `PET-T03`
+- `PET-T04`
+
+No runtime test has been executed. Global first future live gate remains `DUNGEON-T10`.
