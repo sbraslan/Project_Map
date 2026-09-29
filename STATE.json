@@ -8,7 +8,7 @@
   "active": {
     "subsystem": "monarch",
     "display_name": "Monarch",
-    "status": "STATIC MAPPING IN PROGRESS / 7 VERIFIED BUGS / EXECUTION LOCKED",
+    "status": "STATIC MAPPING IN PROGRESS / 9 VERIFIED BUGS / EXECUTION LOCKED",
     "system_file": "systems/monarch.md",
     "bug_file": "bugs/monarch.md",
     "test_file": "tests/monarch.md",
@@ -19,14 +19,16 @@
       "BUG-MON-004",
       "BUG-MON-005",
       "BUG-MON-006",
-      "BUG-MON-007"
+      "BUG-MON-007",
+      "BUG-MON-008",
+      "BUG-MON-009"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Audit SetMonarch SQL column/schema consistency if an authoritative schema becomes available.",
-      "Audit candidacy/election persistence reconstruction across DB restart.",
-      "Close process-local PowerUp/DefenseUp as deployed or dormant.",
-      "Audit remaining monarch notice/warp/money-add boundaries.",
+      "Close PowerUp/DefenseUp and takemonarchmoney as deployed versus dormant.",
+      "Audit add-money overflow/failure reporting symmetry.",
+      "Audit remaining monarch notice and warp boundaries.",
+      "Decide Monarch static completion and select next subsystem.",
       "Keep runtime/fault-injection execution locked; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -3013,7 +3015,7 @@
     ]
   },
   "monarch_mapping": {
-    "status": "STATIC MAPPING IN PROGRESS / 7 VERIFIED BUGS",
+    "status": "STATIC MAPPING IN PROGRESS / 9 VERIFIED BUGS",
     "canonical_files": {
       "system": "systems/monarch.md",
       "bugs": "bugs/monarch.md",
@@ -3026,7 +3028,9 @@
       "BUG-MON-004",
       "BUG-MON-005",
       "BUG-MON-006",
-      "BUG-MON-007"
+      "BUG-MON-007",
+      "BUG-MON-008",
+      "BUG-MON-009"
     ],
     "mapped_flows": [
       "GM elect -> HEADER_GD_COME_TO_VOTE -> DB ComeToVote -> CMonarch::ElectMonarch -> no winner/state update -> BUG-MON-001",
@@ -3036,14 +3040,15 @@
       "SQL wrapper: DELETE -> uiAffectedRows, uiNumRows=0 -> DelMonarch false/stale runtime state -> strengthened BUG-MON-003",
       "mtr + mmob distinct cooldowns -> same stale local treasury precheck -> effects before DB auth -> rejected second DecMoney has no rollback -> BUG-MON-005",
       "mtax SetMC(MI_TAX) with no IsMCOK(MI_TAX) gate -> BUG-MON-006",
-      "remote mtr -> GG_TRANSFER -> receiver FindPC may fail -> no ACK while source already charges/cooldowns -> BUG-MON-007"
+      "remote mtr -> GG_TRANSFER -> receiver FindPC may fail -> no ACK while source already charges/cooldowns -> BUG-MON-007",
+      "DB startup InitializeMonarch -> LoadMonarch(monarch table only) -> candidacy/election containers remain empty despite SQL rows -> BUG-MON-008",
+      "new CHARACTER -> Initialize -> InitMC -> timestamps backdated by full limits -> no player persistence -> relog resets enforced monarch cooldowns -> BUG-MON-009"
     ],
     "candidates": [
-      "SetMonarch SQL uses REPLACE columns (empire, name, windate, money) while LoadMonarch reads a.pid; authoritative table schema is not tracked.",
-      "process-local PowerUp/DefenseUp buffs; no current Project_Game caller found for oh.monarchpowerup/oh.monarchdefenseup.",
-      "takemonarchmoney authorization/precheck code is compiled out, but no current Project_Game caller was found.",
-      "election/candidacy persistence reconstruction across DB restart is still open.",
-      "remaining warp failure and AddMoney overflow/reporting boundaries."
+      "process-local PowerUp/DefenseUp buffs; deployed caller closure pending",
+      "takemonarchmoney validation is compiled under __UNIMPLEMENTED__; deployed caller not yet proven",
+      "add-money overflow/failure reporting symmetry",
+      "legacy SetMonarch SQL column mismatch remains candidate until authoritative table schema is available"
     ],
     "runtime_tests": {
       "status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN",
@@ -3054,7 +3059,9 @@
         "MON-T04",
         "MON-T05",
         "MON-T06",
-        "MON-T07"
+        "MON-T07",
+        "MON-T08",
+        "MON-T09"
       ],
       "first_live_gate_unchanged": "DUNGEON-T09"
     },
