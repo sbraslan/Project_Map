@@ -96,3 +96,7 @@ Purpose: validate the dormant compatibility risk in OBS-BIO-002. This test stays
 - Primary legitimate normal-path candidate: BIO-T01.
 - BIO-T08 remains dependency-gated on access to actual biolog DB rows.
 - Overall first live runtime gate remains DUNGEON-T09.
+
+
+### BIO-T01 preflight — 2026-09-29
+Current C++/client/quest package reverified. Collection completion sets biolog_manager.* flags; UI completion button calls SendRequestEventQuest("biolog_manager"); required pc.biolog_* Lua helpers exist, but current Project_Game quest_list still contains only legacy collect_* Biolog quests and repository search finds no biolog_manager quest implementation. Canonical handoff: `../BIO_T01_HANDOFF.md`.
