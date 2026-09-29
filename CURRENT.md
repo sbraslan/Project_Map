@@ -2,7 +2,7 @@
 
 **Active phase:** Detection / Mapping Only  
 **Active state:** Monarch static mapping  
-**Status:** MONARCH — STATIC MAPPING IN PROGRESS / 7 VERIFIED BUGS / EXECUTION LOCKED  
+**Status:** MONARCH — STATIC MAPPING IN PROGRESS / 9 VERIFIED BUGS / EXECUTION LOCKED  
 **Machine state:** `STATE.json`  
 **Active subsystem:** Monarch — OPEN  
 **System:** `systems/monarch.md`  
@@ -23,7 +23,9 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 - `BUG-MON-005` — different monarch actions can pass the same stale treasury balance before async DB deduction returns, producing an effect DB later cannot charge.
 - `BUG-MON-006` — MI_TAX is set but never checked, so tax cooldown is unenforced.
 - `BUG-MON-007` — remote `mtr` charges treasury/cooldown before any delivery acknowledgement; target disappearance makes it fail silently.
-- Deferred tests: `MON-T01..MON-T07`; none executed.
+- `BUG-MON-008` — DB restart reloads only monarch identity/treasury, not persisted candidacy/vote runtime state.
+- `BUG-MON-009` — new character sessions run `InitMC()` and reset enforced Monarch cooldowns to immediately ready.
+- Deferred tests: `MON-T01..MON-T09`; none executed.
 
 ## Recent static closures
 - Arena / PvP Duel: `BUG-ARENA-001..003`.
@@ -31,10 +33,10 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 - Marriage / Wedding: canonical registry remains closed; runtime locked.
 
 ## Exact resume cursor
-1. Audit SetMonarch SQL schema/column consistency if authoritative schema is available.
-2. Audit candidacy/election persistence reconstruction across DB restart.
-3. Close process-local PowerUp/DefenseUp and takemonarchmoney as deployed vs dormant.
-4. Audit remaining monarch warp/notice/money-add boundaries.
+1. Close PowerUp/DefenseUp and `takemonarchmoney` as deployed versus dormant.
+2. Audit add-money overflow/failure reporting symmetry.
+3. Audit remaining monarch notice and warp boundaries.
+4. Decide Monarch STATIC COMPLETE and select the next subsystem.
 5. Keep source/game repositories read-only and runtime execution locked.
 
 ## Mapping acceleration index
