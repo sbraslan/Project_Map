@@ -1244,7 +1244,7 @@
         "DCORE-T02",
         "DCORE-T04"
       ],
-      "note": "Distinct from Dungeon Info; global first live gate remains DUNGEON-T10.",
+      "note": "Distinct from Dungeon Info; global first live gate is DUNGEON-T09.",
       "global_qualified_bug_tests": {
         "DCORE::BUG-DUNGEON-001": [
           "DCORE-T01"
@@ -1638,7 +1638,6 @@
     },
     "global_execution_order": {
       "stage_a_normal_current_flow": [
-        "DUNGEON-T10",
         "DUNGEON-T09",
         "DUNGEON-T11",
         "DUNGEON-T12",
@@ -1690,33 +1689,13 @@
       "stage_c_persistence_fault": "Use subsystem-local canonical test files and READINESS_AUDIT.md; includes crash-consistency, DB fault, pending-load, restart and durability tests."
     },
     "dungeon_t10_handoff": {
-      "status": "READY / EXECUTION LOCKED / NOT RUN",
+      "status": "RETRACTED / DO NOT RUN",
       "file": "DUNGEON_T10_HANDOFF.md",
       "canonical_bug": "DINFO::BUG-DUNGEON-010",
       "canonical_test": "DUNGEON-T10",
-      "trigger": "Normal login -> minimap Dungeon Info button -> observe opened window",
-      "expected_static_prediction": "Window opens with no dungeon rows although tracked config has 9 entries.",
-      "forbidden_during_gate": [
-        "source edit",
-        "config edit",
-        "DB mutation",
-        "packet injection",
-        "Python console/injection",
-        "GM/admin workaround",
-        "apply FIX-DUNGEON-010 before evidence"
-      ],
-      "result_classes": [
-        "REPRODUCED",
-        "NOT REPRODUCED",
-        "INCONCLUSIVE"
-      ],
-      "stop_after_capture": true,
-      "downstream_order": [
-        "DUNGEON-T09",
-        "DUNGEON-T11",
-        "DUNGEON-T12"
-      ],
-      "downstream_blocked_until_t10_recorded": true
+      "retracted_at": "2026-09-29",
+      "reason": "False-positive indentation reading; current uidungeoninfo.py list construction loop is outside the zero-count branch.",
+      "replacement_first_live_gate": "DUNGEON-T09"
     },
     "costume_appearance": {
       "status": "READY / NOT RUN",
@@ -1743,7 +1722,7 @@
         "LOOK-T02 eligibility-only",
         "LOOK-T03 controlled warp/state"
       ],
-      "execution_priority": "Does not supersede DUNGEON-T10"
+      "execution_priority": "Does not supersede DUNGEON-T09"
     },
     "coverage": {
       "static_complete_subsystems": 26,
@@ -2050,7 +2029,7 @@
       "Current build WEAR_MAX_NUM=33 and DS_SLOT_MAX=6 make active-deck -1 wrap the set-cleanup start to wear 27.",
       "Tracked daily-gift quest is compiled, but no tracked manager quest guarantees ds_dg_id is non-zero before event activation.",
       "No Dragon Soul runtime test has been executed.",
-      "Global first future live gate remains DUNGEON-T10."
+      "Global first future live gate remains DUNGEON-T09."
     ]
   },
   "acce_sash_mapping": {
@@ -2375,7 +2354,7 @@
       "Current packed item_proto parity confirmed between Project_Binary and Project_DumpProto.",
       "Achievement TYPE_SUMMON_MOUNT missing producer remains owned by BUG-ACH-006.",
       "No Horse/Mount runtime test has been executed.",
-      "Global first future live gate remains DUNGEON-T10."
+      "Global first future live gate remains DUNGEON-T09."
     ]
   },
   "pet_mapping": {
@@ -2436,7 +2415,7 @@
       "143 PET_PAY rows reference 135 unique races; server mob_proto and client npclist coverage are both 135/135.",
       "Ownership changes are revalidated at final pet pickup; stale raw LPITEM lifetime remains owned by BUG-PET-002.",
       "No Classic Pet runtime test has been executed.",
-      "Global first future live gate remains DUNGEON-T10."
+      "Global first future live gate remains DUNGEON-T09."
     ]
   }
 }
