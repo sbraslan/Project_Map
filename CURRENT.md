@@ -35,8 +35,14 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 - `RemoveAllBlockList` is reached by `pc.change_name`, but the deployed success path immediately executes `command("quit")`; P2P logout reaches `MessengerManager::Logout` and clears the old-name cache edges. Persistent rename desync is closed as non-promoted/transient.
 - `OnBlockLogin`'s missing local handler-null guard is closed as non-bug because `PyCallClassMemberFunc` safely rejects a null handler.
 
+## Static closure
+- Messenger / Friend / Block is closed statically with `BUG-MSG-001..021`.
+- Deferred runtime plans are `MSG-T01..MSG-T21`; none has been executed.
+- Final remove/inverse/P2P symmetry review produced no additional independent finding.
+- CRC collision and marriage/block policy observations remain unpromoted.
+- Global first future live gate remains `DUNGEON-T09`.
+
 ## Exact resume cursor
-1. Messenger / Friend / Block is STATIC COMPLETE with `BUG-MSG-001..021` and `MSG-T01..MSG-T21`.
-2. Do not execute runtime/fault-injection tests; global first future live gate remains `DUNGEON-T09`.
-3. Continue with a global source-feature coverage discovery pass to identify the next subsystem not yet represented in `INDEX.md`.
-4. Preserve source/game repositories as read-only; only `Project_Map` may be updated.
+1. Open the next independent subsystem for detection-only mapping.
+2. Keep all source/game repositories read-only.
+3. Do not execute runtime or fault-injection tests.
