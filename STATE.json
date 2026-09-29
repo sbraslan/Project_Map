@@ -8,7 +8,7 @@
   "active": {
     "subsystem": "messenger",
     "display_name": "Messenger / Friend / Block",
-    "status": "MAPPING IN PROGRESS / 7 VERIFIED BUGS / EXECUTION LOCKED",
+    "status": "MAPPING IN PROGRESS / 8 VERIFIED BUGS / EXECUTION LOCKED",
     "system_file": "systems/messenger.md",
     "bug_file": "bugs/messenger.md",
     "test_file": "tests/messenger.md",
@@ -19,14 +19,15 @@
       "BUG-MSG-004",
       "BUG-MSG-005",
       "BUG-MSG-006",
-      "BUG-MSG-007"
+      "BUG-MSG-007",
+      "BUG-MSG-008"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Continue Messenger remove-all/inverse relation lifecycle audit after BUG-MSG-007.",
-      "Audit P2P presence and block enforcement on non-whisper social surfaces.",
-      "Audit client messenger packet-length/state handling and GM cache lifecycle.",
-      "Close reconnect/channel-change boundaries and remaining candidates.",
+      "Close client messenger parser/state safety and optimistic unblock behavior.",
+      "Finish GM messenger cache lifecycle and channel-change/reconnect boundaries.",
+      "Resolve active-call reachability of RemoveAllBlockList before promotion.",
+      "Keep BUG-MSG-008 party-request bypass paired with deferred MSG-T08.",
       "Do not execute runtime tests; first future live gate remains DUNGEON-T09."
     ]
   },
