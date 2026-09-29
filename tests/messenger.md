@@ -166,4 +166,13 @@ After runtime is explicitly unlocked:
 
 Bug signature: the name-based path succeeds while the VID-based path is rejected solely because A is in observer mode.
 
+## MSG-T18 — Battle Field friend-add VID parity
+After runtime is explicitly unlocked:
+1. enter a Battle Field map with A and visible player B;
+2. verify Messenger-window add-by-name against B is rejected by the Battle Field restriction;
+3. target B and use the target-board friend button;
+4. observe whether B receives `messenger_auth` and whether the relation can be completed.
+
+Bug signature: add-by-name is rejected on the Battle Field map while the target-board VID route creates the friend request.
+
 Do not run any MSG test while the project execution lock is active.
