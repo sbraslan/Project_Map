@@ -49,6 +49,6 @@ Important global ID rules:
 
 
 ## Messenger / Friend / Block ownership — 2026-09-29
-- `BUG-MSG-001..013` -> `messenger.md`.
+- `BUG-MSG-001..014` -> `messenger.md`.
 - Status: MAPPING IN PROGRESS / VERIFIED STATIC findings.
-- Deferred runtime ownership: `../tests/messenger.md` (`MSG-T01..MSG-T13`); execution locked.
+- Deferred runtime ownership: `../tests/messenger.md` (`MSG-T01..MSG-T14`); execution locked.
