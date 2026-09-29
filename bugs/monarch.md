@@ -1,6 +1,6 @@
 # Monarch — Bug Registry
 
-**Status:** STATIC MAPPING IN PROGRESS / 10 VERIFIED BUGS  
+**Status:** STATIC MAPPING IN PROGRESS / 12 VERIFIED BUGS  
 **Execution:** LOCKED / NOT RUN
 
 ## BUG-MON-001 — election finalizer does not produce a monarch
@@ -211,3 +211,45 @@ A monarch can repeatedly change the tax flag while the configured MI_TAX cooldow
 ## Dormant candidate notes
 - `monarch_defenseup_event` receives `monarch_defenseup_event_info` but casts it as `monarch_powerup_event_info`; if `oh.monarchdefenseup` becomes deployed, the expiration event can fail to clear DefenseUp.
 - `oh.takemonarchmoney` keeps authorization, negative-money and balance validation inside `__UNIMPLEMENTED__`; no tracked Project_Game caller is currently deployed, so this remains unpromoted.
+
+
+## BUG-MON-011 — mto accepts private-map targets but warps to the base map instead of the target instance
+
+**Class:** private-instance routing / charge-on-wrong-destination  
+**Reachability:** VERIFIED through registered `mto` command.
+
+### Proof
+1. `IsMonarchWarpZone(map_idx)` explicitly reduces private indices with `map_idx /= 10000`, so an allowed base map makes its private instances pass the gate.
+2. For a local target, `mto` reads the target X/Y but calls `ch->WarpSet(x, y)` without the target private map index.
+3. `WarpSet(x,y)` resolves routing with `CMapLocation::Get(x,y)`.
+4. `CMapLocation::Get(x,y)` derives a normal map index from `SECTREE_MANAGER::GetMapIndex(x,y)`; no private-instance ID is supplied.
+5. For a remote target, P2P CCI itself stores `lMapIndex` from coordinate-based `SECTREE_MANAGER::GetMapIndex(x,y)`, so the private identity is already lost.
+6. The command still requests 10,000 treasury deduction and sets MI_WARP after issuing the warp.
+
+### Consequence
+When the target is inside an allowed private instance, `mto` can report success and consume treasury/cooldown while moving the monarch to the corresponding base/public map rather than the target's actual instance.
+
+### Deferred validation
+`MON-T11`.
+
+## BUG-MON-012 — remote mtr cannot preserve the monarch's private instance
+
+**Class:** P2P private-instance routing / local-vs-remote parity  
+**Reachability:** VERIFIED through registered `mtr` remote-target path.
+
+### Proof
+1. The source monarch's private map is accepted when its base map passes `IsMonarchWarpZone`.
+2. Local-target `mtr` correctly calls:
+   `tch->WarpSet(ch->GetX(), ch->GetY(), ch->GetMapIndex())`,
+   preserving the private map index.
+3. Remote-target `mtr` sends `TPacketGGTransfer`.
+4. `TPacketGGTransfer` contains only target name and X/Y; it has no map/private-map index.
+5. Receiver `CInputP2P::Transfer` executes `ch->WarpSet(p->lX, p->lY)`.
+6. Coordinate-only routing resolves the base map, not the source monarch's private instance.
+7. Treasury deduction and MI_TRANSFER cooldown are committed on the source side.
+
+### Consequence
+A remote same-channel player summoned to a monarch who is inside an otherwise-allowed private instance is routed to the base/public map rather than to the monarch's instance, despite the operation being charged as successful.
+
+### Deferred validation
+`MON-T12`.
