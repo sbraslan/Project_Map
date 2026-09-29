@@ -1,6 +1,6 @@
 # Marriage / Wedding — Static Map
 
-**Status:** STATIC MAPPING IN PROGRESS / 6 VERIFIED BUGS  
+**Status:** STATIC MAPPING IN PROGRESS / 7 VERIFIED BUGS  
 **Phase:** Detection / Mapping Only  
 **Opened:** 2026-09-29  
 **Source/Game repositories:** READ-ONLY  
@@ -188,18 +188,30 @@ Current deployment makes same-core exits realistic because map 81 shares cores w
 
 Promoted as `BUG-MARR-006`.
 
+### BUG-MARR-007 — EXP-based love-point progression becomes zero from level 26 onward
+EXP distribution computes:
+`static_cast<uint32_t>(2000.0L / level / level / 3) * static_cast<uint32_t>(iFinalExp)`.
+
+The fractional level coefficient is cast to `uint32_t` before multiplication. Marriage requires level 25 in the deployed quest:
+- level 25 coefficient is about 1.066 and truncates to 1;
+- level 26 coefficient is below 1 and truncates to 0;
+- every higher level remains 0.
+
+Therefore the entire EXP-derived update is zero for level 26+ regardless of EXP earned. The subsequent `pMarriage->Update(dwUpdatePoint)` receives zero and does not set/save love-point progress.
+
+Promoted as `BUG-MARR-007`.
+
 ## Closed / scoped observations
 - Legacy `HEADER_GD_BREAK_MARRIAGE` is a DB-side two-PID compatibility entry that calls the normal DB marriage remove routine. No separate active quest/client sender was established in the tracked deployed flow; `HEADER_DG_BREAK_MARRIAGE` has no independent Marriage gameplay consequence in the mapped path.
-- Marriage critical/penetration/EXP bonus consumers are server-side and remain tied to the existing Marriage relation/online-pointer model; no independent bonus bug has been promoted yet.
+- Marriage critical/penetration/EXP bonus consumers are server-side. No separate item-bonus defect is promoted in this pass.
+- Mutual-divorce stale-target/double-mutation candidate is closed for the normal confirmation path: `CQuestManager::Confirm` resumes the suspended quest synchronously inside the confirmation handler, and the post-confirm mutual-divorce branch contains no additional suspension before its target re-check/mutations. This differs from BUG-MARR-001, where a later explicit `wait()` creates a real interruption window.
 
 ## Current audit cursor
 Continue with:
-1. finish mutual/unilateral divorce post-confirm race audit;
-2. finish marriage login/logout + near-check/love-point lifecycle;
-3. close wedding end/duplicate READY interaction with BUG-MARR-005/006;
-4. audit marriage unique-item bonus/near-state intent versus implementation;
-5. close remaining Lua null/state candidates against deployed callers;
-6. decide STATIC COMPLETE readiness.
+1. close remaining unique-item bonus/near-state semantics;
+2. close remaining Lua relation/wedding null-state callers;
+3. reconcile duplicate READY with wedding-end/orphan-map cleanup;
+4. decide STATIC COMPLETE readiness.
 
 ## Runtime
 No Marriage runtime test may be executed while the global execution lock is active. First future live gate remains `DUNGEON-T09`.
