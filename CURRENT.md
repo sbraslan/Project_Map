@@ -21,10 +21,11 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 - Major closure findings include engagement transaction ordering, duplicate map-81 producers, divorce fee boundary, stale P2P lover state, wedding exit/membership lifecycle, EXP love-point truncation, and cross-core marriage-item sharing.
 
 ## Exact resume cursor
-1. Perform final Marriage/Wedding closure pass over client UI, Lua caller guards and remaining candidate.
-2. If no new independent finding is proven, mark Marriage/Wedding STATIC COMPLETE.
-3. Refresh machine indexes/checkpoint and choose the next queued subsystem.
-4. Keep source/game repositories read-only and runtime execution locked.
+1. Audit remaining wedding Lua null/map-state assumptions against deployed callers.
+2. Close relation removal versus active wedding-map lifecycle.
+3. Audit cross-core lover-info/love-point refresh behavior.
+4. Reconcile Marriage findings into index feature/symbol/callgraph seeds.
+5. Keep runtime/fault-injection execution locked; first future live gate remains `DUNGEON-T09`.
 
 ## Mapping acceleration index
 - Status: **READY / ACTIVE**
