@@ -1,6 +1,6 @@
 # Mining / Pickaxe
 
-**Status:** MAPPING IN PROGRESS / 5 VERIFIED BUGS / EXECUTION LOCKED  
+**Status:** MAPPING IN PROGRESS / 6 VERIFIED BUGS / EXECUTION LOCKED  
 **Phase:** Detection / Mapping Only  
 **Source repos:** read-only  
 **Writable repo:** Project_Map only
@@ -182,3 +182,33 @@ Still open before STATIC COMPLETE:
 - compiled quest/object evidence for ore refinement;
 - any mining-specific Battle Pass integration expected by current configs;
 - final vein/concurrency and pickaxe data sanity pass.
+
+
+## BUG-MIN-006 — pending mining can settle from a vein already killed by Mining Event shutdown
+The custom scheduled Mining Event runs on `EVENT_MAP_INDEX = 230`.
+
+When the event is stopped, `SetMiningEvent(false)`:
+1. schedules players to be warped out after 15 seconds;
+2. calls `regen_free_map(EVENT_MAP_INDEX)`;
+3. runs `FKillSectree`, whose vein branch calls `ch->Dead()`.
+
+For a non-PC, normal `Dead()` does not immediately destroy the character. In the ordinary branch it creates `dead_event` with a 10-second delay.
+
+Player mining attempts are not cancelled by `SetMiningEvent(false)` / `FKillSectree`.
+
+The delayed `mining_event` callback only checks whether the stored vein VID still resolves. It does **not** check `load->IsDead()`.
+
+Therefore, during the dead-vein retention window, a mining attempt that was already in progress can:
+- resolve the dead vein by VID;
+- use its unchanged race VNUM;
+- roll normal mining success;
+- drop ore;
+- grant pickaxe practice.
+
+Promoted as `BUG-MIN-006`.
+
+## Candidate closures from this pass
+- **OreRefine payment ordering:** local C++ ordering is unsafe, but the deployed `guild_building_melt.quest` checks the exact computed gold requirement before calling `pc.ore_refine` / `pc.diamond_refine`. No current insufficient-gold reachability is promoted.
+- **Vein VID reuse:** normal VID allocation is monotonically increasing. Destroyed vein VIDs are removed from the manager and are not normally reused during a mining attempt; no stale-VID retarget bug promoted.
+- **Battle Field ownership:** map 357 has no deployed vein spawns, and the dynamic Mining Event uses map 230 while the alternate mining initializer uses map 103. The no-ownership Battle Field branch is not currently reachable through mapped mining content.
+- **Pickaxe proto rows:** DumpProto contains proto blobs, but the available representation does not yield authoritative readable 29101..29109 rows. No values are inferred.
