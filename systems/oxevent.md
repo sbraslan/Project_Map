@@ -1,6 +1,6 @@
 # OX Event — Static Map
 
-**Status:** STATIC COMPLETE / 7 VERIFIED BUGS  
+**Status:** STATIC COMPLETE / 8 VERIFIED BUGS  
 **Phase:** Detection / Mapping Only  
 **Opened:** 2026-09-29  
 **Source/Game repositories:** READ-ONLY  
@@ -252,3 +252,26 @@ Promoted as `BUG-OX-007`.
 - Winner reward is intentionally implemented as an online-character operation; no persistence requirement was found, so offline reward loss is not promoted independently.
 - Automatic admission-policy dependency is no longer a candidate: missing flags are defined as zero and the Event Manager does not initialize them.
 - Reconnect elimination bypass is distinct from cap-accounting corruption because it restores competitive attendee eligibility after `CheckAnswer`.
+
+
+### BUG-OX-008 — closing OX mid-cleanup leaks timer stage into the next event
+Under `ENABLE_OX_RENEWAL`, `oxevent_timer` stores its stage in a function-local `static uint8_t flag`.
+
+After stage 1:
+- `CheckAnswer` has populated `m_map_miss`;
+- `flag` has advanced to 2;
+- stage 2 cleanup is still pending.
+
+If `CloseEvent()` is invoked in this window (for example by the deployed GM force-end path), it cancels `m_timedEvent` and calls `Initialize()`. However:
+- `Initialize()` clears `m_map_char` and `m_map_attender`, but not `m_map_miss`;
+- neither `CloseEvent` nor `Initialize` resets the function-local static `flag`.
+
+Context7/cppreference confirms that a function-local static retains its value across function calls for the process lifetime.
+
+The next OX quiz therefore creates a fresh timer whose first callback can enter stage 2 immediately, execute cleanup/status-close instead of normal question evaluation, and only then reset the static flag.
+
+Promoted as `BUG-OX-008`.
+
+## Context7 verification
+- C++ static local variables retain their value across calls; used as supplementary verification for the cross-event stage-leak proof.
+- Project source remains authoritative for event cancellation, `Initialize`, and `m_map_miss` behavior.
