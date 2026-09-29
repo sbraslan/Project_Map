@@ -294,21 +294,21 @@ Observer-mode restrictions are path-dependent: friend/block add actions rejected
 
 ---
 
-## BUG-MSG-015 — inverse watcher sets retain logged-out accounts indefinitely
+## BUG-MSG-015 — GM inverse watcher sets retain logged-out accounts indefinitely
 
 **Class:** server lifecycle / stale-cache accumulation / memory-performance leak  
-**Reachability:** VERIFIED for friend, block and synthetic GM messenger relations.
+**Reachability:** VERIFIED for the synthetic GM messenger relation.
 
 ### Proof
-1. Friend loading stores `m_Relation[account]` plus `m_InverseRelation[companion]`; block loading stores `m_BlockRelation[account]` plus `m_InverseBlockRelation[companion]`; GM loading stores `m_GMRelation[account]` plus `m_InverseGMRelation[gm]`.
-2. `MessengerManager::Logout(account)` erases the account's outgoing friend/GM/block relations and removes the departing name from values in the corresponding outgoing maps.
-3. Logout does not erase the departing account from the inverse sets representing that account as a watcher of its own friends, blocked names or GM entries.
-4. Relation-specific remove helpers do prune inverse edges, but ordinary logout does not invoke them for the departing account's full outgoing relation set.
-5. Repeated logins reinsert the same set members, so one account does not duplicate itself, but unique historical accounts remain resident for the process lifetime unless the underlying relation is explicitly removed.
-6. Presence fanout iterates these inverse sets and attempts sends to stale/offline watcher names; send helpers later no-op when no local descriptor exists.
+1. Every `MessengerManager::Login(account)` schedules `LoadGMList`, including remote players entering through `P2PLogin -> Login`.
+2. `LoadGMList` inserts `m_GMRelation[account].insert(gm)` and `m_InverseGMRelation[gm].insert(account)` for each selected GM.
+3. `MessengerManager::Logout(account)` removes the account's outgoing GM relation but never removes that account from the corresponding `m_InverseGMRelation[gm]` watcher sets.
+4. Unlike persistent friend/block relations, these GM edges are synthesized from the global GM query on every login rather than representing a user-managed persistent relationship.
+5. `MessengerManager::Destroy()` is empty, so historical account names remain in the inverse GM sets for the lifetime of the process.
+6. Later GM presence fanout iterates those historical watchers; send helpers only discard them after a local `FindPC`/descriptor miss.
 
 ### Consequence
-Friend, block and GM inverse watcher maps grow toward historical process-visible accounts rather than only currently useful watchers. Presence events repeatedly traverse stale names, increasing resident cache size and fanout work over long uptimes.
+Long-running cores accumulate historical account names in each GM inverse watcher set. GM presence changes repeatedly scan stale offline recipients, causing avoidable resident-memory and fanout growth proportional to distinct accounts observed by the process.
 
 ### Deferred validation
 `MSG-T15`.
@@ -333,8 +333,6 @@ A channel/core transition can make an affected process mark a still-online chara
 
 ### Deferred validation
 `MSG-T16`.
----
-
 ---
 
 ## BUG-MSG-017 — name-based messenger CG packets do not faithfully encode the configured 48-byte name range
@@ -373,8 +371,6 @@ The intended “cannot add friends in Battle Field” server restriction depends
 
 ### Deferred validation
 `MSG-T18`.
----
-
 ---
 
 ## BUG-MSG-019 — pending friend authorization does not revalidate messenger block state
