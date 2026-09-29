@@ -1,6 +1,6 @@
 # Dragon Soul / Alchemy — Bug Registry
 
-**Status:** ACTIVE STATIC MAPPING  
+**Status:** STATIC COMPLETE EVIDENCE  
 **Execution:** NOT RUN
 
 ## BUG-DS-001 — Breaking an active full DS set can leave stale set-bonus stats
