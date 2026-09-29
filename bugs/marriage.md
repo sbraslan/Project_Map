@@ -1,6 +1,6 @@
 # Marriage / Wedding — Bug Registry
 
-**Status:** STATIC MAPPING IN PROGRESS / 7 VERIFIED BUGS  
+**Status:** STATIC COMPLETE / 8 VERIFIED BUGS  
 **Execution:** LOCKED / NOT RUN
 
 ## BUG-MARR-001 — engagement resource transaction commits before authoritative marriage creation
@@ -144,6 +144,25 @@ Almost every normally progressing married character above level 25 loses the EXP
 
 ### Deferred validation
 `MARR-T07`.
+
+## BUG-MARR-008 — marriage item effects are not shared across game cores
+
+**Class:** distributed state / gameplay effect parity  
+**Reachability:** VERIFIED for spouses online on different game cores.
+
+### Proof
+1. Deployed locale descriptions for 71069..71074 say that if one spouse equips the item, its effect applies to both spouses.
+2. `CHARACTER::GetMarriageBonus` calls `TMarriage::GetBonus`.
+3. Shared mode checks `ch1/ch2->IsEquipUniqueItem(vnum)`.
+4. `ch1/ch2` are local CHARACTER pointers populated by Marriage `Login(ch)`.
+5. P2P login does not populate a remote spouse CHARACTER pointer in Marriage state.
+6. On separate cores, each process can inspect only its local spouse's equipment.
+
+### Consequence
+If only one spouse wears a marriage bonus item, the remote spouse on another core does not receive the advertised shared effect. Moving both spouses onto the same core can change the effect without any marriage/item change.
+
+### Deferred validation
+`MARR-T08`.
 
 ## Open candidates
 - `WeddingManager::__CreateWeddingMap` inserts a WeddingMap/private map before checking whether `GetMap(dwMapIndex)` succeeds; the failure return currently has no cleanup. Keep unpromoted until realistic failure reachability is established.
