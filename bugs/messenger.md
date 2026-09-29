@@ -290,3 +290,47 @@ Observer-mode restrictions are path-dependent: friend/block add actions rejected
 ### Deferred validation
 `MSG-T14`.
 
+
+
+---
+
+## BUG-MSG-015 — GM inverse watcher sets retain logged-out accounts indefinitely
+
+**Class:** server lifecycle / stale-cache accumulation / memory-performance leak  
+**Reachability:** VERIFIED for accounts loaded into the synthetic GM messenger relation, including remote accounts observed through P2P login.
+
+### Proof
+1. Every `MessengerManager::Login(account)` schedules `LoadGMList` with a query that returns configured GM names for that account.
+2. `LoadGMList` stores both directions: `m_GMRelation[account].insert(gm)` and `m_InverseGMRelation[gm].insert(account)`.
+3. `MessengerManager::Logout(account)` erases the account's outgoing `m_GMRelation[account]` and removes the account from values inside `m_GMRelation`.
+4. The logout path never erases `account` from `m_InverseGMRelation[gm]`.
+5. No inverse-GM cleanup/clear path is present in `messenger_manager.cpp`; `MessengerManager::Destroy()` is empty.
+6. Newly observed remote P2P characters also reach `P2PLogin -> Login`, so they can contribute to the same inverse watcher sets.
+
+### Consequence
+For each GM, the inverse watcher set can grow toward all unique accounts observed during the process lifetime instead of the currently relevant accounts. GM login/logout fanout repeatedly traverses stale names; offline recipients are eventually discarded by send helpers, but resident memory and fanout work keep accumulating.
+
+### Deferred validation
+`MSG-T15`.
+
+---
+
+## BUG-MSG-016 — delayed old-core P2P logout can delete a newer channel/session presence
+
+**Class:** multi-core ordering / lifecycle race  
+**Reachability:** VERIFIED as a static cross-connection ordering race during channel/core handoff.
+
+### Proof
+1. A newly loaded character broadcasts `TPacketGGLogin` containing name, PID, map and channel.
+2. `P2P_MANAGER::Login` looks up the CCI by name. If it already exists, the function updates that same CCI in place with the newest descriptor, map and channel.
+3. The source core later broadcasts `TPacketGGLogout`, whose identity payload is the character name.
+4. `CInputP2P::Logout` ignores the source descriptor for identity validation and calls `P2P_MANAGER::Logout(name)`.
+5. `P2P_MANAGER::Logout(name)` resolves whichever CCI is currently stored under that name, invokes `MessengerManager::P2PLogout(name) -> Logout(name)`, erases the CCI maps and deletes the object.
+6. The new login and old logout originate from different P2P peer connections; per-connection TCP ordering therefore does not impose a global order between them.
+7. If an observer core receives LOGIN(new) first and delayed LOGOUT(old) second, the stale logout removes the **newly updated** CCI and tears down messenger presence for the still-online destination session.
+
+### Consequence
+A channel/core transition can make an affected process mark a still-online character offline, delete its current P2P CCI and run messenger relation/block logout cleanup against the newer session. This can compound `BUG-MSG-007` until another presence resynchronization occurs.
+
+### Deferred validation
+`MSG-T16`.
