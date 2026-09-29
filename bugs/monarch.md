@@ -1,6 +1,6 @@
 # Monarch — Bug Registry
 
-**Status:** STATIC MAPPING IN PROGRESS / 12 VERIFIED BUGS  
+**Status:** STATIC COMPLETE / 13 VERIFIED BUGS  
 **Execution:** LOCKED / NOT RUN
 
 ## BUG-MON-001 — election finalizer does not produce a monarch
@@ -253,3 +253,29 @@ A remote same-channel player summoned to a monarch who is inside an otherwise-al
 
 ### Deferred validation
 `MON-T12`.
+
+
+## BUG-MON-013 — cross-core monarch notice is truncated only on remote game cores
+
+**Class:** P2P framing / cross-core UI consistency  
+**Reachability:** VERIFIED through registered `mnotice` command.
+
+### Proof
+1. Player chat/command input allows up to `CHAT_MAX_LEN` (512, or 700 with ticket system), minus the command/name framing space.
+2. `do_monarch_notice` passes the full command argument to `BroadcastMonarchNotice`.
+3. The source core calls local `SendMonarchNotice(bEmpire, c_pszBuf)` with the full string.
+4. P2P packet `TPacketGGMonarchNotice` carries the original `strlen + 1`.
+5. Remote `CInputP2P::MonarchNotice` copies the payload into `char szBuf[256 + 1]`.
+6. It uses `strlcpy(..., MIN(p->lSize + 1, sizeof(szBuf)))`, truncating longer notices to the fixed remote buffer.
+7. It then calls remote `SendMonarchNotice` with the truncated text.
+
+### Consequence
+For notices longer than the P2P receiver buffer, players of the monarch's empire see different text depending on which game core they are connected to: full notice on the source core, truncated notice on remote cores.
+
+### Deferred validation
+`MON-T13`.
+
+## Static closure notes
+- AddMoney overflow/cap path is not promoted independently: game request precheck, game DG application and DB state all enforce the same 2,000,000,000 ceiling; overflow contributions can be discarded at the cap but no separate persistent/runtime divergence was proven.
+- `oh.monarchpowerup`, `oh.monarchdefenseup`, `oh.monarchbless` and `oh.takemonarchmoney` have no current tracked Project_Game caller and remain dormant.
+- The wrong event-info cast in dormant `monarch_defenseup_event` remains a future activation risk, not a current deployed bug.
