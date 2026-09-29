@@ -1,6 +1,6 @@
 # Monarch — Static Map
 
-**Status:** STATIC MAPPING IN PROGRESS / 10 VERIFIED BUGS  
+**Status:** STATIC MAPPING IN PROGRESS / 12 VERIFIED BUGS  
 **Phase:** Detection / Mapping Only  
 **Opened:** 2026-09-29  
 **Source/Game repositories:** READ-ONLY  
@@ -252,3 +252,18 @@ Promoted as `BUG-MON-010`.
 2. audit remaining mto/mtr private-map and WarpSet failure boundaries;
 3. inspect notice path and treasury producers for independent defects;
 4. decide Monarch STATIC COMPLETE.
+
+
+## BUG-MON-011 — mto loses private-instance identity
+`IsMonarchWarpZone` allows private instances by evaluating their base index, but `mto` calls coordinate-only `WarpSet` and never supplies the target private map index. Remote CCI map state is also stored from coordinate-derived base map index.
+
+An allowed private target therefore routes the monarch to the base/public map, while the command still charges treasury and sets MI_WARP.
+
+Promoted as `BUG-MON-011`.
+
+## BUG-MON-012 — remote mtr loses the monarch's private-instance identity
+Local `mtr` preserves `ch->GetMapIndex()`, including private instance IDs. The remote path instead sends `TPacketGGTransfer{name,x,y}`; receiver uses coordinate-only `WarpSet(x,y)`.
+
+When the monarch is in an allowed private instance, the remote target is routed to the base/public map rather than the monarch's instance, while treasury and MI_TRANSFER are consumed.
+
+Promoted as `BUG-MON-012`.
