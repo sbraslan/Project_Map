@@ -47,10 +47,28 @@
   ],
   "counts": {
     "closed_subsystems": 39,
-    "open_subsystems": 0,
-    "total_canonical_subsystems": 39
+    "open_subsystems": 1,
+    "total_canonical_subsystems": 40
   },
-  "active": null,
+  "active": {
+    "id": "blue_dragon_lair",
+    "name": "Blue Dragon / Beran Setaou",
+    "status": "OPEN",
+    "evidence": {
+      "system": "systems/blue_dragon_lair.md",
+      "bugs": "bugs/blue_dragon_lair.md",
+      "tests": "tests/blue_dragon_lair.md"
+    },
+    "verified_bug_count": 0,
+    "test_plan_count": 0,
+    "cursor": [
+      "Map entry authority, global event state, channel serialization, group-entry window and access-item transaction.",
+      "Map boss spawn/combat hooks, skill timers and stone modifiers.",
+      "Audit timeout, death, rejoin/login and room purge/warp lifecycle.",
+      "Resolve legacy DragonLair.startRaid reachability.",
+      "Close deployment/data parity and promote only source-proven defects."
+    ]
+  },
   "closed": {
     "guild_storage": {
       "name": "Guild Storage + Guild lifecycle",
@@ -548,12 +566,17 @@
     "flame dungeon": "classic_dungeons",
     "razador": "classic_dungeons",
     "snow dungeon": "classic_dungeons",
-    "nemere": "classic_dungeons"
+    "nemere": "classic_dungeons",
+    "blue_dragon_lair": "blue_dragon_lair",
+    "blue dragon": "blue_dragon_lair",
+    "blue dragon lair": "blue_dragon_lair",
+    "beran": "blue_dragon_lair",
+    "beran setaou": "blue_dragon_lair"
   },
   "discovery": {
-    "status": "TARGETED_UNKNOWN_ONLY",
+    "status": "PAUSED_WHILE_ACTIVE",
     "queue": [
-      "dragon_lairs",
+      "meley_lair",
       "yohara_progression",
       "advanced_yohara_dungeons",
       "defense_wave",
@@ -565,8 +588,8 @@
       "client_service_layer",
       "equipment_extensions"
     ],
-    "last_transition": "classic_dungeons CLOSED -> resume queued UNKNOWN-only discovery",
-    "next_after_active_close": "Normalize the next queued family before opening it; CLOSED nodes remain locked.",
+    "last_transition": "dragon_lairs split into independent Blue Dragon and Meley families; blue_dragon_lair OPEN",
+    "next_after_active_close": "Resume with meley_lair; CLOSED nodes remain locked.",
     "criteria": "Canonical candidate = enabled and independently stateful/networked/persistent or quest-deployed gameplay feature family. Pure rendering/assets, compile-time fixes and small options remain dependencies/subfeatures rather than standalone nodes."
   },
   "lookup_indexes": {
