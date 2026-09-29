@@ -138,3 +138,12 @@ Runtime remains locked; no live test was executed.
 - canonical handoff: `BIO_T01_HANDOFF.md`.
 - actual biolog mission/reward values remain live-DB dependent.
 - global first live gate remains `DUNGEON-T09`; no Biolog runtime test executed.
+
+
+## Inventory / Item normal-path preflight — 2026-09-29
+- `ITEM-T01` destroy-count semantics reverified.
+- normal Binary UI forwards the selected partial `dropCount` into `SendItemDestroyPacket`.
+- server receives count but `CHARACTER::RemoveItem` does not use it; full item stack is destroyed.
+- adjacent `BUG-ITEM-001` UAF may interrupt the same flow and remains owned by `ITEM-T02`.
+- canonical handoff: `ITEM_T01_HANDOFF.md`.
+- global first live gate remains `DUNGEON-T09`; no Inventory/Item runtime test executed.
