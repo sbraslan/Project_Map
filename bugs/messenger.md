@@ -416,3 +416,23 @@ If a third process receives LOGIN(new channel) before the delayed LOGOUT(old cha
 ### Deferred validation
 `MSG-T15`.
 
+
+---
+
+## BUG-MSG-019 — pending friend authorization ignores a block established after the request
+
+**Class:** authorization TOCTOU / relation-policy bypass  
+**Reachability:** VERIFIED through the normal friend-request + block + accept sequence.
+
+### Proof
+1. Friend creation through both normal add entry paths checks messenger block state **before** `RequestToAdd` creates the pending authorization token.
+2. `RequestToAdd` stores only the CRC-derived pending token and sends `messenger_auth` to the target.
+3. A block can be created while that request remains pending; `AddToBlockList` does not cancel or invalidate pending friend authorization tokens.
+4. `do_messenger_auth` later calls `MessengerManager::AuthToAdd(account, companion, bDeny)`.
+5. `AuthToAdd` validates only that the pending CRC token exists. On accept it directly calls `AddToList(companion, account)` and `AddToList(account, companion)` without rechecking either block direction.
+
+### Consequence
+A friend request that was valid when created can still become a mutual friendship after either participant blocks the other before acceptance. This independently recreates friend+block coexistence even if the duplicate-check defect in `BUG-MSG-001` is fixed.
+
+### Deferred validation
+`MSG-T19`.
