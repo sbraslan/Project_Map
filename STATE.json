@@ -8,17 +8,20 @@
   "active": {
     "subsystem": "marriage",
     "display_name": "Marriage / Wedding",
-    "status": "STATIC MAPPING IN PROGRESS / 0 VERIFIED BUGS / EXECUTION LOCKED",
+    "status": "STATIC MAPPING IN PROGRESS / 2 VERIFIED BUGS / EXECUTION LOCKED",
     "system_file": "systems/marriage.md",
     "bug_file": "bugs/marriage.md",
     "test_file": "tests/marriage.md",
-    "verified_bug_ids": [],
+    "verified_bug_ids": [
+      "BUG-MARR-001",
+      "BUG-MARR-002"
+    ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Map marriage login/logout plus near-check/love-point event lifecycle.",
-      "Map wedding map membership, teardown, and end timing.",
-      "Compare quest preconditions with server-side invariants.",
-      "Audit DB/game multi-core ordering and stale relation/wedding state.",
+      "Close legacy HEADER_GD_BREAK_MARRIAGE / HEADER_DG_BREAK_MARRIAGE path.",
+      "Audit mutual and unilateral divorce transaction ordering.",
+      "Map marriage login/logout plus near-check/love-point lifecycle.",
+      "Map wedding membership/teardown and duplicate READY consequences.",
       "Keep runtime/fault-injection execution locked; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -2802,30 +2805,43 @@
     "next_action": "continue Marriage/Wedding static mapping: login/logout + near-check/love-point lifecycle"
   },
   "marriage_mapping": {
-    "status": "STATIC MAPPING IN PROGRESS",
+    "status": "STATIC MAPPING IN PROGRESS / 2 VERIFIED BUGS",
     "canonical_files": {
       "system": "systems/marriage.md",
       "bugs": "bugs/marriage.md",
       "tests": "tests/marriage.md"
     },
-    "verified_bug_ids": [],
+    "verified_bug_ids": [
+      "BUG-MARR-001",
+      "BUG-MARR-002"
+    ],
     "mapped_flows": [
       "marriage_manage.quest -> marriage.engage_to -> ALUA(marriage_engage_to) -> marriage::CManager::RequestAdd -> HEADER_GD_MARRIAGE_ADD -> DB CClientManager::MarriageAdd -> DB marriage::CManager::Add -> SQL INSERT marriage -> HEADER_DG_MARRIAGE_ADD -> game CInputDB::MarriageAdd -> game marriage::CManager::Add",
       "game marriage::CManager::Add -> HEADER_GD_WEDDING_REQUEST -> DB CClientManager::WeddingRequest -> HEADER_DG_WEDDING_REQUEST -> game CInputDB::WeddingRequest -> WeddingManager::Request -> private WEDDING_MAP_INDEX -> HEADER_GD_WEDDING_READY -> DB CClientManager::WeddingReady -> HEADER_DG_WEDDING_READY -> DB ReadyWedding +5s -> HEADER_DG_WEDDING_START -> game WeddingStart -> partner warps",
       "marriage_manage.quest -> marriage.set_to_marriage -> ALUA(marriage_set_to_marriage) -> TMarriage::SetMarried -> TMarriage::Save -> marriage::CManager::RequestUpdate -> HEADER_GD_MARRIAGE_UPDATE -> DB marriage::CManager::Update -> SQL UPDATE marriage -> HEADER_DG_MARRIAGE_UPDATE -> game CInputDB::MarriageUpdate",
       "marriage_manage.quest -> marriage.remove -> ALUA(marriage_remove) -> game CManager::RequestRemove -> HEADER_GD_MARRIAGE_REMOVE -> DB marriage::CManager::Remove -> SQL DELETE marriage -> HEADER_DG_MARRIAGE_REMOVE -> game CInputDB::MarriageRemove -> game CManager::Remove",
-      "DB marriage::CManager::OnSetup -> HEADER_DG_MARRIAGE_ADD + HEADER_DG_MARRIAGE_UPDATE + running HEADER_DG_WEDDING_READY/START -> game core reconstruction"
+      "DB marriage::CManager::OnSetup -> HEADER_DG_MARRIAGE_ADD + HEADER_DG_MARRIAGE_UPDATE + running HEADER_DG_WEDDING_READY/START -> game core reconstruction",
+      "deployed engagement quest -> CONFIRM_OK -> Yang/ring mutations -> wait() suspension -> marriage.engage_to(u_vid) -> target VID re-resolution -> RequestAdd; transaction ordering proves BUG-MARR-001",
+      "DB WeddingRequest -> unfiltered ForwardPacket to all game peers -> map_allow_find(81); current ch2/core4 + ch99/core99 both own map81 -> duplicate WeddingManager::Request/READY path -> BUG-MARR-002"
     ],
-    "candidates": [],
+    "candidates": [
+      "WeddingManager::__CreateWeddingMap returns after post-insert GetMap failure without explicit cleanup; practical failure reachability not yet proven.",
+      "Several marriage Lua helpers rely on quest-side state; all deployed callers must be closed before promotion.",
+      "Mutual divorce post-confirm reselection semantics require further event-resume audit."
+    ],
     "runtime_tests": {
-      "status": "NOT YET FINALIZED / EXECUTION LOCKED / NOT RUN",
-      "canonical_test_ids": [],
+      "status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN",
+      "canonical_test_ids": [
+        "MARR-T01",
+        "MARR-T02"
+      ],
       "first_live_gate_unchanged": "DUNGEON-T09"
     },
     "closure_notes": [
-      "Marriage/Wedding mapping opened after global coverage discovery.",
-      "No Marriage/Wedding bug has been promoted yet.",
-      "Source/Game repositories remain read-only."
+      "Marriage/Wedding mapping is active.",
+      "BUG-MARR-001 and BUG-MARR-002 are statically verified and have deferred tests MARR-T01/MARR-T02.",
+      "Source/Game repositories remain read-only.",
+      "Global first future live gate remains DUNGEON-T09."
     ]
   }
 }
