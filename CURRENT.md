@@ -2,7 +2,7 @@
 
 **Active phase:** Detection / Mapping Only  
 **Active state:** Static mapping continuation  
-**Status:** MESSENGER / FRIEND / BLOCK — MAPPING IN PROGRESS / 17 VERIFIED BUGS / EXECUTION LOCKED  
+**Status:** MESSENGER / FRIEND / BLOCK — MAPPING IN PROGRESS / 14 VERIFIED BUGS / EXECUTION LOCKED  
 **Machine state:** `STATE.json`  
 **Active subsystem:** Messenger / Friend / Block  
 **System:** `systems/messenger.md`  
