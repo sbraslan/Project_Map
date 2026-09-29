@@ -6,20 +6,26 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "arena",
-    "display_name": "Arena / PvP Duel",
-    "status": "STATIC MAPPING IN PROGRESS / 1 VERIFIED BUG / EXECUTION LOCKED",
-    "system_file": "systems/arena.md",
-    "bug_file": "bugs/arena.md",
-    "test_file": "tests/arena.md",
+    "subsystem": "oxevent",
+    "display_name": "OX Event",
+    "status": "STATIC COMPLETE / 8 VERIFIED BUGS / EXECUTION LOCKED",
+    "system_file": "systems/oxevent.md",
+    "bug_file": "bugs/oxevent.md",
+    "test_file": "tests/oxevent.md",
     "verified_bug_ids": [
-      "BUG-ARENA-001"
+      "BUG-OX-001",
+      "BUG-OX-002",
+      "BUG-OX-003",
+      "BUG-OX-004",
+      "BUG-OX-005",
+      "BUG-OX-006",
+      "BUG-OX-007",
+      "BUG-OX-008"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Audit classic Arena map112 deployment/routing and lower-layer candidates.",
-      "Audit disconnect/death/timeout, item/potion restrictions and observer lifecycle.",
-      "Map GM-only CBattleArena companion and its deployment.",
+      "Open Arena as the next indexed subsystem.",
+      "Map duel registration/start, round/death, timeout, observer and disconnect lifecycles.",
       "Keep runtime/fault-injection execution locked; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -2802,10 +2808,10 @@
       "exact source fetch"
     ],
     "context7_role": "supplementary external library/API documentation verification; not authoritative Metin2 source location",
-    "next_action": "select/open Arena as next queued subsystem after OX static closure"
+    "next_action": "open Arena static mapping using indexed roots; Context7 only for external language/library semantics"
   },
   "marriage_mapping": {
-    "status": "STATIC COMPLETE / 13 VERIFIED BUGS",
+    "status": "STATIC COMPLETE / 14 VERIFIED BUGS",
     "canonical_files": {
       "system": "systems/marriage.md",
       "bugs": "bugs/marriage.md",
@@ -2902,7 +2908,7 @@
     }
   },
   "oxevent_mapping": {
-    "status": "STATIC COMPLETE / 5 VERIFIED BUGS",
+    "status": "STATIC COMPLETE / 8 VERIFIED BUGS",
     "canonical_files": {
       "system": "systems/oxevent.md",
       "bugs": "bugs/oxevent.md",
@@ -2913,7 +2919,10 @@
       "BUG-OX-002",
       "BUG-OX-003",
       "BUG-OX-004",
-      "BUG-OX-005"
+      "BUG-OX-005",
+      "BUG-OX-006",
+      "BUG-OX-007",
+      "BUG-OX-008"
     ],
     "mapped_flows": [
       "deployed 20011 NPC -> OPEN/level/cooldown/cap checks -> pc.warp(896500,24600) -> map113 login -> COXEventManager::Enter -> EnterAttender",
@@ -2923,7 +2932,8 @@
       "quest check_limit equality + async RequestSetEventFlag counter update + target EnterAttender no max guard -> BUG-OX-002",
       "source OPEN check -> cross-core warp -> target Enter accepts CLOSE/QUIZ -> BUG-OX-003",
       "automatic round CloseEvent/reopen does not reset ox_map_login_counter -> BUG-OX-004",
-      "deployed GM force-end closes COX only, leaves CEventManager m_pOXEvent alive -> BUG-OX-005"
+      "deployed GM force-end closes COX only, leaves CEventManager m_pOXEvent alive -> BUG-OX-005",
+      "CloseEvent after CheckAnswer cancels inner timer but does not reset function-static stage or m_map_miss -> next event first quiz enters stale stage2 -> BUG-OX-008"
     ],
     "candidates": [
       "Automatic Event Manager start does not initialize ox_map_level_min/max, ox_map_player_max, or ox_map_login_counter; current persisted runtime flag values are not tracked.",
@@ -2938,7 +2948,10 @@
         "OX-T02",
         "OX-T03",
         "OX-T04",
-        "OX-T05"
+        "OX-T05",
+        "OX-T06",
+        "OX-T07",
+        "OX-T08"
       ],
       "first_live_gate_unchanged": "DUNGEON-T09"
     },
@@ -2946,7 +2959,8 @@
       "OX Event static mapping complete with BUG-OX-001..005.",
       "OX-T01..OX-T05 are canonical deferred tests; none executed.",
       "Automatic start level/max flags remain a deployment/runtime-state dependency because persisted DB flag values are not tracked.",
-      "Source/Game repositories remain read-only."
+      "Source/Game repositories remain read-only.",
+      "BUG-OX-008 verified with project lifecycle code plus Context7 C++ static-local persistence semantics."
     ],
     "system_file": "systems/oxevent.md",
     "bug_file": "bugs/oxevent.md",
