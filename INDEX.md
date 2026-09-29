@@ -44,6 +44,7 @@ This is the navigation index. Normal continuation starts at `STATE.json`, then `
 | Horse / Mount / Riding | STATIC COMPLETE | `systems/horse_mount.md` |
 | Classic Pet System | STATIC COMPLETE | `systems/pet.md` |
 | Fishing Renewal | STATIC COMPLETE | `systems/fishing.md` |
+| Mining / Pickaxe | MAPPING IN PROGRESS | `systems/mining.md` |
 
 ## Current phase
 - **Detection / mapping only.** Source and game repositories remain read-only.
@@ -192,3 +193,7 @@ Initial verified findings: `BUG-FISH-001..002`. Fishing is not yet counted as ST
 Fishing Renewal is closed statically with **11 verified bugs** and deferred tests `FISH-T01..FISH-T11`.
 Effective static-complete subsystem count is now **30**.
 Runtime remains locked; global first future live gate remains `DUNGEON-T09`.
+
+
+## Mining / Pickaxe mapping opened — 2026-09-29
+Mining / Pickaxe is the active 31st subsystem candidate. It is **MAPPING IN PROGRESS** with 3 verified bugs. Effective STATIC COMPLETE count remains **30** until closure. Runtime execution remains locked; global first future live gate is still `DUNGEON-T09`.
