@@ -3,7 +3,7 @@
   "project": "Metin2 Project",
   "canonical": true,
   "canonical_file": "MAP_STATE.json",
-  "updated_at": "2026-09-29",
+  "updated_at": "2026-09-30",
   "mode": "STATIC_MAPPING_ONLY",
   "execution_lock": "LOCKED",
   "repository_policy": {
@@ -46,29 +46,11 @@
     "Never revisit a CLOSED node merely because an old evidence file contains words like next, active, open or mapping."
   ],
   "counts": {
-    "closed_subsystems": 37,
-    "open_subsystems": 1,
+    "closed_subsystems": 38,
+    "open_subsystems": 0,
     "total_canonical_subsystems": 38
   },
-  "active": {
-    "id": "zodiac_temple",
-    "name": "Zodiac Temple / 12ZI",
-    "status": "OPEN",
-    "evidence": {
-      "system": "systems/zodiac_temple.md",
-      "bugs": "bugs/zodiac_temple.md",
-      "tests": "tests/zodiac_temple.md"
-    },
-    "verified_bug_count": 7,
-    "test_plan_count": 7,
-    "cursor": [
-      "Resolve deployment/entry ownership: server-time portals versus missing tracked quest source.",
-      "Audit DecMember event-flag branch plus party/reconnect teardown.",
-      "Audit private-map/floor timer destruction ordering.",
-      "Audit bead regeneration/persistence and 12ZI shop-limit accounting.",
-      "Close remaining client/server parity findings and promote only source-proven defects."
-    ]
-  },
+  "active": null,
   "closed": {
     "guild_storage": {
       "name": "Guild Storage + Guild lifecycle",
@@ -402,6 +384,17 @@
         "bugs": "bugs/attr6th7th.md",
         "tests": "tests/attr6th7th.md"
       }
+    },
+    "zodiac_temple": {
+      "name": "Zodiac Temple / 12ZI",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/zodiac_temple.md",
+        "bugs": "bugs/zodiac_temple.md",
+        "tests": "tests/zodiac_temple.md"
+      },
+      "verified_bug_count": 9,
+      "test_plan_count": 9
     }
   },
   "alias_index": {
@@ -524,13 +517,18 @@
     "6th/7th attribute": "attr6th7th",
     "attr67": "attr6th7th",
     "6 7 efsun": "attr6th7th",
-    "6. 7. efsun": "attr6th7th"
+    "6. 7. efsun": "attr6th7th",
+    "zodiac_temple": "zodiac_temple",
+    "zodiac temple": "zodiac_temple",
+    "zodiac": "zodiac_temple",
+    "12zi": "zodiac_temple",
+    "12zi temple": "zodiac_temple"
   },
   "discovery": {
-    "status": "PAUSED_WHILE_ACTIVE",
+    "status": "TARGETED_UNKNOWN_ONLY",
     "queue": [],
-    "last_transition": "attr6th7th CLOSED -> targeted discovery found zodiac_temple",
-    "next_after_active_close": "Use raw lookup indexes to search only feature families that do not resolve through alias_index."
+    "last_transition": "zodiac_temple CLOSED -> targeted UNKNOWN-only discovery started",
+    "next_after_active_close": "Discovery is in progress. Only feature families that do not resolve through alias_index may be inspected; CLOSED nodes remain locked."
   },
   "lookup_indexes": {
     "authority": "NON_CANONICAL_ACCELERATOR_ONLY",
