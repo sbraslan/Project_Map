@@ -1,6 +1,6 @@
 # Classic Pet System — Static Bug Registry
 
-**Status:** ACTIVE STATIC MAPPING
+**Status:** STATIC COMPLETE EVIDENCE
 
 ## BUG-PET-001 — Bruce auto-pickup range ignores Y-axis distance
 
