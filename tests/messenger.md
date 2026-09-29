@@ -147,15 +147,13 @@ After runtime is explicitly unlocked in a controlled multi-core environment:
 
 Bug signature: the delayed old logout resolves P only by name, deletes the CCI already updated to B and invokes messenger logout for the still-online destination session.
 
+## MSG-T17 — configured long-name CG messenger round trip
+After runtime is explicitly unlocked in an isolated test environment:
+1. create/use valid 47-byte and 48-byte character names under the configured name limit;
+2. from the Messenger name dialog, attempt friend add and block add against those names;
+3. establish matching relations by another route where needed, then exercise friend remove, block remove and unblock-by-VID;
+4. capture the 48-byte CG name field and compare it byte-for-byte with the intended character name and server lookup result.
 
-## MSG-T14 — observer name-path parity
-After runtime is explicitly unlocked:
-1. enter observer/spectator mode with A;
-2. confirm VID-based friend/block actions are rejected where exposed;
-3. open the Messenger window and use Add Friend by name against B;
-4. use Add Block by name against B;
-5. inspect B's friend authorization and A/B block relation.
-
-Bug signature: name-based friend/block creation succeeds from observer mode while the equivalent VID routes are explicitly rejected.
+Bug signature: 48-byte names are truncated by add/block-add to 47 bytes, while 47-byte-or-longer remove/unblock fields can transmit a non-terminated/stale final byte and fail to address the intended relation.
 
 Do not run any MSG test while the project execution lock is active.
