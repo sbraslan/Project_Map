@@ -64,3 +64,30 @@ Warp branch:
 - verify `m_pkFishingNewEvent` survives and whether catch/event processing continues on the destination map without water-position revalidation.
 
 Do not run while execution lock is active.
+
+
+## FISH-T07 — fish_new_log identity
+Run only after runtime unlock. Instrument/record the session-selected `info->vnum`, actual reward VNUM, and inserted `fish_new_log.vnum` over repeated renewed sessions, including baited sessions.
+
+Bug indicator: log VNUM differs from the session fish/reward.
+Covers `BUG-FISH-007`.
+
+## FISH-T08 — renewed TYPE_FISH achievement hook
+Use a current incomplete TYPE_FISH achievement. Catch its target fish through renewed fishing and inspect task progress before/after.
+
+Bug indicator: reward is granted but Achievement task does not progress.
+Covers `BUG-FISH-008`.
+
+## FISH-T09 — Battle Pass fishing mission routing
+With current FISH_FISHING and FISH_CATCH missions active, catch a qualifying fish through renewed fishing and compare both mission counters.
+
+Bug indicator: FISH_CATCH increments while FISH_FISHING does not.
+Covers `BUG-FISH-009`.
+
+## FISH-T10 — bait persistence over logout
+Load bait onto an equipped rod, begin renewed fishing, disconnect before stop/decision clears socket2, relog and inspect rod socket2.
+
+Bug indicator: bait socket remains non-zero although the bait item was already consumed.
+Covers `BUG-FISH-010`.
+
+Do not run while execution lock is active.
