@@ -1,6 +1,6 @@
 # OX Event — Static Map
 
-**Status:** STATIC MAPPING IN PROGRESS / 5 VERIFIED BUGS  
+**Status:** STATIC COMPLETE / 5 VERIFIED BUGS  
 **Phase:** Detection / Mapping Only  
 **Opened:** 2026-09-29  
 **Source/Game repositories:** READ-ONLY  
@@ -154,8 +154,8 @@ When a round ends and rounds remain:
 
 The deployed entry quest's `ox_map_login_counter` is not reset by this path. That flag is reset only by the quest helper `cleanup_event()` / GM manual cleanup.
 
-### BUG-OX-004 — automatic round restart keeps the previous round's admission counter
-The automatic three-round scheduler resets local OX maps but not the quest's persistent admission counter. As a result, round 2/3 capacity is calculated from cumulative prior-round login count rather than the new round.
+### BUG-OX-004 — automatic event/round restart keeps the previous admission counter
+The automatic scheduler resets local OX maps but not the quest's persistent admission counter. This applies both between its three internal rounds and across automatic Event Manager OX runs because `SetOXEvent(true/false)` never resets `ox_map_login_counter`. Capacity is therefore calculated from stale/cumulative prior admission state unless the separate manual quest cleanup happened to reset it.
 
 If round 1 reached `ox_map_player_max`, the next OPEN round starts with `counter == max` and the deployed NPC blocks all new entrants. If the counter was below max, only the remaining cumulative difference is available.
 
@@ -205,12 +205,19 @@ The OX map has one tracked core owner, so no duplicate-map-manager bug comparabl
 - O/X answer rectangles leave a divider gap; no invariant currently proves it is unintended.
 - map 113 is single-core in the tracked deployment.
 
-## Open work
-1. audit logout/relog and eliminated-player lifecycle beyond the cap-accounting path;
-2. audit `Show()` based audience movement and map/state validation;
-3. audit reward delivery/offline-winner behavior;
-4. close automatic-start dependency on persisted level/max flags;
-5. decide STATIC COMPLETE readiness.
+## Static closure
+OX Event static mapping is complete for the tracked source/deployment snapshot.
+
+Verified bugs:
+- `BUG-OX-001..005`.
+
+Closed/scoped:
+- map 113 has a single tracked core owner (`ch99/core99`), so no duplicate local OX-manager ownership bug is promoted;
+- natural expiration of `m_timedEvent` is safe because event_cancel handles completed events with `q_el == nullptr`;
+- quiz level boundary `level == m_vec_quiz.size()` is unsafe in the API but current deployed callers always use level 1 and the deployed quiz vector has index 1;
+- `Show()` audience relocation is same-map sectree movement and no independent OX defect was established;
+- offline-winner reward is online-only in current implementation, but no tracked requirement proves offline persistence is required;
+- automatic Event Manager OX does not initialize the manual quest's level/min/max flags. Their current persisted runtime values are outside the tracked repositories, so this remains a deployment dependency rather than a promoted static bug.
 
 ## Runtime
 No OX runtime test may be executed while the global execution lock is active. First future live gate remains `DUNGEON-T09`.
