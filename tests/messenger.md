@@ -175,4 +175,15 @@ After runtime is explicitly unlocked:
 
 Bug signature: add-by-name is rejected on the Battle Field map while the target-board VID route creates the friend request.
 
+
+## MSG-T15 — channel-change stale logout race
+After runtime/fault-injection execution is explicitly unlocked:
+1. use at least three game processes/cores with P2P visibility;
+2. move player A from old channel/core X to new channel/core Y;
+3. on observer core Z, force/delay P2P delivery so `GG_LOGIN` from Y is processed before `GG_LOGOUT` from X;
+4. inspect Z's CCI for A and Messenger presence after both packets are processed;
+5. attempt a remote lookup/relay toward A.
+
+Bug signature: the delayed logout from X removes the CCI already updated to Y and emits Messenger P2P logout, leaving A falsely offline/missing on Z.
+
 Do not run any MSG test while the project execution lock is active.
