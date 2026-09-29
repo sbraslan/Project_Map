@@ -80,3 +80,17 @@ Expected bug signature: the character remains in the WeddingMap set after warp a
 Covers `BUG-MARR-006`.
 
 Do not run these tests while the execution lock is active.
+
+
+## MARR-T07 — EXP love-point progression across level boundary
+After runtime is explicitly unlocked:
+1. use a married level-25 character with spouse in the same map and valid near state;
+2. gain a controlled amount of EXP and record love-point delta;
+3. repeat at level 26 with the same EXP amount and relationship state;
+4. optionally repeat at higher levels.
+
+Expected bug signature: level 25 produces an EXP-derived update while level 26+ produces zero because the coefficient truncates before multiplication.
+
+Covers `BUG-MARR-007`.
+
+Do not run while the execution lock is active.
