@@ -192,3 +192,45 @@ So the stale classic pet is not proven permanent across owner teardown. The veri
 5. promote only verified reachable additional bugs/tests.
 
 No Classic Pet runtime test is authorized. Global first future live gate remains `DUNGEON-T10`.
+
+
+## Checkpoint — legacy Lua producer excluded + Achievement time-loss closed
+
+### Legacy Lua `pet.summon()` reachability
+The compiled server still exposes the legacy quest API in `questlua_pet.cpp`, where the call shape is semantically mismatched against the active `ENABLE_PET_SYSTEM` C++ signature.
+
+Current tracked deployment audit:
+- GitHub code search across `Project_Game` finds no `pet.summon`, `pet.unsummon`, `pet.is_summon`, `pet.count_summoned` or `pet.spawn_effect` usage;
+- current `share/locale/europe/quest/quest_list` contains no pet quest source;
+- tracked active quest package therefore does not establish a live producer for the mismatched Lua call.
+
+Decision: keep the signature mismatch as a dormant/deferred compatibility hazard; do not promote it as a current reachable Classic Pet bug.
+
+### Achievement summon-time consequence
+Current `Project_Game/share/locale/europe/achievements.xml` contains Achievement 60:
+- comment: `Summon pet for 30 days`;
+- task type = 4 / `TYPE_SUMMON_PET`;
+- max_value = 2592000 seconds;
+- restriction type 13 enables time-based accumulation.
+
+Normal classic pet lifecycle:
+- summon calls `CAchievementSystem::OnSummon(... TYPE_SUMMON_PET, vnum, 0, false)`;
+- `pet.summon_time` stores summon start time;
+- normal `CPetActor::Unsummon()` resolves the summon item, calls `OnSummon(... elapsed_time ...)`, then resets the flag.
+
+Abnormal REAL_TIME expiry path from BUG-PET-003:
+- summon item is destroyed before `Unsummon()`;
+- later `CPetActor::Unsummon()` sees `pet.summon_time > 0` but cannot resolve `m_dwSummonItemVID`;
+- elapsed duration is therefore not submitted to `CAchievementSystem::OnSummon`;
+- the flag is also not reset in that branch;
+- `CAchievementSystem::OnLogout()` later sees the stale flag and unconditionally resets it to 0 without crediting time.
+
+This makes the lost accounting externally visible: real accumulated classic-pet summon duration can be discarded from the 30-day achievement after forced item expiry. Promoted as `BUG-PET-004`.
+
+## Updated next work
+1. finish current PET_PAY item/race/client coverage;
+2. audit remaining death/warp/login restoration edges;
+3. inspect pet auto-pickup ownership-expiry/re-target behavior for any additional reachable lifetime bug;
+4. close Classic Pet static mapping when no further reachable candidates remain.
+
+No Classic Pet runtime test is authorized. Global first future live gate remains `DUNGEON-T10`.
