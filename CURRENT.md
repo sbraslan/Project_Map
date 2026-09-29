@@ -10,7 +10,7 @@
 **Tests:** `tests/pet.md`  
 **Last completed subsystem:** Classic Pet System  
 **Effective completed/readiness-covered subsystems:** 29  
-**First future live gate:** `DUNGEON-T10`  
+**First future live gate:** `DUNGEON-T09`  
 **Last updated:** 2026-09-29
 
 ## Hard rule
@@ -76,3 +76,14 @@ Do not execute `PET-T01`..`PET-T04`.
 **Classic Pet System: STATIC COMPLETE.**
 
 Runtime remains locked. First future live gate remains `DUNGEON-T10`.
+
+
+## Runtime-gate correction — 2026-09-29
+Fresh preflight found the previous first-gate premise was wrong:
+- `BUG-DUNGEON-010` retracted;
+- `DUNGEON-T10` retracted / do not run;
+- current `uidungeoninfo.py` creates list buttons for nonzero dungeon counts;
+- `BUG-DUNGEON-009` malformed ranking SQL remains statically verified.
+
+**New first future live gate: `DUNGEON-T09`.**
+Execution remains locked.
