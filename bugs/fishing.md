@@ -103,3 +103,25 @@ Carbon rod never receives the explicit doubled `(rod->GetValue(0) / 10) * 2` cha
 
 ### Deferred validation
 Canonical test: `FISH-T05`.
+
+
+## BUG-FISH-006 — renewed fishing survives death/warp lifecycle boundaries
+
+**Class:** lifecycle/state cleanup defect  
+**Reachability:** VERIFIED.
+
+### Static proof
+1. `Dead()` does not cancel `m_pkFishingNewEvent`.
+2. Renewed fishing event callback does not check `IsDead()`.
+3. If catch count is already >= required count, the callback calls `fishing_catch_decision()`.
+4. The decision function does not check death state before final reward logic.
+5. `CanWarp()` does not block active renewed fishing.
+6. `WarpSet()` does not cancel the renewed fishing event.
+7. The renewed event does not revalidate original fishing map/water position after relocation.
+
+### Consequence
+- a narrow death race can allow the already-completed minigame state to resolve its fishing reward after death;
+- same-character warp paths can carry the active fishing session across map relocation until another stop condition occurs.
+
+### Deferred validation
+Canonical test: `FISH-T06`.
