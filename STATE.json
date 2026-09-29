@@ -8,25 +8,16 @@
   "active": {
     "subsystem": null,
     "display_name": "Static Mapping Coverage Complete",
-    "status": "MAPPING IN PROGRESS / 6 VERIFIED BUGS / EXECUTION LOCKED",
+    "status": "MINING / PICKAXE STATIC COMPLETE / 31 EFFECTIVE STATIC-COMPLETE SUBSYSTEMS / EXECUTION LOCKED",
     "system_file": null,
     "bug_file": null,
     "test_file": null,
-    "verified_bug_ids": [
-      "BUG-MIN-001",
-      "BUG-MIN-002",
-      "BUG-MIN-003",
-      "BUG-MIN-004",
-      "BUG-MIN-005",
-      "BUG-MIN-006"
-    ],
+    "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Resolve whether CHARACTER_MANAGER::InitializeMiningEvent has an active caller; its data/event/mining/map_mining.txt dependency is missing.",
-      "Close pickaxe proto/refine progression data if a readable authoritative proto source becomes available.",
-      "Audit remaining mining client/UI entry points and multi-farm interaction.",
-      "Decide whether Mining can be marked STATIC COMPLETE.",
-      "Do not execute Mining runtime tests; first future live gate remains DUNGEON-T09."
+      "Preserve runtime execution lock.",
+      "First future live runtime gate is DUNGEON-T09; DUNGEON-T10 is retracted and must not be run.",
+      "When continuation is requested, select the next independent unmapped gameplay subsystem and continue detection-only mapping."
     ]
   },
   "startup": {
@@ -323,7 +314,12 @@
     "Project_Game/share/locale/europe/map/index::no map230",
     "Project_Game/share/data/event::no mining_event_regen_type_0.txt",
     "Project_Game/g_guild/guild_building_melt.quest shields OreRefine insufficient-gold ordering",
-    "game/src/char_manager.cpp::AllocVID monotonic vein lifetime closure"
+    "game/src/char_manager.cpp::AllocVID monotonic vein lifetime closure",
+    "game/src/event_manager.cpp::EVENT_TYPE_MINING -> SetMiningEvent map230 missing deployment -> BUG-MIN-006",
+    "Project_Game/share/locale/europe/map/index::no map 230 -> BUG-MIN-006",
+    "Project_Game quest/guild_building_melt.quest::OreRefine precheck closure",
+    "Project_Game map357 data::no mining veins; Battle Field ownership exception closed",
+    "Project_DumpProto item_names::29101..29109 pickaxe +0..+8"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -2629,12 +2625,11 @@
       "first_live_gate_unchanged": "DUNGEON-T09"
     },
     "candidates_closed": [
-      "OreRefine internal ore-before-gold ordering not promoted because deployed guild_building_melt.quest checks exact gold cost first.",
-      "Battle Field no-ownership branch not reachable through mapped vein content on map 357.",
-      "Destroyed vein VID retarget not promoted under monotonic VID allocation.",
-      "InitializeMiningEvent missing data/event/mining/map_mining.txt retained as risk only because no active caller was established.",
-      "No Battle Pass/Achievement mining mission type exists.",
-      "Readable authoritative pickaxe proto rows unavailable; no numeric inference made."
+      "OreRefine internal ore-before-gold ordering is shielded by deployed guild_building_melt quest precheck; not promoted.",
+      "Battle Field ownership exception not currently reachable: map 357 has no tracked mining veins and mining event paths target 230/103.",
+      "Vein despawn/VID lifecycle cleanly aborts and normal VID reuse alias was not established.",
+      "InitializeMiningEvent map-103 global NPC cleanup remains dead-path risk because no active caller was found.",
+      "Pickaxe item_proto values unavailable as readable text; item-name deployment confirms 29101..29109 +0..+8."
     ]
   }
 }
