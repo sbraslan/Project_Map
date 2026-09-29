@@ -1,3 +1,23 @@
+# DUNGEON-T10 — RETRACTED HANDOFF
+
+**Status:** RETRACTED / DO NOT EXECUTE  
+**Date corrected:** 2026-09-29  
+**Former bug:** `DINFO::BUG-DUNGEON-010`
+
+Fresh verification of the canonical tracked `Project_Binary/root/uidungeoninfo.py` disproved the premise of this handoff. The list-button creation loop is outside the zero-count `else` branch and executes when `dungeonInfo.GetCount() > 0`.
+
+Therefore:
+- `BUG-DUNGEON-010` is a false positive and is retracted;
+- `DUNGEON-T10` must not be executed;
+- this file is retained only as historical traceability;
+- the first future live gate is now `DUNGEON-T09`.
+
+Runtime remains locked until explicit phase change.
+
+---
+
+## Historical superseded content
+
 # DUNGEON-T10 — Runtime Gate Handoff
 
 **Prepared:** 2026-09-28  
