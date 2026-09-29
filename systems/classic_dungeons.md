@@ -1,6 +1,6 @@
 # Classic Quest Dungeons — Static System Map
 
-**Status:** STATIC MAPPING OPEN / 0 VERIFIED BUGS  
+**Status:** STATIC MAPPING OPEN / 1 VERIFIED BUG  
 **Mode:** detection / mapping only  
 **Execution:** LOCKED / NOT RUN  
 **Source policy:** Project_ClientSrc, Project_ServerSRC, Project_Binary, Project_Game and Project_DumpProto are read-only.
@@ -30,3 +30,24 @@ The pinned Game snapshot's active quest_list includes each corresponding quest s
 
 ## Boundary
 Blue Dragon/Beran and Meley/DragonLair are not in this node because dedicated C++ components exist for those families. Dawnmist/Snake/White Dragon/Defense Wave are also deferred to later candidate families.
+
+
+## Cursor 1 checkpoint — entry authorization / instance ownership
+
+### Scope result
+- Devil Tower enters through the public tower map and later creates a private map with `d.new_jump_all`.
+- Devil Catacombs gates floor-1 entry by level, tower completion and cooldown; the rag transition requires a party and creates a private party dungeon.
+- Spider 2F is a direct public-map warp.
+- Spider Baroness is a channel-scoped shared-room design rather than a generic private dungeon.
+- Flame and Snow validate the same-map party population and create private instances with `d.new_jump_party`.
+- The Flame/Snow party-validation scope matches the server implementation of `d.new_jump_party`: both use `ForEachOnMapMember(..., sourceMapIndex)`. Off-map party members are therefore neither validated nor warped by that entry action; the initially suspected remote-member bypass is not a defect.
+
+### Verified multiplayer defect
+Spider Baroness correctly suffixes most shared state with `get_channel_id()`, but stores its boss VID in the unsuffixed event flag `king_vid`. Event flags are DB-owned/global: Game sends `HEADER_GD_SET_EVENT_FLAG`, DB persists the flag under PID 0 and broadcasts `HEADER_DG_SET_EVENT_FLAG` to game peers. A character VID, by contrast, is resolved locally through `CHARACTER_MANAGER::Find(vid)`.
+
+Concurrent Spider Baroness runs on different channels can therefore overwrite the single global `king_vid`. Subsequent egg kills may fail to modify the intended boss or can target a different local character if that numeric VID exists on the receiving game process.
+
+Promoted as `BUG-CLD-001`.
+
+### Next cursor
+Quest flags, server timers and floor/stage progression for the five dungeon families.
