@@ -142,3 +142,6 @@ Friend/block add-by-VID rejects observer-mode characters. The corresponding name
 
 ### Friend-authorization TOCTOU
 The initial add-by-VID/name branches enforce block state, but the pending request token survives later block creation. `AuthToAdd` checks only token existence and then writes both friend directions. This is `BUG-MSG-019`, independent of the block-add validation typo in `BUG-MSG-001`.
+
+### GM inverse-cache lifecycle
+`LoadGMList` creates synthetic account→GM relations and inverse GM→account memberships. Logout removes the forward list but not the inverse memberships; `Destroy()` is empty. Therefore the inverse side grows with distinct historical logins and GM presence fanout traverses stale accounts. Verified as `BUG-MSG-016`.
