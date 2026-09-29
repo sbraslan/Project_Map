@@ -225,7 +225,7 @@ Promoted as `BUG-MARR-008`.
 - Mutual-divorce stale-target/double-mutation candidate is closed for the normal confirmation path: `CQuestManager::Confirm` resumes the suspended quest synchronously inside the confirmation handler, and the post-confirm mutual-divorce branch contains no additional suspension before its target re-check/mutations. This differs from BUG-MARR-001, where a later explicit `wait()` creates a real interruption window.
 
 ## Closure status — current
-Marriage / Wedding remains **STATIC MAPPING IN PROGRESS** for the tracked source/deployment snapshot.
+Marriage / Wedding is **STATIC COMPLETE** for the tracked source/deployment snapshot.
 
 Verified bugs:
 - `BUG-MARR-001..014`.
