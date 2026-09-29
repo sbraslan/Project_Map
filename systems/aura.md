@@ -69,7 +69,7 @@ Aura and Dragon Soul do not share one universal opener mutex. Dragon Soul closur
 8. map Aura visual/proto/client persistence surfaces;
 9. create additional bug/test records only from verified reachable paths.
 
-No Aura runtime test is authorized. Global first future live gate remains `DUNGEON-T10`.
+No Aura runtime test is authorized. Global first future live gate remains `DUNGEON-T09`.
 
 
 ## Transaction contract / material validation pass — 2026-09-28
@@ -414,7 +414,7 @@ Canonical deferred tests:
 Runtime execution:
 - **LOCKED / NOT RUN**
 
-No source repository was modified. Global first future live gate remains `DUNGEON-T10`.
+No source repository was modified. Global first future live gate remains `DUNGEON-T09`.
 
 
 ## Closure pass — booster, lifecycle, proto and visual surfaces
