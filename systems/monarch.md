@@ -129,21 +129,17 @@ Combat reads these arrays directly in `char_battle.cpp` for ±10% damage.
 No DB/P2P replication was found in the mapped path. Keep as a candidate until a currently deployed quest/caller for these Lua functions is proven.
 
 ## Open candidates
-- multi-core treasury double-spend/effect-before-authoritative-deduction;
-- process-local PowerUp/DefenseUp effects versus multi-core empire scope;
-- `takemonarchmoney` has authorization/precheck code under `__UNIMPLEMENTED__`; audit tracked caller reachability;
-- admin `SetMonarch` SQL schema/column consistency;
-- `DelMonarch` DELETE result handling;
-- warp/transfer money/cooldown committed without checking final warp/transfer success;
-- election vote/candidacy producer deployment is incomplete in tracked Game quest corpus.
+- process-local PowerUp/DefenseUp effects versus multi-core empire scope; deployed caller closure pending;
+- `takemonarchmoney` has authorization/precheck code under `__UNIMPLEMENTED__`; current tracked deployed caller not yet proven;
+- add-money overflow/failure handling versus unconditional fanout;
+- monarch cooldown state is character-process-local; reconnect/core-move persistence audit pending.
 
 ## Current audit cursor
-1. close treasury request/ack concurrency and failure semantics;
-2. map `takemonarchmoney` callers and authorization;
-3. map PowerUp/DefenseUp deployed callers and cross-core behavior;
-4. audit monarch warp/transfer failure charging;
-5. audit Set/Del SQL persistence details;
-6. decide additional promotions.
+1. audit `takemonarchmoney` deployed caller/authorization reachability;
+2. audit process-local PowerUp/DefenseUp deployment and cross-core scope;
+3. audit add-money overflow/failure broadcast symmetry;
+4. audit monarch cooldown persistence across reconnect/core moves;
+5. close candidates and decide static completion.
 
 ## Runtime
 No Monarch runtime/fault-injection test may execute while the global execution lock is active. First future live gate remains `DUNGEON-T09`.
