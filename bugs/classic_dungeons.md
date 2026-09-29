@@ -1,6 +1,6 @@
 # Classic Quest Dungeons — Bug Registry
 
-**Status:** STATIC MAPPING OPEN / 2 VERIFIED BUGS  
+**Status:** STATIC MAPPING OPEN / 3 VERIFIED BUGS  
 **Execution:** LOCKED / NOT RUN
 
 Previously verified generic Dungeon Core or Party bugs are referenced rather than duplicated unless a distinct feature-specific defect is proven.
@@ -42,3 +42,21 @@ A leader can return within the advertised rejoin window and continue the dungeon
 
 ### Deferred validation
 `CLD-T02`.
+
+
+## BUG-CLD-003 — Devil Catacombs consumes the entry item before fallible private-map creation
+
+**Class:** item transaction / failure rollback
+
+### Proof
+- The 30101 take handler validates the item and party state, then immediately calls `item.remove()`.
+- The quest performs two `wait()` suspensions before calling `d.new_jump_party`.
+- `d.new_jump_party` calls `CDungeonManager::Create(mapIndex)`.
+- If private-map creation fails, the binding logs `cannot create dungeon` and returns to Lua without pushing a success/failure result.
+- The quest does not test a result and contains no compensation path that restores the removed item.
+
+### Consequence
+A failed instance-creation attempt can consume the Catacomb entry item without creating/entering the dungeon. The transaction is not atomic from the player's inventory perspective.
+
+### Deferred validation
+`CLD-T03`.
