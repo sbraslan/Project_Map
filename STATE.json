@@ -537,7 +537,18 @@
       },
       "retracted": {
         "DINFO::BUG-DUNGEON-010": "DUNGEON-T10 retracted 2026-09-29; source indentation reverified and list loop is outside zero-count branch."
-      }
+      },
+      "handoffs": {
+        "DUNGEON-T09": "DUNGEON_T09_HANDOFF.md",
+        "DUNGEON-T11": "DUNGEON_T11_HANDOFF.md",
+        "DUNGEON-T12": "DUNGEON_T12_HANDOFF.md"
+      },
+      "preflight_notes": [
+        "T09 current source still concatenates dungeon_ranking and LEFT JOIN without whitespace.",
+        "T11 current parser recognizes GLOBAL only from literal GLOBAL; current Blue Dragon config uses numeric 1 while quest uses global event flag dragon_lair_time.",
+        "T12 current QUEST-backed config has no explicit COOLDOWN directives; expired/zero arithmetic can wrap into uint32.",
+        "T10 is retracted and must not be run."
+      ]
     },
     "ticket": {
       "status": "DOCUMENTATION READY / NOT RUN",
