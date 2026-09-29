@@ -105,3 +105,24 @@ A mining attempt already underway can still award ore and pickaxe practice durin
 
 ### Deferred validation
 `MIN-T06`.
+
+
+## BUG-MIN-007 — scheduled Mining Event cannot start on current deployment but sets active flag first
+
+**Class:** deployment/configuration + state consistency  
+**Reachability:** VERIFIED when the scheduled Event Manager starts `EVENT_TYPE_MINING`.
+
+### Static proof
+1. Event Manager maps `EVENT_TYPE_MINING` to `SetMiningEvent(true)`.
+2. `SetMiningEvent(true)` first calls `UpdateGameFlag("mining_event", true)`.
+3. It then requests `SECTREE_MANAGER::GetMap(EVENT_MAP_INDEX)`.
+4. `EVENT_MAP_INDEX` is hardcoded as 230.
+5. Deployed `share/locale/europe/map/index` has no entry 230.
+6. The function therefore returns false after the flag was already set.
+7. The configured regen file `data/event/mining_event_regen_type_0.txt` is also absent from the tracked game/runtime tree.
+
+### Consequence
+The scheduled Mining Event can enter a false-active state: event/game flag enabled, event start reported internally as failed, and no mining event content spawned.
+
+### Deferred validation
+`MIN-T07`.
