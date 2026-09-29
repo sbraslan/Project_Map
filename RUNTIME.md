@@ -46,7 +46,7 @@ Prepared validations:
 Do not run this cluster until runtime execution is explicitly enabled.
 
 ## Current next target
-**DUNGEON-T10 live reproduction is the gate.**
+**DUNGEON-T09 live ranking reproduction is the gate.**
 
 Preflight result:
 - current server config has 9 dungeon entries;
@@ -78,7 +78,7 @@ No source/config modification is needed for this first test.
 
 The Dungeon Info cluster is now normalized into two execution classes without changing any source or game data:
 
-- **Normal-path chain:** DUNGEON-T10 -> DUNGEON-T09 -> DUNGEON-T11 -> DUNGEON-T12.
+- **Normal-path chain:** DUNGEON-T09 -> DUNGEON-T11 -> DUNGEON-T12.
 - **Isolated ASan/debug chain:** DUNGEON-T01 through DUNGEON-T08.
 
 Bug/test mapping:
@@ -95,7 +95,7 @@ Bug/test mapping:
 - T11 -> BUG-DUNGEON-011
 - T12 -> BUG-DUNGEON-012
 
-The first future live gate remains **DUNGEON-T10** because it is reproducible with the current checked-in 9-dungeon configuration and no crafted packet/config change. T09/T11/T12 remain live-pending behind T10. T01-T08 remain isolated/debug-only and must not be executed during the current detection-only phase.
+The first future live gate is **DUNGEON-T09**. DUNGEON-T10 was retracted after source revalidation. T11/T12 remain behind T09; T01-T08 remain isolated/debug-only and must not be executed during the current detection-only phase.
 
 **Next documentation cluster:** Ticket runtime readiness.
 
@@ -117,7 +117,7 @@ Execution classes:
 - **Normal-path UI validation:** TICKET-T07. This can be observed with legitimate ticket creation/UI behavior and no crafted packet.
 - **Isolated/adversarial validation:** TICKET-T01 through TICKET-T06. These require one or more of: modified client input, foreign ticket IDs, disposable DB data, controlled collision setup, invalid admin mode, ASan/UBSan, or crafted non-NUL packets.
 
-Overall runtime order remains unchanged: DUNGEON-T10 is still the first live gate. Ticket's first future normal-path test is **TICKET-T07** after the Dungeon normal-path cluster is cleared.
+Overall runtime order now starts with DUNGEON-T09; DUNGEON-T10 is retracted. Ticket's first future normal-path test is **TICKET-T07** after the Dungeon normal-path cluster is cleared.
 
 **Next documentation cluster:** Hunting runtime readiness.
 
@@ -144,7 +144,7 @@ Execution classes:
 - **Crash consistency / persistence:** HUNT-T05 and HUNT-T06.
 - **Fault-injection robustness:** HUNT-T07 and HUNT-T08.
 
-The global first live gate remains **DUNGEON-T10**. Hunting does not preempt that order.
+The global first live gate is **DUNGEON-T09**. Hunting does not preempt that order.
 
 **Next documentation cluster:** Battle Pass runtime readiness.
 
@@ -162,7 +162,7 @@ Summary:
 - crash-consistency, leak/instrumentation, and controlled-state cases remain deferred;
 - no Battle Pass runtime test has been executed.
 
-The global first live gate remains **DUNGEON-T10**.
+The global first live gate is **DUNGEON-T09**.
 
 **Next documentation cluster:** Achievement runtime readiness.
 
@@ -181,7 +181,7 @@ Execution classes:
 - **Config-evolution / sanitizer:** ACH-T08.
 - **DB atomicity / disposable-data fault test:** ACH-T09.
 
-The global first live gate remains **DUNGEON-T10**.
+The global first live gate is **DUNGEON-T09**.
 
 **Next documentation cluster:** Biolog runtime readiness.
 
@@ -209,7 +209,7 @@ Execution classes:
 - **External DB dependency:** BIO-T08.
 - **Observation-only / isolated:** BIO-T09..BIO-T11.
 
-The global first live gate remains **DUNGEON-T10**.
+The global first live gate is **DUNGEON-T09**.
 
 **Next documentation cluster:** Inventory / Item / Special Inventory runtime readiness.
 
@@ -239,7 +239,7 @@ No canonical BUG-ITEM-005 exists; the numbering gap is intentionally preserved.
 The mixed legacy Guild Storage/Switchbot sections in tests/inventory_items.md are not treated as Inventory ownership. Switchbot will be consolidated from its own canonical bug/test files next.
 
 Primary Inventory normal-path candidate: **ITEM-T01**.
-The global first live gate remains **DUNGEON-T10**.
+The global first live gate is **DUNGEON-T09**.
 
 **Next documentation cluster:** Switchbot runtime readiness.
 
@@ -261,7 +261,7 @@ Canonical deferred IDs:
 
 Primary legitimate monitored candidates are SWB-T01 and SWB-T03. Modified-client testing is confined to SWB-T04/SWB-T07; observation status remains unchanged for SWB-T06/SWB-T07.
 
-The global first live gate remains **DUNGEON-T10**.
+The global first live gate is **DUNGEON-T09**.
 
 **Next documentation cluster:** Guild Storage runtime readiness.
 
@@ -287,7 +287,7 @@ Candidate-only mapping:
 
 Legacy candidate GS-003 and GS-004 are superseded by their later verified BUG-GS-003/004 records. Candidate IDs 001/002/005/006 remain candidates and are not promoted by documentation alone.
 
-The global first live gate remains **DUNGEON-T10**.
+The global first live gate is **DUNGEON-T09**.
 
 **Next documentation cluster:** Exchange / Trade runtime readiness.
 
@@ -311,7 +311,7 @@ Coverage:
 Important registry condition: BUG-EXCHANGE-004 is duplicated across two different verified findings. The ID collision is documented but not renumbered during the current detection-only phase.
 
 Primary normal-path candidates: **EXC-T01** and **EXC-T02**.
-The global first live gate remains **DUNGEON-T10**.
+The global first live gate is **DUNGEON-T09**.
 
 **Next documentation cluster:** Shop / Premium Private Shop runtime readiness.
 
@@ -343,7 +343,7 @@ Observation coverage:
 Historical provisional SHOP-T01..T03 are retained but are not canonical continuation IDs. In particular, old stash-cap clipping is observation-only after the later static invariant audit.
 
 Primary normal-path candidates: **SHP-T02** and **SHP-T03**.
-The global first live gate remains **DUNGEON-T10**.
+The global first live gate is **DUNGEON-T09**.
 
 **Next documentation cluster:** Safebox / Mall runtime readiness.
 
@@ -370,7 +370,7 @@ Dormant ENABLE_SAFEBOX_MONEY coverage:
 
 Historical OBS-SAFEBOX-001 is superseded by BUG-SAFEBOX-005. The active build has no clean normal-player verified-bug test; SFB-T09 is an ordinary-flow access-policy observation, not a verified bug.
 
-The global first live gate remains **DUNGEON-T10**.
+The global first live gate is **DUNGEON-T09**.
 
 **Next documentation cluster:** Mailbox runtime readiness.
 
@@ -399,7 +399,7 @@ Observation coverage:
 
 Primary ordinary-flow candidates: **MAIL-T07** and **MAIL-T11**. Adversarial, crash-consistency and fault-injection cases remain isolated/deferred.
 
-The global first live gate remains **DUNGEON-T10**.
+The global first live gate is **DUNGEON-T09**.
 
 **Next documentation cluster:** Ranking runtime readiness.
 
@@ -425,7 +425,7 @@ Conditional/unpromoted:
 Primary normal-path candidates: **RANK-T01, RANK-T02, RANK-T03, RANK-T04**.
 RANK-T07 is isolated malformed-server-packet parser validation.
 
-The global first live gate remains **DUNGEON-T10**.
+The global first live gate is **DUNGEON-T09**.
 
 **Next documentation cluster:** Party runtime readiness.
 
@@ -452,7 +452,7 @@ Execution classes:
 
 Party Match remains a separate subsystem and is not folded into the Party matrix.
 
-The global first live gate remains **DUNGEON-T10**.
+The global first live gate is **DUNGEON-T09**.
 
 **Next documentation cluster:** Party Match runtime readiness.
 
@@ -475,7 +475,7 @@ Unpromoted robustness:
 Primary normal-path candidate: **PMATCH-T03**.
 PMATCH-T01 is a controlled multi-core normal-flow architecture test; PMATCH-T02 is isolated exchange/item-lifetime testing.
 
-The global first live gate remains **DUNGEON-T10**.
+The global first live gate is **DUNGEON-T09**.
 
 **Next documentation cluster:** Dungeon Core runtime readiness.
 
@@ -497,7 +497,7 @@ Execution classes:
 
 Primary Dungeon Core candidates: **DCORE-T01** and **DCORE-T02**.
 
-Dungeon Core is separate from the already-consolidated Dungeon Info subsystem. The global first live gate remains **DUNGEON-T10**.
+Dungeon Core is separate from the already-consolidated Dungeon Info subsystem. The global first live gate is **DUNGEON-T09**.
 
 **Next documentation cluster:** Battle Field runtime readiness.
 
@@ -525,7 +525,7 @@ Registry corrections:
 Primary ordinary-flow candidates: **BFIELD-T01, T02, T03, T09, T10, T11**.
 BFIELD-T06 is privileged/admin routing; BFIELD-T08 is deterministic schedule arithmetic.
 
-The global first live gate remains **DUNGEON-T10**.
+The global first live gate is **DUNGEON-T09**.
 
 **Next documentation cluster:** World Lottery runtime readiness.
 
@@ -559,7 +559,7 @@ Execution classes:
 
 Primary ordinary/current-flow candidates: **WLOT-T04** and **WLOT-T10**.
 
-The global first live gate remains **DUNGEON-T10**.
+The global first live gate is **DUNGEON-T09**.
 
 **Next documentation cluster:** World Boss runtime readiness.
 
@@ -596,7 +596,7 @@ Dependency note:
 Primary ordinary/current-flow candidates: **WB-T09, WB-T13, WB-T15, WB-T16**.
 Scheduler/multicore/lifecycle, client-parser and reward-atomicity cases remain controlled/deferred.
 
-The global first live gate remains **DUNGEON-T10**.
+The global first live gate is **DUNGEON-T09**.
 
 **Next documentation cluster:** Sung Mahi Tower runtime-readiness final consolidation.
 
@@ -623,7 +623,7 @@ Deferred architectural/data questions remain separate and unpromoted:
 Primary current-repository candidate: **SMT-T01**.
 SMT-T02/T03/T04 require isolated time/state or ASan/debug execution; SMT-T05 is deterministic data validation; SMT-T06 is deployment/proto drift validation.
 
-The global first live gate remains **DUNGEON-T10**.
+The global first live gate is **DUNGEON-T09**.
 
 ## Runtime-readiness documentation milestone — COMPLETE — 2026-09-28
 All currently indexed static-complete subsystem clusters now have deferred runtime-readiness coverage or an explicitly documented folded ownership path.
@@ -633,7 +633,7 @@ Execution remains locked. No runtime, crafted-packet, sanitizer, crash-consisten
 The next allowed documentation-only step is a **global readiness integrity audit**:
 1. cross-check every STATIC COMPLETE subsystem in INDEX.md against STATE.json runtime_readiness;
 2. cross-check verified/retracted/candidate/observation ownership for numbering gaps and aliases;
-3. produce one canonical global execution order while preserving DUNGEON-T10 as the first live gate;
+3. produce one canonical global execution order with DUNGEON-T09 as the first live gate;
 4. do not execute anything until the user explicitly changes phase.
 
 
@@ -653,12 +653,12 @@ Audit result:
 - `STATE.json completed_subsystems` is normalized to the 21 STATIC COMPLETE rows.
 
 Canonical future order is recorded in `READINESS_AUDIT.md` and `STATE.json`.
-The first future live gate remains **DUNGEON-T10**.
+The first future live gate is **DUNGEON-T09**.
 
-**Next documentation-only target:** prepare the DUNGEON-T10 preflight/handoff checklist. Do not run it until the user explicitly changes phase.
+**Next documentation-only target:** use the prepared DUNGEON-T09 handoff when runtime is explicitly unlocked.
 
 
-## DUNGEON-T10 runtime gate handoff — READY — 2026-09-28
+## DUNGEON-T10 runtime gate handoff — RETRACTED — corrected 2026-09-29
 **Execution:** LOCKED / NOT RUN  
 **Canonical checklist:** `DUNGEON_T10_HANDOFF.md`
 
@@ -733,7 +733,7 @@ Deferred, unpromoted:
 
 This is a **post-audit extension**: the original global audit covered 21/21 STATIC COMPLETE subsystems. Costume / Appearance / ChangeLook raises current effective static/readiness coverage to **22/22**.
 
-The global first future live gate remains **DUNGEON-T10**. LOOK tests do not execute before it unless the project phase and order are explicitly changed.
+The global first future live gate is **DUNGEON-T09**. LOOK tests do not execute before it unless the project phase and order are explicitly changed.
 
 
 ## Runtime-readiness consolidation — Acce / Sash — 2026-09-28
@@ -762,7 +762,7 @@ Cross-system note:
 
 Acce is a **post-audit extension**. Current effective static-complete/readiness coverage is **23/23**, plus the folded Guild lifecycle companion.
 
-The global first future live gate remains **DUNGEON-T10**. No Acce test has been executed.
+The global first future live gate is **DUNGEON-T09**. No Acce test has been executed.
 
 
 ## Runtime-readiness consolidation — Dragon Soul / Alchemy — 2026-09-28
@@ -795,7 +795,7 @@ Closure notes:
 
 Dragon Soul is a **post-audit extension**. Current effective static-complete/readiness coverage is **24/24**, plus the folded Guild lifecycle companion.
 
-The global first future live gate remains **DUNGEON-T10**. No Dragon Soul test has been executed.
+The global first future live gate is **DUNGEON-T09**. No Dragon Soul test has been executed.
 
 
 ## Runtime-readiness consolidation — Aura System — 2026-09-28
@@ -825,7 +825,7 @@ Unpromoted closure boundaries:
 
 Aura is a **post-audit extension**. Current effective static-complete/readiness coverage is **25/25**, plus the folded Guild lifecycle companion.
 
-The global first future live gate remains **DUNGEON-T10**. No Aura test has been executed.
+The global first future live gate is **DUNGEON-T09**. No Aura test has been executed.
 
 
 ## Runtime-readiness consolidation — Refine / Cube / Crafting — 2026-09-28
@@ -862,7 +862,7 @@ Closure candidates left unpromoted:
 
 Refine / Cube / Crafting is a **post-audit extension**. Current effective static-complete/readiness coverage is **26/26**, plus the folded Guild lifecycle companion.
 
-The global first future live gate remains **DUNGEON-T10**. No REFCUBE test has been executed.
+The global first future live gate is **DUNGEON-T09**. No REFCUBE test has been executed.
 
 
 ## Classic Pet runtime readiness extension
@@ -879,7 +879,7 @@ Readiness notes:
 - current PET_PAY item/race registration coverage is closed at 143 rows / 135 races;
 - 135/135 races exist in server mob_proto and client npclist;
 - runtime asset presence remains a deployment check because raw client packs are not fully versioned;
-- execution order is unchanged: do not run these before the global first live gate `DUNGEON-T10`.
+- execution order is unchanged: do not run these before the global first live gate `DUNGEON-T09`.
 
 
 ## Dungeon Info gate correction — 2026-09-29
