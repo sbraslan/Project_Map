@@ -1,6 +1,6 @@
 # Marriage / Wedding — Static Map
 
-**Status:** STATIC COMPLETE / 8 VERIFIED BUGS  
+**Status:** STATIC COMPLETE / 13 VERIFIED BUGS  
 **Phase:** Detection / Mapping Only  
 **Opened:** 2026-09-29  
 **Source/Game repositories:** READ-ONLY  
