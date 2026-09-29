@@ -6,20 +6,20 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "global_feature_coverage",
-    "display_name": "Global Source-Feature Coverage Discovery",
-    "status": "37 STATIC COMPLETE SUBSYSTEMS / GLOBAL DISCOVERY OPEN / EXECUTION LOCKED",
-    "system_file": "INDEX.md",
-    "bug_file": "bugs/INDEX.md",
-    "test_file": "RUNTIME.md",
+    "subsystem": "zodiac_temple",
+    "display_name": "Zodiac Temple / 12ZI",
+    "status": "STATIC MAPPING OPEN / 0 VERIFIED BUGS / EXECUTION LOCKED",
+    "system_file": "systems/zodiac_temple.md",
+    "bug_file": "bugs/zodiac_temple.md",
+    "test_file": "tests/zodiac_temple.md",
     "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Run global source-feature coverage discovery against the indexed source corpus.",
-      "Compare feature flags, packet families, quest/Lua bindings, server managers and client UI/modules against INDEX.md.",
-      "Open exactly one new subsystem if an unmapped feature family is found.",
-      "Otherwise record global static coverage closure/readiness handoff.",
-      "Keep runtime/fault-injection execution locked; first future live gate remains DUNGEON-T09."
+      "Verify deployment/quest entry and portal argument validation.",
+      "Map private-instance, party/member, reconnect/logout and destruction lifecycle.",
+      "Audit player-accessible Zodiac chat commands and reward state.",
+      "Audit Zodiac combat event raw-pointer lifetime and map destruction.",
+      "Map client/server parity and packet/command boundaries."
     ]
   },
   "startup": {
@@ -2797,7 +2797,7 @@
     },
     "counts": {
       "mapping_relevant_files": 10119,
-      "systems": 35,
+      "systems": 40,
       "symbol_seeds": 257,
       "packet_seeds": 24,
       "call_flow_edges": 295
@@ -2810,7 +2810,8 @@
       "exact source fetch"
     ],
     "context7_role": "supplementary external library/API documentation verification; not authoritative Metin2 source location",
-    "next_action": "start Attr6th7th static mapping from indexed roots; Context7 supplementary only"
+    "next_action": "continue Zodiac Temple / 12ZI static mapping from indexed roots; Context7 supplementary only",
+    "features_refresh": "2026-09-29: recent closures + Zodiac cursor"
   },
   "marriage_mapping": {
     "status": "STATIC COMPLETE / 14 VERIFIED BUGS",
@@ -3156,6 +3157,47 @@
       "No tracked non-Lua/native retrieval caller exists; retrieval null/full-inventory/wait candidates remain dormant.",
       "Cross-window shop/private-shop review produced no independent bug beyond BUG-ATTR67-001/003/004.",
       "Runtime remains locked; first future live gate remains DUNGEON-T09."
+    ]
+  },
+  "zodiac_temple_mapping": {
+    "status": "STATIC MAPPING OPEN / 0 VERIFIED BUGS",
+    "source_repositories_read_only": true,
+    "system_file": "systems/zodiac_temple.md",
+    "bug_file": "bugs/zodiac_temple.md",
+    "test_file": "tests/zodiac_temple.md",
+    "verified_bug_ids": [],
+    "mapped_roots": [
+      "common/CommonDefines.h::ENABLE_12ZI",
+      "game/src/zodiac_temple.cpp/.h",
+      "game/src/char_zodiac_temple.cpp",
+      "game/src/char_battle_zodiac.cpp",
+      "game/src/questlua_zodiac_temple.cpp",
+      "game/src/cmd.cpp + cmd_general.cpp::Zodiac player commands",
+      "Project_Binary/root/ui12zi.py + game.py",
+      "Project_Game/share/data/dungeon/zodiac",
+      "Project_Game/share/locale/europe/map/metin2_12zi_stage"
+    ],
+    "mapped_flows": [
+      "zodiac_temple.starttemple -> CZodiacManager::StartTemple -> CreatePrivateMap -> Jump/JumpParty -> StartLogin",
+      "ui12zi reward controls -> chat command -> do_cz_check_box/do_cz_reward -> CHARACTER ZTT helpers -> quest flags/items -> OpenUI12zi",
+      "ui12zi floor controls -> /jumpfloor or /nextfloor -> command -> FindByMapIndex -> NewFloor"
+    ],
+    "candidates": [
+      "CZodiacManager::Initialize non-channel-99 missing explicit bool return; caller semantics pending.",
+      "ZTT_CHECK_BOX ownerless CreateItem lifetime pending verification.",
+      "Player command state/authorization boundaries pending.",
+      "Combat event raw LPCHARACTER lifetime pending."
+    ],
+    "runtime_tests": {
+      "status": "NOT CREATED / EXECUTION LOCKED",
+      "canonical_test_ids": [],
+      "first_live_gate_unchanged": "DUNGEON-T09"
+    },
+    "next_actions": [
+      "Verify portal/start entry and quest deployment.",
+      "Audit player commands and reward arithmetic/item lifetime.",
+      "Audit instance/member/event lifecycles.",
+      "Audit client/server parity."
     ]
   }
 }
