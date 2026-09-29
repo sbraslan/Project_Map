@@ -1,6 +1,6 @@
 # Classic Quest Dungeons — Deferred Runtime Tests
 
-**Status:** STATIC MAPPING OPEN / 1 TEST DOCUMENTED / EXECUTION LOCKED / NOT RUN
+**Status:** STATIC MAPPING OPEN / 2 TESTS DOCUMENTED / EXECUTION LOCKED / NOT RUN
 
 Runtime/fault-injection execution remains globally locked.
 
@@ -11,3 +11,11 @@ Expected signature in the current code: channel A reads B's globally propagated 
 
 Covers `BUG-CLD-001`.
 
+
+
+## CLD-T02 — Snow leader reconnect before timeout
+Start Snow Dungeon, advance until `dungeon_enter == 1`, disconnect/logout the party leader, then reconnect/rejoin before the 5-minute `REJOIN_LIMIT_TIME` expires and continue playing past the original deadline.
+
+Expected signature in the current code: the reconnect succeeds, but the old `snow_dungeon_leader_out_timer` is still registered; at its original deadline it schedules `snow_dungeon_end_timer`, which ejects the party about 10 seconds later. A corrected flow must cancel the leader-out timer when the leader validly returns.
+
+Covers `BUG-CLD-002`.
