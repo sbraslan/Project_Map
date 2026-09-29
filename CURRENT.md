@@ -2,7 +2,7 @@
 
 **Active phase:** Detection / Mapping Only  
 **Active state:** Fishing Renewal mapping in progress  
-**Status:** 29 STATIC COMPLETE / FISHING ACTIVE / 6 VERIFIED BUGS / EXECUTION LOCKED  
+**Status:** 29 STATIC COMPLETE / FISHING ACTIVE / 10 VERIFIED BUGS / EXECUTION LOCKED  
 **Machine state:** `STATE.json`  
 **Active subsystem:** Fishing Renewal  
 **System:** `systems/fishing.md`  
@@ -30,6 +30,10 @@ Promoted:
 - `BUG-FISH-004` — renewed fishing does not server-lock movement or revalidate fishing position after start.
 - `BUG-FISH-005` — Carbon rod 27591 special doubled chance branch is impossible because the same condition also requires `dwVnum <= 27490`.
 - `BUG-FISH-006` — renewed fishing event is not cancelled on death/warp; completed catch state can resolve after death and same-character warp can carry the session across maps.
+- `BUG-FISH-007` — fish_new_log rerolls a fresh fish after bait is cleared instead of logging the actual session fish.
+- `BUG-FISH-008` — renewed successful catches do not call Achievement TYPE_FISH despite live TYPE_FISH tasks.
+- `BUG-FISH-009` — renewed successful fishing updates Battle Pass FISH_CATCH instead of the distinct FISH_FISHING family.
+- `BUG-FISH-010` — logout during active renewed fishing saves non-zero rod bait socket2, allowing consumed bait to survive relog.
 
 Open candidate:
 - Carbon-rod bonus branch is impossible as written: `dwVnum == 27591 && dwVnum >= 27400 && dwVnum <= 27490`. Intended effect still needs semantic closure.
@@ -43,4 +47,4 @@ Open candidate:
 6. audit rod refine/current proto values;
 7. promote only verified reachable additional findings.
 
-Do not execute `FISH-T01`..`FISH-T06`. Global first live gate remains `DUNGEON-T09`.
+Do not execute `FISH-T01`..`FISH-T10`. Global first live gate remains `DUNGEON-T09`.
