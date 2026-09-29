@@ -21,11 +21,10 @@
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Close OreRefine resource/payment ordering against deployed or compiled quest reachability.",
-      "Audit mining skill-book delay and skill progression integration.",
-      "Audit vein spawn/despawn and concurrent-player contention.",
-      "Inspect Battle Pass/Achievement hooks for mining and ore actions.",
-      "Close logout/disconnect and cross-core warp behavior.",
+      "Audit OreRefine payment ordering and locate deployed quest/object callers.",
+      "Audit ore ownership and Battle Field multiplayer contention semantics.",
+      "Cross-check pickaxe item proto/refine progression values.",
+      "Audit vein lifetime/despawn interaction with pending player events.",
       "Do not execute Mining runtime tests; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -308,7 +307,10 @@
     "game/src/mining.cpp::mining_event + char death cleanup gap -> BUG-MIN-002",
     "game/src/mining.cpp::event stores no pick identity; completion re-reads WEAR_WEAPON -> BUG-MIN-003",
     "game/src/char.cpp::CanWarp/WarpSet/Stop omit mining cancellation + mining_event lacks map-distance recheck -> BUG-MIN-004",
-    "game/src/char.cpp::CHARACTER::mining >1000 return precedes >2500 MINING_LOCATION HackLog -> BUG-MIN-005"
+    "game/src/char.cpp::CHARACTER::mining >1000 return precedes >2500 MINING_LOCATION HackLog -> BUG-MIN-005",
+    "game/src/char.cpp::CanWarp/WarpSet omit mining lifecycle cleanup -> BUG-MIN-003",
+    "game/src/mining.cpp::completion rebinds current pick -> BUG-MIN-004",
+    "game/src/char.cpp::MINING_LOCATION dead anti-hack branch -> BUG-MIN-005"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -2586,12 +2588,16 @@
       "CHARACTER::mining -> delayed mining_event -> death without cancellation -> BUG-MIN-002",
       "delayed mining re-resolves current equipped pickaxe -> BUG-MIN-003",
       "CanWarp/WarpSet preserve mining while event lacks map/distance revalidation -> BUG-MIN-004",
-      "early >1000 return makes MINING_LOCATION >2500 HackLog unreachable -> BUG-MIN-005"
+      "early >1000 return makes MINING_LOCATION >2500 HackLog unreachable -> BUG-MIN-005",
+      "WarpSet/CanWarp omit mining cancel + mining_event omits map/distance revalidation -> BUG-MIN-003",
+      "mining_event re-reads current WEAR_WEAPON instead of initiating pick identity -> BUG-MIN-004",
+      "CHARACTER::mining >1000 early return makes >2500 MINING_LOCATION HackLog unreachable -> BUG-MIN-005"
     ],
     "candidates": [
-      "OreRefine consumes 100 raw ore before gold check; local defect verified but deployed caller reachability still unproven.",
-      "Authoritative pickaxe item_proto rows are unavailable because tracked DumpProto item_proto text files are empty.",
-      "Cross-core warp likely tears down the character/event; same-process warp defect is already captured by BUG-MIN-004."
+      "OreRefine consumes 100 raw ore before gold check; Lua APIs are registered but deployed caller still pending.",
+      "Ore ownership is intentionally disabled in Battle Field maps; multiplayer semantics pending.",
+      "Vein despawn/VID reuse interaction with delayed mining event pending.",
+      "Pickaxe proto/refine progression values pending authoritative row closure."
     ],
     "runtime_tests": {
       "status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN",
