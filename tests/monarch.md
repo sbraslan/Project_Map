@@ -83,3 +83,29 @@ Expected bug signature: receiver performs no warp, but treasury deduction/cooldo
 Covers `BUG-MON-007`.
 
 Do not run these tests while the global execution lock is active.
+
+
+## MON-T08 — DB restart during election state
+After runtime is explicitly unlocked in an isolated environment:
+1. create candidate and vote rows through normal DB handlers;
+2. confirm the in-memory vectors/maps are populated;
+3. restart only the DB cache process;
+4. inspect SQL rows and reconstructed `CMonarch` election containers;
+5. invoke election/candidate queries.
+
+Expected signature: SQL rows remain but runtime candidacy/election state returns empty.
+
+Covers `BUG-MON-008`.
+
+## MON-T09 — monarch cooldown across relog
+After runtime is explicitly unlocked:
+1. use an action with an enforced cooldown, such as summon/warp/transfer;
+2. confirm immediate repeat is rejected;
+3. logout and log back in;
+4. retry before the original cooldown duration expires.
+
+Expected signature: the action is immediately allowed because the new `CHARACTER` object ran `InitMC()`.
+
+Covers `BUG-MON-009`.
+
+Do not run these tests while the global execution lock is active.
