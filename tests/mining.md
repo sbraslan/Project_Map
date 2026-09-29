@@ -45,3 +45,17 @@ After runtime is explicitly unlocked in an isolated environment, attempt mining 
 Expected static result: both are rejected by the first >1000 return and `MINING_LOCATION` is never emitted.
 
 Do not run while execution lock is active.
+
+
+## MIN-T06 — Mining Event shutdown during active mining
+After runtime is explicitly unlocked, in an isolated event-map test:
+1. start mining a valid event vein;
+2. stop the scheduled Mining Event while the player mining timer has <=10 seconds remaining;
+3. verify the vein is in dead state but still manager-resolvable;
+4. observe whether the pending player mining event still rolls ore and applies pickaxe practice before the vein's dead-event destroys it.
+
+Bug signature: ore/mastery settles after event shutdown from a dead vein.
+
+Covers `BUG-MIN-006`.
+
+Do not run while execution lock is active.
