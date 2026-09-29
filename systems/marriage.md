@@ -307,3 +307,9 @@ Promoted as `BUG-MARR-013`.
 - Client LoverInfo duplication candidate closed: same-process WarpEnd does not call marriage Login; full phase/game teardown destroys messenger/UI state before a new session.
 - Lua `marriage.in_my_wedding` and `wedding_is_playing_music` have weak standalone null assumptions, but current deployed quest callers guard them through engaged/married + in-wedding conditions. No independent deployed bug promoted.
 - `WeddingManager::__CreateWeddingMap` has a cleanup gap after a successful private-map allocation followed by a failed map lookup; no realistic current failure producer was proven, so it remains unpromoted.
+
+
+## Context7 / Lua coroutine verification
+Context7 was used as a supplementary external-semantics check for Lua coroutine behavior. Lua coroutines preserve their own stack, local variables and instruction pointer across yield/resume; execution continues from the yield point. This independently supports the stale-local-state window used in `BUG-MARR-001`: quest locals such as `u_vid` survive a `wait()` suspension and are reused when the quest resumes.
+
+This does not replace Metin2 source evidence; GitHub/Project_Map remains authoritative for project behavior.
