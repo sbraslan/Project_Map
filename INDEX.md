@@ -45,7 +45,7 @@ This is the navigation index. Normal continuation starts at `STATE.json`, then `
 | Classic Pet System | STATIC COMPLETE | `systems/pet.md` |
 | Fishing Renewal | STATIC COMPLETE | `systems/fishing.md` |
 | Mining / Pickaxe | STATIC COMPLETE | `systems/mining.md` |
-| Messenger / Friend / Block | MAPPING IN PROGRESS | `systems/messenger.md` |
+| Messenger / Friend / Block | STATIC COMPLETE | `systems/messenger.md` |
 
 ## Current phase
 - **Detection / mapping only.** Source and game repositories remain read-only.
@@ -226,3 +226,11 @@ Messenger / Friend / Block is now the active mapping cursor:
 - `tests/messenger.md`.
 
 Current verified findings: `BUG-MSG-001..021`. Messenger is not yet counted as STATIC COMPLETE. Runtime execution remains locked and `DUNGEON-T09` remains the first future live gate.
+
+
+## Messenger / Friend / Block STATIC COMPLETE — 2026-09-29
+Messenger / Friend / Block is statically closed with **21 verified bugs** and canonical deferred tests `MSG-T01..MSG-T21`.
+
+Effective STATIC COMPLETE subsystem count is now **32**, plus the folded Guild lifecycle companion. The next static cursor is global source-feature coverage discovery to identify any subsystem not yet represented in this index.
+
+Runtime execution remains locked; global first future live gate remains `DUNGEON-T09`.
