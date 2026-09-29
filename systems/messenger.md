@@ -72,12 +72,11 @@ Do not execute runtime tests. Global first future live gate remains `DUNGEON-T09
 - Exchange, PvP and equipment-view paths also check messenger blocks.
 - The target-board “request to join party” path is different: `uitarget.py::__OnRequestParty -> /party_request -> do_party_request -> CHARACTER::RequestToParty`. The final server path never checks messenger block state. See BUG-MSG-008.
 - The previously suspected block-by-VID return-size mismatch is closed: `TPacketCGMessengerAddByVID` and `TPacketCGMessengerAddBlockByVID` are both a single `uint32_t vid`.
-- `RemoveAllBlockList` has asymmetric incoming-row cleanup semantics. Active reachability is proven through `questlua_pc.cpp::pc_change_name`; whether the subsequent rename/logout lifecycle fully masks or exposes the stale incoming RAM/P2P state remains under assessment.
+- `RemoveAllBlockList` is actively reached through `questlua_pc.cpp::pc_change_name`, but the deployed name-change quest immediately issues `command("quit")` after success. P2P logout calls `MessengerManager::P2PLogout -> Logout`, which removes the old name from all outgoing relation/block caches. Persistent rename desync is therefore closed; only a short transient window exists.
 - The missing local `m_poMessengerHandler` guard in `OnBlockLogin` is closed as non-bug because `PyCallClassMemberFunc` performs its own null-class guard.
 
 ## Updated cursor
 Continue static audit of:
-- rename/remove-all lifecycle after the now-proven `pc_change_name -> RemoveAllList/RemoveAllBlockList` caller;
 - pending party/guild invite acceptance after a new messenger block is established;
 - GM messenger cache lifecycle beyond the already verified teardown leak;
 - channel-change/reconnect interaction with asynchronous loads and relation cache reconstruction;
