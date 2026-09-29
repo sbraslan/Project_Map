@@ -2788,5 +2788,37 @@
       "Legacy mobile-message send binding is a no-op, but normal UI reachability is Ymir-only; Europe scope is dormant and unpromoted.",
       "Global first future live gate remains DUNGEON-T09."
     ]
+  },
+  "acceleration_index": {
+    "status": "READY",
+    "generated_at": "2026-09-29",
+    "directory": "index/",
+    "source_repositories_read_only": true,
+    "github_code_search_required": false,
+    "files": {
+      "repositories": "index/repositories.json",
+      "inventory": "index/files.json",
+      "features": "index/features.json",
+      "symbols": "index/symbols.json",
+      "packets": "index/packets.json",
+      "callgraph": "index/callgraph.json",
+      "workflow": "index/README.md"
+    },
+    "counts": {
+      "mapping_relevant_files": 10119,
+      "systems": 34,
+      "symbol_seeds": 228,
+      "packet_seeds": 9,
+      "call_flow_edges": 234
+    },
+    "lookup_order": [
+      "index/features.json",
+      "index/symbols.json + index/packets.json",
+      "index/callgraph.json",
+      "index/files.json",
+      "exact source fetch"
+    ],
+    "context7_role": "supplementary external library/API documentation verification; not authoritative Metin2 source location",
+    "next_action": "global source-feature coverage discovery using acceleration index"
   }
 }
