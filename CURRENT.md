@@ -75,7 +75,7 @@ Do not execute `PET-T01`..`PET-T04`.
 
 **Classic Pet System: STATIC COMPLETE.**
 
-Runtime remains locked. First future live gate remains `DUNGEON-T10`.
+Runtime remains locked. First future live gate is `DUNGEON-T09`.
 
 
 ## Runtime-gate correction — 2026-09-29
@@ -87,3 +87,13 @@ Fresh preflight found the previous first-gate premise was wrong:
 
 **New first future live gate: `DUNGEON-T09`.**
 Execution remains locked.
+
+
+## Dungeon normal-path handoff closure — 2026-09-29
+Fresh source/data verification:
+- `DUNGEON-T09`: malformed ranking SQL remains verified and is the first future live gate.
+- `DUNGEON-T11`: config token `1` is parsed as PC because parser only accepts literal `GLOBAL`; Blue Dragon quest actually reads/writes `dragon_lair_time` via global event flags.
+- `DUNGEON-T12`: QUEST-backed entries have no explicit COOLDOWN lines; expired/zero values can underflow into a large `uint32_t` cooldown.
+
+Canonical handoffs are now prepared for T09, T11 and T12.
+Runtime remains locked; no live test was executed.
