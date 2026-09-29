@@ -54,7 +54,7 @@
     },
     {
       "id": "monarch",
-      "status": "ACTIVE / 4 VERIFIED BUGS",
+      "status": "ACTIVE / 7 VERIFIED BUGS",
       "evidence": [
         "Project_ServerSRC:db/src/Monarch.cpp",
         "Project_ServerSRC:game/src/monarch.cpp",
