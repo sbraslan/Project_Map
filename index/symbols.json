@@ -1583,19 +1583,22 @@
     {
       "name": "CManager::Remove",
       "references": [
-        "marriage_mapping"
+        "marriage_mapping",
+        "BUG-MARR-014"
       ]
     },
     {
       "name": "CManager::WeddingEnd",
       "references": [
-        "marriage_mapping"
+        "marriage_mapping",
+        "BUG-MARR-014"
       ]
     },
     {
       "name": "WeddingManager::End",
       "references": [
-        "marriage_mapping"
+        "marriage_mapping",
+        "BUG-MARR-014"
       ]
     },
     {
@@ -1632,6 +1635,12 @@
       "name": "P2P_MANAGER::Logout",
       "references": [
         "marriage_mapping"
+      ]
+    },
+    {
+      "name": "CHARACTER::ProcessRecallItem",
+      "references": [
+        "BUG-MARR-014"
       ]
     }
   ]
