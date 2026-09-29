@@ -2,7 +2,7 @@
 
 **Active phase:** Detection / Mapping Only  
 **Active state:** Classic Pet System Static Mapping  
-**Status:** STATIC MAPPING IN PROGRESS / 3 PROMOTED CLASSIC-PET BUGS / EXECUTION LOCKED  
+**Status:** STATIC MAPPING IN PROGRESS / 4 PROMOTED CLASSIC-PET BUGS / EXECUTION LOCKED  
 **Machine state:** `STATE.json`  
 **Active subsystem:** Classic Pet System  
 **System:** `systems/pet.md`  
@@ -21,11 +21,13 @@ Promoted:
 - `BUG-PET-001` — Bruce pickup range ignores Y distance.
 - `BUG-PET-002` — Bruce caches a raw ground-item `LPITEM` across update ticks; owner manual pickup can destroy the object before the pet dereferences it again.
 - `BUG-PET-003` — REAL_TIME PET_PAY expiry removes the summon item without PetUnsummon; the missing-item actor branch returns before Unsummon and the update event keeps scheduling.
+- `BUG-PET-004` — forced summon-item loss prevents elapsed TYPE_SUMMON_PET time from being credited; logout later clears the stale summon-time flag without credit.
 
 Deferred tests:
 - `PET-T01`
 - `PET-T02`
 - `PET-T03`
+- `PET-T04`
 
 Also closed:
 - normal PET_PAY toggle uses explicit `PetUnsummon`;
@@ -46,3 +48,17 @@ Newly closed:
 
 Do not execute `PET-T01`, `PET-T02` or `PET-T03`.
 GitHub state is canonical.
+
+
+## Latest checkpoint
+- active tracked quest package contains no `pet.summon()`/related producer; legacy Lua signature mismatch remains dormant and is not promoted;
+- Achievement 60 actively tracks 30 days of `TYPE_SUMMON_PET` time;
+- REAL_TIME item loss can discard the current uncommitted summon interval -> `BUG-PET-004`.
+
+## Exact next work
+1. finish PET_PAY item/race/client coverage;
+2. close death/warp/login restoration edges;
+3. audit remaining auto-pickup ownership/re-target lifetime boundaries;
+4. decide Classic Pet STATIC COMPLETE.
+
+Do not execute `PET-T01`..`PET-T04`.
