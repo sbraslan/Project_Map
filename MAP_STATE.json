@@ -33,7 +33,8 @@
     "Before opening a candidate subsystem, normalize its name through alias_index. If it resolves to CLOSED, skip it. If it resolves to OPEN, continue its cursor. Only UNKNOWN candidates may become new nodes.",
     "While an OPEN subsystem exists, do not run broad global rediscovery unless its cursor explicitly requires a targeted dependency lookup.",
     "Raw lookup indexes are accelerators only and can never change lifecycle state.",
-    "Runtime/fault-injection tests remain locked until the user explicitly changes project phase."
+    "Runtime/fault-injection tests remain locked until the user explicitly changes project phase.",
+    "Project_Map GitHub code-search results are non-authoritative because search indexing may lag behind deletions/updates; lifecycle checks must use direct MAP_STATE.json reads and direct evidence-file fetches."
   ],
   "resume_protocol": [
     "Read MAP_STATE.json only.",
