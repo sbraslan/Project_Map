@@ -331,4 +331,4 @@ Canonical verified findings:
 Canonical deferred tests:
 `ACCE-T01..ACCE-T08`.
 
-No runtime test has been executed. Runtime order remains locked with `DUNGEON-T10` first.
+No runtime test has been executed. Runtime order remains locked with `DUNGEON-T09` first.
