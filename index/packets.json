@@ -129,6 +129,30 @@
       "references": [
         "mapped_roots.3"
       ]
+    },
+    {
+      "name": "HEADER_GD_WEDDING_END",
+      "references": [
+        "marriage_mapping"
+      ]
+    },
+    {
+      "name": "HEADER_DG_WEDDING_END",
+      "references": [
+        "marriage_mapping"
+      ]
+    },
+    {
+      "name": "HEADER_GD_BREAK_MARRIAGE",
+      "references": [
+        "marriage_mapping"
+      ]
+    },
+    {
+      "name": "HEADER_DG_BREAK_MARRIAGE",
+      "references": [
+        "marriage_mapping"
+      ]
     }
   ]
 }
