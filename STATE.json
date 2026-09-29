@@ -6,26 +6,18 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "oxevent",
-    "display_name": "OX Event",
-    "status": "STATIC COMPLETE / 8 VERIFIED BUGS / EXECUTION LOCKED",
-    "system_file": "systems/oxevent.md",
-    "bug_file": "bugs/oxevent.md",
-    "test_file": "tests/oxevent.md",
-    "verified_bug_ids": [
-      "BUG-OX-001",
-      "BUG-OX-002",
-      "BUG-OX-003",
-      "BUG-OX-004",
-      "BUG-OX-005",
-      "BUG-OX-006",
-      "BUG-OX-007",
-      "BUG-OX-008"
-    ],
+    "subsystem": "monarch",
+    "display_name": "Monarch",
+    "status": "STATIC MAPPING OPEN / 0 VERIFIED BUGS / EXECUTION LOCKED",
+    "system_file": "systems/monarch.md",
+    "bug_file": "bugs/monarch.md",
+    "test_file": "tests/monarch.md",
+    "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Open Arena as the next indexed subsystem.",
-      "Map duel registration/start, round/death, timeout, observer and disconnect lifecycles.",
+      "Map DB/game Monarch state synchronization and election lifecycle.",
+      "Map treasury money add/take/decrease paths and permissions.",
+      "Map monarch commands/skills and deployed quest callers.",
       "Keep runtime/fault-injection execution locked; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -2808,7 +2800,7 @@
       "exact source fetch"
     ],
     "context7_role": "supplementary external library/API documentation verification; not authoritative Metin2 source location",
-    "next_action": "open Arena static mapping using indexed roots; Context7 only for external language/library semantics"
+    "next_action": "open Monarch static mapping from indexed DB/game/quest roots"
   },
   "marriage_mapping": {
     "status": "STATIC COMPLETE / 14 VERIFIED BUGS",
@@ -2967,14 +2959,16 @@
     "test_file": "tests/oxevent.md"
   },
   "arena_mapping": {
-    "status": "STATIC MAPPING IN PROGRESS / 1 VERIFIED BUG",
+    "status": "STATIC COMPLETE / 3 VERIFIED BUGS",
     "canonical_files": {
       "system": "systems/arena.md",
       "bugs": "bugs/arena.md",
       "tests": "tests/arena.md"
     },
     "verified_bug_ids": [
-      "BUG-ARENA-001"
+      "BUG-ARENA-001",
+      "BUG-ARENA-002",
+      "BUG-ARENA-003"
     ],
     "mapped_flows": [
       "settings.lua -> arena.add_map(112,...) x4 -> CArenaManager::AddArena -> four classic CArena slots",
@@ -2989,13 +2983,24 @@
     "runtime_tests": {
       "status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN",
       "canonical_test_ids": [
-        "ARENA-T01"
+        "ARENA-T01",
+        "ARENA-T02",
+        "ARENA-T03"
       ],
       "first_live_gate_unchanged": "DUNGEON-T09"
     },
     "closure_notes": [
-      "Arena mapping opened after OX Event static closure.",
-      "Source/Game repositories remain read-only."
+      "Arena / PvP Duel static mapping complete with BUG-ARENA-001..003.",
+      "ARENA-T01..ARENA-T03 are canonical deferred tests; none executed.",
+      "Source/Game repositories remain read-only.",
+      "Global first future live gate remains DUNGEON-T09."
+    ],
+    "candidates_closed": [
+      "Classic timeout reset packet to A twice/B never remains shadowed by BUG-ARENA-001 plus unhosted map112.",
+      "Observer packet/chat broadcast no-op remains shadowed by classic start/deployment blockers.",
+      "Observer Arena pointer/mode teardown remains after-fix only.",
+      "map112 no MAP_ALLOW owner remains a deployment candidate shadowed by BUG-ARENA-001.",
+      "BattleArena empire2/3 reversed random-stone Y bounds are shadowed by missing maps 191/192."
     ]
   }
 }
