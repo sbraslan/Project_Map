@@ -1,6 +1,6 @@
 # Fishing Renewal — Static Map
 
-**Status:** STATIC MAPPING IN PROGRESS  
+**Status:** STATIC COMPLETE  
 **Phase:** Detection / Mapping Only  
 **Source policy:** read-only source/game repositories; only Project_Map is writable.  
 **Feature gate:** `ENABLE_FISHING_RENEWAL`.
