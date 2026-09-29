@@ -8,21 +8,21 @@
   "active": {
     "subsystem": "mining",
     "display_name": "Mining / Pickaxe",
-    "status": "MAPPING IN PROGRESS / 3 VERIFIED BUGS / EXECUTION LOCKED",
+    "status": "MAPPING IN PROGRESS / 2 VERIFIED BUGS / EXECUTION LOCKED",
     "system_file": "systems/mining.md",
     "bug_file": "bugs/mining.md",
     "test_file": "tests/mining.md",
     "verified_bug_ids": [
       "BUG-MINE-001",
-      "BUG-MINE-002",
-      "BUG-MINE-003"
+      "BUG-MINE-002"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Audit ore-refine quest yield/transaction boundaries and catalyst lifetime.",
-      "Map pickaxe proto values/refined-vnum semantics and current grade data.",
-      "Audit ENABLE_MINING_EVENT and SKILL_MINING integration.",
-      "Map client mining trust boundary and multiplayer ore ownership.",
+      "Map click/quest entry ownership and packet trust boundary.",
+      "Audit logout/equipment-change and delayed-event cleanup.",
+      "Audit pick mastery/refine extended-inventory cell behavior.",
+      "Establish current OreRefine caller/reachability and fee/material atomicity.",
+      "Audit mining skill-book progression/cooldown and ore ownership/Battle Field interactions.",
       "Do not execute Mining runtime tests; global first future live gate remains DUNGEON-T09."
     ]
   },
@@ -2562,45 +2562,30 @@
   },
   "mining_mapping": {
     "status": "MAPPING IN PROGRESS",
-    "canonical_files": {
-      "system": "systems/mining.md",
-      "bugs": "bugs/mining.md",
-      "tests": "tests/mining.md"
-    },
-    "mapped_roots": [
-      "game/src/mining.cpp/.h",
-      "game/src/char.cpp::mining/mining_cancel/mining_take + WarpSet/WarpEnd + ore vein lifetime",
-      "game/src/char_state.cpp::normal movement -> Move -> OnMove -> mining_cancel",
-      "game/src/char_battle.cpp::Dead",
-      "game/src/questlua_pc.cpp::pc.mining/ore_refine/diamond_refine",
-      "game/src/questlua_global.cpp::__refine_pick",
-      "Project_Game/share/locale/europe/quest/n_npc/mining.quest",
-      "Project_Game/share/locale/europe/quest/g_guild/guild_building_melt.quest",
-      "Project_DumpProto item_names pickaxe family 29101..29110"
-    ],
-    "mapped_flows": [
-      "pc.mining -> CHARACTER::mining -> delayed mining event -> OreDrop -> PracticePick",
-      "normal movement -> OnMove -> mining_cancel",
-      "NPC 20015 pickaxe refine quest -> __refine_pick -> RealRefinePick -> BUG-MINE-001",
-      "active mining -> same-character warp -> completion without map/distance revalidation -> BUG-MINE-002",
-      "active mining -> Dead -> completion without IsDead validation -> BUG-MINE-003",
-      "guild_building_melt quest -> pc.ore_refine/diamond_refine -> OreRefine"
+    "canonical_files": [
+      "systems/mining.md",
+      "bugs/mining.md",
+      "tests/mining.md"
     ],
     "verified_bug_ids": [
       "BUG-MINE-001",
-      "BUG-MINE-002",
-      "BUG-MINE-003"
+      "BUG-MINE-002"
+    ],
+    "mapped_flows": [
+      "vein click/quest -> CHARACTER::mining -> delayed mining_event -> OreDrop/PracticePick",
+      "NPC 20015 take -> __refine_pick -> RealRefinePick -> Pick_Refinable",
+      "OnMove -> mining_cancel normal movement cleanup",
+      "death/warp omit mining cancellation/revalidation -> BUG-MINE-002"
     ],
     "candidates": [
-      "OreRefine removes 100 raw ore before internal Yang check; current quest pre-checks matching fee, so normal reachability remains unproven pending yield/state audit.",
-      "The >2500 MINING_LOCATION hack-log branch is shadowed by the earlier >1000 return and is currently dead defensive code."
+      "OreRefine removes 100 ore before insufficient-gold return; current quest caller not yet found.",
+      "MINING_LOCATION >2500 hack-log branch is unreachable after earlier >1000 return."
     ],
     "runtime_tests": {
       "status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN",
       "canonical_test_ids": [
         "MINE-T01",
-        "MINE-T02",
-        "MINE-T03"
+        "MINE-T02"
       ],
       "first_live_gate_unchanged": "DUNGEON-T09"
     }
