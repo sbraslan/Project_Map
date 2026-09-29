@@ -84,7 +84,7 @@ That predicate is broader than the apparent intended exact type/subtype check. I
 8. close client race/proto/appearance asset coverage;
 9. create bugs/tests only for verified reachable paths.
 
-No Horse/Mount runtime test is authorized. Global first future live gate remains `DUNGEON-T10`.
+No Horse/Mount runtime test is authorized. Global first future live gate remains `DUNGEON-T09`.
 
 
 ## Checkpoint — persistence/login + stamina/health event lifecycle closed
@@ -122,7 +122,7 @@ No Horse/Mount runtime test is authorized. Global first future live gate remains
 6. close client race/proto/appearance asset coverage;
 7. create bugs/tests only for verified reachable paths.
 
-No Horse/Mount runtime test is authorized. Global first future live gate remains `DUNGEON-T10`.
+No Horse/Mount runtime test is authorized. Global first future live gate remains `DUNGEON-T09`.
 
 
 ## Checkpoint — active quest API + mount state synchronization
@@ -214,7 +214,7 @@ This is a strong lifetime-laundering candidate, but promotion is deferred until 
 5. close client race/proto/horse-appearance asset coverage;
 6. promote only verified reachable additional Horse/Mount bugs/tests.
 
-No runtime execution is authorized. Global first future live gate remains `DUNGEON-T10`.
+No runtime execution is authorized. Global first future live gate remains `DUNGEON-T09`.
 
 
 ## Checkpoint — horse progression + expiry + Achievement ownership
@@ -267,7 +267,7 @@ However, the tracked `Project_DumpProto/*/item_proto.txt` snapshot is not expose
 4. revisit ChangeLook lifetime only if a concrete time-limited COSTUME_MOUNT row becomes readable;
 5. decide Horse/Mount STATIC COMPLETE and prepare deferred runtime tests.
 
-No runtime execution is authorized. Global first future live gate remains `DUNGEON-T10`.
+No runtime execution is authorized. Global first future live gate remains `DUNGEON-T09`.
 
 
 ## Final checkpoint — client race/combat coverage + subsystem closure
@@ -363,4 +363,4 @@ Deferred runtime tests:
 - `HORSE-T02`
 - `HORSE-T03`
 
-No Horse/Mount runtime test has been executed. Global first future live gate remains `DUNGEON-T10`.
+No Horse/Mount runtime test has been executed. Global first future live gate remains `DUNGEON-T09`.
