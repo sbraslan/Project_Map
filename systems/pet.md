@@ -97,3 +97,58 @@ Promoted as `BUG-PET-001`.
 7. create additional bugs/tests only for verified reachable paths.
 
 No Classic Pet runtime test is authorized. Global first future live gate remains `DUNGEON-T10`.
+
+
+## Checkpoint — Bruce pickup lifetime + PET_PAY removal boundary
+
+### BUG-PET-002 — Bruce keeps a raw ground-item pointer across update ticks
+`PetPickUpItemStruct` stores the selected target directly through:
+`pet->SetPickupItem(item)`.
+
+The actor then keeps that raw `LPITEM` while moving toward the target:
+`CheckPetPickup()`
+-> `PickUpItems(900)`
+-> `BringItem()`.
+
+If the item is farther than 250 units from the pet, `BringItem()` starts movement and leaves the pointer stored for later 4 Hz update ticks.
+
+The player can still manually pick up the same owned ground item during that interval.
+
+Reachable destruction cases in `CHARACTER::PickupItem()` / `PickupItemByPet()` include:
+- gold/ELK: ground item is removed and `M2_DESTROY_ITEM(item)` is called;
+- stackable item that fully merges into an existing stack: `M2_DESTROY_ITEM(item)`.
+
+On the next pet update, `BringItem()` reads the cached pointer and immediately dereferences it for `item->GetX()/GetY()` without re-resolving by VID or validating ownership/sectree/liveness.
+
+This is a reachable stale-pointer / use-after-free path and is promoted as `BUG-PET-002`.
+
+### Raw pickup lifetime classification
+If manual pickup merely moves the item into inventory without destroying it, the cached object remains allocated but no longer represents a ground target. The destructive gold/full-stack cases are sufficient to establish the stronger lifetime defect.
+
+### PET_PAY forced-removal boundary
+Normal user toggle is safe:
+`PET_PAY use`
+-> `UnequipItem(item)`
+-> `PetUnsummon(item)`.
+
+Forced item deletion is different:
+`ITEM_MANAGER::RemoveItem`
+-> `CItem::RemoveFromCharacter`
+-> equipped item `CItem::Unequip()`
+-> item destruction.
+
+That lower-level path does not call `CHARACTER::PetUnsummon()`.
+
+`CPetActor::Update()` also has a missing-summon-item branch that returns `false` before `Unsummon()`, while the pet-system event ignores the Update return value and continues scheduling.
+
+This is a strong stale-pet candidate. Promotion is deferred until a concrete current PET_PAY forced-removal/expiry producer is closed from deployed data.
+
+## Exact next work
+1. close current PET_PAY real-time/timer-based expiry reachability and decide the stale-pet candidate;
+2. audit CPetSystem event/actor-map teardown and owner logout/destruction;
+3. locate/exclude active `pet.summon()` quest producers;
+4. map current PET_PAY item/race/client coverage;
+5. audit Achievement TYPE_SUMMON_PET accounting under missing-item and abnormal unsummon paths;
+6. promote only verified reachable additional Classic Pet bugs/tests.
+
+No runtime execution is authorized. Global first future live gate remains `DUNGEON-T10`.
