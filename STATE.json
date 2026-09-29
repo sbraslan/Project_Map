@@ -8,32 +8,23 @@
   "active": {
     "subsystem": "oxevent",
     "display_name": "OX Event",
-    "status": "STATIC MAPPING IN PROGRESS / 14 VERIFIED BUGS / EXECUTION LOCKED",
+    "status": "STATIC COMPLETE / 7 VERIFIED BUGS / EXECUTION LOCKED",
     "system_file": "systems/oxevent.md",
     "bug_file": "bugs/oxevent.md",
     "test_file": "tests/oxevent.md",
     "verified_bug_ids": [
-      "BUG-MARR-001",
-      "BUG-MARR-002",
-      "BUG-MARR-003",
-      "BUG-MARR-004",
-      "BUG-MARR-005",
-      "BUG-MARR-006",
-      "BUG-MARR-007",
-      "BUG-MARR-008",
-      "BUG-MARR-009",
-      "BUG-MARR-010",
-      "BUG-MARR-011",
-      "BUG-MARR-012",
-      "BUG-MARR-013",
-      "BUG-MARR-014"
+      "BUG-OX-001",
+      "BUG-OX-002",
+      "BUG-OX-003",
+      "BUG-OX-004",
+      "BUG-OX-005",
+      "BUG-OX-006",
+      "BUG-OX-007"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Close divorce cooldown anchor semantics (engagement time vs marriage time) without promotion until intent is proven.",
-      "Audit remaining wedding Lua null/map-state assumptions against deployed callers.",
-      "Audit cross-core lover-info/love-point refresh and Marriage Fast topology behavior.",
-      "Perform final Marriage packet/lifecycle symmetry pass before static closure.",
+      "Persist final OX closure/index state.",
+      "Select Arena as the next queued subsystem and open its static map.",
       "Keep runtime/fault-injection execution locked; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -2815,10 +2806,10 @@
       "exact source fetch"
     ],
     "context7_role": "supplementary external library/API documentation verification; not authoritative Metin2 source location",
-    "next_action": "Marriage closure pass: cooldown anchor intent, deployed Lua null/map-state guards, cross-core refresh semantics"
+    "next_action": "select/open Arena as next queued subsystem after OX static closure"
   },
   "marriage_mapping": {
-    "status": "STATIC MAPPING IN PROGRESS / 14 VERIFIED BUGS",
+    "status": "STATIC COMPLETE / 13 VERIFIED BUGS",
     "canonical_files": {
       "system": "systems/marriage.md",
       "bugs": "bugs/marriage.md",
@@ -2890,9 +2881,9 @@
       "first_live_gate_unchanged": "DUNGEON-T09"
     },
     "closure_notes": [
-      "Marriage/Wedding mapping remains active with BUG-MARR-001..008.",
-      "Legacy BREAK_MARRIAGE is currently scoped as an unproven active/dead-path legacy entry, not an independent bug.",
-      "Wedding membership disconnect cleanup is present; no independent teardown bug promoted in this pass.",
+      "Marriage / Wedding static mapping complete with BUG-MARR-001..013.",
+      "MARR-T01..MARR-T13 are canonical deferred tests; none has been executed.",
+      "Remaining WeddingManager post-allocation GetMap cleanup gap is unpromoted because realistic reachability was not proven.",
       "Source/Game repositories remain read-only.",
       "Global first future live gate remains DUNGEON-T09."
     ],
@@ -2911,7 +2902,7 @@
     }
   },
   "oxevent_mapping": {
-    "status": "STATIC MAPPING IN PROGRESS / 5 VERIFIED BUGS",
+    "status": "STATIC COMPLETE / 7 VERIFIED BUGS",
     "canonical_files": {
       "system": "systems/oxevent.md",
       "bugs": "bugs/oxevent.md",
@@ -2922,7 +2913,9 @@
       "BUG-OX-002",
       "BUG-OX-003",
       "BUG-OX-004",
-      "BUG-OX-005"
+      "BUG-OX-005",
+      "BUG-OX-006",
+      "BUG-OX-007"
     ],
     "mapped_flows": [
       "deployed 20011 NPC -> OPEN/level/cooldown/cap checks -> pc.warp(896500,24600) -> map113 login -> COXEventManager::Enter -> EnterAttender",
@@ -2947,13 +2940,21 @@
         "OX-T02",
         "OX-T03",
         "OX-T04",
-        "OX-T05"
+        "OX-T05",
+        "OX-T06",
+        "OX-T07"
       ],
       "first_live_gate_unchanged": "DUNGEON-T09"
     },
     "closure_notes": [
-      "OX Event mapping opened after Marriage/Wedding static closure.",
+      "OX Event static mapping complete with BUG-OX-001..007.",
+      "OX-T01..OX-T07 are canonical deferred tests; none has been executed.",
+      "Automatic admission-policy dependency promoted to BUG-OX-007 after confirming missing flags resolve to zero and DB event flags persist.",
+      "Reconnect-after-answer eligibility bypass promoted to BUG-OX-006.",
       "Source/Game repositories remain read-only."
-    ]
+    ],
+    "system_file": "systems/oxevent.md",
+    "bug_file": "bugs/oxevent.md",
+    "test_file": "tests/oxevent.md"
   }
 }
