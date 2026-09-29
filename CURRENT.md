@@ -21,11 +21,11 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 - Major closure findings include engagement transaction ordering, duplicate map-81 producers, divorce fee boundary, stale P2P lover state, wedding exit/membership lifecycle, EXP love-point truncation, and cross-core marriage-item sharing.
 
 ## Exact resume cursor
-1. Map `OXEvent.cpp/.h` manager/state machine.
-2. Map deployed `e_event/oxevent.quest` entry/exit and reward calls.
-3. Map participant/attender containers and quiz answer movement.
-4. Audit event map ownership, disconnect/relog, death/warp, and multi-core boundaries.
-5. Keep runtime locked.
+1. Audit DB restart/setup persistence of engaged vs married rows.
+2. Close Marriage Fast time-based point semantics/monotonicity.
+3. Finish wedding-map teardown/reconnect edges.
+4. Close remaining Lua state assumptions and marriage-bonus consumers.
+5. Keep source/game repositories read-only and runtime execution locked.
 
 ## Mapping acceleration index
 - Status: **READY / ACTIVE**
