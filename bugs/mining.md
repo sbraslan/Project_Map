@@ -1,42 +1,36 @@
-# Mining / Pickaxe — Bug Registry
+# Mining / Pickaxe — Verified Bugs
 
-## BUG-MINE-001 — pickaxe refinement is unreachable through the current quest threshold
+## BUG-MIN-001 — deployed pickaxe refine quest and C++ disagree on mastery boundary
 
-**Class:** progression / quest-C++ contract mismatch  
-**Reachability:** VERIFIED — current `quest_list` includes `n_npc/mining.quest`.
+**Class:** gameplay progression / unreachable normal refine path  
+**Reachability:** VERIFIED through deployed `mining.quest` and registered `__refine_pick` binding.
 
-### Static proof
-1. Current mining quest handles pick VNUM 29101..<29110.
-2. The refine branch requires `item.get_socket(0) == item.get_value(2)`.
-3. It calls `__refine_pick(item.get_cell())`.
-4. The registered Lua function forwards to `mining::RealRefinePick`.
-5. `RealRefinePick` calls `Pick_Refinable`.
-6. `Pick_Refinable` rejects when `curExp <= maxExp`, so equality is rejected.
-7. When `curExp > maxExp`, the quest's non-equality branch runs instead and never calls refine.
+### Proof
+- Quest refine branch requires `socket0 == value2`.
+- `__refine_pick` calls `RealRefinePick()`.
+- `RealRefinePick()` rejects when `!Pick_Refinable()`.
+- `Pick_Refinable()` rejects every value `<= value2`, so equality is rejected.
+- `PracticePick()` can increment equality to `value2 + 1`, which C++ accepts, but the quest equality guard no longer opens.
 
 ### Consequence
-The normal deployed NPC quest cannot successfully reach the pickaxe-refine RNG path for +0..+8 pickaxes.
+The ordinary NPC quest path cannot hand a pickaxe to C++ at a mastery value that both layers accept.
 
 ### Deferred validation
-`MINE-T01`.
+`MIN-T01`.
 
-## BUG-MINE-002 — delayed mining completion ignores death and warp relocation
+## BUG-MIN-002 — delayed mining result can execute while player is dead
 
-**Class:** lifecycle/state revalidation defect  
-**Reachability:** VERIFIED.
+**Class:** lifecycle/state validation  
+**Reachability:** VERIFIED from normal mining plus death before event completion.
 
-### Static proof
-1. Mining starts only near a valid vein and schedules a delayed event.
-2. Ordinary movement cancels through `OnMove()->mining_cancel()`.
-3. `Dead()` does not cancel the event.
-4. `CanWarp()` does not block active mining.
-5. `WarpSet()->Stop()` does not invoke `OnMove` or cancel mining.
-6. Delayed `mining_event` does not check dead state, current map equality, or distance to vein.
-7. If the vein still resolves by VID and a pick remains equipped, it performs the normal ore chance and `OreDrop`.
-8. `OreDrop` uses the player's current map/coordinates.
+### Proof
+- Mining creates a delayed `m_pkMiningEvent`.
+- Movement cancels it, but `Dead()` does not.
+- `mining_event` has no `IsDead()` check.
+- Event success can still call `OreDrop()` and `PracticePick()`.
 
 ### Consequence
-Pending mining can resolve after death, and a pending session can resolve after warp with ore dropped at the destination map.
+A mining attempt begun while alive can finish and produce ore/mastery after the player has died.
 
 ### Deferred validation
-`MINE-T02`.
+`MIN-T02`.
