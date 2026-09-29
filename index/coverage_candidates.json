@@ -2,11 +2,11 @@
   "schema": 1,
   "generated_at": "2026-09-29",
   "source": "index/files.json coverage discovery",
-  "selected_next": "oxevent",
+  "selected_next": "arena",
   "candidates": [
     {
       "id": "marriage",
-      "status": "STATIC COMPLETE / 8 VERIFIED BUGS",
+      "status": "STATIC COMPLETE / 13 VERIFIED BUGS",
       "evidence": [
         "Project_ServerSRC:db/src/Marriage.cpp",
         "Project_ServerSRC:db/src/Marriage.h",
@@ -25,7 +25,7 @@
     },
     {
       "id": "oxevent",
-      "status": "SELECTED / OPEN",
+      "status": "STATIC COMPLETE / 7 VERIFIED BUGS",
       "evidence": [
         "Project_ServerSRC:game/src/OXEvent.cpp",
         "Project_ServerSRC:game/src/questlua_oxevent.cpp",
@@ -39,7 +39,7 @@
     },
     {
       "id": "arena",
-      "status": "QUEUED",
+      "status": "SELECTED / OPEN",
       "evidence": [
         "Project_ServerSRC:game/src/arena.cpp",
         "Project_ServerSRC:game/src/BattleArena.cpp",
