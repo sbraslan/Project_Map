@@ -907,3 +907,10 @@ Canonical handoff files:
 - `DUNGEON_T12_HANDOFF.md`
 
 Execution remains locked.
+
+
+## Ticket T07 handoff — 2026-09-29
+`TICKET-T07` preflight reverified and canonical handoff prepared at `TICKET_T07_HANDOFF.md`.
+It remains ordered after `DUNGEON-T09 -> DUNGEON-T11 -> DUNGEON-T12`.
+Normal T07 does not directly trigger BUG-TICKET-005 because C++ GetLogByID is called only for cached indices 0..9; the visible failure is pagination/data loss beyond the retained 10 rows.
+Execution remains locked.
