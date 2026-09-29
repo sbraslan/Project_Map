@@ -225,7 +225,7 @@ Messenger / Friend / Block is now the active mapping cursor:
 - `bugs/messenger.md`;
 - `tests/messenger.md`.
 
-Current verified findings: `BUG-MSG-001..021`. Messenger is not yet counted as STATIC COMPLETE. Runtime execution remains locked and `DUNGEON-T09` remains the first future live gate.
+Current verified findings: `BUG-MSG-001..021`. Messenger is **STATIC COMPLETE**. Runtime execution remains locked and `DUNGEON-T09` remains the first future live gate.
 
 
 ## Messenger / Friend / Block STATIC COMPLETE — 2026-09-29
