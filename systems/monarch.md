@@ -1,6 +1,6 @@
 # Monarch — Static Map
 
-**Status:** STATIC MAPPING IN PROGRESS / 4 VERIFIED BUGS  
+**Status:** STATIC MAPPING IN PROGRESS / 7 VERIFIED BUGS  
 **Phase:** Detection / Mapping Only  
 **Opened:** 2026-09-29  
 **Source/Game repositories:** READ-ONLY  
@@ -77,19 +77,22 @@ Game `CInputDB::Analyze` has no handler for SETMONARCH/RMCANDIDACY responses. Ru
 
 Promoted as `BUG-MON-002`.
 
-## BUG-MON-003 — rmmonarch calls deletion twice and cannot publish a successful removal
+## BUG-MON-003 — rmmonarch deletes persistence but always reports failure and leaves runtime state stale
 Registered GM command:
 `rmmonarch <name>`
 → `HEADER_GD_RMMONARCH`
 → DB `CClientManager::RMMonarch`.
 
-The handler executes:
-1. `CMonarch::Instance().DelMonarch(szName);`
-2. immediately calls the same function again to compute `iRet`.
+`CMonarch::DelMonarch` executes a SQL `DELETE`, then tests `pMsg->Get()->uiNumRows == 0`.
 
-If the first call succeeds, it removes/clears the matching monarch, so the second call cannot find the same name and returns false. The success broadcast branch therefore cannot represent the successful first mutation.
+The project's SQL wrapper sets:
+- `uiAffectedRows = mysql_affected_rows(...)`;
+- `uiNumRows = mysql_num_rows(...)` only when `mysql_store_result` returns a result set;
+- otherwise `uiNumRows = 0`.
 
-There is also no `HEADER_DG_UPDATE_MONARCH_INFO` refresh in this path.
+A DELETE has no result-set rows, so a successful DELETE still leaves `uiNumRows == 0`. `DelMonarch` therefore returns false before clearing its in-memory monarch fields.
+
+`CClientManager::RMMonarch` additionally calls `DelMonarch(szName)` twice. Neither path emits an authoritative `HEADER_DG_UPDATE_MONARCH_INFO`.
 
 Promoted as `BUG-MON-003`.
 
@@ -144,3 +147,61 @@ No DB/P2P replication was found in the mapped path. Keep as a candidate until a 
 
 ## Runtime
 No Monarch runtime/fault-injection test may execute while the global execution lock is active. First future live gate remains `DUNGEON-T09`.
+
+
+## BUG-MON-005 — asynchronous treasury deductions can grant a monarch effect that DB refuses to charge
+Registered monarch commands use game-core-local cached treasury state for prechecks, but the cache is not reduced when a GD deduction request is sent.
+
+Concrete reachable pair:
+1. `mtr` checks local balance >= 10,000, performs/sends the transfer, sends `HEADER_GD_DEC_MONARCH_MONEY`, and sets MI_TRANSFER.
+2. Before the DG deduction returns, `mmob` has an independent MI_SUMMON cooldown and can still see the same old local balance.
+3. `mmob` can spawn the monster immediately, then send a 5,000,000 deduction.
+
+With a treasury balance at the boundary, both effects can pass local checks while DB can fund only one deduction.
+
+DB `CClientManager::DecMonarchMoney` ignores the bool returned by DB `CMonarch::DecMoney` and broadcasts the requested DG DEC delta even when the authoritative deduction failed.
+
+Game-core `DecMoney` can refuse the underflow locally, but there is no failure acknowledgement capable of rolling back the already-applied transfer/spawn effect.
+
+Promoted as `BUG-MON-005`.
+
+## BUG-MON-006 — monarch tax cooldown is written but never enforced
+`InitMC()` configures MI_TAX cooldown and `do_monarch_tax` calls `SetMC(MI_TAX)` after a tax change.
+
+Unlike warp/transfer/summon/heal paths, `do_monarch_tax` contains no `IsMCOK(MI_TAX)` check before applying another tax change.
+
+Therefore the cooldown timestamp is updated but never gates the command.
+
+Promoted as `BUG-MON-006`.
+
+## BUG-MON-007 — cross-core monarch transfer charges and consumes cooldown without delivery acknowledgement
+Registered `mtr` can target a remote player tracked by P2P CCI.
+
+The source core:
+- validates the CCI;
+- sends `TPacketGGTransfer`;
+- immediately requests 10,000 treasury deduction;
+- immediately sets MI_TRANSFER cooldown.
+
+Receiver `CInputP2P::Transfer` simply performs:
+`FindPC(name)`, and only if the target still exists does it call `WarpSet`.
+
+There is no ACK/NACK to the sender. If the target disconnects or changes ownership between CCI lookup and P2P handling, the receiver silently does nothing while the source has already charged treasury and consumed cooldown.
+
+Promoted as `BUG-MON-007`.
+
+## Caller/deployment closure
+A recursive tracked quest inventory plus repository search found no current `Project_Game` caller for:
+- `oh.takemonarchmoney`
+- `oh.monarchpowerup`
+- `oh.monarchdefenseup`
+- `oh.monarchbless`.
+
+These Lua APIs remain mapped but are not promoted as deployed gameplay bugs without a tracked caller.
+
+## Current audit cursor
+1. audit SetMonarch SQL column/schema consistency using any authoritative schema source available;
+2. inspect candidacy/election persistence reload behavior across DB restart;
+3. close process-local power/defense as dormant vs deployed;
+4. inspect remaining monarch notice/warp and money-add boundaries;
+5. decide Monarch static closure.
