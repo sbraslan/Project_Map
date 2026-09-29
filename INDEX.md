@@ -60,7 +60,7 @@ Full pre-migration maps/checkpoints are in `archive/`. They are fallback evidenc
 
 
 ## Runtime-readiness milestone — 2026-09-28
-All STATIC COMPLETE subsystem rows currently represented by the canonical mapping have deferred runtime-readiness coverage or an explicitly folded ownership path. Runtime execution remains locked. The active documentation cursor is now the global readiness integrity audit; first future live gate remains DUNGEON-T10.
+All STATIC COMPLETE subsystem rows currently represented by the canonical mapping have deferred runtime-readiness coverage or an explicitly folded ownership path. Runtime execution remains locked. The active documentation cursor is now the global readiness integrity audit; first future live gate remains DUNGEON-T09.
 
 
 ## Global readiness integrity audit — 2026-09-28
@@ -71,7 +71,7 @@ Result: **COMPLETE — PASS WITH NORMALIZATIONS**.
 - Guild lifecycle is folded with Guild Storage but `BUG-GUILD-001` has explicit `GUILD-T01` companion coverage.
 - Dungeon Info/Core historical bug-ID collision is globally namespace-qualified.
 - Retracted/cross-system IDs and legacy test aliases are normalized.
-- First future live gate remains `DUNGEON-T10`.
+- First future live gate remains `DUNGEON-T09`.
 
 
 ## First runtime gate handoff — 2026-09-28
@@ -87,7 +87,7 @@ Costume / Appearance / ChangeLook was mapped after the original 21/21 readiness 
 
 Current effective coverage is **22/22 STATIC COMPLETE subsystem rows** plus the folded Guild lifecycle companion.
 
-The historical `READINESS_AUDIT.md` 21/21 result remains valid for its original scope; a post-audit extension records this additional subsystem. The first future live gate remains `DUNGEON-T10`.
+The historical `READINESS_AUDIT.md` 21/21 result remains valid for its original scope; a post-audit extension records this additional subsystem. The first future live gate remains `DUNGEON-T09`.
 
 
 ## Post-audit extension — Acce / Sash — 2026-09-28
@@ -95,7 +95,7 @@ Acce / Sash is now **STATIC COMPLETE** with verified `BUG-ACCE-001..008` and can
 
 Current effective coverage is **23/23 STATIC COMPLETE subsystem rows** plus the folded Guild lifecycle companion. Dragon Soul / Alchemy remains separately **MAPPING IN PROGRESS**.
 
-Runtime execution remains locked and `DUNGEON-T10` remains the first future live gate.
+Runtime execution remains locked and `DUNGEON-T09` remains the first future live gate.
 
 
 
@@ -104,7 +104,7 @@ Dragon Soul / Alchemy is now **STATIC COMPLETE** with verified `BUG-DS-001..011`
 
 Current effective coverage is **24/24 STATIC COMPLETE subsystem rows** plus the folded Guild lifecycle companion. Aura System is the next active mapping cursor.
 
-Runtime execution remains locked and `DUNGEON-T10` remains the first future live gate.
+Runtime execution remains locked and `DUNGEON-T09` remains the first future live gate.
 
 
 ## Post-audit extension — Aura System — 2026-09-28
@@ -112,7 +112,7 @@ Aura System is now **STATIC COMPLETE** with verified `BUG-AURA-001..006` and can
 
 Current effective coverage is **25/25 STATIC COMPLETE subsystem rows** plus the folded Guild lifecycle companion.
 
-Runtime execution remains locked and `DUNGEON-T10` remains the first future live gate.
+Runtime execution remains locked and `DUNGEON-T09` remains the first future live gate.
 
 
 ## Active continuation — Growth Pet System — 2026-09-28
@@ -134,7 +134,7 @@ Current effective completed/readiness coverage is **25/25 STATIC COMPLETE subsys
 
 The active mapping cursor is now **Refine / Cube / Crafting**. Initial Cube Renewal mapping has already verified `BUG-REFCUBE-001..002`.
 
-Runtime execution remains locked and `DUNGEON-T10` remains the first future live gate.
+Runtime execution remains locked and `DUNGEON-T09` remains the first future live gate.
 
 
 ## Post-audit extension — Refine / Cube / Crafting — 2026-09-28
@@ -142,7 +142,7 @@ Refine / Cube / Crafting is now **STATIC COMPLETE** with verified `BUG-REFCUBE-0
 
 Current effective static-complete/readiness coverage is **26/26** subsystem rows plus the folded Guild lifecycle companion.
 
-Growth Pet System remains the active mapping cursor. Runtime execution remains locked and `DUNGEON-T10` remains the first future live gate.
+Growth Pet System remains the active mapping cursor. Runtime execution remains locked and `DUNGEON-T09` remains the first future live gate.
 
 
 ## Post-audit extension — Growth Pet System — 2026-09-29
@@ -155,7 +155,7 @@ The active mapping cursor is now **Horse / Mount / Riding**:
 - `bugs/horse_mount.md`;
 - `tests/horse_mount.md`.
 
-Runtime execution remains locked and `DUNGEON-T10` remains the first future live gate.
+Runtime execution remains locked and `DUNGEON-T09` remains the first future live gate.
 
 
 ## Post-audit extension — Horse / Mount / Riding — 2026-09-29
@@ -168,9 +168,9 @@ The active mapping cursor is now **Classic Pet System**:
 - `bugs/pet.md`;
 - `tests/pet.md`.
 
-Runtime execution remains locked and `DUNGEON-T10` remains the first future live gate.
+Runtime execution remains locked and `DUNGEON-T09` remains the first future live gate.
 
 
 Classic Pet System is now **STATIC COMPLETE** with verified `BUG-PET-001..004` and canonical deferred tests `PET-T01..PET-T04`.
 Current effective completed/readiness coverage is **29/29 STATIC COMPLETE subsystem rows** plus the folded Guild lifecycle companion.
-Runtime execution remains locked; first future live gate remains `DUNGEON-T10`.
+Runtime execution remains locked; first future live gate remains `DUNGEON-T09`.
