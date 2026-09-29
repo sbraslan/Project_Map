@@ -95,4 +95,4 @@ Purpose: validate the dormant compatibility risk in OBS-BIO-002. This test stays
 - BIO-T11 added as a conditional future regression for OBS-BIO-002; observation status is unchanged.
 - Primary legitimate normal-path candidate: BIO-T01.
 - BIO-T08 remains dependency-gated on access to actual biolog DB rows.
-- Overall first live runtime gate remains DUNGEON-T10.
+- Overall first live runtime gate remains DUNGEON-T09.
