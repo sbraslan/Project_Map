@@ -6,40 +6,20 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "messenger",
-    "display_name": "Messenger / Friend / Block",
-    "status": "STATIC COMPLETE / 21 VERIFIED BUGS / EXECUTION LOCKED",
-    "system_file": "systems/messenger.md",
-    "bug_file": "bugs/messenger.md",
-    "test_file": "tests/messenger.md",
-    "verified_bug_ids": [
-      "BUG-MSG-001",
-      "BUG-MSG-002",
-      "BUG-MSG-003",
-      "BUG-MSG-004",
-      "BUG-MSG-005",
-      "BUG-MSG-006",
-      "BUG-MSG-007",
-      "BUG-MSG-008",
-      "BUG-MSG-009",
-      "BUG-MSG-010",
-      "BUG-MSG-011",
-      "BUG-MSG-012",
-      "BUG-MSG-013",
-      "BUG-MSG-014",
-      "BUG-MSG-015",
-      "BUG-MSG-016",
-      "BUG-MSG-017",
-      "BUG-MSG-018",
-      "BUG-MSG-019",
-      "BUG-MSG-020",
-      "BUG-MSG-021"
-    ],
+    "subsystem": "marriage",
+    "display_name": "Marriage / Wedding",
+    "status": "STATIC MAPPING IN PROGRESS / 0 VERIFIED BUGS / EXECUTION LOCKED",
+    "system_file": "systems/marriage.md",
+    "bug_file": "bugs/marriage.md",
+    "test_file": "tests/marriage.md",
+    "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Run global source-feature coverage discovery to identify the next subsystem not yet represented in Project_Map.",
-      "Preserve Messenger as STATIC COMPLETE with BUG-MSG-001..021 and MSG-T01..MSG-T21.",
-      "Do not execute runtime tests; first future live gate remains DUNGEON-T09."
+      "Map marriage login/logout plus near-check/love-point event lifecycle.",
+      "Map wedding map membership, teardown, and end timing.",
+      "Compare quest preconditions with server-side invariants.",
+      "Audit DB/game multi-core ordering and stale relation/wedding state.",
+      "Keep runtime/fault-injection execution locked; first future live gate remains DUNGEON-T09."
     ]
   },
   "startup": {
@@ -2790,7 +2770,7 @@
     ]
   },
   "acceleration_index": {
-    "status": "READY",
+    "status": "READY / ACTIVE",
     "generated_at": "2026-09-29",
     "directory": "index/",
     "source_repositories_read_only": true,
@@ -2806,7 +2786,7 @@
     },
     "counts": {
       "mapping_relevant_files": 10119,
-      "systems": 34,
+      "systems": 35,
       "symbol_seeds": 228,
       "packet_seeds": 9,
       "call_flow_edges": 234
@@ -2819,6 +2799,33 @@
       "exact source fetch"
     ],
     "context7_role": "supplementary external library/API documentation verification; not authoritative Metin2 source location",
-    "next_action": "global source-feature coverage discovery using acceleration index"
+    "next_action": "continue Marriage/Wedding static mapping using acceleration index"
+  },
+  "marriage_mapping": {
+    "status": "STATIC MAPPING IN PROGRESS",
+    "canonical_files": {
+      "system": "systems/marriage.md",
+      "bugs": "bugs/marriage.md",
+      "tests": "tests/marriage.md"
+    },
+    "verified_bug_ids": [],
+    "mapped_flows": [
+      "marriage_manage.quest -> marriage.engage_to -> ALUA(marriage_engage_to) -> marriage::CManager::RequestAdd -> HEADER_GD_MARRIAGE_ADD -> DB CClientManager::MarriageAdd -> DB marriage::CManager::Add -> SQL INSERT marriage -> HEADER_DG_MARRIAGE_ADD -> game CInputDB::MarriageAdd -> game marriage::CManager::Add",
+      "game marriage::CManager::Add -> HEADER_GD_WEDDING_REQUEST -> DB CClientManager::WeddingRequest -> HEADER_DG_WEDDING_REQUEST -> game CInputDB::WeddingRequest -> WeddingManager::Request -> private WEDDING_MAP_INDEX -> HEADER_GD_WEDDING_READY -> DB CClientManager::WeddingReady -> HEADER_DG_WEDDING_READY -> DB ReadyWedding +5s -> HEADER_DG_WEDDING_START -> game WeddingStart -> partner warps",
+      "marriage_manage.quest -> marriage.set_to_marriage -> ALUA(marriage_set_to_marriage) -> TMarriage::SetMarried -> TMarriage::Save -> marriage::CManager::RequestUpdate -> HEADER_GD_MARRIAGE_UPDATE -> DB marriage::CManager::Update -> SQL UPDATE marriage -> HEADER_DG_MARRIAGE_UPDATE -> game CInputDB::MarriageUpdate",
+      "marriage_manage.quest -> marriage.remove -> ALUA(marriage_remove) -> game CManager::RequestRemove -> HEADER_GD_MARRIAGE_REMOVE -> DB marriage::CManager::Remove -> SQL DELETE marriage -> HEADER_DG_MARRIAGE_REMOVE -> game CInputDB::MarriageRemove -> game CManager::Remove",
+      "DB marriage::CManager::OnSetup -> HEADER_DG_MARRIAGE_ADD + HEADER_DG_MARRIAGE_UPDATE + running HEADER_DG_WEDDING_READY/START -> game core reconstruction"
+    ],
+    "candidates": [],
+    "runtime_tests": {
+      "status": "NOT YET FINALIZED / EXECUTION LOCKED / NOT RUN",
+      "canonical_test_ids": [],
+      "first_live_gate_unchanged": "DUNGEON-T09"
+    },
+    "closure_notes": [
+      "Marriage/Wedding mapping opened after global coverage discovery.",
+      "No Marriage/Wedding bug has been promoted yet.",
+      "Source/Game repositories remain read-only."
+    ]
   }
 }
