@@ -98,3 +98,18 @@ Expected bug signature: clean automatic OX rejects entry with zero policy; later
 Covers `BUG-OX-007`.
 
 Do not run while the global execution lock is active.
+
+
+## OX-T08 — close after CheckAnswer, then start a new OX
+After runtime is explicitly unlocked:
+1. start an OX quiz and let stage 1 / `CheckAnswer` execute;
+2. before stage 2 / `WarpToAudience`, invoke the deployed force-end or equivalent close path;
+3. confirm the inner event is cancelled;
+4. start a fresh OX event and first quiz;
+5. trace the first callback's static stage and `m_map_miss`.
+
+Expected bug signature: the new quiz's first inner callback enters stale stage 2, performs cleanup/status-close instead of normal stage 0, then resets the flag.
+
+Covers `BUG-OX-008`.
+
+Do not run while the global execution lock is active.
