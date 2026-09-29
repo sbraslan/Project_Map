@@ -26,11 +26,10 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 - Deferred canonical test: `ARENA-T01`; not executed.
 
 ## Exact resume cursor
-1. Audit classic Arena map112 routing and candidate reachability.
-2. Audit duel disconnect/death/timeout and item/potion restrictions.
-3. Audit observer lifecycle.
-4. Map GM-only CBattleArena companion and deployment.
-5. Keep runtime locked.
+1. OX Event is statically closed with `BUG-OX-001..008`.
+2. Open Arena as the next indexed subsystem.
+3. Map duel start/timeout/death/observer/disconnect lifecycles.
+4. Keep source/game repositories read-only and runtime execution locked.
 
 ## Mapping acceleration index
 - Status: **READY / ACTIVE**
