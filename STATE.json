@@ -8,16 +8,22 @@
   "active": {
     "subsystem": "monarch",
     "display_name": "Monarch",
-    "status": "STATIC MAPPING OPEN / 0 VERIFIED BUGS / EXECUTION LOCKED",
+    "status": "STATIC MAPPING IN PROGRESS / 4 VERIFIED BUGS / EXECUTION LOCKED",
     "system_file": "systems/monarch.md",
     "bug_file": "bugs/monarch.md",
     "test_file": "tests/monarch.md",
-    "verified_bug_ids": [],
+    "verified_bug_ids": [
+      "BUG-MON-001",
+      "BUG-MON-002",
+      "BUG-MON-003",
+      "BUG-MON-004"
+    ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Map DB/game Monarch state synchronization and election lifecycle.",
-      "Map treasury money add/take/decrease paths and permissions.",
-      "Map monarch commands/skills and deployed quest callers.",
+      "Close treasury request/ack concurrency and failed-deduction semantics.",
+      "Audit takemonarchmoney caller/authorization reachability.",
+      "Audit PowerUp/DefenseUp caller deployment and cross-core replication.",
+      "Audit monarch warp/transfer charge-on-failure ordering.",
       "Keep runtime/fault-injection execution locked; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -2800,7 +2806,7 @@
       "exact source fetch"
     ],
     "context7_role": "supplementary external library/API documentation verification; not authoritative Metin2 source location",
-    "next_action": "open Monarch static mapping from indexed DB/game/quest roots"
+    "next_action": "continue Monarch treasury/multicore static audit; use Context7 only for external C++/library semantics"
   },
   "marriage_mapping": {
     "status": "STATIC COMPLETE / 14 VERIFIED BUGS",
@@ -3001,6 +3007,47 @@
       "Observer Arena pointer/mode teardown remains after-fix only.",
       "map112 no MAP_ALLOW owner remains a deployment candidate shadowed by BUG-ARENA-001.",
       "BattleArena empire2/3 reversed random-stone Y bounds are shadowed by missing maps 191/192."
+    ]
+  },
+  "monarch_mapping": {
+    "status": "STATIC MAPPING IN PROGRESS / 4 VERIFIED BUGS",
+    "canonical_files": {
+      "system": "systems/monarch.md",
+      "bugs": "bugs/monarch.md",
+      "tests": "tests/monarch.md"
+    },
+    "verified_bug_ids": [
+      "BUG-MON-001",
+      "BUG-MON-002",
+      "BUG-MON-003",
+      "BUG-MON-004"
+    ],
+    "mapped_flows": [
+      "GM elect -> HEADER_GD_COME_TO_VOTE -> DB ComeToVote -> CMonarch::ElectMonarch -> no winner/state update -> BUG-MON-001",
+      "GM setmonarch -> HEADER_GD_SETMONARCH -> DB SetMonarch -> wrong HEADER_DG_RMCANDIDACY/no UPDATE_MONARCH_INFO -> stale game-core state -> BUG-MON-002",
+      "GM rmmonarch -> DB RMMonarch -> DelMonarch called twice -> success fanout lost/no UPDATE_MONARCH_INFO -> BUG-MON-003",
+      "player mtax -> IsMonarch -> invalid-range chat without return -> SetEventFlag(trade_tax, invalid) -> BUG-MON-004"
+    ],
+    "candidates": [
+      "multi-core treasury race/effect-before-authoritative-deduction",
+      "process-local PowerUp/DefenseUp buffs; deployed caller closure pending",
+      "takemonarchmoney authorization code is compiled out under __UNIMPLEMENTED__; caller closure pending",
+      "warp/transfer cost and cooldown can be committed without authoritative success acknowledgement",
+      "SetMonarch SQL/schema consistency",
+      "DelMonarch DELETE-result interpretation"
+    ],
+    "runtime_tests": {
+      "status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN",
+      "canonical_test_ids": [
+        "MON-T01",
+        "MON-T02",
+        "MON-T03",
+        "MON-T04"
+      ],
+      "first_live_gate_unchanged": "DUNGEON-T09"
+    },
+    "context7_notes": [
+      "cppreference default-initialization semantics confirm new int[n] leaves fundamental elements indeterminate without value initialization."
     ]
   }
 }
