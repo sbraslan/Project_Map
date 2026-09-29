@@ -1,50 +1,40 @@
 # CURRENT — Canonical Active Checkpoint
 
 **Active phase:** Detection / Mapping Only  
-**Active state:** Fishing Renewal mapping in progress  
-**Status:** 29 STATIC COMPLETE / FISHING ACTIVE / 10 VERIFIED BUGS / EXECUTION LOCKED  
+**Active state:** Static Mapping Coverage Complete  
+**Status:** FISHING RENEWAL STATIC COMPLETE / 11 VERIFIED BUGS / EXECUTION LOCKED  
 **Machine state:** `STATE.json`  
-**Active subsystem:** Fishing Renewal  
+**Active subsystem:** none  
+**Latest completed subsystem:** Fishing Renewal  
 **System:** `systems/fishing.md`  
 **Bugs:** `bugs/fishing.md`  
 **Tests:** `tests/fishing.md`  
-**Last completed subsystem:** Classic Pet System  
-**Effective completed/readiness-covered subsystems:** 29  
+**Effective completed/readiness-covered subsystems:** 30  
 **First future live gate:** `DUNGEON-T09`  
 **Last updated:** 2026-09-29
 
 ## Hard rule
 Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-only. Runtime/fault-injection execution remains locked until an explicit phase change.
 
-## Fishing Renewal initial checkpoint
-Verified:
-- `ENABLE_FISHING_RENEWAL` is active.
-- client renewed UI exists in `Project_Binary/root/uifishing.py`;
-- server dispatch: `HEADER_CG_FISHING_NEW -> CInputMain::FishingNew -> CHARACTER::fishing_new_*`;
-- current rod names include 27400..27490 (+1..+10), 27500..27590 (+11..+20), and 27591 Carbon rod.
+## Fishing Renewal closure
+Verified bug set:
+- `BUG-FISH-001` second normal table OOB selection.
+- `BUG-FISH-002` temporary CreateItem(50187) leak.
+- `BUG-FISH-003` client-authoritative minigame hit validation.
+- `BUG-FISH-004` movement not locked/revalidated.
+- `BUG-FISH-005` Carbon rod special bonus branch unreachable.
+- `BUG-FISH-006` death/warp lifecycle cleanup missing.
+- `BUG-FISH-007` fish_new_log records rerolled VNUM.
+- `BUG-FISH-008` renewed success omits Achievement TYPE_FISH hook.
+- `BUG-FISH-009` Battle Pass routes renewed catch to FISH_CATCH instead of FISH_FISHING.
+- `BUG-FISH-010` active-session logout persists consumed bait socket.
+- `BUG-FISH-011` unthrottled CATCH_FAILED packets are immediately rebroadcast to nearby clients.
 
-Promoted:
-- `BUG-FISH-001` — second normal fish table has 5 entries but is indexed with `number(0,6)`; normal renewed fishing with +11..+20/Carbon rods reaches `second=true`.
-- `BUG-FISH-002` — `fishing_new_start()` creates temporary item 50187 for inventory probing and never destroys it; repeated starts can accumulate ownerless registered items.
-- `BUG-FISH-003` — renewed fishing successful-hit validation is client-authoritative; server accepts timed CATCH packets without verifying the UI hit test.
-- `BUG-FISH-004` — renewed fishing does not server-lock movement or revalidate fishing position after start.
-- `BUG-FISH-005` — Carbon rod 27591 special doubled chance branch is impossible because the same condition also requires `dwVnum <= 27490`.
-- `BUG-FISH-006` — renewed fishing event is not cancelled on death/warp; completed catch state can resolve after death and same-character warp can carry the session across maps.
-- `BUG-FISH-007` — fish_new_log rerolls a fresh fish after bait is cleared instead of logging the actual session fish.
-- `BUG-FISH-008` — renewed successful catches do not call Achievement TYPE_FISH despite live TYPE_FISH tasks.
-- `BUG-FISH-009` — renewed successful fishing updates Battle Pass FISH_CATCH instead of the distinct FISH_FISHING family.
-- `BUG-FISH-010` — logout during active renewed fishing saves non-zero rod bait socket2, allowing consumed bait to survive relog.
+Closed without promotion:
+- `POINT_FISHING_RARE` uint8 narrowing: no current producer/value range proves a reachable overflow in this snapshot.
+- failed-counter overflow: theoretical extreme; meaningful reachable issue captured by BUG-FISH-011.
 
-Open candidate:
-- Carbon-rod bonus branch is impossible as written: `dwVnum == 27591 && dwVnum >= 27400 && dwVnum <= 27490`. Intended effect still needs semantic closure.
+## Next static action
+No active subsystem. On the next continuation, choose the next independent unmapped gameplay subsystem from source/config coverage and open only its canonical files.
 
-## Exact next work
-1. map renewed fishing packet registration and size validation;
-2. audit catch/fail timing, replay and trust boundaries;
-3. close bait + `POINT_FISHING_RARE` arithmetic;
-4. audit success/log/Battle Pass/Achievement flow;
-5. audit stop/death/warp/logout/equipment-change cleanup;
-6. audit rod refine/current proto values;
-7. promote only verified reachable additional findings.
-
-Do not execute `FISH-T01`..`FISH-T10`. Global first live gate remains `DUNGEON-T09`.
+Do not execute `FISH-T01..FISH-T11`. Global first live runtime gate remains `DUNGEON-T09`.
