@@ -2,7 +2,7 @@
 
 **Active phase:** Detection / Mapping Only  
 **Active state:** Static mapping continuation  
-**Status:** MESSENGER / FRIEND / BLOCK — MAPPING IN PROGRESS / 8 VERIFIED BUGS / EXECUTION LOCKED  
+**Status:** MESSENGER / FRIEND / BLOCK — MAPPING IN PROGRESS / 9 VERIFIED BUGS / EXECUTION LOCKED  
 **Machine state:** `STATE.json`  
 **Active subsystem:** Messenger / Friend / Block  
 **System:** `systems/messenger.md`  
@@ -24,6 +24,7 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 - `BUG-MSG-006` — pending friend authorization has no server-side expiry/logout cleanup.
 - `BUG-MSG-007` — companion logout erases persistent outgoing friend/block cache for still-online users; relog does not reconstruct it.
 - `BUG-MSG-008` — client-visible `/party_request` route bypasses messenger block checks that protect the normal party-invite packet route.
+- `BUG-MSG-009` — unblock-by-VID can dereference a vanished target instance after the confirmation delay.
 
 ## Closed / scoped observations
 - Shout delivery checks the receiver's messenger block relation on both local and P2P fanout. BUG-MSG-007 can still undermine it after logout/relog cache loss.
@@ -32,7 +33,7 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 - `RemoveAllBlockList` has a DB-vs-cache/P2P asymmetry for incoming block rows, but no active call site has yet been established; keep it candidate-only.
 
 ## Exact resume cursor
-1. Close client messenger parser/state safety: list lengths, remove-by-VID nullability, optimistic unblock behavior.
+1. Continue client messenger parser/state safety: list-length accounting and optimistic unblock/server-ack behavior.
 2. Finish GM messenger cache/login/logout lifecycle symmetry.
 3. Re-check channel-change boundaries against BUG-MSG-003/007 and P2P presence reconstruction.
 4. Resolve the dormant `RemoveAllBlockList` call-site question before any promotion.
