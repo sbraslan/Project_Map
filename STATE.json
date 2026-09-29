@@ -8,7 +8,7 @@
   "active": {
     "subsystem": "monarch",
     "display_name": "Monarch",
-    "status": "STATIC MAPPING IN PROGRESS / 10 VERIFIED BUGS / EXECUTION LOCKED",
+    "status": "STATIC MAPPING IN PROGRESS / 12 VERIFIED BUGS / EXECUTION LOCKED",
     "system_file": "systems/monarch.md",
     "bug_file": "bugs/monarch.md",
     "test_file": "tests/monarch.md",
@@ -22,14 +22,16 @@
       "BUG-MON-007",
       "BUG-MON-008",
       "BUG-MON-009",
-      "BUG-MON-010"
+      "BUG-MON-010",
+      "BUG-MON-011",
+      "BUG-MON-012"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Audit registered mto/mtr private-instance and map-index semantics.",
-      "Audit remaining WarpSet result handling and AddMoney boundaries.",
-      "Keep Lua-only PowerUp/DefenseUp/takemonarchmoney dormant unless a deployed caller is proven.",
-      "Decide Monarch STATIC COMPLETE and select the next subsystem.",
+      "Audit AddMoney overflow/failure fanout symmetry.",
+      "Inspect monarch notice and remaining treasury producers for independent defects.",
+      "Close dormant Lua candidates explicitly.",
+      "Decide Monarch STATIC COMPLETE.",
       "Keep runtime/fault-injection execution locked; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -2812,7 +2814,7 @@
       "exact source fetch"
     ],
     "context7_role": "supplementary external library/API documentation verification; not authoritative Metin2 source location",
-    "next_action": "continue Monarch mto/mtr private-instance and final boundary closure; Context7 supplementary only"
+    "next_action": "finish Monarch AddMoney/notice/dormant closure; Context7 supplementary only"
   },
   "marriage_mapping": {
     "status": "STATIC COMPLETE / 14 VERIFIED BUGS",
@@ -3016,7 +3018,7 @@
     ]
   },
   "monarch_mapping": {
-    "status": "STATIC MAPPING IN PROGRESS / 10 VERIFIED BUGS",
+    "status": "STATIC MAPPING IN PROGRESS / 12 VERIFIED BUGS",
     "canonical_files": {
       "system": "systems/monarch.md",
       "bugs": "bugs/monarch.md",
@@ -3032,7 +3034,9 @@
       "BUG-MON-007",
       "BUG-MON-008",
       "BUG-MON-009",
-      "BUG-MON-010"
+      "BUG-MON-010",
+      "BUG-MON-011",
+      "BUG-MON-012"
     ],
     "mapped_flows": [
       "GM elect -> HEADER_GD_COME_TO_VOTE -> DB ComeToVote -> CMonarch::ElectMonarch -> no winner/state update -> BUG-MON-001",
@@ -3048,12 +3052,15 @@
       "GM setmonarch -> REPLACE writes selected PID through name while authoritative LoadMonarch reads pid -> BUG-MON-006",
       "VoteMonarch/AddCandidacy -> persistent rows + process-local containers -> DB restart InitializeMonarch only LoadMonarch(monarch) -> BUG-MON-008",
       "CHARACTER recreation -> InitMC backdates cooldown timestamps by full limits -> relog makes enforced monarch cooldowns ready -> BUG-MON-009",
-      "mtax -> SetMC(MI_TAX) without IsMCOK(MI_TAX) gate -> BUG-MON-010"
+      "mtax -> SetMC(MI_TAX) without IsMCOK(MI_TAX) gate -> BUG-MON-010",
+      "mto private target -> private index normalized for allow check -> coordinate-only WarpSet -> base map route + charge/cooldown -> BUG-MON-011",
+      "remote mtr from private map -> GG_TRANSFER(name,x,y) no map index -> receiver WarpSet(x,y) -> base map route + charge/cooldown -> BUG-MON-012"
     ],
     "candidates": [
-      "remaining AddMoney overflow/failure reporting symmetry",
-      "remaining mto/mtr private-instance and WarpSet result boundaries",
-      "PowerUp/DefenseUp and takemonarchmoney remain dormant in current tracked Project_Game deployment"
+      "process-local PowerUp/DefenseUp plus wrong defense-event cast remain dormant because no current Project_Game caller is tracked.",
+      "takemonarchmoney validation is compiled out but no current Project_Game caller is tracked.",
+      "remaining AddMoney overflow/failure fanout symmetry.",
+      "remaining monarch notice and treasury-producer boundaries."
     ],
     "runtime_tests": {
       "status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN",
@@ -3067,7 +3074,9 @@
         "MON-T07",
         "MON-T08",
         "MON-T09",
-        "MON-T10"
+        "MON-T10",
+        "MON-T11",
+        "MON-T12"
       ],
       "first_live_gate_unchanged": "DUNGEON-T09"
     },
