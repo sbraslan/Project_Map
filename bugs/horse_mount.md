@@ -64,3 +64,62 @@ The live DB schema/default values are not versioned in the tracked repositories.
 
 ### Deferred validation
 Canonical runtime test: `HORSE-T02`.
+
+
+---
+
+## BUG-HORSE-003 — current mount races 20276..20283 are absent from client mount-level classification
+
+**Class:** client/server data-code mismatch / mounted combat disabled  
+**Reachability:** VERIFIED — current packed item proto contains deployed COSTUME_MOUNT items using all eight affected races.
+
+### Current deployment proof
+Project_Binary and Project_DumpProto use the same packed item-proto blob:
+`24ed504beb93a38aff772b8c24d9b6e1bcd4c2d0`.
+
+Decoded rows:
+- 71259 -> 20276
+- 71260 -> 20277
+- 71261 -> 20278
+- 71262 -> 20279
+- 71263 -> 20280
+- 71264 -> 20281
+- 71265 -> 20282
+- 71266 -> 20283
+
+Each row is `ITEM_COSTUME / COSTUME_MOUNT` with first apply `APPLY_MOUNT`.
+
+Client `npclist.txt` also contains the corresponding 2021/2022 race entries.
+
+### Broken client invariant
+`ENABLE_NO_MOUNT_CHECK` is disabled.
+
+`InstanceBase.cpp::GetMountLevelByVnum()` has no case for 20276..20283, so each falls through to `MOUNT_TYPE_NONE`.
+
+That result is consumed by:
+- `SHORSE::CanAttack()`;
+- `SHORSE::CanUseSkill()`;
+- `CInstanceBase::CanAttackHorseLevel()`;
+- `CInstanceBase::CanAttack()`;
+- `CPythonPlayer` auto-attack handling.
+
+### Consequence
+These current mount items can render through the normal mount path, while the client rejects mounted combat and horse-skill eligibility for their race IDs.
+
+### Deferred validation
+Canonical runtime test: `HORSE-T03`.
+
+---
+
+## Closure
+
+Horse / Mount / Riding static bug set:
+- BUG-HORSE-001
+- BUG-HORSE-002
+- BUG-HORSE-003
+
+Remaining observations intentionally unpromoted:
+- time-limited mount ChangeLook donor lifetime is not transferred, but a tracked normal-player transmutation opener is not proven;
+- raw DB horse level lacks a load-time clamp, but no malformed producer is tracked;
+- login horse-level normalization resets underlying HP/stamina/drop-time, currently masked by infinite horse health/stamina;
+- Additional Equipment UNIQUE ride remove helper is suspicious, but no tracked live remove-side producer was established.
