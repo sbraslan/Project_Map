@@ -8,7 +8,7 @@
   "active": {
     "subsystem": "oxevent",
     "display_name": "OX Event",
-    "status": "STATIC MAPPING IN PROGRESS / 8 VERIFIED BUGS / EXECUTION LOCKED",
+    "status": "STATIC MAPPING IN PROGRESS / 10 VERIFIED BUGS / EXECUTION LOCKED",
     "system_file": "systems/oxevent.md",
     "bug_file": "bugs/oxevent.md",
     "test_file": "tests/oxevent.md",
@@ -20,14 +20,16 @@
       "BUG-MARR-005",
       "BUG-MARR-006",
       "BUG-MARR-007",
-      "BUG-MARR-008"
+      "BUG-MARR-008",
+      "BUG-MARR-009",
+      "BUG-MARR-010"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Audit DB restart/setup persistence for engaged vs married rows.",
-      "Close Marriage Fast time-based point semantics and monotonicity.",
-      "Finish wedding map teardown/reconnect edge cases.",
-      "Close remaining Lua null/state assumptions and shared-bonus consumers.",
+      "Finish wedding-map teardown/reconnect and DB OnSetup ordering review.",
+      "Close client lover UI/command lifecycle.",
+      "Close remaining Lua null/state assumptions and marriage bonus consumers.",
+      "Decide any remaining candidates, then mark Marriage/Wedding STATIC COMPLETE if no new independent findings.",
       "Keep runtime/fault-injection execution locked; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -2809,10 +2811,10 @@
       "exact source fetch"
     ],
     "context7_role": "supplementary external library/API documentation verification; not authoritative Metin2 source location",
-    "next_action": "continue Marriage/Wedding static mapping: DB restart persistence + Marriage Fast time semantics + teardown/reconnect closure"
+    "next_action": "finish Marriage/Wedding static closure: teardown/reconnect + client lover commands + Lua state assumptions"
   },
   "marriage_mapping": {
-    "status": "STATIC MAPPING IN PROGRESS / 8 VERIFIED BUGS",
+    "status": "STATIC MAPPING IN PROGRESS / 10 VERIFIED BUGS",
     "canonical_files": {
       "system": "systems/marriage.md",
       "bugs": "bugs/marriage.md",
@@ -2826,7 +2828,9 @@
       "BUG-MARR-005",
       "BUG-MARR-006",
       "BUG-MARR-007",
-      "BUG-MARR-008"
+      "BUG-MARR-008",
+      "BUG-MARR-009",
+      "BUG-MARR-010"
     ],
     "mapped_flows": [
       "marriage_manage.quest -> marriage.engage_to -> ALUA(marriage_engage_to) -> marriage::CManager::RequestAdd -> HEADER_GD_MARRIAGE_ADD -> DB CClientManager::MarriageAdd -> DB marriage::CManager::Add -> SQL INSERT marriage -> HEADER_DG_MARRIAGE_ADD -> game CInputDB::MarriageAdd -> game marriage::CManager::Add",
@@ -2845,12 +2849,12 @@
       "game CManager::Add is sole WEDDING_REQUEST sender and requires both local at DG ADD time -> no retry -> BUG-MARR-005",
       "EXP marriage update casts 2000/level^2/3 before EXP multiply -> zero at level>=26 -> BUG-MARR-006",
       "PREMIUM_MARRIAGE_FAST combat delta *=3 vs deployed 2x item description -> BUG-MARR-007",
-      "GetBonus sees only local ch1/ch2 equipment; P2P does not replicate spouse equipment -> cross-core shared item effect loss -> BUG-MARR-008"
+      "GetBonus sees only local ch1/ch2 equipment; P2P does not replicate spouse equipment -> cross-core shared item effect loss -> BUG-MARR-008",
+      "DB Main -> MarriageManager.Initialize -> DELETE marriage WHERE is_married=0 before reconstruction -> pending engagement persistence loss -> BUG-MARR-009",
+      "GetMarriagePoint total elapsed days * current premium rate -> premium activation/expiry recomputes history non-monotonically -> BUG-MARR-010"
     ],
     "candidates": [
       "WeddingManager::__CreateWeddingMap returns after post-insert GetMap failure without explicit cleanup; practical failure reachability not yet proven.",
-      "Marriage Fast daily-age calculation applies current premium state to all elapsed marriage days and may be non-monotonic when premium expires; quantify and decide promotion.",
-      "DB Initialize deletes all is_married=0 rows; determine whether restart-time engagement loss is intentional policy or a persistence defect.",
       "Several marriage Lua helpers rely on quest-side state; all deployed callers must be closed before promotion."
     ],
     "runtime_tests": {
@@ -2863,7 +2867,9 @@
         "MARR-T05",
         "MARR-T06",
         "MARR-T07",
-        "MARR-T08"
+        "MARR-T08",
+        "MARR-T09",
+        "MARR-T10"
       ],
       "first_live_gate_unchanged": "DUNGEON-T09"
     },
