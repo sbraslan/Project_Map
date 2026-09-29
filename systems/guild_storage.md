@@ -2,6 +2,8 @@
 
 **Status:** STATIC COMPLETE
 
+> Canonical lifecycle node: `guild_storage`. General Guild lifecycle findings are folded into this subsystem; there is no separate active `guild` mapping node.
+
 > Canonical subsystem history split from legacy `00_PROGRESS.md`. Read this file only when this subsystem is active or explicitly revisited.
 
 ## Checkpoint — Guild Storage open/lock path
