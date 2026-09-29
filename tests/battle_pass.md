@@ -47,3 +47,7 @@
 - BP-T08 remains a broad lifecycle/regression check rather than a unique bug mapping.
 - BP-T02 is the primary normal-path observational candidate.
 - Overall first live runtime gate remains DUNGEON-T09.
+
+
+### BP-T02 preflight — 2026-09-29
+Current source reverified: every TPacketGCExtBattlePassMissionUpdate construction path leaves bMissionType unset. Client forwards it unchanged. UI impact refined: HaveMission currently matches only missionIndex, so progress can still update; selected missions pass the undefined missionType into SetMissionInfo. Canonical handoff: `../BP_T02_HANDOFF.md`.
