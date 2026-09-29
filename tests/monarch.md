@@ -151,3 +151,17 @@ Expected bug signature: target reaches the base/public map instead of the monarc
 Covers `BUG-MON-012`.
 
 Do not run these tests while the global execution lock is active.
+
+
+## MON-T13 — cross-core long monarch notice
+After runtime is explicitly unlocked:
+1. place same-empire test characters on the source core and at least one remote game core;
+2. issue an `mnotice` whose text exceeds 256 characters but stays within normal chat/command limits;
+3. capture the local and remote displayed notice strings;
+4. compare their lengths/content.
+
+Expected bug signature: source-core player receives the full notice while remote-core player receives text truncated to the fixed 256-byte P2P buffer.
+
+Covers `BUG-MON-013`.
+
+Do not run this test while the global execution lock is active.
