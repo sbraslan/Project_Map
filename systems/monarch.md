@@ -128,18 +128,13 @@ Combat reads these arrays directly in `char_battle.cpp` for ±10% damage.
 
 No DB/P2P replication was found in the mapped path. Keep as a candidate until a currently deployed quest/caller for these Lua functions is proven.
 
-## Open candidates
-- process-local PowerUp/DefenseUp effects versus multi-core empire scope; deployed caller closure pending;
-- `takemonarchmoney` has authorization/precheck code under `__UNIMPLEMENTED__`; current tracked deployed caller not yet proven;
-- add-money overflow/failure handling versus unconditional fanout;
-- monarch cooldown state is character-process-local; reconnect/core-move persistence audit pending.
+## Early candidates (later closure below)
+- PowerUp/DefenseUp and `takemonarchmoney` were audited for deployed callers; current tracked quest corpus contains no caller.
+- Add-money overflow/failure symmetry remains in final boundary pass.
+- Monarch cooldown reconstruction was promoted as `BUG-MON-009`.
 
-## Current audit cursor
-1. audit `takemonarchmoney` deployed caller/authorization reachability;
-2. audit process-local PowerUp/DefenseUp deployment and cross-core scope;
-3. audit add-money overflow/failure broadcast symmetry;
-4. audit monarch cooldown persistence across reconnect/core moves;
-5. close candidates and decide static completion.
+## Earlier audit cursor
+The items below were subsequently advanced in the later sections of this file; the canonical resume cursor is the final `Current audit cursor` at the end.
 
 ## Runtime
 No Monarch runtime/fault-injection test may execute while the global execution lock is active. First future live gate remains `DUNGEON-T09`.
