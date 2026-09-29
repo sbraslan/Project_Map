@@ -1949,6 +1949,90 @@
       "references": [
         "marriage_mapping.mapped_flows.4"
       ]
+    },
+    {
+      "from": "WeddingMap::WarpAll",
+      "to": "CHARACTER::ExitToSavedLocation",
+      "references": [
+        "BUG-MARR-005"
+      ]
+    },
+    {
+      "from": "CHARACTER::SaveExitLocation",
+      "to": "m_posExit + m_lExitMapIndex",
+      "references": [
+        "BUG-MARR-005"
+      ]
+    },
+    {
+      "from": "CHARACTER::ExitToSavedLocation",
+      "to": "WarpSet(m_posWarp.x,m_posWarp.y,m_lWarpMapIndex)",
+      "references": [
+        "BUG-MARR-005"
+      ]
+    },
+    {
+      "from": "WarpSet completion",
+      "to": "WarpEnd clears m_posWarp + m_lWarpMapIndex",
+      "references": [
+        "BUG-MARR-005"
+      ]
+    },
+    {
+      "from": "P2P_MANAGER::Login(new core)",
+      "to": "overwrite existing name-keyed CCI descriptor/channel",
+      "references": [
+        "BUG-MARR-004"
+      ]
+    },
+    {
+      "from": "stale HEADER_GG_LOGOUT(old core)",
+      "to": "P2P_MANAGER::Logout(name)",
+      "references": [
+        "BUG-MARR-004"
+      ]
+    },
+    {
+      "from": "P2P_MANAGER::Logout(name)",
+      "to": "marriage::CManager::Logout(pid)",
+      "references": [
+        "BUG-MARR-004"
+      ]
+    },
+    {
+      "from": "unilateral marriage.remove",
+      "to": "HEADER_GD_MARRIAGE_REMOVE",
+      "references": [
+        "BUG-MARR-013"
+      ]
+    },
+    {
+      "from": "HEADER_DG_MARRIAGE_REMOVE",
+      "to": "TMarriage::~TMarriage",
+      "references": [
+        "BUG-MARR-013"
+      ]
+    },
+    {
+      "from": "TMarriage::~TMarriage",
+      "to": "lover_divorce only if IsOnline(local ch1&&ch2)",
+      "references": [
+        "BUG-MARR-013"
+      ]
+    },
+    {
+      "from": "DB CManager::Initialize",
+      "to": "DELETE FROM marriage WHERE is_married = 0",
+      "references": [
+        "BUG-MARR-009"
+      ]
+    },
+    {
+      "from": "DB CManager::OnSetup",
+      "to": "replay WEDDING_READY + WEDDING_START without WeddingMap recreation",
+      "references": [
+        "BUG-MARR-011"
+      ]
     }
   ]
 }
