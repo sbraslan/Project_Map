@@ -1,35 +1,26 @@
 # CURRENT — Canonical Active Checkpoint
 
 **Active phase:** Detection / Mapping Only  
-**Active state:** Static Mapping In Progress  
-**Status:** MESSENGER / FRIEND / BLOCK / 6 VERIFIED BUGS / EXECUTION LOCKED  
+**Active state:** Static mapping continuation  
+**Status:** MESSENGER / FRIEND / BLOCK ACTIVE — SERVER ENTRYPOINT PASS 1 COMPLETE / 1 VERIFIED BUG / EXECUTION LOCKED  
 **Machine state:** `STATE.json`  
 **Active subsystem:** Messenger / Friend / Block  
-**Latest completed subsystem:** Mining / Pickaxe  
-**System:** `systems/messenger.md`  
-**Bugs:** `bugs/messenger.md`  
-**Tests:** `tests/messenger.md`  
-**Effective completed/readiness-covered subsystems:** 31  
+**System:** `systems/messenger_friend_block.md`  
+**Bugs:** `bugs/messenger_friend_block.md`  
+**Tests:** `tests/messenger_friend_block.md`  
+**Previous completed subsystem:** Mining / Pickaxe  
 **First future live gate:** `DUNGEON-T09`  
 **Last updated:** 2026-09-29
 
 ## Hard rule
 Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-only. Runtime/fault-injection execution remains locked until an explicit phase change.
 
-## Previous closure
-Mining / Pickaxe is **STATIC COMPLETE** with `BUG-MIN-001..007` and deferred `MIN-T01..MIN-T07`.
+## Current verified finding
+- `BUG-MSG-001` — both block-add-by-VID and block-add-by-name duplicate `IsBlocked(actor,target)` where the first guard/message is the friend-list guard. Existing friends can therefore pass both checks and be added to the block relation without removing the friend relation.
 
-## Active Messenger findings
-- `BUG-MSG-001` — block-add friend validation duplicates `IsBlocked`; friend+block coexistence is allowed and the intended already-blocked branch is shadowed.
-- `BUG-MSG-002` — P2P/remote whispers bypass messenger block checks because enforcement requires local `pkChr`.
-- `BUG-MSG-003` — asynchronous messenger DB callbacks can repopulate relation state and emit presence after logout.
-- `BUG-MSG-004` — client `OnBlockLogin` invokes `OnLogout`, rendering online blocked users offline.
-- `BUG-MSG-005` — client `Destroy()` clears friend/guild state but leaves block and GM caches across session teardown.
-- `BUG-MSG-006` — pending friend authorization tokens have no server timeout/logout cleanup and remain consumable later.
-
-## Exact continuation cursor
-1. Audit friend/block remove-all and inverse relation symmetry.
-2. Audit P2P presence consistency and non-whisper block enforcement surfaces.
-3. Audit messenger client packet-size/state handling and GM cache lifecycle.
-4. Close reconnect/channel-change boundaries and remaining candidates.
-5. Keep all runtime tests deferred; global first future live gate remains `DUNGEON-T09`.
+## Exact resume cursor
+1. Trace P2P propagation and login/logout reconstruction for simultaneous friend+block state.
+2. Trace client packet/UI entry points for both block-add variants.
+3. Check whisper/shout/party/guild behavior when friend+block coexist.
+4. Audit block-add-by-VID return-size mismatches before deciding whether they are a real defect.
+5. Do not execute runtime tests; global first future live gate remains `DUNGEON-T09`.
