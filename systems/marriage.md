@@ -1,6 +1,6 @@
 # Marriage / Wedding — Static Map
 
-**Status:** STATIC MAPPING IN PROGRESS / 2 VERIFIED BUGS  
+**Status:** STATIC MAPPING IN PROGRESS / 6 VERIFIED BUGS  
 **Phase:** Detection / Mapping Only  
 **Opened:** 2026-09-29  
 **Source/Game repositories:** READ-ONLY  
@@ -133,17 +133,73 @@ DB `marriage::CManager::OnSetup` replays persisted relations to a game peer usin
 - GD 74 / DG 154 — WEDDING_READY
 - DG 155 — WEDDING_START
 - GD 75 / DG 156 — WEDDING_END
-- GD 116 / DG 159 — BREAK_MARRIAGE legacy path; closure still pending.
+- GD 116 / DG 159 — BREAK_MARRIAGE legacy headers. DB GD receiver parses two PIDs and routes into normal marriage::CManager::Remove; no independent modern divorce flow was established.
+
+## Additional verified findings
+
+### BUG-MARR-003 — mutual divorce rejects exactly 500,000 Yang
+The deployed mutual-divorce quest defines `MONEY_NEED_FOR_ONE = 500000` but computes both players' eligibility with strict `> MONEY_NEED_FOR_ONE` checks, both before and after confirmation. A character with exactly 500,000 Yang is therefore treated as insufficient even though the subsequent debit is exactly 500,000.
+
+Promoted as `BUG-MARR-003`.
+
+### BUG-MARR-004 — stale P2P logout can overwrite fresh lover-online state
+Cross-core P2P login updates an existing name-keyed CCI to the newest descriptor. P2P logout is later processed only by player name and does not verify that the logout came from the descriptor currently stored in that CCI.
+
+The already-verified channel/core ordering race therefore also reaches Marriage:
+`LOGIN(new core)`
+→ existing CCI descriptor updated
+→ Marriage/login path can emit `lover_login`
+→ delayed `LOGOUT(old core)`
+→ name-only CCI removal
+→ `marriage::CManager::Logout(pid)`
+→ `TMarriage::Logout`
+→ `lover_logout` sent to spouse/current relay.
+
+The client handles `lover_logout` by marking the lover offline and hiding lover state. No later login event is guaranteed because the fresh LOGIN already happened before the stale logout.
+
+Promoted as `BUG-MARR-004`.
+
+### BUG-MARR-005 — wedding exit uses the wrong saved-location fields
+`SaveExitLocation()` stores:
+- `m_posExit = GetXYZ()`
+- `m_lExitMapIndex = GetMapIndex()`.
+
+But `ExitToSavedLocation()` calls:
+`WarpSet(m_posWarp.x, m_posWarp.y, m_lWarpMapIndex)`
+instead of using `m_posExit / m_lExitMapIndex`, then clears the real exit fields.
+
+Wedding entry explicitly calls `SaveExitLocation()`, and wedding shutdown calls `ExitToSavedLocation()` for every PC. After a completed warp, `WarpEnd()` resets `m_posWarp` and `m_lWarpMapIndex` to zero, so the wedding exit path does not use the saved pre-wedding destination.
+
+Promoted as `BUG-MARR-005`.
+
+### BUG-MARR-006 — same-process warp does not detach WeddingMap membership
+`CHARACTER::SetWeddingMap(nullptr)` is the code path that calls `WeddingMap::DecMember`, but `CHARACTER::WarpSet()` does not call it.
+
+Wedding shutdown:
+1. `SetEnded()` schedules the end event;
+2. step 0 calls `WeddingMap::WarpAll()`;
+3. `WarpAll()` calls `ExitToSavedLocation()/WarpSet()`;
+4. 15 seconds later the same event calls `WeddingManager::DestroyWeddingMap()`;
+5. `DestroyWeddingMap()` calls `WeddingMap::DestroyAll()`, which destroys every character still in `m_set_pkChr`.
+
+If the exit warp stays in the same game process/core, character destruction does not occur during the warp, so the stale WeddingMap member entry survives and that already-warped player is destroyed/disconnected 15 seconds later.
+
+Current deployment makes same-core exits realistic because map 81 shares cores with other allowed maps (for example ch2/core4 also hosts 61..70 and ch99/core99 hosts multiple normal/special maps).
+
+Promoted as `BUG-MARR-006`.
+
+## Closed / scoped observations
+- Legacy `HEADER_GD_BREAK_MARRIAGE` is a DB-side two-PID compatibility entry that calls the normal DB marriage remove routine. No separate active quest/client sender was established in the tracked deployed flow; `HEADER_DG_BREAK_MARRIAGE` has no independent Marriage gameplay consequence in the mapped path.
+- Marriage critical/penetration/EXP bonus consumers are server-side and remain tied to the existing Marriage relation/online-pointer model; no independent bonus bug has been promoted yet.
 
 ## Current audit cursor
 Continue with:
-1. legacy BREAK_MARRIAGE path;
-2. mutual/unilateral divorce transaction ordering;
-3. marriage login/logout + near-check/love-point lifecycle;
-4. wedding map membership and teardown;
-5. DB/game multi-core ordering after duplicate READY;
-6. marriage unique-item bonus consumers;
-7. Lua null/state assumptions against deployed callers.
+1. finish mutual/unilateral divorce post-confirm race audit;
+2. finish marriage login/logout + near-check/love-point lifecycle;
+3. close wedding end/duplicate READY interaction with BUG-MARR-005/006;
+4. audit marriage unique-item bonus/near-state intent versus implementation;
+5. close remaining Lua null/state candidates against deployed callers;
+6. decide STATIC COMPLETE readiness.
 
 ## Runtime
 No Marriage runtime test may be executed while the global execution lock is active. First future live gate remains `DUNGEON-T09`.
