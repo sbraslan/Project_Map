@@ -52,6 +52,7 @@ Remote target: target is represented by P2P `CCI` and relay descriptor while `pk
 - `BUG-MSG-007` — logout erases the departing character from every online account's outgoing friend/block cache; reconnect reloads only the departing account, so persistent block/friend state is not restored for observers.
 - `BUG-MSG-008` — target-board `/party_request` uses a player command path without messenger block validation, bypassing the guarded direct party-invite path.
 - `BUG-MSG-009` — target-board unblock confirmation can outlive the target instance; remove-by-VID dereferences `GetInstancePtr(vid)` without a null guard.
+- `BUG-MSG-010` — project-wide character names were extended to 48, but `RecvMessenger()` still receives every messenger name into a 25-byte legacy stack buffer.
 - `BUG-MSG-010` — pending party/guild invitations can still be accepted after a messenger block is established because acceptance does not revalidate block state.
 - `BUG-MSG-011` — `pc.is_blocked` and `pc.is_friend` are registered Lua name-query helpers but gate their first argument with `lua_isnumber` before calling `FindPC(name)`.
 
@@ -99,3 +100,10 @@ The same send path removes the local block entry immediately and has no positive
 - `SendMessengerBlockRemoveByVIDPacket` resolves the VID through `CPythonCharacterManager::GetInstancePtr` and dereferences the result with no null check.
 - `GetInstancePtr` returns `nullptr` for a missing VID.
 - Result: verified `BUG-MSG-009`; deferred test `MSG-T09`.
+
+
+### Messenger name-length compatibility
+Both server and client canonical character-name constants are 48 in this snapshot, while `RecvMessenger()` retains the pre-extension literal `char_name[24 + 1]`. All friend/GM/block/mobile variable-length name branches trust the packet length and write a terminator at that index. This is BUG-MSG-010.
+
+### Channel-change ordering candidate
+`MoveChannel -> WarpSet(custom addr/port)` sends `GC_WARP`; the client immediately calls `Connect(newAddr,newPort)`. The old process broadcasts `GG_LOGOUT` during character disconnect, while the new process broadcasts `GG_LOGIN` from `WarpEnd`. On a third process, `P2P_MANAGER::Login` updates an existing CCI without calling messenger `P2PLogin`, while `CInputP2P::Logout` removes by name only and does not verify the packet's source descriptor against the CCI's current descriptor. Thus LOGIN(new) -> delayed LOGOUT(old) can remove the newer CCI and messenger presence. Keep candidate-only until runtime/order validation; do not assign a BUG-MSG ID yet.
