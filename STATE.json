@@ -8,7 +8,7 @@
   "active": {
     "subsystem": "attr6th7th",
     "display_name": "6th/7th Attribute",
-    "status": "STATIC MAPPING OPEN / 8 VERIFIED BUGS / EXECUTION LOCKED",
+    "status": "STATIC MAPPING OPEN / 9 VERIFIED BUGS / EXECUTION LOCKED",
     "system_file": "systems/attr6th7th.md",
     "bug_file": "bugs/attr6th7th.md",
     "test_file": "tests/attr6th7th.md",
@@ -3088,7 +3088,7 @@
     ]
   },
   "attr6th7th_mapping": {
-    "status": "STATIC MAPPING OPEN / 8 VERIFIED BUGS",
+    "status": "STATIC MAPPING OPEN / 9 VERIFIED BUGS",
     "canonical_files": {
       "system": "systems/attr6th7th.md",
       "bugs": "bugs/attr6th7th.md",
@@ -3102,7 +3102,8 @@
       "BUG-ATTR67-005",
       "BUG-ATTR67-006",
       "BUG-ATTR67-007",
-      "BUG-ATTR67-008"
+      "BUG-ATTR67-008",
+      "BUG-ATTR67-009"
     ],
     "mapped_flows": [
       "client UI -> CPythonNetworkStream -> HEADER_CG_ATTR_6TH_7TH -> CInputMain::Attr67Send -> OPEN/CLOSE/SKILLBOOK_COMB/GET_FRAGMENT/ADD",
@@ -3113,7 +3114,9 @@
       "ADD fragment removal precedes additive validation -> invalid additive after committed fragment cost -> BUG-ATTR67-005",
       "uniform_real_distribution [low,high) + uint32 truncation -> configured high skillbook VNUM never generated -> BUG-ATTR67-006",
       "97/97 deployed quest_list sources contain no Attr67 open/retrieval caller -> BUG-ATTR67-007",
-      "special skillbook global slots 180..359 vs uint8 bCell -> slots 256..359 truncate -> BUG-ATTR67-008"
+      "special skillbook global slots 180..359 vs uint8 bCell -> slots 256..359 truncate -> BUG-ATTR67-008",
+      "CheckItemAdded -> GetAttributeCount(normal 5 only) ignores existing rare slots -> fully 7-attribute item can pass -> GetItemAttr ignores AddRareAttribute(false) and reports result 1 -> BUG-ATTR67-009",
+      "NPC_STORAGE row + attr_6th_7th time/percent quest flags have mapped DB/save/load reconstruction; no reconnect/restart loss bug promoted."
     ],
     "deployment_shadowed_findings": [
       "Skillbook UI displays 1,000,000 Yang while server checks/charges 100,000.",
@@ -3136,19 +3139,20 @@
         "ATTR67-T05",
         "ATTR67-T06",
         "ATTR67-T07",
-        "ATTR67-T08"
+        "ATTR67-T08",
+        "ATTR67-T09"
       ],
       "first_live_gate_unchanged": "DUNGEON-T09"
     },
     "context7_notes": [
       "cppreference confirms std::uniform_real_distribution produces values in [a,b), supporting BUG-ATTR67-006.",
-      "Context7 is supplementary only; tracked Metin2 source remains authoritative."
+      "Context7 is supplementary only; tracked Metin2 source remains authoritative.",
+      "CPython C-API docs confirm PyList_Size drives iteration length; the native fixed-array copy must impose its own cap. This remains deployment-shadowed rather than a new active server bug."
     ],
     "next_actions": [
-      "Finish private-shop/shop/material cross-window pass.",
-      "Audit NPC_STORAGE reconnect/restart reconstruction.",
-      "Audit percent/support boundaries and rare-attribute mutation.",
-      "Close client/server parity candidates and decide STATIC COMPLETE."
+      "Close remaining deployment-shadowed client/server parity findings.",
+      "Re-check dormant retrieval candidates for any non-quest/native caller.",
+      "Decide Attr67 STATIC COMPLETE."
     ]
   }
 }
