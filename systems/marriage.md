@@ -266,3 +266,27 @@ Example with zero stored kill points after 20 marriage days:
 A “points increase twice as fast” effect therefore can cause already-visible love points to drop later.
 
 Promoted as `BUG-MARR-010`.
+
+
+### BUG-MARR-011 — game-core restart does not recreate an active private wedding map
+DB `OnSetup` replays a running wedding to a reconnecting game peer with `HEADER_DG_WEDDING_READY` and `HEADER_DG_WEDDING_START`.
+
+Those handlers reconstruct only relation-side `pWeddingInfo` / `m_setWedding`. They do **not** call `WeddingManager::Request` or `__CreateWeddingMap`, so a restarted core that previously hosted the process-local private map comes back with an empty `WeddingManager::m_mapWedding`.
+
+When the later END arrives on a core where map 81 is allowed, `WeddingManager::End(mapIndex)` returns false and game `CManager::WeddingEnd` returns before clearing `pWeddingInfo` and `m_setWedding`.
+
+Promoted as `BUG-MARR-011`.
+
+### BUG-MARR-012 — DB restart loses all running-wedding scheduler state
+Running weddings are kept only in DB-process memory:
+- `m_pqWeddingStart`;
+- `m_pqWeddingEnd`;
+- `m_mapRunningWedding`.
+
+They are not loaded from SQL by `CManager::Initialize()`.
+
+If DB restarts after a wedding has started, the one-hour end queue and running map are lost. A later manual `HEADER_GD_WEDDING_END` reaches DB `EndWedding`, which cannot find the pair in `m_mapRunningWedding` and returns without broadcasting `HEADER_DG_WEDDING_END`.
+
+A still-running game-side wedding map therefore has no automatic or DB-mediated termination path after that restart.
+
+Promoted as `BUG-MARR-012`.
