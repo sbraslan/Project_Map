@@ -1,14 +1,14 @@
 # CURRENT — Canonical Active Checkpoint
 
 **Active phase:** Detection / Mapping Only  
-**Active state:** Arena / PvP Duel static mapping  
-**Status:** ARENA — STATIC MAPPING IN PROGRESS / 1 VERIFIED BUG / EXECUTION LOCKED  
+**Active state:** Monarch static mapping  
+**Status:** MONARCH — STATIC MAPPING OPEN / 0 VERIFIED BUGS / EXECUTION LOCKED  
 **Machine state:** `STATE.json`  
-**Active subsystem:** Arena / PvP Duel — OPEN  
-**System:** `systems/arena.md`  
-**Bugs:** `bugs/arena.md`  
-**Tests:** `tests/arena.md`  
-**Previous completed subsystem:** OX Event — STATIC COMPLETE / 5 VERIFIED BUGS  
+**Active subsystem:** Monarch — OPEN  
+**System:** `systems/monarch.md`  
+**Bugs:** `bugs/monarch.md`  
+**Tests:** `tests/monarch.md`  
+**Previous completed subsystem:** Arena / PvP Duel — STATIC COMPLETE / 3 VERIFIED BUGS  
 **First future live gate:** `DUNGEON-T09`  
 **Last updated:** 2026-09-29
 
@@ -36,3 +36,15 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 - Indexed mapping-relevant files: **10,119**
 - Primary lookup: `features -> symbols/packets -> callgraph -> files -> exact source fetch`.
 - Context7 remains supplementary for external APIs only.
+
+
+## Arena closure — 2026-09-29
+- Arena / PvP Duel: STATIC COMPLETE / `BUG-ARENA-001..003`.
+- Deferred tests: `ARENA-T01..ARENA-T03`; none executed.
+- Timeout packet, observer no-op/teardown and map112 routing remain shadowed after-fix probes.
+
+## Monarch resume cursor
+1. DB/game state synchronization.
+2. election/candidacy lifecycle.
+3. treasury money mutation paths.
+4. command/skill permissions and deployed quest integration.
