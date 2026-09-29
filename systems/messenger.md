@@ -62,6 +62,8 @@ Remote target: target is represented by P2P `CCI` and relay descriptor while `pk
 - `BUG-MSG-017` — client→server name-based messenger packets use a 48-byte field for a configured 48-byte name, truncating add/block-add to 47 bytes and leaving long remove/unblock fields without an explicit final NUL.
 - `BUG-MSG-018` — Battle Field blocks friend add-by-name but the normal target-board add-by-VID path lacks the map restriction.
 - `BUG-MSG-019` — pending friend authorization revalidates only its request token, not messenger block state, so a block added during the pending window does not prevent acceptance.
+- `BUG-MSG-020` — friend/block list serialization can exceed the 16-bit `TPacketGCMessenger::size` while the server still transmits the full buffer, desynchronizing client packet framing.
+- `BUG-MSG-021` — GM-to-GM block authorization differs between block-by-VID and block-by-name routes.
 
 ## Current cursor
 Continue static audit of:
@@ -87,9 +89,9 @@ Do not execute runtime tests. Global first future live gate remains `DUNGEON-T09
 
 ## Updated cursor
 Continue static audit of:
-- remaining friend/block relation mutation surfaces and pending-token identity safety after BUG-MSG-019;
+- remaining friend/block/GM relation mutation symmetry after BUG-MSG-019/021;
 - residual P2P presence resynchronization after BUG-MSG-016;
-- final client/server messenger packet-boundary pass after BUG-MSG-012/017;
+- any remaining packet-boundary/framing paths after BUG-MSG-012/017/020;
 - static-closure readiness.
 
 Do not execute runtime tests. Global first future live gate remains `DUNGEON-T09`.
@@ -144,4 +146,11 @@ Friend/block add-by-VID rejects observer-mode characters. The corresponding name
 The initial add-by-VID/name branches enforce block state, but the pending request token survives later block creation. `AuthToAdd` checks only token existence and then writes both friend directions. This is `BUG-MSG-019`, independent of the block-add validation typo in `BUG-MSG-001`.
 
 ### GM inverse-cache lifecycle
-`LoadGMList` creates synthetic account→GM relations and inverse GM→account memberships. Logout removes the forward list but not the inverse memberships; `Destroy()` is empty. Therefore the inverse side grows with distinct historical logins and GM presence fanout traverses stale accounts. Verified as `BUG-MSG-016`.
+`LoadGMList` creates synthetic account→GM relations and inverse GM→account memberships. Logout removes the forward list but not the inverse memberships; `Destroy()` is empty. Therefore the inverse side grows with distinct historical logins and GM presence fanout traverses stale accounts. Verified as `BUG-MSG-015`.
+
+
+### Oversized messenger-list framing
+`TPacketGCMessenger::size` is 16-bit, but `SendList` and `SendBlockList` construct a complete relation payload in a 128 KiB temporary buffer with no cumulative size or relation-count cap. `pack.size += buf.size()` can therefore wrap while the full `buf.size()` bytes are still transmitted. Client parsing uses the wrapped advertised size, leaving surplus bytes to corrupt later stream framing. This is `BUG-MSG-020`; deferred validation is `MSG-T20`.
+
+### GM block route parity
+The block-by-VID branch rejects a GM target only when the requester is `GM_PLAYER`, while block-by-name rejects every GM target on non-test servers regardless of requester authority. Target-board and Messenger name-entry surfaces expose both routes and no common later guard reconciles them. This is `BUG-MSG-021`; deferred validation is `MSG-T21`.
