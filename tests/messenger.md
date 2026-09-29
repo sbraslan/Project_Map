@@ -156,4 +156,14 @@ After runtime is explicitly unlocked in an isolated test environment:
 
 Bug signature: 48-byte names are truncated by add/block-add to 47 bytes, while 47-byte-or-longer remove/unblock fields can transmit a non-terminated/stale final byte and fail to address the intended relation.
 
+
+## MSG-T14 — observer-mode name-path bypass
+After runtime is explicitly unlocked:
+1. place A in observer mode and keep B online;
+2. verify A cannot add/block B through the VID/target-board path;
+3. open the Messenger window and type B's name into Add Friend / Add Block;
+4. inspect the request/block state on both server and client.
+
+Bug signature: the name-based path succeeds while the VID-based path is rejected solely because A is in observer mode.
+
 Do not run any MSG test while the project execution lock is active.
