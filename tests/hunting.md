@@ -64,3 +64,7 @@ This determines whether the ignored ground-insertion result is a reachable rewar
 - Primary legitimate Hunting live candidate: HUNT-T04.
 - Crash/persistence validation remains deferred until runtime execution is explicitly enabled.
 - Overall first live runtime gate remains DUNGEON-T09.
+
+
+### HUNT-T04 preflight — 2026-09-29
+Current source reverified: HUNTING_MISSION_COUNT=90, mission/reward tables are [91] (valid indices 0..90), and ReciveHuntingRewards unconditionally increments hunting_system.level. A legitimate level-90 claim stores 91. The follow-up OOB path requires character level >=91; otherwise OpenHuntingWindowMain takes the lower-level zero-data branch. Canonical handoff: `../HUNT_T04_HANDOFF.md`.
