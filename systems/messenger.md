@@ -48,6 +48,7 @@ Remote target: target is represented by P2P `CCI` and relay descriptor while `pk
 - `BUG-MSG-005` — client `Destroy()` leaves block and GM caches intact across game-window/session teardown.
 - `BUG-MSG-006` — pending friend authorization tokens have no server timeout/logout cleanup and can be consumed later.
 - `BUG-MSG-007` — logout erases the departing character from every online account's outgoing friend/block cache; reconnect reloads only the departing account, so persistent block/friend state is not restored for observers.
+- `BUG-MSG-008` — target-board `/party_request` uses a player command path without messenger block validation, bypassing the guarded direct party-invite path.
 
 ## Current cursor
 Continue static audit of:
@@ -57,5 +58,24 @@ Continue static audit of:
 - client packet-length/state handling;
 - GM messenger cache lifecycle;
 - logout/reconnect and channel-change boundaries.
+
+Do not execute runtime tests. Global first future live gate remains `DUNGEON-T09`.
+
+
+## Social-surface pass
+- Global shout delivery is filtered per receiver with `IsBlocked(receiver,sender)` in `FuncShout`, including P2P-delivered shouts.
+- Direct party invite checks both block directions in `CInputMain::PartyInvite`.
+- Guild invite checks both block directions before `CGuild::Invite`.
+- Exchange, PvP and equipment-view paths also check messenger blocks.
+- The target-board “request to join party” path is different: `uitarget.py::__OnRequestParty -> /party_request -> do_party_request -> CHARACTER::RequestToParty`. The final server path never checks messenger block state. See BUG-MSG-008.
+- The previously suspected block-by-VID return-size mismatch is closed: `TPacketCGMessengerAddByVID` and `TPacketCGMessengerAddBlockByVID` are both a single `uint32_t vid`.
+- `RemoveAllBlockList` has asymmetric incoming-row cleanup semantics but remains unpromoted until an active caller is proven.
+
+## Updated cursor
+Continue static audit of:
+- client messenger parser/state safety, especially block remove-by-VID pointer handling and optimistic local removal;
+- GM messenger cache lifecycle;
+- channel-change/reconnect interaction with asynchronous loads and relation cache reconstruction;
+- active-call reachability of `RemoveAllBlockList`.
 
 Do not execute runtime tests. Global first future live gate remains `DUNGEON-T09`.
