@@ -1,6 +1,6 @@
 # Classic Quest Dungeons — Deferred Runtime Tests
 
-**Status:** STATIC MAPPING OPEN / 4 TESTS DOCUMENTED / EXECUTION LOCKED / NOT RUN
+**Status:** STATIC MAPPING CLOSED / 4 TESTS DOCUMENTED / EXECUTION LOCKED / NOT RUN
 
 Runtime/fault-injection execution remains globally locked.
 
@@ -35,3 +35,7 @@ Run two Snow private instances (A and B) on the same game process. Ensure a serv
 Expected signature in the current code: A registers the floor transition using the stale server-timer arg from B instead of A's `d.get_map_index()`. When the timer fires it selects B (or another stale map), leaving A stuck and potentially advancing the wrong instance. Repeat for the level-5 cube, level-6 stone and level-8 key paths.
 
 Covers `BUG-CLD-004`.
+
+
+## Static closure
+`CLD-T01..CLD-T04` remain documented and **NOT RUN**. Runtime/fault-injection execution is still globally locked.
