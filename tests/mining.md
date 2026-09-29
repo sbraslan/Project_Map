@@ -59,3 +59,17 @@ Bug signature: ore/mastery settles after event shutdown from a dead vein.
 Covers `BUG-MIN-006`.
 
 Do not run while execution lock is active.
+
+
+## MIN-T07 — scheduled Mining Event deployment preflight
+After runtime is explicitly unlocked, preferably first as a non-invasive preflight:
+1. inspect runtime map registry for map 230;
+2. verify `data/event/mining_event_regen_type_0.txt` exists at the server's expected working path;
+3. trigger the Mining Event only in an isolated environment;
+4. compare `mining_event` flag state with `SetMiningEvent` return/error log and actual vein population.
+
+Bug signature: flag becomes active while the event fails because map 230 and/or its regen data are unavailable.
+
+Covers `BUG-MIN-007`.
+
+Do not run while execution lock is active.
