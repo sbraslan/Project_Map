@@ -2,7 +2,7 @@
   "schema": 1,
   "generated_at": "2026-09-29",
   "source": "index/files.json coverage discovery",
-  "selected_next": "arena",
+  "selected_next": "monarch",
   "candidates": [
     {
       "id": "marriage",
@@ -39,7 +39,7 @@
     },
     {
       "id": "arena",
-      "status": "SELECTED / OPEN / 1 VERIFIED BUG",
+      "status": "STATIC COMPLETE / 3 VERIFIED BUGS",
       "evidence": [
         "Project_ServerSRC:game/src/arena.cpp",
         "Project_ServerSRC:game/src/BattleArena.cpp",
@@ -54,7 +54,7 @@
     },
     {
       "id": "monarch",
-      "status": "QUEUED",
+      "status": "SELECTED / OPEN",
       "evidence": [
         "Project_ServerSRC:db/src/Monarch.cpp",
         "Project_ServerSRC:game/src/monarch.cpp",
