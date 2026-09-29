@@ -21,7 +21,7 @@ Bir subsystem `CLOSED` olduğunda tekrar açılması yalnız iki durumda mümkü
 Bunun dışında CLOSED node tekrar okunmaz/taranmaz.
 
 ## Lookup indexleri
-`index/files.json`, `symbols.json`, `packets.json`, `callgraph.json`, `repositories.json` yalnız aramayı hızlandırır. **Status/cursor/queue belirleyemezler.**
+`index/files.json` ve `index/repositories.json` yalnız ham source envanteri/metadata için kullanılır. State'ten türetilmiş feature/symbol/packet/callgraph indeksleri tutulmaz. **Status/cursor/queue yalnız MAP_STATE.json içindedir.**
 
 ## Repo politikası
 Yalnız `sbraslan/Project_Map` yazılabilir. Client/Server/Binary/Game/DumpProto kaynak repoları salt-okumadır.
