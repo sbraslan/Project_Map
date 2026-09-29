@@ -114,3 +114,23 @@ Promoted as `BUG-CLD-004`.
 - Snow's misuse of stale `get_server_timer_arg()` in non-timer progression events produced `BUG-CLD-004`.
 
 No additional source-proven item/reward duplicate or rollback defect was promoted.
+
+
+## Cursor 4 checkpoint — reconnect / party / timeout cleanup
+- Snow's stale leader-absence timer is already captured as `BUG-CLD-002`.
+- Flame rejoin is bound to the stored party dungeon index, matching leader PID and a per-player 5-minute exit window.
+- Devil Catacombs validates reconnecting private-map players against the dungeon floor / player quest-floor state and schedules removal for a mismatched return.
+- Devil Tower resets the exit warp target and removes its transient tower key/map items on logout.
+- Spider Baroness uses its shared-room timeout/dead timers to clear channel-scoped run state and purge/warp the room.
+- No additional source-proven reconnect, party-change or timeout cleanup defect was promoted.
+
+## Cursor 5 checkpoint — generic Dungeon Core / Party dependency reachability
+This cursor was a narrow dependency lookup only; the CLOSED Dungeon Core and Party nodes were not reopened.
+
+- Classic source quests do not establish live reachability to `BUG-DUNGEON-001`: the affected generic APIs are `d.join` / `d.new_jump_guild`, while the mapped classic entry flows use `d.new_jump_party` / `d.new_jump_all`.
+- No classic path uses `d.spawn_move_unique`, so `BUG-DUNGEON-002` is not duplicated here.
+- The inspected `d.set_unique` uses employ distinct/generated keys; no feature-specific path was established for `BUG-DUNGEON-003` or `BUG-DUNGEON-004`.
+- Devil Catacombs does have a live cross-system path through `d.exit_all_by_item_group("reapers_credit")`. Generic Dungeon Core can call `CParty::Quit(pid)` for a party member without the required item; if that member is the leader in a party with more than two members, execution reaches the already verified `BUG-PARTY-001` leader self-delete/use-after-free path.
+- This is recorded as **Classic Catacomb -> Dungeon Core -> BUG-PARTY-001 reachability**, not assigned a duplicate `BUG-CLD-*` ID.
+
+No new Classic-specific bug was promoted in this dependency cursor.
