@@ -97,3 +97,10 @@ Fresh source/data verification:
 
 Canonical handoffs are now prepared for T09, T11 and T12.
 Runtime remains locked; no live test was executed.
+
+
+## Ticket normal-path preflight — 2026-09-29
+- `TICKET-T07` current 40(server) / 10(C++ cache) / 20-per-page(Python UI) mismatch reverified.
+- direct BUG-TICKET-005 OOB is not part of normal T07; UI only requests C++ rows 0..9.
+- canonical handoff: `TICKET_T07_HANDOFF.md`.
+- global first future live gate remains `DUNGEON-T09`; Ticket follows the Dungeon normal-path cluster.
