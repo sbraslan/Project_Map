@@ -8,7 +8,7 @@
   "active": {
     "subsystem": "messenger",
     "display_name": "Messenger / Friend / Block",
-    "status": "MAPPING IN PROGRESS / 14 VERIFIED BUGS / EXECUTION LOCKED",
+    "status": "MAPPING IN PROGRESS / 17 VERIFIED BUGS / EXECUTION LOCKED",
     "system_file": "systems/messenger.md",
     "bug_file": "bugs/messenger.md",
     "test_file": "tests/messenger.md",
@@ -28,14 +28,15 @@
       "BUG-MSG-013",
       "BUG-MSG-014",
       "BUG-MSG-015",
-      "BUG-MSG-016"
+      "BUG-MSG-016",
+      "BUG-MSG-017"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Continue channel-change/reconnect P2P ordering candidate without promoting timing-dependent behavior.",
-      "Finish remaining GM messenger lifecycle and inverse-cache semantics after BUG-MSG-013.",
-      "Audit remaining client messenger packet/parser boundaries after BUG-MSG-012.",
-      "Check tracked quest usage/reachability of BUG-MSG-011 Lua helpers.",
+      "Close Battle Field friend-add parity: ADD_BY_NAME rejects battle-zone use while ADD_BY_VID does not.",
+      "Re-check residual P2P resynchronization after BUG-MSG-016 against BUG-MSG-003/007.",
+      "Run final friend/block/GM relation symmetry and packet-boundary pass.",
+      "Assess Messenger static-closure readiness.",
       "Do not execute runtime tests; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -2688,7 +2689,8 @@
       "BUG-MSG-013",
       "BUG-MSG-014",
       "BUG-MSG-015",
-      "BUG-MSG-016"
+      "BUG-MSG-016",
+      "BUG-MSG-017"
     ],
     "mapped_flows": [
       "input_login.cpp -> MessengerManager::Login -> asynchronous friend/GM/block SQL callbacks",
@@ -2711,10 +2713,12 @@
       "uimessenger.py name-based friend/block add -> server observer-mode parity bypass",
       "MessengerManager::LoadGMList -> m_InverseGMRelation[gm] accumulation without logout pruning",
       "P2P channel/core handoff -> existing CCI update by LOGIN(new) -> stale LOGOUT(old) name-only teardown",
-      "CInputMain Messenger add-by-name/block-by-name -> normal uimessenger.py name dialogs -> observer-mode guard bypass"
+      "CInputMain Messenger add-by-name/block-by-name -> normal uimessenger.py name dialogs -> observer-mode guard bypass",
+      "PythonNetworkStreamPhaseGame.cpp outgoing messenger name fields -> 48-byte configured-name truncation/non-termination boundary",
+      "Project_Game quest corpus search -> no tracked caller of pc.is_blocked / pc.is_friend"
     ],
     "candidates": [
-      "channel-change P2P presence ordering: third core can observe LOGIN(new) before delayed LOGOUT(old); logout is name-only and does not validate source descriptor"
+      "Battle Field friend-add parity: ADD_BY_NAME rejects battle-zone use but ADD_BY_VID has no equivalent server-side map check; normal target-board VID route is exposed and final UI/map reachability is under closure."
     ],
     "runtime_tests": {
       "status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN",
@@ -2734,7 +2738,8 @@
         "MSG-T13",
         "MSG-T14",
         "MSG-T15",
-        "MSG-T16"
+        "MSG-T16",
+        "MSG-T17"
       ],
       "first_live_gate_unchanged": "DUNGEON-T09"
     },
@@ -2745,7 +2750,8 @@
       "Pending party/guild invite revalidation promoted to BUG-MSG-010.",
       "Observer-mode add-by-name friend/block parity promoted to BUG-MSG-014.",
       "GM inverse watcher lifecycle promoted to BUG-MSG-015.",
-      "Channel/core P2P LOGIN(new) vs delayed LOGOUT(old) ordering promoted to BUG-MSG-016."
+      "Channel/core P2P LOGIN(new) vs delayed LOGOUT(old) ordering promoted to BUG-MSG-016.",
+      "Project_Game contains no tracked caller of pc.is_blocked/pc.is_friend; BUG-MSG-011 remains a registered API defect with no current tracked quest dependency."
     ]
   }
 }
