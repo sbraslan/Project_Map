@@ -44,7 +44,7 @@ This is the navigation index. Normal continuation starts at `STATE.json`, then `
 | Horse / Mount / Riding | STATIC COMPLETE | `systems/horse_mount.md` |
 | Classic Pet System | STATIC COMPLETE | `systems/pet.md` |
 | Fishing Renewal | STATIC COMPLETE | `systems/fishing.md` |
-| Mining / Pickaxe | MAPPING IN PROGRESS | `systems/mining.md` |
+| Mining / Pickaxe | STATIC COMPLETE | `systems/mining.md` |
 
 ## Current phase
 - **Detection / mapping only.** Source and game repositories remain read-only.
@@ -208,3 +208,9 @@ Mining / Pickaxe is now the active mapping cursor:
 - `tests/mining.md`.
 
 Initial verified findings: `BUG-MINE-001..002`. Mining is not yet counted as STATIC COMPLETE. Runtime remains locked and `DUNGEON-T09` remains the first future live gate.
+
+
+## Mining / Pickaxe STATIC COMPLETE — 2026-09-29
+Mining / Pickaxe is closed statically with **7 verified bugs** and deferred tests `MIN-T01..MIN-T07`.
+Effective static-complete subsystem count is now **31**.
+Runtime remains locked; global first future live gate remains `DUNGEON-T09`.
