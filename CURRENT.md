@@ -2,7 +2,7 @@
 
 **Active phase:** Detection / Mapping Only  
 **Active state:** Monarch static mapping  
-**Status:** MONARCH — STATIC MAPPING IN PROGRESS / 9 VERIFIED BUGS / EXECUTION LOCKED  
+**Status:** MONARCH — STATIC MAPPING IN PROGRESS / 10 VERIFIED BUGS / EXECUTION LOCKED  
 **Machine state:** `STATE.json`  
 **Active subsystem:** Monarch — OPEN  
 **System:** `systems/monarch.md`  
@@ -34,11 +34,11 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 - Marriage / Wedding: canonical registry remains closed; runtime locked.
 
 ## Exact resume cursor
-1. Audit AddMoney overflow/failure fanout symmetry.
-2. Audit remaining mto/mtr private-map and WarpSet failure boundaries.
-3. Inspect monarch notice path and treasury producers for independent defects.
-4. Keep dormant Lua PowerUp/DefenseUp/takemonarchmoney unpromoted unless deployment appears.
-5. Decide Monarch STATIC COMPLETE; source/game repos remain read-only and runtime stays locked.
+1. Audit registered `mto/mtr` private-instance and map-index semantics.
+2. Close remaining `WarpSet` result handling and AddMoney boundaries.
+3. Keep Lua-only PowerUp/DefenseUp/takemonarchmoney dormant unless a deployed caller is proven.
+4. Decide Monarch STATIC COMPLETE and select the next subsystem.
+5. Keep source/game repositories read-only and runtime execution locked.
 
 ## Mapping acceleration index
 - Status: **READY / ACTIVE**
