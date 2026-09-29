@@ -174,3 +174,22 @@ A bait already consumed from inventory can survive logout on the rod and be reus
 
 ### Deferred validation
 `FISH-T10`.
+
+
+## BUG-FISH-011 — unthrottled CATCH_FAILED server rebroadcast amplification
+
+**Class:** packet-rate / multiplayer amplification  
+**Reachability:** VERIFIED — active renewed fishing event plus repeated client CATCH_FAILED packets.
+
+### Static proof
+1. `fishing_new_catch_failed()` has no timing/rate-limit check.
+2. Every call increments the failed counter.
+3. Every call immediately invokes `PacketAround` with a CATCH_FAILED packet.
+4. Session cancellation based on failed count occurs only when the periodic fishing event next consumes the counter.
+5. Therefore multiple failed packets can be accepted and rebroadcast before cancellation.
+
+### Consequence
+A modified client can cause disproportionate server->nearby-client packet fanout during an active fishing session. This is especially relevant in crowded MMORPG areas.
+
+### Deferred validation
+Canonical test: `FISH-T11`.
