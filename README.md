@@ -1,29 +1,30 @@
 # Project_Map
 
-Metin2 projesinin salt-okuma kaynak haritası ve kalıcı teknik checkpoint deposu.
+Bu depo Metin2 kaynak kodu için **salt-okuma statik haritalama ve bug kanıt deposudur**.
 
-## Start here
-**Normal çalışma başlangıcı: `STATE.json` -> `CURRENT.md` -> aktif `systems/<name>.md`.**
+## Tek kanonik ilerleme sistemi
+**İlerleme durumunu belirleyen tek dosya: `MAP_STATE.json`.**
 
-Yeni sohbette geçmiş konuşmaları taşımaya gerek yok. Şu kısa komut yeterlidir:
+Yeni bir sohbet veya devam turu her zaman:
+1. yalnız `MAP_STATE.json` dosyasını okur;
+2. `active.status == OPEN` ise yalnız o sistemin cursor'undan devam eder;
+3. `CLOSED` sistemleri aynı source snapshot'ında tekrar taramaz;
+4. yeni bir aday sistem açmadan önce `alias_index` ile mevcut CLOSED/OPEN node'lara eşleştirir.
 
-> `sbraslan/Project_Map STATE.json dosyasını oku ve aktif checkpointten WORKFLOW.md kurallarına göre ilerle.`
+`systems/`, `bugs/` ve `tests/` yalnız teknik **kanıt** dosyalarıdır. İçlerindeki eski tarihsel ifadeler ilerleme durumu belirlemez.
 
-Sonrasında aynı sohbet içinde yalnızca **"ilerleyelim"** denebilir.
+## Kalıcı kilit
+Bir subsystem `CLOSED` olduğunda tekrar açılması yalnız iki durumda mümkündür:
+- kullanıcı açıkça yeniden denetim ister;
+- ilgili source repo SHA değişir ve impact check sistemi `INVALIDATED` olarak işaretler.
 
-## Architecture
-- `STATE.json` — machine-readable project memory, active cursor and source snapshot
-- `CURRENT.md` — tiny overwrite-only human checkpoint
-- `INDEX.md` — subsystem status/navigation
-- `WORKFLOW.md` — low-context continuation contract
-- `systems/` — one canonical map per subsystem
-- `bugs/` — subsystem-scoped bug registries
-- `tests/` — subsystem-scoped runtime/fault-injection tests
-- `history/` — rare architecture/migration checkpoints; never normal startup context
-- `archive/` — legacy monolithic files; recovery only
+Bunun dışında CLOSED node tekrar okunmaz/taranmaz.
 
-## Safety rule
-Source repos are read-only. Mapping writes go only to `Project_Map`.
+## Lookup indexleri
+`index/files.json`, `symbols.json`, `packets.json`, `callgraph.json`, `repositories.json` yalnız aramayı hızlandırır. **Status/cursor/queue belirleyemezler.**
 
-## Core principle
-**Do not rebuild project state from chat history. Persist it to GitHub, then resume from GitHub.**
+## Repo politikası
+Yalnız `sbraslan/Project_Map` yazılabilir. Client/Server/Binary/Game/DumpProto kaynak repoları salt-okumadır.
+
+## Şu anki devam noktası
+Bunu README'den değil, her zaman `MAP_STATE.json -> active` alanından oku.
