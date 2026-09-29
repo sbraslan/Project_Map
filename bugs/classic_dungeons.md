@@ -1,6 +1,6 @@
 # Classic Quest Dungeons — Bug Registry
 
-**Status:** STATIC MAPPING OPEN / 4 VERIFIED BUGS  
+**Status:** STATIC MAPPING CLOSED / 4 VERIFIED BUGS  
 **Execution:** LOCKED / NOT RUN
 
 Previously verified generic Dungeon Core or Party bugs are referenced rather than duplicated unless a distinct feature-specific defect is proven.
@@ -82,3 +82,7 @@ With multiple active timer-driven systems/instances on one game process, a Snow 
 
 ### Deferred validation
 `CLD-T04`.
+
+
+## Static closure
+Classic Quest Dungeons closed with `BUG-CLD-001..004`. No additional bug was promoted from final deployment/data parity. The live Catacomb reachability to `BUG-PARTY-001` remains a cross-system reference rather than a duplicate Classic bug.
