@@ -1,14 +1,12 @@
 # CURRENT — Canonical Active Checkpoint
 
 **Active phase:** Detection / Mapping Only  
-**Active state:** 6th/7th Attribute static mapping  
-**Status:** ATTR6TH7TH — STATIC MAPPING OPEN / 9 VERIFIED BUGS / EXECUTION LOCKED  
+**Active state:** Global source-feature coverage discovery  
+**Status:** 37 STATIC COMPLETE SUBSYSTEMS / GLOBAL DISCOVERY OPEN / EXECUTION LOCKED  
 **Machine state:** `STATE.json`  
-**Active subsystem:** 6th/7th Attribute — OPEN  
-**System:** `systems/attr6th7th.md`  
-**Bugs:** `bugs/attr6th7th.md`  
-**Tests:** `tests/attr6th7th.md`  
-**Previous completed subsystem:** Monarch — STATIC COMPLETE / 13 VERIFIED BUGS  
+**Navigation:** `INDEX.md`  
+**Runtime readiness:** `RUNTIME.md`  
+**Previous completed subsystem:** 6th/7th Attribute — STATIC COMPLETE / 9 VERIFIED BUGS  
 **First future live gate:** `DUNGEON-T09`  
 **Last updated:** 2026-09-29
 
@@ -16,19 +14,22 @@
 Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-only. Runtime/fault-injection execution remains locked until an explicit phase change.
 
 ## Recent static closure
-- Monarch is closed with `BUG-MON-001..013`.
-- Deferred Monarch tests are `MON-T01..MON-T13`; none executed.
-- Attr67 mapping has verified `BUG-ATTR67-001..009`; runtime remains locked.
-- Context7 supplied supplementary C++/MySQL semantics checks only.
+- Attr67 closed with `BUG-ATTR67-001..009`.
+- Deferred Attr67 tests are `ATTR67-T01..ATTR67-T09`; none executed.
+- NPC_STORAGE + quest-flag persistence was mapped without a new reconnect/restart loss bug.
+- Remaining Attr67 retrieval hazards are dormant because the tracked deployment has no retrieval caller.
+- All **37 subsystem rows currently represented in `INDEX.md` are STATIC COMPLETE**; Guild lifecycle remains folded with Guild Storage.
+- Context7 remains supplementary; Metin2 source is authoritative.
 
 ## Exact resume cursor
-1. Close remaining deployment-shadowed Attr67 client/server parity findings.
-2. Re-check dormant retrieval candidates for any non-quest/native caller.
-3. Decide Attr67 STATIC COMPLETE.
-4. Source/game repos stay read-only and runtime stays locked.
+1. Run global source-feature coverage discovery against the indexed source corpus.
+2. Compare feature flags, packet families, quest/Lua bindings, server managers and client UI/modules against `INDEX.md`.
+3. If an unmapped feature family is found, open exactly one new subsystem and continue static mapping.
+4. If no unmapped family is found, record global static coverage closure/readiness handoff.
+5. Keep source/game repos read-only and runtime locked.
 
 ## Mapping acceleration index
 - Status: **READY / ACTIVE**
 - Indexed mapping-relevant files: **10,119**
 - Primary lookup: `features -> symbols/packets -> callgraph -> files -> exact source fetch`.
-- Context7: supplementary external semantics verification; Metin2 source remains authoritative.
+- Context7: supplementary external semantics verification only.
