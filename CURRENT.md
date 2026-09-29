@@ -1,13 +1,13 @@
 # CURRENT — Canonical Active Checkpoint
 
 **Active phase:** Detection / Mapping Only  
-**Active state:** Messenger static closure / global coverage discovery next  
-**Status:** MESSENGER / FRIEND / BLOCK — STATIC COMPLETE / 21 VERIFIED BUGS / EXECUTION LOCKED  
+**Active state:** Marriage / Wedding static mapping  
+**Status:** MARRIAGE / WEDDING — STATIC MAPPING IN PROGRESS / 0 VERIFIED BUGS / EXECUTION LOCKED  
 **Machine state:** `STATE.json`  
-**Active subsystem:** Messenger / Friend / Block — CLOSED  
-**System:** `systems/messenger.md`  
-**Bugs:** `bugs/messenger.md`  
-**Tests:** `tests/messenger.md`  
+**Active subsystem:** Marriage / Wedding — OPEN  
+**System:** `systems/marriage.md`  
+**Bugs:** `bugs/marriage.md`  
+**Tests:** `tests/marriage.md`  
 **Previous completed subsystem:** Messenger / Friend / Block  
 **First future live gate:** `DUNGEON-T09`  
 **Last updated:** 2026-09-29
@@ -43,10 +43,10 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 - Global first future live gate remains `DUNGEON-T09`.
 
 ## Exact resume cursor
-1. Open the next independent subsystem for detection-only mapping.
-2. Keep all source/game repositories read-only.
-3. Do not execute runtime or fault-injection tests.
-
+1. Continue `systems/marriage.md` with login/logout + near-check/love-point lifecycle.
+2. Audit wedding membership/teardown, quest-vs-server invariant parity, and DB/game multi-core ordering.
+3. Keep all source/game repositories read-only.
+4. Do not execute runtime or fault-injection tests.
 
 ## Mapping acceleration index — 2026-09-29
 - Status: **READY**
