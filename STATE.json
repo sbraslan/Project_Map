@@ -2794,9 +2794,9 @@
     "counts": {
       "mapping_relevant_files": 10119,
       "systems": 35,
-      "symbol_seeds": 256,
+      "symbol_seeds": 257,
       "packet_seeds": 24,
-      "call_flow_edges": 290
+      "call_flow_edges": 295
     },
     "lookup_order": [
       "index/features.json",
@@ -2881,9 +2881,11 @@
       "first_live_gate_unchanged": "DUNGEON-T09"
     },
     "closure_notes": [
-      "Marriage / Wedding static mapping complete with BUG-MARR-001..013.",
-      "MARR-T01..MARR-T13 are canonical deferred tests; none has been executed.",
-      "Remaining WeddingManager post-allocation GetMap cleanup gap is unpromoted because realistic reachability was not proven.",
+      "Marriage/Wedding static mapping remains active with BUG-MARR-001..014.",
+      "Context7 Lua coroutine semantics were used only as supplementary validation; project source remains authoritative.",
+      "Legacy BREAK_MARRIAGE has no active mapped sender and delegates to normal relation removal.",
+      "Mutual-divorce stale-target double mutation is closed as non-reachable in the ordinary synchronous confirm-resume path.",
+      "Deployed standalone Lua null-deref surfaces are guarded by current quest predicates; no independent bug promoted.",
       "Source/Game repositories remain read-only.",
       "Global first future live gate remains DUNGEON-T09."
     ],
@@ -2892,7 +2894,9 @@
       "marriage.in_my_wedding standalone null dereference risk not promoted: deployed quest callers gate with pc.is_engaged()/pc.is_married().",
       "wedding_is_playing_music missing pWeddingInfo guard not promoted independently: deployed caller first requires marriage.in_my_wedding().",
       "IsNear same-map-only behavior not promoted without a deployed proximity invariant; historical distance/party code is commented out.",
-      "Legacy HEADER_GD_BREAK_MARRIAGE has no active mapped sender and delegates to normal relation Remove path."
+      "Legacy HEADER_GD_BREAK_MARRIAGE has no active mapped sender and delegates to normal relation Remove path.",
+      "Mutual-divorce stale target after confirm not promoted: CQuestManager::Confirm immediately calls RunState on the suspended quest after validating the responder, and no later yield occurs before the resource re-check.",
+      "Active-wedding relation-removal candidate promoted to BUG-MARR-014 after ordinary USE_TALISMAN memory-recall reachability was proven."
     ],
     "context7_verification": {
       "library": "Lua",
