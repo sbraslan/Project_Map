@@ -65,13 +65,11 @@ Crafted Python/UI calls can therefore read outside both the dungeon container an
 
 `CDungeonInfoManager::Ranking` builds adjacent string literals with no whitespace between the closing `dungeon_ranking` table identifier and `LEFT JOIN`. The resulting SQL contains `dungeon_ranking\`LEFT JOIN`, which is invalid SQL. The function returns on `uiSQLErrno`, so normal ranking requests fail through this query.
 
-### BUG-DUNGEON-010 — Dungeon UI creates list buttons only in the zero-dungeon branch
-- Statik durum: **doğrulandı**
-- Sınıf: client UI control flow / feature breakage
+### BUG-DUNGEON-010 — RETRACTED: list-button loop was misread as nested in zero-count branch
+- Statik durum: **RETRACTED / FALSE POSITIVE (2026-09-29)**
+- Sınıf: mapping correction
 
-In `root/uidungeoninfo.py::DungeonInfoWindow.Initialize`, the loop that creates `ListToggleButton` entries is indented inside the `else` branch for `GetCount() == 0`. When real dungeon data exists, the code only unlocks controls and leaves `toggleButtonObjList` empty.
-
-The current snapshot contains 9 dungeons, so this affects the normal configuration.
+Fresh source verification shows the `for key in xrange(...)` list-button loop is aligned after the `if/else`; it is not inside the zero-count branch. With `GetCount() > 0`, controls are unlocked and the loop still executes. This ID must not be treated as an active bug.
 
 ### BUG-DUNGEON-011 — config documents numeric GLOBAL flag but parser expects literal GLOBAL
 - Statik durum: **doğrulandı**
