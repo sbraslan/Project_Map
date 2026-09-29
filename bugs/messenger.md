@@ -145,3 +145,30 @@ Persistent relationships in SQL diverge from the live server cache after the com
 
 ### Deferred validation
 `MSG-T07`.
+
+
+---
+
+## BUG-MSG-008 — party-request command bypasses messenger block enforcement
+
+**Class:** social-interaction authorization bypass  
+**Reachability:** VERIFIED through the normal target-board UI.
+
+### Proof
+1. The normal `HEADER_CG_PARTY_INVITE` path in `CInputMain::PartyInvite` checks both directions with `MessengerManager::IsBlocked` before sending the party invitation.
+2. A separate player command `party_request` is registered at `GM_PLAYER` level.
+3. `do_party_request` resolves the target VID and calls `CHARACTER::RequestToParty(tch)`.
+4. `CHARACTER::RequestToParty` checks `BLOCK_PARTY_REQUEST`, party state and join conditions, but does not consult messenger `IsBlocked` in either direction.
+5. `Project_Binary/root/uitarget.py` exposes this route through `TARGET_BUTTON_REQUEST_ENTER_PARTY`; `__OnRequestParty` sends `/party_request <vid>`.
+
+### Consequence
+When A targets B while B is already in a party, A can use the normal target-board “request to join party” surface to deliver a party request even when A and B are messenger-blocked. This is inconsistent with the protected direct party-invite route and bypasses the block relationship on a standard player UI path.
+
+### Deferred validation
+`MSG-T08`.
+
+## Candidate / closure notes after social-surface pass
+- Shout fanout checks `IsBlocked(receiver,sender)` on every process, including P2P shout delivery. Logout cache corruption from BUG-MSG-007 can still make this check false later; this is an impact extension of BUG-MSG-007, not a separate finding.
+- Guild invite, direct party invite, exchange, PvP and equipment-view paths observed in this pass contain messenger block checks.
+- The block-add-by-VID branches that sometimes return `sizeof(TPacketCGMessengerAddByVID)` are equal-sized to `TPacketCGMessengerAddBlockByVID` in this snapshot (both contain one `uint32_t vid`), so the suspected packet-consumption mismatch is closed as non-bug.
+- `RemoveAllBlockList(account)` deletes SQL rows where account is either endpoint but iterates/P2P-removes only `m_BlockRelation[account]`. This remains a dormant candidate until an active caller is proven.
