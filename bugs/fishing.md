@@ -1,6 +1,6 @@
 # Fishing Renewal — Static Bug Registry
 
-**Status:** ACTIVE STATIC MAPPING
+**Status:** STATIC COMPLETE EVIDENCE
 
 ## BUG-FISH-001 — second normal fish table out-of-bounds selection
 
