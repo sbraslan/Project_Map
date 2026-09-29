@@ -1641,6 +1641,314 @@
       "references": [
         "messenger_mapping.candidates_closed.2"
       ]
+    },
+    {
+      "from": "marriage_manage.quest",
+      "to": "marriage.engage_to",
+      "references": [
+        "marriage_mapping.mapped_flows.0"
+      ]
+    },
+    {
+      "from": "marriage.engage_to",
+      "to": "ALUA(marriage_engage_to)",
+      "references": [
+        "marriage_mapping.mapped_flows.0"
+      ]
+    },
+    {
+      "from": "ALUA(marriage_engage_to)",
+      "to": "marriage::CManager::RequestAdd",
+      "references": [
+        "marriage_mapping.mapped_flows.0"
+      ]
+    },
+    {
+      "from": "marriage::CManager::RequestAdd",
+      "to": "HEADER_GD_MARRIAGE_ADD",
+      "references": [
+        "marriage_mapping.mapped_flows.0"
+      ]
+    },
+    {
+      "from": "HEADER_GD_MARRIAGE_ADD",
+      "to": "DB CClientManager::MarriageAdd",
+      "references": [
+        "marriage_mapping.mapped_flows.0"
+      ]
+    },
+    {
+      "from": "DB CClientManager::MarriageAdd",
+      "to": "DB marriage::CManager::Add",
+      "references": [
+        "marriage_mapping.mapped_flows.0"
+      ]
+    },
+    {
+      "from": "DB marriage::CManager::Add",
+      "to": "SQL INSERT marriage",
+      "references": [
+        "marriage_mapping.mapped_flows.0"
+      ]
+    },
+    {
+      "from": "SQL INSERT marriage",
+      "to": "HEADER_DG_MARRIAGE_ADD",
+      "references": [
+        "marriage_mapping.mapped_flows.0"
+      ]
+    },
+    {
+      "from": "HEADER_DG_MARRIAGE_ADD",
+      "to": "game CInputDB::MarriageAdd",
+      "references": [
+        "marriage_mapping.mapped_flows.0"
+      ]
+    },
+    {
+      "from": "game CInputDB::MarriageAdd",
+      "to": "game marriage::CManager::Add",
+      "references": [
+        "marriage_mapping.mapped_flows.0"
+      ]
+    },
+    {
+      "from": "game marriage::CManager::Add",
+      "to": "HEADER_GD_WEDDING_REQUEST",
+      "references": [
+        "marriage_mapping.mapped_flows.1"
+      ]
+    },
+    {
+      "from": "HEADER_GD_WEDDING_REQUEST",
+      "to": "DB CClientManager::WeddingRequest",
+      "references": [
+        "marriage_mapping.mapped_flows.1"
+      ]
+    },
+    {
+      "from": "DB CClientManager::WeddingRequest",
+      "to": "HEADER_DG_WEDDING_REQUEST",
+      "references": [
+        "marriage_mapping.mapped_flows.1"
+      ]
+    },
+    {
+      "from": "HEADER_DG_WEDDING_REQUEST",
+      "to": "game CInputDB::WeddingRequest",
+      "references": [
+        "marriage_mapping.mapped_flows.1"
+      ]
+    },
+    {
+      "from": "game CInputDB::WeddingRequest",
+      "to": "WeddingManager::Request",
+      "references": [
+        "marriage_mapping.mapped_flows.1"
+      ]
+    },
+    {
+      "from": "WeddingManager::Request",
+      "to": "private WEDDING_MAP_INDEX",
+      "references": [
+        "marriage_mapping.mapped_flows.1"
+      ]
+    },
+    {
+      "from": "private WEDDING_MAP_INDEX",
+      "to": "HEADER_GD_WEDDING_READY",
+      "references": [
+        "marriage_mapping.mapped_flows.1"
+      ]
+    },
+    {
+      "from": "HEADER_GD_WEDDING_READY",
+      "to": "DB CClientManager::WeddingReady",
+      "references": [
+        "marriage_mapping.mapped_flows.1"
+      ]
+    },
+    {
+      "from": "DB CClientManager::WeddingReady",
+      "to": "HEADER_DG_WEDDING_READY",
+      "references": [
+        "marriage_mapping.mapped_flows.1"
+      ]
+    },
+    {
+      "from": "HEADER_DG_WEDDING_READY",
+      "to": "DB ReadyWedding +5s",
+      "references": [
+        "marriage_mapping.mapped_flows.1"
+      ]
+    },
+    {
+      "from": "DB ReadyWedding +5s",
+      "to": "HEADER_DG_WEDDING_START",
+      "references": [
+        "marriage_mapping.mapped_flows.1"
+      ]
+    },
+    {
+      "from": "HEADER_DG_WEDDING_START",
+      "to": "game WeddingStart",
+      "references": [
+        "marriage_mapping.mapped_flows.1"
+      ]
+    },
+    {
+      "from": "game WeddingStart",
+      "to": "partner warps",
+      "references": [
+        "marriage_mapping.mapped_flows.1"
+      ]
+    },
+    {
+      "from": "marriage_manage.quest",
+      "to": "marriage.set_to_marriage",
+      "references": [
+        "marriage_mapping.mapped_flows.2"
+      ]
+    },
+    {
+      "from": "marriage.set_to_marriage",
+      "to": "ALUA(marriage_set_to_marriage)",
+      "references": [
+        "marriage_mapping.mapped_flows.2"
+      ]
+    },
+    {
+      "from": "ALUA(marriage_set_to_marriage)",
+      "to": "TMarriage::SetMarried",
+      "references": [
+        "marriage_mapping.mapped_flows.2"
+      ]
+    },
+    {
+      "from": "TMarriage::SetMarried",
+      "to": "TMarriage::Save",
+      "references": [
+        "marriage_mapping.mapped_flows.2"
+      ]
+    },
+    {
+      "from": "TMarriage::Save",
+      "to": "marriage::CManager::RequestUpdate",
+      "references": [
+        "marriage_mapping.mapped_flows.2"
+      ]
+    },
+    {
+      "from": "marriage::CManager::RequestUpdate",
+      "to": "HEADER_GD_MARRIAGE_UPDATE",
+      "references": [
+        "marriage_mapping.mapped_flows.2"
+      ]
+    },
+    {
+      "from": "HEADER_GD_MARRIAGE_UPDATE",
+      "to": "DB marriage::CManager::Update",
+      "references": [
+        "marriage_mapping.mapped_flows.2"
+      ]
+    },
+    {
+      "from": "DB marriage::CManager::Update",
+      "to": "SQL UPDATE marriage",
+      "references": [
+        "marriage_mapping.mapped_flows.2"
+      ]
+    },
+    {
+      "from": "SQL UPDATE marriage",
+      "to": "HEADER_DG_MARRIAGE_UPDATE",
+      "references": [
+        "marriage_mapping.mapped_flows.2"
+      ]
+    },
+    {
+      "from": "HEADER_DG_MARRIAGE_UPDATE",
+      "to": "game CInputDB::MarriageUpdate",
+      "references": [
+        "marriage_mapping.mapped_flows.2"
+      ]
+    },
+    {
+      "from": "marriage_manage.quest",
+      "to": "marriage.remove",
+      "references": [
+        "marriage_mapping.mapped_flows.3"
+      ]
+    },
+    {
+      "from": "marriage.remove",
+      "to": "ALUA(marriage_remove)",
+      "references": [
+        "marriage_mapping.mapped_flows.3"
+      ]
+    },
+    {
+      "from": "ALUA(marriage_remove)",
+      "to": "game CManager::RequestRemove",
+      "references": [
+        "marriage_mapping.mapped_flows.3"
+      ]
+    },
+    {
+      "from": "game CManager::RequestRemove",
+      "to": "HEADER_GD_MARRIAGE_REMOVE",
+      "references": [
+        "marriage_mapping.mapped_flows.3"
+      ]
+    },
+    {
+      "from": "HEADER_GD_MARRIAGE_REMOVE",
+      "to": "DB marriage::CManager::Remove",
+      "references": [
+        "marriage_mapping.mapped_flows.3"
+      ]
+    },
+    {
+      "from": "DB marriage::CManager::Remove",
+      "to": "SQL DELETE marriage",
+      "references": [
+        "marriage_mapping.mapped_flows.3"
+      ]
+    },
+    {
+      "from": "SQL DELETE marriage",
+      "to": "HEADER_DG_MARRIAGE_REMOVE",
+      "references": [
+        "marriage_mapping.mapped_flows.3"
+      ]
+    },
+    {
+      "from": "HEADER_DG_MARRIAGE_REMOVE",
+      "to": "game CInputDB::MarriageRemove",
+      "references": [
+        "marriage_mapping.mapped_flows.3"
+      ]
+    },
+    {
+      "from": "game CInputDB::MarriageRemove",
+      "to": "game CManager::Remove",
+      "references": [
+        "marriage_mapping.mapped_flows.3"
+      ]
+    },
+    {
+      "from": "DB marriage::CManager::OnSetup",
+      "to": "HEADER_DG_MARRIAGE_ADD + HEADER_DG_MARRIAGE_UPDATE + running HEADER_DG_WEDDING_READY/START",
+      "references": [
+        "marriage_mapping.mapped_flows.4"
+      ]
+    },
+    {
+      "from": "HEADER_DG_MARRIAGE_ADD + HEADER_DG_MARRIAGE_UPDATE + running HEADER_DG_WEDDING_READY/START",
+      "to": "game core reconstruction",
+      "references": [
+        "marriage_mapping.mapped_flows.4"
+      ]
     }
   ]
 }
