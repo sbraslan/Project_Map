@@ -56,4 +56,14 @@ After runtime is explicitly unlocked:
 
 Bug signature: the old request is still accepted and creates the relationship.
 
+## MSG-T07 — block persistence across target logout/relogin
+After runtime is explicitly unlocked:
+1. keep A online and have A block B;
+2. verify `IsBlocked(A,B)` behavior through a blocked interaction;
+3. log B out while A stays online;
+4. reconnect B without reconnecting A;
+5. repeat the blocked interaction on the same core.
+
+Bug signature: A's server-side outgoing block entry for B was erased at B logout and is not restored by B's reload, so the interaction is no longer blocked.
+
 Do not run any MSG test while the project execution lock is active.
