@@ -53,3 +53,21 @@ When runtime phase is explicitly opened:
 Expected static result: item expiry bypasses `PetUnsummon`; the actor remains summoned until a later teardown/cleanup path.
 
 No test is authorized before the global runtime phase opens.
+
+
+## PET-T04 — lost TYPE_SUMMON_PET time after forced expiry
+
+**Owner bug:** `BUG-PET-004`  
+**Execution state:** NOT RUN / LOCKED
+
+When runtime phase is explicitly opened:
+1. use a controlled short-duration classic `PET_PAY` item that follows the same REAL_TIME path as current deployed pets;
+2. summon it and keep it active for a measurable interval;
+3. let REAL_TIME expire and destroy the summon item;
+4. confirm the pet later reaches an abnormal cleanup/logout path;
+5. compare the `TYPE_SUMMON_PET` time-based achievement progress before and after;
+6. verify a normal manual unsummon control credits the same elapsed interval.
+
+Expected static result: the forced-expiry path loses the uncommitted elapsed duration because the summon item can no longer be resolved.
+
+No test is authorized before the global runtime phase opens.
