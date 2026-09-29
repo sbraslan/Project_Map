@@ -357,27 +357,6 @@ Messenger name-based operations are not round-trip safe at the configured charac
 `MSG-T17`.
 ---
 
-## BUG-MSG-014 — observer-mode restriction is bypassed by name-based friend/block add paths
-
-**Class:** authorization/path-parity defect  
-**Reachability:** VERIFIED through the normal Messenger window name-entry actions.
-
-### Proof
-1. `MESSENGER_SUBHEADER_CG_ADD_BY_VID` rejects the request when `ch->IsObserverMode()` is true.
-2. `MESSENGER_SUBHEADER_CG_BLOCK_ADD_BY_VID` applies the same observer-mode rejection.
-3. The corresponding `ADD_BY_NAME` and `BLOCK_ADD_BY_NAME` branches contain no observer-mode check.
-4. `Project_Binary/root/uimessenger.py` exposes normal Messenger-window actions that call `SendMessengerAddByNamePacket(text)` and `SendMessengerBlockAddByNamePacket(text)`.
-5. `HEADER_CG_MESSENGER` itself is not globally gated by observer mode in `CInputMain::Analyze`.
-
-### Consequence
-An observer who is intentionally blocked from adding a visible target by VID can perform the same friend/block add operation by typing the target's name in the Messenger UI.
-
-### Deferred validation
-`MSG-T14`.
-
-
----
-
 ## BUG-MSG-018 — Battle Field friend-add restriction is bypassed by the VID path
 
 **Class:** server authorization / path-parity defect  
@@ -397,42 +376,23 @@ The intended “cannot add friends in Battle Field” server restriction depends
 `MSG-T18`.
 ---
 
-## BUG-MSG-015 — channel-change P2P login/logout can delete the newer presence record
-
-**Class:** distributed ordering race / stale logout  
-**Reachability:** VERIFIED statically for cross-channel movement; exact packet arrival order remains timing-dependent.
-
-### Proof
-1. The old game process eventually broadcasts `HEADER_GG_LOGOUT` by player name during disconnect.
-2. The destination game process broadcasts `HEADER_GG_LOGIN` from `CHARACTER::WarpEnd` after the player enters the new channel.
-3. These packets originate from different P2P TCP connections, so a third process has no single-stream ordering guarantee between them.
-4. `P2P_MANAGER::Login(d,p)` finds an existing CCI by name; when one exists it updates that same CCI's `pkDesc`, channel and map and deliberately does not call `MessengerManager::P2PLogin` (`UpdateP2P == false`).
-5. `CInputP2P::Logout(d,...)` ignores the source descriptor `d` and calls `P2P_MANAGER::Logout(name)`.
-6. `Logout(name)` deletes whichever CCI currently owns that name, with no check that its `pkDesc` still matches the old source connection.
-
-### Consequence
-If a third process receives LOGIN(new channel) before the delayed LOGOUT(old channel), the new CCI is first updated and then removed by the stale logout. Messenger presence is also driven offline through `MessengerManager::P2PLogout`, and subsequent remote lookup/relay state can remain wrong until another presence event reconstructs it.
-
-### Deferred validation
-`MSG-T15`.
-
-
 ---
 
-## BUG-MSG-019 — pending friend authorization ignores a block established after the request
+## BUG-MSG-019 — pending friend authorization does not revalidate messenger block state
 
-**Class:** authorization TOCTOU / relation-policy bypass  
-**Reachability:** VERIFIED through the normal friend-request + block + accept sequence.
+**Class:** TOCTOU / social authorization revalidation defect  
+**Reachability:** VERIFIED through the normal friend-request acceptance flow.
 
 ### Proof
-1. Friend creation through both normal add entry paths checks messenger block state **before** `RequestToAdd` creates the pending authorization token.
-2. `RequestToAdd` stores only the CRC-derived pending token and sends `messenger_auth` to the target.
-3. A block can be created while that request remains pending; `AddToBlockList` does not cancel or invalidate pending friend authorization tokens.
-4. `do_messenger_auth` later calls `MessengerManager::AuthToAdd(account, companion, bDeny)`.
-5. `AuthToAdd` validates only that the pending CRC token exists. On accept it directly calls `AddToList(companion, account)` and `AddToList(account, companion)` without rechecking either block direction.
+1. Both friend-request creation routes check messenger block state before calling `MessengerManager::RequestToAdd`.
+2. `RequestToAdd` creates a CRC-based pending token in `m_set_requestToAdd` and sends `messenger_auth <requester>` to the target.
+3. While that token is pending, either side can establish a messenger block because the friendship has not yet been created.
+4. Normal client acceptance sends `/messenger_auth y <requester>` and reaches `MessengerManager::AuthToAdd`.
+5. `AuthToAdd` checks only that the pending token exists, erases it, then calls `AddToList` in both directions.
+6. The acceptance path never re-checks `IsBlocked` in either direction.
 
 ### Consequence
-A friend request that was valid when created can still become a mutual friendship after either participant blocks the other before acceptance. This independently recreates friend+block coexistence even if the duplicate-check defect in `BUG-MSG-001` is fixed.
+A friend request that was valid when issued can still be accepted after either side blocks the other, creating a contradictory friend + block state through a normal UI sequence independently of BUG-MSG-001.
 
 ### Deferred validation
 `MSG-T19`.
