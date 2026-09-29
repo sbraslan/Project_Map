@@ -416,3 +416,47 @@ A long-running game process accumulates one stale inverse-GM membership for each
 ### Deferred validation
 `MSG-T16`.
 
+
+
+---
+
+## BUG-MSG-020 — oversized friend/block lists overflow the 16-bit messenger packet size
+
+**Class:** protocol framing / list-size overflow  
+**Reachability:** VERIFIED for sufficiently large persistent friend or block relation sets; no relation-count cap is enforced in the mapped manager paths.
+
+### Proof
+1. `TPacketGCMessenger::size` is a `uint16_t`, so one messenger packet can declare at most 65,535 bytes.
+2. `MessengerManager::SendList` and `SendBlockList` build the complete relation list in a `TEMP_BUFFER(128 * 1024)`.
+3. Every entry appends its connected/length metadata plus the full character-name bytes, with no cumulative packet-size check.
+4. No relation-count limit is enforced in the mapped friend/block creation paths.
+5. After construction, the code performs `pack.size += buf.size()`; payloads beyond the 16-bit range truncate/wrap the advertised size.
+6. The server still transmits the complete buffer with `d->Packet(buf.read_peek(), buf.size())`.
+7. Client `RecvMessenger` derives the list payload length from `p.size`, so bytes beyond the wrapped advertised size remain in the stream and can be interpreted as later packet framing.
+
+### Consequence
+A sufficiently large friend or block list can desynchronize the client network stream at list delivery, causing malformed subsequent packets, disconnects or client instability.
+
+### Deferred validation
+`MSG-T20`.
+
+---
+
+## BUG-MSG-021 — GM-to-GM block authorization differs between VID and name paths
+
+**Class:** authorization path-parity defect  
+**Reachability:** VERIFIED for a GM requester targeting another GM when `test_server == false`.
+
+### Proof
+1. The block-by-VID branch rejects a GM target only when the requester is a normal player:
+   `ch->GetGMLevel() == GM_PLAYER && ch_companion->GetGMLevel() != GM_PLAYER && !test_server`.
+2. A GM requester can therefore pass that check when blocking another GM by VID.
+3. The block-by-name branch instead rejects whenever `gm_get_level(name) != GM_PLAYER && !test_server`, without considering the requester's GM level.
+4. The target-board block button exposes the VID route, while the Messenger block-name dialog exposes the name route.
+5. `AddToBlockList` has no later common authorization check that reconciles the two policies.
+
+### Consequence
+The same GM-to-GM block operation is allowed through the target/VID surface but denied through the name-entry surface solely because the protocol path differs.
+
+### Deferred validation
+`MSG-T21`.
