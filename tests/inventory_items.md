@@ -477,3 +477,7 @@ Kodun mevcut invariant'ı: `IsEmptySpecialItemGrid(..., bSize > 1) -> false`. Da
 - Legacy Guild Storage and duplicate SWITCHBOT test blocks remain in this file for history, but their readiness ownership belongs to their canonical subsystem clusters.
 - Primary normal-path candidate: ITEM-T01. ITEM-T02 is also reachable through the normal destroy flow but sanitizer/debug evidence is preferred for the use-after-free.
 - Overall first live runtime gate remains DUNGEON-T09.
+
+
+### ITEM-T01 preflight — 2026-09-29
+Current packet/client/server path reverified. Normal Binary destroy flow forwards the selected dropCount into SendItemDestroyPacket; TPacketCGItemDestroy carries count; CInputMain forwards it to CHARACTER::RemoveItem; RemoveItem never applies bCount and destroys the full item object. ITEM-T01 is therefore a genuine normal-flow candidate. Adjacent BUG-ITEM-001 UAF may interrupt the observation and should be recorded separately. Canonical handoff: `../ITEM_T01_HANDOFF.md`.
