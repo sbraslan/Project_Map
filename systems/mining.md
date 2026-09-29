@@ -158,3 +158,27 @@ The local resource-loss defect is confirmed in the function. However no current 
 
 ## Multiplayer ownership closure
 Normal mining drops use 15-second ownership for the miner. Battle Field maps intentionally skip `SetOwnership`. No independent ownership bug is promoted in this pass.
+
+
+## Skill-book and teardown closure
+### Mining skill book
+`ITEM_MINING_SKILL_TRAIN_BOOK` routes through `LearnSkillByBook(SKILL_MINING, pct)`.
+
+`LearnSkillByBook` itself rejects reads while `GetSkillNextReadTime(SKILL_MINING)` is still active. On a valid attempt the outer item handler consumes the book and sets the next read time.
+
+No separate cooldown-bypass bug is promoted.
+
+### Logout / character teardown
+Final character destruction explicitly calls `event_cancel(&m_pkMiningEvent)`. A normal logout/destruction therefore does not preserve the player mining event.
+
+### Cross-core warp
+If a warp causes the source character object to be destroyed, normal teardown cancels the mining event. The verified location-lifecycle defect in `BUG-MIN-004` is limited to same-process/same-character warp paths where the character object survives.
+
+## Current closure position
+Verified Mining bugs: `BUG-MIN-001..005`.
+
+Still open before STATIC COMPLETE:
+- OreRefine deployed-call reachability;
+- compiled quest/object evidence for ore refinement;
+- any mining-specific Battle Pass integration expected by current configs;
+- final vein/concurrency and pickaxe data sanity pass.
