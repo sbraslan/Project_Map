@@ -752,7 +752,16 @@
       "dataset_audit_dependency": [
         "ITEM-T13"
       ],
-      "normal_path_candidate": "ITEM-T01"
+      "normal_path_candidate": "ITEM-T01",
+      "handoff": "ITEM_T01_HANDOFF.md",
+      "preflight_notes": [
+        "TPacketCGItemDestroy carries an explicit uint8 count.",
+        "Normal Binary destroy flow forwards the user-selected dropCount into SendItemDestroyPacket.",
+        "CInputMain::ItemDestroy forwards packet count to CHARACTER::RemoveItem.",
+        "CHARACTER::RemoveItem never applies bCount and removes the whole item object.",
+        "ITEM-T01 is therefore normal-flow reachable without packet crafting.",
+        "BUG-ITEM-001 UAF shares the same destroy path and may preempt observation; keep ITEM-T01 and ITEM-T02 classifications separate."
+      ]
     },
     "switchbot": {
       "status": "DOCUMENTATION READY / NOT RUN",
