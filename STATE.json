@@ -16,7 +16,8 @@
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
       "Preserve runtime execution lock.",
-      "First future live runtime gate remains DUNGEON-T10.",
+      "First future live runtime gate is DUNGEON-T09; DUNGEON-T10 is retracted and must not be run.",
+      "When runtime is explicitly unlocked, execute only the canonical DUNGEON-T09 handoff first.",
       "When a new subsystem or feature is requested, open only its canonical mapping files and continue detection-only mapping."
     ]
   },
@@ -454,7 +455,7 @@
   },
   "runtime_readiness": {
     "status": "DOCUMENTATION AUDITED + POST-AUDIT EXTENSION — EXECUTION LOCKED",
-    "current_first_live_gate": "DUNGEON-T10",
+    "current_first_live_gate": "DUNGEON-T09",
     "sung_mahi_test_file": "tests/sung_mahi_tower.md",
     "sung_mahi_test_ids": [
       "SMT-T01",
@@ -493,13 +494,12 @@
     "dungeon_info": {
       "status": "DOCUMENTATION READY / NOT RUN",
       "normal_path_order": [
-        "DUNGEON-T10",
         "DUNGEON-T09",
         "DUNGEON-T11",
         "DUNGEON-T12"
       ],
       "isolated_debug_range": "DUNGEON-T01..DUNGEON-T08",
-      "first_live_gate": "DUNGEON-T10",
+      "first_live_gate": "DUNGEON-T09",
       "global_qualified_bug_tests": {
         "DINFO::BUG-DUNGEON-001": [
           "DUNGEON-T01"
@@ -528,15 +528,15 @@
         "DINFO::BUG-DUNGEON-009": [
           "DUNGEON-T09"
         ],
-        "DINFO::BUG-DUNGEON-010": [
-          "DUNGEON-T10"
-        ],
         "DINFO::BUG-DUNGEON-011": [
           "DUNGEON-T11"
         ],
         "DINFO::BUG-DUNGEON-012": [
           "DUNGEON-T12"
         ]
+      },
+      "retracted": {
+        "DINFO::BUG-DUNGEON-010": "DUNGEON-T10 retracted 2026-09-29; source indentation reverified and list loop is outside zero-count branch."
       }
     },
     "ticket": {
@@ -1566,7 +1566,7 @@
       "folded_companion_coverage": {
         "guild_lifecycle": "GUILD-T01 -> BUG-GUILD-001"
       },
-      "first_live_gate": "DUNGEON-T10"
+      "first_live_gate": "DUNGEON-T09"
     },
     "guild_lifecycle": {
       "status": "FOLDED COMPANION READY / NOT RUN",
@@ -1766,7 +1766,7 @@
         "ACCE-T07",
         "ACCE-T08"
       ],
-      "first_live_gate": "DUNGEON-T10"
+      "first_live_gate": "DUNGEON-T09"
     },
     "dragon_soul": {
       "status": "READY / EXECUTION LOCKED / NOT RUN",
@@ -1799,7 +1799,7 @@
         "DS-T10",
         "DS-T11"
       ],
-      "first_live_gate": "DUNGEON-T10"
+      "first_live_gate": "DUNGEON-T09"
     },
     "aura": {
       "status": "READY / EXECUTION LOCKED / NOT RUN",
@@ -1820,7 +1820,7 @@
         "AURA-T05",
         "AURA-T06"
       ],
-      "first_live_gate": "DUNGEON-T10"
+      "first_live_gate": "DUNGEON-T09"
     },
     "refine_cube": {
       "status": "READY / EXECUTION LOCKED / NOT RUN",
@@ -1863,7 +1863,7 @@
         "REFCUBE-T15",
         "REFCUBE-T16"
       ],
-      "first_live_gate": "DUNGEON-T10"
+      "first_live_gate": "DUNGEON-T09"
     }
   },
   "folded_subsystems": {
@@ -2087,7 +2087,7 @@
         "ACCE-T07",
         "ACCE-T08"
       ],
-      "first_live_gate_unchanged": "DUNGEON-T10"
+      "first_live_gate_unchanged": "DUNGEON-T09"
     },
     "next": [],
     "closed_observations": [
@@ -2149,7 +2149,7 @@
         "AURA-T05",
         "AURA-T06"
       ],
-      "first_live_gate_unchanged": "DUNGEON-T10"
+      "first_live_gate_unchanged": "DUNGEON-T09"
     }
   },
   "growth_pet_mapping": {
@@ -2205,7 +2205,7 @@
     ],
     "runtime_tests": {
       "status": "READY / EXECUTION LOCKED / NOT RUN",
-      "first_live_gate_unchanged": "DUNGEON-T10"
+      "first_live_gate_unchanged": "DUNGEON-T09"
     },
     "closure_notes": [
       "Summon/dismiss/death/real-time expiry and rewarp lifetime closed.",
@@ -2291,7 +2291,7 @@
         "REFCUBE-T15",
         "REFCUBE-T16"
       ],
-      "first_live_gate_unchanged": "DUNGEON-T10"
+      "first_live_gate_unchanged": "DUNGEON-T09"
     },
     "next": [],
     "closure_notes": [
@@ -2350,7 +2350,7 @@
         "HORSE-T02",
         "HORSE-T03"
       ],
-      "first_live_gate_unchanged": "DUNGEON-T10"
+      "first_live_gate_unchanged": "DUNGEON-T09"
     },
     "candidates": [
       "Time-limited COSTUME_MOUNT donor lifetime/socket2 is not transferred by ChangeLook Accept; packed proto proves timed donors exist, but no tracked normal-player game.open_transmutation producer is proven.",
@@ -2418,7 +2418,7 @@
         "PET-T03",
         "PET-T04"
       ],
-      "first_live_gate_unchanged": "DUNGEON-T10"
+      "first_live_gate_unchanged": "DUNGEON-T09"
     },
     "closure_notes": [
       "Classic Pet System static mapping complete with BUG-PET-001..004.",
