@@ -488,4 +488,4 @@ Regression/lifecycle baseline:
 - GUILD-T01 belongs to the broader Guild lifecycle companion area, not the Guild Storage verified-bug map.
 
 Primary normal-path Guild Storage candidates: GS-T01/GS-T02 baseline, followed by GS-T17 for live permission-revocation behavior in a controlled guild.
-Overall first live runtime gate remains DUNGEON-T10.
+Overall first live runtime gate remains DUNGEON-T09.
