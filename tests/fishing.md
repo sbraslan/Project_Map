@@ -91,3 +91,15 @@ Bug indicator: bait socket remains non-zero although the bait item was already c
 Covers `BUG-FISH-010`.
 
 Do not run while execution lock is active.
+
+
+## FISH-T11 — CATCH_FAILED burst amplification
+Goal: validate `BUG-FISH-011`.
+
+Only after runtime unlock and in an isolated environment:
+- start one renewed fishing session;
+- send a controlled burst of CATCH_FAILED packets within one event tick;
+- count server-accepted packets and resulting nearby-client broadcasts;
+- verify the session is cancelled only when the periodic event consumes the failed counter.
+
+Do not perform on production/public players.
