@@ -1,6 +1,6 @@
 # 6th/7th Attribute — Static Map
 
-**Status:** STATIC MAPPING OPEN / 9 VERIFIED BUGS  
+**Status:** STATIC COMPLETE / 9 VERIFIED BUGS  
 **Phase:** Detection / Mapping Only  
 **Opened:** 2026-09-29  
 **Source/Game repositories:** READ-ONLY  
@@ -135,10 +135,17 @@ No reconnect/restart item-loss or flag-loss bug is promoted from the mapped path
 - Client and server use the same visible success-percent formula and 10-fragment / 5-support limits.
 - Authoritative support-item `value1` rows are not retrievable from the oversized tracked DumpProto text through the current connector, so no unsupported percent-overflow claim is promoted.
 
-## Current audit cursor
-1. Close remaining deployment-shadowed client/server parity findings.
-2. Re-check dormant retrieval candidates against any non-quest/native caller.
-3. Decide Attr67 STATIC COMPLETE.
-4. Keep runtime locked; source/game repos remain read-only.
+## Static closure
+- Verified bugs: `BUG-ATTR67-001..009`.
+- Deferred tests: `ATTR67-T01..T09`.
+- No non-Lua/native retrieval caller was found in the tracked ServerSRC/ClientSrc/Binary/Game corpus.
+- Retrieval null/full-inventory/wait-time candidates remain dormant behind the missing deployment route.
+- Cross-window shop/private-shop review strengthened BUG-ATTR67-001/003/004 but produced no additional independent bug.
+- NPC_STORAGE plus quest-flag reconnect/restart reconstruction is mapped and no persistence-loss bug is promoted.
+- Percent/support code-side formula parity is mapped; no unsupported overflow claim is promoted.
+- Source/game repositories remain read-only and runtime remains locked.
+
+## Next project cursor
+Return to global source-feature coverage discovery. Open a new subsystem only if the indexed source corpus exposes a feature family not already represented by a STATIC COMPLETE map.
 
 Source/Game repositories remain read-only. Runtime remains locked; first future live gate remains `DUNGEON-T09`.
