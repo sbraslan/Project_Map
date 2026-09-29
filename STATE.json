@@ -8,18 +8,26 @@
   "active": {
     "subsystem": "zodiac_temple",
     "display_name": "Zodiac Temple / 12ZI",
-    "status": "STATIC MAPPING OPEN / 0 VERIFIED BUGS / EXECUTION LOCKED",
+    "status": "STATIC MAPPING OPEN / 7 VERIFIED BUGS / EXECUTION LOCKED",
     "system_file": "systems/zodiac_temple.md",
     "bug_file": "bugs/zodiac_temple.md",
     "test_file": "tests/zodiac_temple.md",
-    "verified_bug_ids": [],
+    "verified_bug_ids": [
+      "BUG-ZOD-001",
+      "BUG-ZOD-002",
+      "BUG-ZOD-003",
+      "BUG-ZOD-004",
+      "BUG-ZOD-005",
+      "BUG-ZOD-006",
+      "BUG-ZOD-007"
+    ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Verify deployment/quest entry and portal argument validation.",
-      "Map private-instance, party/member, reconnect/logout and destruction lifecycle.",
-      "Audit player-accessible Zodiac chat commands and reward state.",
-      "Audit Zodiac combat event raw-pointer lifetime and map destruction.",
-      "Map client/server parity and packet/command boundaries."
+      "Resolve deployment/entry ownership: server-time portals versus missing tracked quest source.",
+      "Audit DecMember event-flag branch plus party/reconnect teardown.",
+      "Audit private-map/floor timer destruction ordering.",
+      "Audit bead regeneration/persistence and 12ZI shop-limit accounting.",
+      "Close client/server parity and promote only source-proven findings."
     ]
   },
   "startup": {
@@ -3160,12 +3168,20 @@
     ]
   },
   "zodiac_temple_mapping": {
-    "status": "STATIC MAPPING OPEN / 0 VERIFIED BUGS",
+    "status": "STATIC MAPPING OPEN / 7 VERIFIED BUGS",
     "source_repositories_read_only": true,
     "system_file": "systems/zodiac_temple.md",
     "bug_file": "bugs/zodiac_temple.md",
     "test_file": "tests/zodiac_temple.md",
-    "verified_bug_ids": [],
+    "verified_bug_ids": [
+      "BUG-ZOD-001",
+      "BUG-ZOD-002",
+      "BUG-ZOD-003",
+      "BUG-ZOD-004",
+      "BUG-ZOD-005",
+      "BUG-ZOD-006",
+      "BUG-ZOD-007"
+    ],
     "mapped_roots": [
       "common/CommonDefines.h::ENABLE_12ZI",
       "game/src/zodiac_temple.cpp/.h",
@@ -3180,7 +3196,14 @@
     "mapped_flows": [
       "zodiac_temple.starttemple -> CZodiacManager::StartTemple -> CreatePrivateMap -> Jump/JumpParty -> StartLogin",
       "ui12zi reward controls -> chat command -> do_cz_check_box/do_cz_reward -> CHARACTER ZTT helpers -> quest flags/items -> OpenUI12zi",
-      "ui12zi floor controls -> /jumpfloor or /nextfloor -> command -> FindByMapIndex -> NewFloor"
+      "ui12zi floor controls -> /jumpfloor or /nextfloor -> command -> FindByMapIndex -> NewFloor",
+      "GM_PLAYER /cz_check_box -> ZTT_CHECK_BOX -> two ownerless registered CreateItem objects -> BUG-ZOD-001",
+      "GM_PLAYER /cz_reward 3 -> asymmetric counters -> gold count 0 -> AutoGiveItem -> CreateItem clamps 0 to 1 when no matching stack -> BUG-ZOD-002",
+      "GM_PLAYER /cz_check_box replay -> arithmetic + (1<<index) instead of idempotent bit set -> bit carry/state corruption -> BUG-ZOD-003",
+      "GM_PLAYER /revive VID -> core-wide CHARACTER_MANAGER::Find -> only Zodiac range checks -> no same private-map/party/proximity gate -> BUG-ZOD-004",
+      "CHARACTER event members m_pkZodiacSkill1..11 uninitialized -> ZodiacDamage tests/cancels indeterminate event handles -> BUG-ZOD-005",
+      "delayed Zodiac skill events retain raw mob/victim LPCHARACTER -> CHARACTER::Destroy does not cancel m_pkZodiacSkill1..11 -> BUG-ZOD-006",
+      "CZodiacManager::Initialize bool -> channel99 returns true; other channels fall off end -> BUG-ZOD-007"
     ],
     "candidates": [
       "CZodiacManager::Initialize non-channel-99 missing explicit bool return; caller semantics pending.",
@@ -3189,15 +3212,23 @@
       "Combat event raw LPCHARACTER lifetime pending."
     ],
     "runtime_tests": {
-      "status": "NOT CREATED / EXECUTION LOCKED",
-      "canonical_test_ids": [],
+      "status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN",
+      "canonical_test_ids": [
+        "ZOD-T01",
+        "ZOD-T02",
+        "ZOD-T03",
+        "ZOD-T04",
+        "ZOD-T05",
+        "ZOD-T06",
+        "ZOD-T07"
+      ],
       "first_live_gate_unchanged": "DUNGEON-T09"
     },
     "next_actions": [
-      "Verify portal/start entry and quest deployment.",
-      "Audit player commands and reward arithmetic/item lifetime.",
-      "Audit instance/member/event lifecycles.",
-      "Audit client/server parity."
+      "Resolve deployment/entry ownership: server-time portals versus missing tracked quest source.",
+      "Audit DecMember event-flag branch plus party/reconnect teardown.",
+      "Audit private-map/floor timer destruction ordering.",
+      "Audit bead regeneration/persistence and 12ZI shop-limit accounting."
     ]
   }
 }
