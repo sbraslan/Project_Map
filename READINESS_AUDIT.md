@@ -224,3 +224,11 @@ Current effective static-complete/readiness coverage is therefore **25/25**, plu
 Aura execution classes and deferred validation ownership are documented in `RUNTIME.md`. No Aura runtime test has been executed.
 
 This extension does not alter the canonical first future live gate: **DUNGEON-T10**.
+
+
+## Gate correction — 2026-09-29
+The former first live gate `DUNGEON-T10` was invalidated by fresh source verification.
+`BUG-DUNGEON-010` / `DUNGEON-T10` are retracted as a false-positive indentation reading.
+
+**Current first future live gate: `DUNGEON-T09`.**
+Runtime remains locked.
