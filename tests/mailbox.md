@@ -67,4 +67,4 @@ Statik Mailbox keşfi kapalı; yalnız test sonucu yeni edge çıkarsa tekrar a�
 - Primary legitimate/ordinary-flow candidates: MAIL-T07 (large legitimate Yang receive arithmetic) and MAIL-T11 (restart reload, disposable environment).
 - Modified-client/adversarial: MAIL-T01..T04, MAIL-T08, MAIL-T09, MAIL-T14.
 - Crash/persistence/fault-injection: MAIL-T10, MAIL-T12, MAIL-T15.
-- Overall first live runtime gate remains DUNGEON-T10.
+- Overall first live runtime gate remains DUNGEON-T09.
