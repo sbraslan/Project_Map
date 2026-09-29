@@ -35,3 +35,21 @@ When runtime phase is explicitly opened:
 Expected static result: the destructive pickup path frees the object still cached by Bruce.
 
 No test is authorized before the global runtime phase opens.
+
+
+## PET-T03 — REAL_TIME PET_PAY expires while summoned
+
+**Owner bug:** `BUG-PET-003`  
+**Execution state:** NOT RUN / LOCKED
+
+When runtime phase is explicitly opened:
+1. use a controlled short-duration `ITEM_PET / PET_PAY` with the same `REAL_TIME` lifecycle as current deployed pets;
+2. equip/summon it and keep the owner online through expiry;
+3. confirm the summon item is removed by `REAL_TIME_EXPIRE`;
+4. immediately check whether the pet actor remains visible/summoned and whether its pet-system update event continues;
+5. verify cleanup after owner logout/destruction as the control boundary;
+6. capture server logs/state for the missing summon-item update branch.
+
+Expected static result: item expiry bypasses `PetUnsummon`; the actor remains summoned until a later teardown/cleanup path.
+
+No test is authorized before the global runtime phase opens.
