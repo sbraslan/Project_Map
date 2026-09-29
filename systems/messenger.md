@@ -52,6 +52,8 @@ Remote target: target is represented by P2P `CCI` and relay descriptor while `pk
 - `BUG-MSG-007` — logout erases the departing character from every online account's outgoing friend/block cache; reconnect reloads only the departing account, so persistent block/friend state is not restored for observers.
 - `BUG-MSG-008` — target-board `/party_request` uses a player command path without messenger block validation, bypassing the guarded direct party-invite path.
 - `BUG-MSG-009` — target-board unblock confirmation can outlive the target instance; remove-by-VID dereferences `GetInstancePtr(vid)` without a null guard.
+- `BUG-MSG-010` — pending party/guild invitations can still be accepted after a messenger block is established because acceptance does not revalidate block state.
+- `BUG-MSG-011` — `pc.is_blocked` and `pc.is_friend` are registered Lua name-query helpers but gate their first argument with `lua_isnumber` before calling `FindPC(name)`.
 
 ## Current cursor
 Continue static audit of:
@@ -77,7 +79,7 @@ Do not execute runtime tests. Global first future live gate remains `DUNGEON-T09
 
 ## Updated cursor
 Continue static audit of:
-- pending party/guild invite acceptance after a new messenger block is established;
+- finish residual party/guild invite lifecycle after BUG-MSG-010;
 - GM messenger cache lifecycle beyond the already verified teardown leak;
 - channel-change/reconnect interaction with asynchronous loads and relation cache reconstruction;
 - remaining client messenger parser/state boundaries after BUG-MSG-009.
