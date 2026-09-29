@@ -36,3 +36,29 @@ Closed without promotion:
 No active subsystem. On the next continuation, select the next independent unmapped gameplay subsystem from source/config coverage and open only its canonical files.
 
 Do not execute `MIN-T01..MIN-T06`. Global first live runtime gate remains `DUNGEON-T09`.
+
+
+## Pause checkpoint
+Mapping was intentionally paused by the user because the conversation/tool flow was repeatedly interrupted.
+
+Resume from **Mining / Pickaxe** without redoing completed work.
+
+### Saved Mining state
+- `BUG-MIN-001` — deployed pickaxe refine quest/C++ mastery boundary mismatch.
+- `BUG-MIN-002` — delayed mining can resolve after death.
+- `BUG-MIN-003` — same-process warp can carry active mining across maps.
+- `BUG-MIN-004` — settlement uses the currently equipped pickaxe, not the initiating pickaxe.
+- `BUG-MIN-005` — `MINING_LOCATION` >2500 anti-hack branch is unreachable due to earlier >1000 return.
+
+### Closed without promotion
+- `OreRefine()` removes 100 ore before its internal gold check, but deployed `guild_building_melt.quest` performs the same affordability check immediately before calling `pc.ore_refine/pc.diamond_refine`; no deployed insufficient-gold loss path is currently proven.
+- vein VID reuse was not promoted: character VIDs are monotonically allocated in the observed process and destroyed veins are removed from the VID map.
+- Battle Field map 357 static data has no mining veins in `regen.txt`, `npc.txt` or `boss.txt`; `stone.txt` contains non-mining stones. Dynamic Mining Event spawn audit was **started but not completed**.
+- Pickaxe proto/value cross-check remains open because the available DumpProto `item_proto` blob was not readable through the connector.
+
+### Exact resume cursor
+1. Finish `ENABLE_MINING_EVENT` dynamic spawn audit, especially whether veins can spawn on Battle Field map 357.
+2. Close Battle Field ore ownership reachability.
+3. Close pickaxe proto/value progression if an authoritative readable proto source is available.
+4. Reassess whether Mining can be marked STATIC COMPLETE.
+5. Do not execute runtime tests; global first future live gate remains `DUNGEON-T09`.
