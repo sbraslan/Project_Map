@@ -395,30 +395,6 @@ A friend request that was valid when issued can still be accepted after either s
 
 ### Deferred validation
 `MSG-T19`.
----
-
-## BUG-MSG-016 — GM inverse relation cache retains logged-out accounts for process lifetime
-
-**Class:** server cache lifecycle / unbounded stale membership growth  
-**Reachability:** VERIFIED whenever GM messenger list loading is enabled.
-
-### Proof
-1. `LoadGMList` inserts every logged-in account into `m_InverseGMRelation[gm]` for every selected GM.
-2. On account logout, `MessengerManager::Logout` erases the account's own `m_GMRelation` and removes the departing name from forward GM relation sets.
-3. It never removes that account from the inverse sets belonging to the GMs that were loaded for it.
-4. `MessengerManager::Destroy()` is empty, so these inverse sets persist until process termination.
-5. Later GM login/logout paths iterate the accumulated inverse set and call `SendGMLogin/SendGMLogout`; those functions then perform `FindPC(account)` and return for stale offline users.
-
-### Consequence
-A long-running game process accumulates one stale inverse-GM membership for each distinct account that has loaded the GM list. GM presence changes then perform increasingly large useless fanout scans, creating avoidable memory and CPU growth tied to historical logins rather than current online users.
-
-### Deferred validation
-`MSG-T16`.
-
-
-
----
-
 ## BUG-MSG-020 — oversized friend/block lists overflow the 16-bit messenger packet size
 
 **Class:** protocol framing / list-size overflow  
