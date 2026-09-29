@@ -6,18 +6,27 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": null,
-    "display_name": "Static Mapping Coverage Complete",
-    "status": "MINING / PICKAXE STATIC COMPLETE / 31 EFFECTIVE STATIC-COMPLETE SUBSYSTEMS / EXECUTION LOCKED",
+    "subsystem": "mining",
+    "display_name": "Mining / Pickaxe",
+    "status": "PAUSED / MAPPING IN PROGRESS / 5 VERIFIED BUGS / EXECUTION LOCKED",
     "system_file": null,
     "bug_file": null,
     "test_file": null,
-    "verified_bug_ids": [],
+    "verified_bug_ids": [
+      "BUG-MIN-001",
+      "BUG-MIN-002",
+      "BUG-MIN-003",
+      "BUG-MIN-004",
+      "BUG-MIN-005"
+    ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Preserve runtime execution lock.",
-      "First future live runtime gate is DUNGEON-T09; DUNGEON-T10 is retracted and must not be run.",
-      "When continuation is requested, select the next independent unmapped gameplay subsystem and continue detection-only mapping."
+      "Resume without re-auditing BUG-MIN-001..005.",
+      "Finish ENABLE_MINING_EVENT dynamic vein spawn audit, especially Battle Field map 357 reachability.",
+      "Close Battle Field ore ownership reachability.",
+      "Cross-check pickaxe proto/value progression only if authoritative readable proto rows are available.",
+      "Reassess Mining STATIC COMPLETE status.",
+      "Do not execute runtime tests; first future live gate remains DUNGEON-T09."
     ]
   },
   "startup": {
@@ -2581,7 +2590,7 @@
     ]
   },
   "mining_mapping": {
-    "status": "STATIC COMPLETE",
+    "status": "PAUSED / MAPPING IN PROGRESS",
     "system_file": "systems/mining.md",
     "bug_file": "bugs/mining.md",
     "test_file": "tests/mining.md",
@@ -2590,8 +2599,7 @@
       "BUG-MIN-002",
       "BUG-MIN-003",
       "BUG-MIN-004",
-      "BUG-MIN-005",
-      "BUG-MIN-006"
+      "BUG-MIN-005"
     ],
     "mapped_flows": [
       "deployed mining.quest -> __refine_pick -> RealRefinePick mastery boundary -> BUG-MIN-001",
@@ -2630,6 +2638,20 @@
       "Vein despawn/VID lifecycle cleanly aborts and normal VID reuse alias was not established.",
       "InitializeMiningEvent map-103 global NPC cleanup remains dead-path risk because no active caller was found.",
       "Pickaxe item_proto values unavailable as readable text; item-name deployment confirms 29101..29109 +0..+8."
-    ]
+    ],
+    "pause_checkpoint": {
+      "reason": "User requested progress save because conversation/tool flow was repeatedly interrupted.",
+      "closed_without_promotion": [
+        "OreRefine internal ore-before-gold ordering: deployed guild_building_melt.quest prechecks affordability before Lua call; no current deployed insufficient-gold loss path proven.",
+        "Vein VID reuse: no practical reuse path proven in normal process lifetime; AllocVID is monotonic and destroyed characters are removed from VID map.",
+        "Battle Field static map 357 contains no mining veins in regen/npc/boss; stone.txt contains non-mining stones."
+      ],
+      "open_cursor": [
+        "Finish ENABLE_MINING_EVENT dynamic spawn audit for Battle Field map 357.",
+        "Close Battle Field ore ownership reachability.",
+        "Close pickaxe proto/value progression if readable authoritative data is available.",
+        "Decide whether Mining can become STATIC COMPLETE."
+      ]
+    }
   }
 }
