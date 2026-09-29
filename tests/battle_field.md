@@ -106,4 +106,4 @@ Do not execute during the current detection/mapping phase.
 - Primary ordinary/normal-flow Battle Field candidates: BFIELD-T01, BFIELD-T02, BFIELD-T03, BFIELD-T09, BFIELD-T10, BFIELD-T11.
 - BFIELD-T06 is privileged/admin routing validation.
 - BFIELD-T08 is deterministic schedule arithmetic validation.
-- Overall first live runtime gate remains DUNGEON-T10.
+- Overall first live runtime gate remains DUNGEON-T09.
