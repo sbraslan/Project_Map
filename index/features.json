@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "generated_at": "2026-09-29",
-  "source": "STATE.json + systems/",
+  "source": "STATE.json + systems/ (refreshed through Zodiac Temple opening)",
   "systems": [
     {
       "id": "acce",
@@ -38,6 +38,40 @@
         "BUG-RANK-007"
       ],
       "runtime_status": null
+    },
+    {
+      "id": "arena",
+      "system_file": "systems/arena.md",
+      "bug_file": "bugs/arena.md",
+      "test_file": "tests/arena.md",
+      "state_section": "arena_mapping",
+      "status": "STATIC COMPLETE",
+      "verified_bug_ids": [
+        "BUG-ARENA-001",
+        "BUG-ARENA-002",
+        "BUG-ARENA-003"
+      ],
+      "runtime_status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN"
+    },
+    {
+      "id": "attr6th7th",
+      "system_file": "systems/attr6th7th.md",
+      "bug_file": "bugs/attr6th7th.md",
+      "test_file": "tests/attr6th7th.md",
+      "state_section": "attr6th7th_mapping",
+      "status": "STATIC COMPLETE",
+      "verified_bug_ids": [
+        "BUG-ATTR67-001",
+        "BUG-ATTR67-002",
+        "BUG-ATTR67-003",
+        "BUG-ATTR67-004",
+        "BUG-ATTR67-005",
+        "BUG-ATTR67-006",
+        "BUG-ATTR67-007",
+        "BUG-ATTR67-008",
+        "BUG-ATTR67-009"
+      ],
+      "runtime_status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN"
     },
     {
       "id": "aura",
@@ -356,7 +390,7 @@
       "bug_file": "bugs/marriage.md",
       "test_file": "tests/marriage.md",
       "state_section": "marriage_mapping",
-      "status": "STATIC MAPPING IN PROGRESS",
+      "status": "STATIC COMPLETE",
       "verified_bug_ids": [
         "BUG-MARR-001",
         "BUG-MARR-002",
@@ -373,7 +407,7 @@
         "BUG-MARR-013",
         "BUG-MARR-014"
       ],
-      "runtime_status": "EXECUTION LOCKED / NOT RUN"
+      "runtime_status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN"
     },
     {
       "id": "messenger",
@@ -439,6 +473,49 @@
         "BUG-MIN-005",
         "BUG-MIN-006",
         "BUG-MIN-007"
+      ],
+      "runtime_status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN"
+    },
+    {
+      "id": "monarch",
+      "system_file": "systems/monarch.md",
+      "bug_file": "bugs/monarch.md",
+      "test_file": "tests/monarch.md",
+      "state_section": "monarch_mapping",
+      "status": "STATIC COMPLETE",
+      "verified_bug_ids": [
+        "BUG-MON-001",
+        "BUG-MON-002",
+        "BUG-MON-003",
+        "BUG-MON-004",
+        "BUG-MON-005",
+        "BUG-MON-006",
+        "BUG-MON-007",
+        "BUG-MON-008",
+        "BUG-MON-009",
+        "BUG-MON-010",
+        "BUG-MON-011",
+        "BUG-MON-012",
+        "BUG-MON-013"
+      ],
+      "runtime_status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN"
+    },
+    {
+      "id": "oxevent",
+      "system_file": "systems/oxevent.md",
+      "bug_file": "bugs/oxevent.md",
+      "test_file": "tests/oxevent.md",
+      "state_section": "oxevent_mapping",
+      "status": "STATIC COMPLETE",
+      "verified_bug_ids": [
+        "BUG-OX-001",
+        "BUG-OX-002",
+        "BUG-OX-003",
+        "BUG-OX-004",
+        "BUG-OX-005",
+        "BUG-OX-006",
+        "BUG-OX-007",
+        "BUG-OX-008"
       ],
       "runtime_status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN"
     },
@@ -668,6 +745,16 @@
         "BUG-WLOT-014"
       ],
       "runtime_status": null
+    },
+    {
+      "id": "zodiac_temple",
+      "system_file": "systems/zodiac_temple.md",
+      "bug_file": "bugs/zodiac_temple.md",
+      "test_file": "tests/zodiac_temple.md",
+      "state_section": "zodiac_temple_mapping",
+      "status": "STATIC MAPPING OPEN",
+      "verified_bug_ids": [],
+      "runtime_status": "EXECUTION LOCKED / NOT RUN"
     }
   ]
 }
