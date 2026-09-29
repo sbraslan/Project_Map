@@ -60,6 +60,8 @@ Remote target: target is represented by P2P `CCI` and relay descriptor while `pk
 - `BUG-MSG-015` — GM inverse watcher sets retain logged-out accounts because logout does not prune `m_InverseGMRelation[gm]`.
 - `BUG-MSG-016` — delayed old-core P2P logout can remove a newer same-name CCI/session presence after channel/core handoff.
 - `BUG-MSG-017` — client→server name-based messenger packets use a 48-byte field for a configured 48-byte name, truncating add/block-add to 47 bytes and leaving long remove/unblock fields without an explicit final NUL.
+- `BUG-MSG-018` — Battle Field blocks friend add-by-name but the normal target-board add-by-VID path lacks the map restriction.
+- `BUG-MSG-019` — pending friend authorization revalidates only its request token, not messenger block state, so a block added during the pending window does not prevent acceptance.
 
 ## Current cursor
 Continue static audit of:
@@ -129,3 +131,10 @@ A repository-wide Project_Game search found no tracked quest caller for `pc.is_b
 
 ### Observer-mode path parity
 Friend/block add-by-VID rejects observer-mode characters. The corresponding name-entry actions from `uimessenger.py` reach add-by-name server branches with no observer-mode guard, while `HEADER_CG_MESSENGER` is not globally observer-gated. This is verified `BUG-MSG-014`.
+
+### Pending friend authorization revalidation
+- Friend-request creation checks messenger block in both directions before `RequestToAdd`.
+- `RequestToAdd` stores a pending CRC token and surfaces `messenger_auth` to the recipient.
+- `/messenger_auth y` reaches `AuthToAdd`, which checks only the token and then creates both friend edges.
+- No `IsBlocked` revalidation occurs at acceptance time.
+- Result: verified `BUG-MSG-019`; deferred test `MSG-T19`.
