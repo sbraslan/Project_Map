@@ -17,7 +17,7 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 
 ## Verified findings
 - `BUG-MSG-001..021` are canonical in `bugs/messenger.md`.
-- Latest additions: `BUG-MSG-020` oversized friend/block-list framing; `BUG-MSG-021` GM-to-GM block path parity.
+- Latest additions: `BUG-MSG-020` 16-bit list-size framing overflow; `BUG-MSG-021` GM-to-GM block route-policy mismatch.
 - Runtime plans are `MSG-T01..MSG-T21`; none has been executed.
 
 - `BUG-MSG-018` — Battle Field rejects friend add-by-name but the target-board add-by-VID path lacks the same map restriction.
@@ -36,8 +36,8 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 - `OnBlockLogin`'s missing local handler-null guard is closed as non-bug because `PyCallClassMemberFunc` safely rejects a null handler.
 
 ## Exact resume cursor
-1. Audit remaining friend/block remove and inverse-cache symmetry after BUG-MSG-019/021.
-2. Re-check residual P2P presence resynchronization after BUG-MSG-016.
-3. Finish client/server Messenger parser and framing boundaries after BUG-MSG-012/017/020.
-4. Perform the final relation/cache/P2P symmetry pass and decide whether Messenger is STATIC COMPLETE.
+1. Close pending friend-token identity/collision review; keep theoretical-only cases unpromoted.
+2. Close malformed/fixed-width messenger packet parsing review; require ordinary server-generated reachability for promotion.
+3. Perform the final relation/cache/P2P symmetry pass after `BUG-MSG-015/016`.
+4. Decide Messenger STATIC COMPLETE.
 5. Do not execute runtime tests; global first future live gate remains `DUNGEON-T09`.
