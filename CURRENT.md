@@ -20,6 +20,14 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 - Latest additions: `BUG-MSG-020` oversized friend/block-list framing; `BUG-MSG-021` GM-to-GM block path parity.
 - Runtime plans are `MSG-T01..MSG-T21`; none has been executed.
 
+- `BUG-MSG-018` — Battle Field rejects friend add-by-name but the target-board add-by-VID path lacks the same map restriction.
+
+- `BUG-MSG-019` — pending friend authorization can still be accepted after either side establishes a messenger block.
+
+- `BUG-MSG-020` — oversized friend/block lists can overflow the 16-bit messenger packet-size field while the full payload is still transmitted.
+
+- `BUG-MSG-021` — GM-to-GM block authorization differs between VID and name routes.
+
 ## Closed / scoped observations
 - Shout delivery checks the receiver's messenger block relation on both local and P2P fanout. BUG-MSG-007 can still undermine it after logout/relog cache loss.
 - Normal party invite, guild invite, exchange, PvP and equipment-view entry points contain messenger block guards.
@@ -28,8 +36,8 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 - `OnBlockLogin`'s missing local handler-null guard is closed as non-bug because `PyCallClassMemberFunc` safely rejects a null handler.
 
 ## Exact resume cursor
-1. Audit friend/block remove and inverse-cache symmetry after BUG-MSG-019.
-2. Review remaining Messenger packet boundaries after BUG-MSG-012/017/020.
-3. Review residual P2P presence reconstruction after BUG-MSG-016.
-4. Perform final static-closure pass and decide Messenger STATIC COMPLETE.
+1. Audit remaining friend/block remove and inverse-cache symmetry after BUG-MSG-019/021.
+2. Re-check residual P2P presence resynchronization after BUG-MSG-016.
+3. Finish client/server Messenger parser and framing boundaries after BUG-MSG-012/017/020.
+4. Perform the final relation/cache/P2P symmetry pass and decide whether Messenger is STATIC COMPLETE.
 5. Do not execute runtime tests; global first future live gate remains `DUNGEON-T09`.
