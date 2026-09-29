@@ -1,6 +1,6 @@
 # Marriage / Wedding — Bug Registry
 
-**Status:** STATIC COMPLETE / 13 VERIFIED BUGS  
+**Status:** STATIC COMPLETE / 14 VERIFIED BUGS  
 **Execution:** LOCKED / NOT RUN
 
 ## BUG-MARR-001 — engagement resource transaction commits before authoritative marriage creation
