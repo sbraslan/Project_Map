@@ -880,3 +880,16 @@ Readiness notes:
 - 135/135 races exist in server mob_proto and client npclist;
 - runtime asset presence remains a deployment check because raw client packs are not fully versioned;
 - execution order is unchanged: do not run these before the global first live gate `DUNGEON-T10`.
+
+
+## Dungeon Info gate correction — 2026-09-29
+Fresh source verification retracted `DINFO::BUG-DUNGEON-010` and `DUNGEON-T10`.
+The `uidungeoninfo.py` list-button loop is outside the zero-count branch.
+
+Updated normal-path order:
+1. `DUNGEON-T09` — first future live gate.
+2. `DUNGEON-T11`.
+3. `DUNGEON-T12`.
+
+`DUNGEON-T10` is historical/retracted and must not be run.
+Execution remains locked.
