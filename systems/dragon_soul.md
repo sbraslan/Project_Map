@@ -360,4 +360,4 @@ Canonical verified findings:
 Canonical deferred tests:
 `DS-T01..DS-T11`.
 
-No Dragon Soul runtime test has been executed. Runtime remains locked and the global first future live gate remains `DUNGEON-T10`.
+No Dragon Soul runtime test has been executed. Runtime remains locked and the global first future live gate remains `DUNGEON-T09`.
