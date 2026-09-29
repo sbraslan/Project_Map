@@ -8,16 +8,25 @@
   "active": {
     "subsystem": null,
     "display_name": "Static Mapping Coverage Complete",
-    "status": "MINING / PICKAXE STATIC COMPLETE / 31 EFFECTIVE STATIC-COMPLETE SUBSYSTEMS / EXECUTION LOCKED",
+    "status": "MAPPING IN PROGRESS / 6 VERIFIED BUGS / EXECUTION LOCKED",
     "system_file": null,
     "bug_file": null,
     "test_file": null,
-    "verified_bug_ids": [],
+    "verified_bug_ids": [
+      "BUG-MIN-001",
+      "BUG-MIN-002",
+      "BUG-MIN-003",
+      "BUG-MIN-004",
+      "BUG-MIN-005",
+      "BUG-MIN-006"
+    ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Preserve runtime execution lock.",
-      "First future live runtime gate is DUNGEON-T09; DUNGEON-T10 is retracted and must not be run.",
-      "When continuation is requested, select the next independent unmapped gameplay subsystem and continue detection-only mapping."
+      "Resolve whether CHARACTER_MANAGER::InitializeMiningEvent has an active caller; its data/event/mining/map_mining.txt dependency is missing.",
+      "Close pickaxe proto/refine progression data if a readable authoritative proto source becomes available.",
+      "Audit remaining mining client/UI entry points and multi-farm interaction.",
+      "Decide whether Mining can be marked STATIC COMPLETE.",
+      "Do not execute Mining runtime tests; first future live gate remains DUNGEON-T09."
     ]
   },
   "startup": {
@@ -309,7 +318,12 @@
     "game/src/event_manager.cpp::SetMiningEvent map230 false-active deployment failure -> BUG-MIN-007",
     "Project_Game/share/locale/europe/map/index::no map 230",
     "missing runtime data/event/mining_event_regen_type_0.txt -> BUG-MIN-007",
-    "Mining / Pickaxe::STATIC COMPLETE"
+    "Mining / Pickaxe::STATIC COMPLETE",
+    "game/src/event_manager.cpp::SetMiningEvent + EVENT_MAP_INDEX 230 missing deployment -> BUG-MIN-006",
+    "Project_Game/share/locale/europe/map/index::no map230",
+    "Project_Game/share/data/event::no mining_event_regen_type_0.txt",
+    "Project_Game/g_guild/guild_building_melt.quest shields OreRefine insufficient-gold ordering",
+    "game/src/char_manager.cpp::AllocVID monotonic vein lifetime closure"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -2581,8 +2595,7 @@
       "BUG-MIN-003",
       "BUG-MIN-004",
       "BUG-MIN-005",
-      "BUG-MIN-006",
-      "BUG-MIN-007"
+      "BUG-MIN-006"
     ],
     "mapped_flows": [
       "deployed mining.quest -> __refine_pick -> RealRefinePick mastery boundary -> BUG-MIN-001",
@@ -2592,13 +2605,16 @@
       "early >1000 return makes MINING_LOCATION >2500 HackLog unreachable -> BUG-MIN-005",
       "WarpSet/CanWarp omit mining cancel + mining_event omits map/distance revalidation -> BUG-MIN-003",
       "mining_event re-reads current WEAR_WEAPON instead of initiating pick identity -> BUG-MIN-004",
-      "CHARACTER::mining >1000 early return makes >2500 MINING_LOCATION HackLog unreachable -> BUG-MIN-005"
+      "CHARACTER::mining >1000 early return makes >2500 MINING_LOCATION HackLog unreachable -> BUG-MIN-005",
+      "EVENT_TYPE_MINING -> SetMiningEvent -> flag set before missing map230 failure -> BUG-MIN-006",
+      "OreRefine deployed guild_building_melt quest prechecks gold -> insufficient-gold raw-ore loss not reachable via current quest",
+      "vein VID lifetime uses monotonic AllocVID + Find; despawn resolves null -> candidate closed",
+      "Battle Field map357 has no deployed ore veins; mining event maps are 230/103 -> ownership candidate closed"
     ],
     "candidates": [
-      "OreRefine consumes 100 raw ore before gold check; Lua APIs are registered but deployed caller still pending.",
-      "Ore ownership is intentionally disabled in Battle Field maps; multiplayer semantics pending.",
-      "Vein despawn/VID reuse interaction with delayed mining event pending.",
-      "Pickaxe proto/refine progression values pending authoritative row closure."
+      "InitializeMiningEvent targets map103 but data/event/mining/map_mining.txt is absent; active caller not yet proven.",
+      "Pickaxe proto/refine rows are present only in unreadable/non-indexed proto blobs; authoritative value closure pending.",
+      "Remaining client/UI and multi-farm integration audit pending."
     ],
     "runtime_tests": {
       "status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN",
@@ -2608,8 +2624,7 @@
         "MIN-T03",
         "MIN-T04",
         "MIN-T05",
-        "MIN-T06",
-        "MIN-T07"
+        "MIN-T06"
       ],
       "first_live_gate_unchanged": "DUNGEON-T09"
     },
