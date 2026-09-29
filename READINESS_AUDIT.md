@@ -85,7 +85,7 @@ Non-canonical historical forms include:
 Runtime remains locked. This is an ordering document only.
 
 ### Stage A — normal/current-flow first
-1. `DUNGEON-T10 -> DUNGEON-T09 -> DUNGEON-T11 -> DUNGEON-T12`
+1. `DUNGEON-T09 -> DUNGEON-T11 -> DUNGEON-T12`
 2. `TICKET-T07`
 3. `HUNT-T04`
 4. `BP-T02`
@@ -108,7 +108,7 @@ Runtime remains locked. This is an ordering document only.
 21. `WB-T09 -> WB-T13 -> WB-T15 -> WB-T16`
 22. `SMT-T01`
 
-**Global first live gate remains `DUNGEON-T10`.**
+**Global first live gate is `DUNGEON-T09`.**
 
 ### Stage B — isolated / modified-client / admin / parser / controlled-state
 Run only after Stage A and only in an isolated environment:
@@ -159,11 +159,11 @@ Resolved by documentation normalization:
 5. cross-system Battle Field -> Ranking ownership is explicit;
 6. candidate/observation/dormant statuses remain non-promoted;
 7. migrated duplicate test blocks are non-canonical outside their owner file;
-8. one future execution order is established with `DUNGEON-T10` first.
+8. one future execution order is established with `DUNGEON-T09` first.
 
 ## Next documentation-only handoff
 
-Prepare the `DUNGEON-T10` runtime gate handoff/checklist without running it. Runtime execution requires an explicit user phase change.
+Prepare the `DUNGEON-T09` runtime gate handoff/checklist without running it. Runtime execution requires an explicit user phase change.
 
 
 ## Post-audit extension — Costume / Appearance / ChangeLook — 2026-09-28
@@ -178,7 +178,7 @@ A subsequent static-mapping extension added:
 
 Current effective static-complete/readiness coverage is therefore **22/22**, plus the folded Guild lifecycle companion.
 
-This extension does not change the previously recorded execution order's first gate. **DUNGEON-T10 remains the first future live gate.**
+This extension does not change the previously recorded execution order's first gate. **DUNGEON-T09 is the first future live gate.**
 
 
 ## Post-audit extension — Acce / Sash — 2026-09-28
@@ -193,7 +193,7 @@ Current effective static-complete/readiness coverage is therefore **23/23**, plu
 
 Acce execution classes are documented in `RUNTIME.md`. No Acce runtime test has been executed.
 
-This extension does not alter the canonical future order's first gate. **DUNGEON-T10 remains the first future live gate.**
+This extension does not alter the canonical future order's first gate. **DUNGEON-T09 is the first future live gate.**
 
 
 ## Post-audit extension — Dragon Soul / Alchemy — 2026-09-28
@@ -206,7 +206,7 @@ Subsequent extensions now include:
 
 Current effective static-complete/readiness coverage is therefore **24/24**, plus the folded Guild lifecycle companion.
 
-Dragon Soul execution classes are documented in `RUNTIME.md`. No Dragon Soul runtime test has been executed. **DUNGEON-T10 remains the first future live gate.**
+Dragon Soul execution classes are documented in `RUNTIME.md`. No Dragon Soul runtime test has been executed. **DUNGEON-T09 is the first future live gate.**
 
 
 ## Post-audit extension — Aura System — 2026-09-28
