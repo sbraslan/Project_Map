@@ -2,7 +2,7 @@
 
 **Active phase:** Detection / Mapping Only  
 **Active state:** Marriage / Wedding static mapping  
-**Status:** MARRIAGE / WEDDING — STATIC MAPPING IN PROGRESS / 0 VERIFIED BUGS / EXECUTION LOCKED  
+**Status:** MARRIAGE / WEDDING — STATIC MAPPING IN PROGRESS / 2 VERIFIED BUGS / EXECUTION LOCKED  
 **Machine state:** `STATE.json`  
 **Active subsystem:** Marriage / Wedding — OPEN  
 **System:** `systems/marriage.md`  
@@ -16,6 +16,10 @@
 Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-only. Runtime/fault-injection execution remains locked until an explicit phase change.
 
 ## Verified findings
+- `BUG-MARR-001` — engagement Yang/ring mutations are committed before the authoritative marriage request and an intervening `wait()` creates an interruption window with no rollback.
+- `BUG-MARR-002` — map 81 is enabled on both ch2/core4 and ch99/core99 while DB wedding requests are broadcast to all game peers, allowing duplicate wedding-map producers/READY paths.
+- Deferred Marriage tests: `MARR-T01`, `MARR-T02`; not executed.
+
 - `BUG-MSG-001..021` are canonical in `bugs/messenger.md`.
 - Latest additions: `BUG-MSG-020` 16-bit list-size framing overflow; `BUG-MSG-021` GM-to-GM block route-policy mismatch.
 - Runtime plans are `MSG-T01..MSG-T21`; none has been executed.
@@ -43,10 +47,11 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 - Global first future live gate remains `DUNGEON-T09`.
 
 ## Exact resume cursor
-1. Continue `systems/marriage.md` with login/logout + near-check/love-point lifecycle.
-2. Audit wedding membership/teardown, quest-vs-server invariant parity, and DB/game multi-core ordering.
-3. Keep all source/game repositories read-only.
-4. Do not execute runtime or fault-injection tests.
+1. Close legacy `HEADER_GD_BREAK_MARRIAGE / HEADER_DG_BREAK_MARRIAGE`.
+2. Audit mutual/unilateral divorce transaction ordering.
+3. Continue marriage login/logout + near-check/love-point lifecycle.
+4. Audit wedding membership/teardown and duplicate READY consequences.
+5. Keep source/game repositories read-only and runtime execution locked.
 
 ## Mapping acceleration index — 2026-09-29
 - Status: **READY**
