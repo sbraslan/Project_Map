@@ -21,3 +21,27 @@ After runtime is explicitly unlocked:
 3. observe whether ore roll/drop and pickaxe practice still execute.
 
 Do not run while execution lock is active.
+
+
+## MIN-T03 — pickaxe substitution during delayed mining
+After runtime is explicitly unlocked:
+1. start mining with pickaxe A;
+2. before event completion, replace it with valid pickaxe B without moving;
+3. record which pick's refine grade affects ore chance;
+4. force/observe a practice success and record which pick gains mastery.
+
+Bug signature: B controls the completion and receives mastery.
+
+## MIN-T04 — direct warp during active mining
+After runtime is explicitly unlocked in an isolated same-process map setup:
+1. start mining beside a valid vein;
+2. trigger a direct warp without a movement packet;
+3. keep the original vein alive;
+4. observe whether the delayed event resolves at the destination and drops ore there.
+
+## MIN-T05 — MINING_LOCATION logging reachability
+After runtime is explicitly unlocked in an isolated environment, attempt mining requests at distances >1000 and >2500 and inspect hack logs.
+
+Expected static result: both are rejected by the first >1000 return and `MINING_LOCATION` is never emitted.
+
+Do not run while execution lock is active.
