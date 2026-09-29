@@ -8,7 +8,7 @@
   "active": {
     "subsystem": "messenger",
     "display_name": "Messenger / Friend / Block",
-    "status": "MAPPING IN PROGRESS / 9 VERIFIED BUGS / EXECUTION LOCKED",
+    "status": "MAPPING IN PROGRESS / 11 VERIFIED BUGS / EXECUTION LOCKED",
     "system_file": "systems/messenger.md",
     "bug_file": "bugs/messenger.md",
     "test_file": "tests/messenger.md",
@@ -21,13 +21,16 @@
       "BUG-MSG-006",
       "BUG-MSG-007",
       "BUG-MSG-008",
-      "BUG-MSG-009"
+      "BUG-MSG-009",
+      "BUG-MSG-010",
+      "BUG-MSG-011"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Audit pending party/guild invite acceptance after either side establishes a messenger block.",
-      "Finish GM messenger cache lifecycle and channel-change/reconnect boundaries.",
-      "Continue remaining client parser/state boundaries after BUG-MSG-009.",
+      "Finish GM messenger cache lifecycle beyond the verified teardown leak.",
+      "Re-check channel-change/reconnect ordering against BUG-MSG-003 and BUG-MSG-007.",
+      "Audit remaining client messenger parser/state boundaries after BUG-MSG-009.",
+      "Check current quest usage/reachability of the broken Lua relation helpers from BUG-MSG-011.",
       "Do not execute runtime tests; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -2673,7 +2676,9 @@
       "BUG-MSG-006",
       "BUG-MSG-007",
       "BUG-MSG-008",
-      "BUG-MSG-009"
+      "BUG-MSG-009",
+      "BUG-MSG-010",
+      "BUG-MSG-011"
     ],
     "mapped_flows": [
       "input_login.cpp -> MessengerManager::Login -> asynchronous friend/GM/block SQL callbacks",
@@ -2688,11 +2693,12 @@
       "uitarget.py -> /party_request -> do_party_request -> CHARACTER::RequestToParty messenger-block bypass",
       "uitarget.py unblock confirmation -> SendMessengerBlockRemoveByVIDPacket -> GetInstancePtr stale-VID/null-deref path",
       "questlua_pc.cpp pc_change_name -> RemoveAllList + RemoveAllBlockList",
-      "input_p2p.cpp shout fanout -> receiver-side IsBlocked filter"
+      "input_p2p.cpp shout fanout -> receiver-side IsBlocked filter",
+      "party/guild pending invite acceptance -> no messenger-block revalidation",
+      "questlua_pc.cpp -> registered pc.is_blocked/pc.is_friend numeric-gate vs FindPC(name)"
     ],
     "candidates": [
-      "add-by-name friend path observer-mode parity with add-by-VID remains under assessment",
-      "pending party/guild invite acceptance after a newly established messenger block remains under assessment"
+      "add-by-name friend path observer-mode parity with add-by-VID remains under assessment"
     ],
     "runtime_tests": {
       "status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN",
@@ -2705,7 +2711,9 @@
         "MSG-T06",
         "MSG-T07",
         "MSG-T08",
-        "MSG-T09"
+        "MSG-T09",
+        "MSG-T10",
+        "MSG-T11"
       ],
       "first_live_gate_unchanged": "DUNGEON-T09"
     },
