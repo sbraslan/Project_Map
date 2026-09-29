@@ -351,6 +351,15 @@
       "runtime_status": null
     },
     {
+      "id": "marriage",
+      "system_file": "systems/marriage.md",
+      "bug_file": "bugs/marriage.md",
+      "test_file": "tests/marriage.md",
+      "state_section": "marriage_mapping",
+      "status": "STATIC MAPPING IN PROGRESS",
+      "verified_bug_ids": []
+    },
+    {
       "id": "messenger",
       "system_file": "systems/messenger.md",
       "bug_file": "bugs/messenger.md",
