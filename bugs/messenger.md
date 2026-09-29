@@ -122,7 +122,7 @@ A request can remain authorizable long after its original UI/request lifetime, i
 ## Open candidates / not promoted yet
 - add-by-name friend path differs from add-by-VID observer validation; gameplay impact not yet closed.
 - remove-all and inverse-only relation cleanup semantics need symmetry audit.
-- `OnBlockLogin` lacks the handler-null guard used by nearby callbacks; safety of the Python-call helper has not yet been proven.
+- `OnBlockLogin` lacks a local handler-null guard, but this is closed as non-bug: `PyCallClassMemberFunc` itself rejects a null class/handler safely.
 
 
 ---
@@ -141,7 +141,7 @@ A request can remain authorizable long after its original UI/request lifetime, i
 6. `IsBlocked(A,B)` and `IsInList(A,B)` read those outgoing maps.
 
 ### Consequence
-Persistent relationships in SQL diverge from the live server cache after the companion logs out. Most critically, if A blocked B, B logging out and reconnecting can make `IsBlocked(A,B)` false until A itself reloads its list. This creates a same-core block-enforcement bypass in addition to the separate cross-core whisper bypass in BUG-MSG-002. Friend membership checks/duplicate prevention can also observe a false-negative cache.
+Persistent relationships in SQL diverge from the live server cache after the companion logs out. Most critically, if A blocked B, B logging out and reconnecting can make `IsBlocked(A,B)` false until A itself reloads its list. This creates a same-core block-enforcement bypass in addition to the separate cross-core whisper bypass in BUG-MSG-002. Friend membership checks/duplicate prevention can also observe a false-negative cache. The same cache loss can undermine receiver-side shout filtering. It can also make a later unblock request fail the server-side `IsBlocked` precheck while the client optimistically removes the block locally, leaving DB/client state divergent until reload.
 
 ### Deferred validation
 `MSG-T07`.
@@ -171,4 +171,26 @@ When A targets B while B is already in a party, A can use the normal target-boar
 - Shout fanout checks `IsBlocked(receiver,sender)` on every process, including P2P shout delivery. Logout cache corruption from BUG-MSG-007 can still make this check false later; this is an impact extension of BUG-MSG-007, not a separate finding.
 - Guild invite, direct party invite, exchange, PvP and equipment-view paths observed in this pass contain messenger block checks.
 - The block-add-by-VID branches that sometimes return `sizeof(TPacketCGMessengerAddByVID)` are equal-sized to `TPacketCGMessengerAddBlockByVID` in this snapshot (both contain one `uint32_t vid`), so the suspected packet-consumption mismatch is closed as non-bug.
-- `RemoveAllBlockList(account)` deletes SQL rows where account is either endpoint but iterates/P2P-removes only `m_BlockRelation[account]`. This remains a dormant candidate until an active caller is proven.
+- `RemoveAllBlockList(account)` deletes SQL rows where account is either endpoint but iterates/P2P-removes only `m_BlockRelation[account]`. Active reachability is now proven through `pc.change_name`; final rename/logout lifecycle impact remains under assessment.
+
+
+---
+
+## BUG-MSG-009 — target-board block removal can dereference a missing client instance
+
+**Class:** client crash / stale VID lifetime defect  
+**Reachability:** VERIFIED through the normal target-board unblock confirmation flow.
+
+### Proof
+1. `uitarget.py::__OnBlockRemove` opens a confirmation dialog whose accept callback later calls `OnBlockRemove` and uses the board's current `self.vid`.
+2. `TargetBoard.Close()` calls `__Initialize()`, which resets `self.vid = 0`, but it does not close or invalidate the block-removal confirmation dialog.
+3. If the target disappears while the dialog is open, the target board can close/reset while the confirmation remains actionable. Even without the reset path, the stored VID can simply become stale after the instance is removed.
+4. Accepting the dialog calls `SendMessengerBlockRemoveByVIDPacket(self.vid)`.
+5. That C++ function calls `CPythonCharacterManager::GetInstancePtr(vid)` and immediately dereferences the returned pointer through `pInstance->GetNameString()` without a null check.
+6. `GetInstancePtr` explicitly returns `nullptr` when the VID is absent from `m_kAliveInstMap`.
+
+### Consequence
+A normal UI race — open “remove block”, let the targeted character leave/despawn or otherwise lose its client instance, then accept — can reach a null-pointer dereference and terminate the client.
+
+### Deferred validation
+`MSG-T09`.
