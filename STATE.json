@@ -613,7 +613,16 @@
       "status": "DOCUMENTATION READY / NOT RUN",
       "test_range": "BP-T01..BP-T14",
       "primary_normal_path_candidate": "BP-T02",
-      "note": "Existing test matrix classified; some bugs have complementary tests and one lifecycle regression test is broad rather than uniquely mapped."
+      "note": "Existing test matrix classified; some bugs have complementary tests and one lifecycle regression test is broad rather than uniquely mapped.",
+      "handoff": "BP_T02_HANDOFF.md",
+      "preflight_notes": [
+        "All mapped TPacketGCExtBattlePassMissionUpdate send sites omit bMissionType assignment.",
+        "Client RecvExtBattlePassMissionUpdatePacket forwards bMissionType unchanged to Python.",
+        "Current HaveMission ignores mission_type and matches by missionIndex, so progress can still update.",
+        "When the updated mission is selected, undefined missionType reaches SetMissionInfo.",
+        "Packet also exposes one uninitialized stack byte.",
+        "BP-T02 remains the primary Battle Pass normal-path observational candidate after earlier global gates."
+      ]
     },
     "achievement": {
       "status": "DOCUMENTATION READY / NOT RUN",
