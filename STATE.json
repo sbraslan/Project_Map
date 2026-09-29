@@ -2787,9 +2787,9 @@
     "counts": {
       "mapping_relevant_files": 10119,
       "systems": 35,
-      "symbol_seeds": 228,
-      "packet_seeds": 9,
-      "call_flow_edges": 234
+      "symbol_seeds": 241,
+      "packet_seeds": 20,
+      "call_flow_edges": 278
     },
     "lookup_order": [
       "index/features.json",
@@ -2799,7 +2799,7 @@
       "exact source fetch"
     ],
     "context7_role": "supplementary external library/API documentation verification; not authoritative Metin2 source location",
-    "next_action": "continue Marriage/Wedding static mapping using acceleration index"
+    "next_action": "continue Marriage/Wedding static mapping: login/logout + near-check/love-point lifecycle"
   },
   "marriage_mapping": {
     "status": "STATIC MAPPING IN PROGRESS",
