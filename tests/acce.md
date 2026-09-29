@@ -2,7 +2,7 @@
 
 **Status:** READY / NOT RUN  
 **Execution:** LOCKED  
-**Global first future live gate:** DUNGEON-T10 remains unchanged.
+**Global first future live gate:** DUNGEON-T09 remains unchanged.
 
 These tests exist only to preserve ownership of the current static findings. They are not authorized for execution.
 
