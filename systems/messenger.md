@@ -49,6 +49,7 @@ Remote target: target is represented by P2P `CCI` and relay descriptor while `pk
 - `BUG-MSG-006` — pending friend authorization tokens have no server timeout/logout cleanup and can be consumed later.
 - `BUG-MSG-007` — logout erases the departing character from every online account's outgoing friend/block cache; reconnect reloads only the departing account, so persistent block/friend state is not restored for observers.
 - `BUG-MSG-008` — target-board `/party_request` uses a player command path without messenger block validation, bypassing the guarded direct party-invite path.
+- `BUG-MSG-009` — target-board unblock confirmation can outlive the target instance; remove-by-VID dereferences `GetInstancePtr(vid)` without a null guard.
 
 ## Current cursor
 Continue static audit of:
@@ -79,3 +80,9 @@ Continue static audit of:
 - active-call reachability of `RemoveAllBlockList`.
 
 Do not execute runtime tests. Global first future live gate remains `DUNGEON-T09`.
+
+
+### Client block-remove lifetime
+The target-board unblock confirmation stores only the target VID across the confirmation delay. The eventual C++ remove-by-VID path resolves that VID again but does not validate the returned instance pointer before reading its name. This creates BUG-MSG-009 when the target disappears before confirmation.
+
+The same send path removes the local block entry immediately and has no positive server acknowledgement. If server-side `IsBlocked` has already false-negatived because of BUG-MSG-007, the server returns without deleting the persistent row while the client has already removed it from its local set. This is tracked as an explicit BUG-MSG-007 consequence for runtime verification.
