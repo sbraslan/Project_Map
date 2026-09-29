@@ -8,14 +8,16 @@
   "active": {
     "subsystem": "fishing",
     "display_name": "Fishing Renewal",
-    "status": "MAPPING IN PROGRESS / 3 VERIFIED BUGS / EXECUTION LOCKED",
+    "status": "MAPPING IN PROGRESS / 5 VERIFIED BUGS / EXECUTION LOCKED",
     "system_file": "systems/fishing.md",
     "bug_file": "bugs/fishing.md",
     "test_file": "tests/fishing.md",
     "verified_bug_ids": [
       "BUG-FISH-001",
       "BUG-FISH-002",
-      "BUG-FISH-003"
+      "BUG-FISH-003",
+      "BUG-FISH-004",
+      "BUG-FISH-005"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
@@ -285,7 +287,9 @@
     "game/src/char_fishing.cpp::CreateItem(50187) inventory probe lifetime -> BUG-FISH-002",
     "Project_Binary/root/uifishing.py::renewed fishing minigame UI",
     "Project_DumpProto/tr/item_names.txt::rod family 27400..27591",
-    "Project_Binary/root/uifishing.py + game/src/char_fishing.cpp::client-authoritative catch validation -> BUG-FISH-003"
+    "Project_Binary/root/uifishing.py + game/src/char_fishing.cpp::client-authoritative catch validation -> BUG-FISH-003",
+    "game/src/char.cpp::CanMove omits renewed fishing state -> BUG-FISH-004",
+    "game/src/char_fishing.cpp::Carbon rod impossible special chance condition -> BUG-FISH-005"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -2494,7 +2498,9 @@
     "verified_bug_ids": [
       "BUG-FISH-001",
       "BUG-FISH-002",
-      "BUG-FISH-003"
+      "BUG-FISH-003",
+      "BUG-FISH-004",
+      "BUG-FISH-005"
     ],
     "mapped_flows": [
       "HEADER_CG_FISHING_NEW -> CInputMain::FishingNew -> CHARACTER::fishing_new_start/stop/catch",
@@ -2503,18 +2509,22 @@
       "current rod names 27400..27591 split at 27490",
       "second normal table bounds defect -> BUG-FISH-001",
       "temporary CreateItem(50187) inventory probe lifetime -> BUG-FISH-002",
-      "client UI hit-test -> trusted CATCH packet -> server catch counter -> BUG-FISH-003"
+      "client UI hit-test -> trusted CATCH packet -> server catch counter -> BUG-FISH-003",
+      "renewed fishing start lacks POS_FISHING/movement lock and event position revalidation -> BUG-FISH-004",
+      "Carbon rod 27591 impossible special chance condition -> BUG-FISH-005"
     ],
     "candidates": [
-      "Carbon rod bonus condition is logically impossible as written; intended semantics not yet closed.",
-      "Probability arithmetic can narrow normal_chance-rare_chance to uint8_t; current reachable value domain still under audit."
+      "GetFishCatchedVnum uint8 rare_chance narrowing/wrap remains unpromoted until current producer/value ranges are proven.",
+      "CATCH_FAILED has no rate-limit and feeds a uint32 failed counter into event sec; practical external impact beyond self-cancel remains unproven."
     ],
     "runtime_tests": {
       "status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN",
       "canonical_test_ids": [
         "FISH-T01",
         "FISH-T02",
-        "FISH-T03"
+        "FISH-T03",
+        "FISH-T04",
+        "FISH-T05"
       ],
       "first_live_gate_unchanged": "DUNGEON-T09"
     }
