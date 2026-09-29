@@ -6,27 +6,19 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "marriage",
-    "display_name": "Marriage / Wedding",
-    "status": "STATIC MAPPING IN PROGRESS / 6 VERIFIED BUGS / EXECUTION LOCKED",
-    "system_file": "systems/marriage.md",
-    "bug_file": "bugs/marriage.md",
-    "test_file": "tests/marriage.md",
-    "verified_bug_ids": [
-      "BUG-MARR-001",
-      "BUG-MARR-002",
-      "BUG-MARR-003",
-      "BUG-MARR-004",
-      "BUG-MARR-005",
-      "BUG-MARR-006"
-    ],
+    "subsystem": "oxevent",
+    "display_name": "OX Event",
+    "status": "STATIC MAPPING IN PROGRESS / 0 VERIFIED BUGS / EXECUTION LOCKED",
+    "system_file": "systems/oxevent.md",
+    "bug_file": "bugs/oxevent.md",
+    "test_file": "tests/oxevent.md",
+    "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Finish mutual divorce stale-target/reselection audit.",
-      "Close marriage near-check/love-point lifecycle.",
-      "Close wedding membership/end interactions after MARR-005/MARR-006.",
-      "Audit remaining marriage Lua state assumptions and unique-item bonus behavior.",
-      "Decide Marriage/Wedding STATIC COMPLETE readiness; runtime remains locked."
+      "Map OX event manager lifecycle, quest entry, participant/attender sets, quiz flow, rewards and exit.",
+      "Audit multi-core/event-map ownership and login/warp lifecycle.",
+      "Compare deployed e_event/oxevent.quest with server-side invariants.",
+      "Keep runtime/fault-injection execution locked; first future live gate remains DUNGEON-T09."
     ]
   },
   "startup": {
@@ -399,7 +391,8 @@
     "acce_sash",
     "dragon_soul",
     "aura",
-    "refine_cube"
+    "refine_cube",
+    "marriage"
   ],
   "ranking_closure": {
     "status": "STATIC COMPLETE",
@@ -2809,7 +2802,7 @@
     "next_action": "continue Marriage/Wedding static mapping: login/logout + near-check/love-point lifecycle"
   },
   "marriage_mapping": {
-    "status": "STATIC MAPPING IN PROGRESS / 6 VERIFIED BUGS",
+    "status": "STATIC COMPLETE / 8 VERIFIED BUGS",
     "canonical_files": {
       "system": "systems/marriage.md",
       "bugs": "bugs/marriage.md",
@@ -2821,7 +2814,9 @@
       "BUG-MARR-003",
       "BUG-MARR-004",
       "BUG-MARR-005",
-      "BUG-MARR-006"
+      "BUG-MARR-006",
+      "BUG-MARR-007",
+      "BUG-MARR-008"
     ],
     "mapped_flows": [
       "marriage_manage.quest -> marriage.engage_to -> ALUA(marriage_engage_to) -> marriage::CManager::RequestAdd -> HEADER_GD_MARRIAGE_ADD -> DB CClientManager::MarriageAdd -> DB marriage::CManager::Add -> SQL INSERT marriage -> HEADER_DG_MARRIAGE_ADD -> game CInputDB::MarriageAdd -> game marriage::CManager::Add",
@@ -2849,15 +2844,37 @@
         "MARR-T03",
         "MARR-T04",
         "MARR-T05",
-        "MARR-T06"
+        "MARR-T06",
+        "MARR-T07",
+        "MARR-T08"
       ],
       "first_live_gate_unchanged": "DUNGEON-T09"
     },
     "closure_notes": [
-      "Legacy BREAK_MARRIAGE mapped as compatibility/DB remove entry; no independent active gameplay path promoted.",
-      "Marriage/Wedding has six statically verified bugs and MARR-T01..T06 deferred tests.",
+      "Marriage/Wedding static mapping complete with BUG-MARR-001..008.",
+      "MARR-T01..MARR-T08 are canonical deferred tests; none executed.",
       "Source/Game repositories remain read-only.",
       "Global first future live gate remains DUNGEON-T09."
+    ]
+  },
+  "oxevent_mapping": {
+    "status": "STATIC MAPPING IN PROGRESS",
+    "canonical_files": {
+      "system": "systems/oxevent.md",
+      "bugs": "bugs/oxevent.md",
+      "tests": "tests/oxevent.md"
+    },
+    "verified_bug_ids": [],
+    "mapped_flows": [],
+    "candidates": [],
+    "runtime_tests": {
+      "status": "NOT YET FINALIZED / EXECUTION LOCKED / NOT RUN",
+      "canonical_test_ids": [],
+      "first_live_gate_unchanged": "DUNGEON-T09"
+    },
+    "closure_notes": [
+      "OX Event mapping opened after Marriage/Wedding static closure.",
+      "Source/Game repositories remain read-only."
     ]
   }
 }
