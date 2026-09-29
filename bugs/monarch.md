@@ -1,6 +1,6 @@
 # Monarch — Bug Registry
 
-**Status:** STATIC MAPPING IN PROGRESS / 9 VERIFIED BUGS  
+**Status:** STATIC MAPPING IN PROGRESS / 10 VERIFIED BUGS  
 **Execution:** LOCKED / NOT RUN
 
 ## BUG-MON-001 — election finalizer does not produce a monarch
@@ -185,3 +185,25 @@ Logging out and creating a fresh character session clears active cooldowns for h
 - unguarded `takemonarchmoney` Lua API while validation is compiled under `__UNIMPLEMENTED__`; deployed caller not yet proven;
 - add-money overflow/failure reporting symmetry;
 - legacy `SetMonarch` SQL column mismatch remains candidate until authoritative table schema is available.
+
+
+## BUG-MON-010 — MI_TAX cooldown is written but never enforced
+
+**Class:** cooldown enforcement  
+**Reachability:** VERIFIED through registered `mtax` command.
+
+### Proof
+1. The monarch cooldown model defines `MI_TAX`.
+2. `do_monarch_tax` calls `SetMC(MI_TAX)` after changing the tax flag.
+3. The handler never calls `IsMCOK(MI_TAX)` before a later tax change.
+4. Warp, transfer, summon and heal paths do explicitly gate their corresponding cooldowns.
+
+### Consequence
+A monarch can repeatedly change the tax flag while the configured MI_TAX cooldown is active.
+
+### Deferred validation
+`MON-T10`.
+
+## Dormant candidate notes
+- `monarch_defenseup_event` receives `monarch_defenseup_event_info` but casts it as `monarch_powerup_event_info`; if `oh.monarchdefenseup` becomes deployed, the expiration event can fail to clear DefenseUp.
+- `oh.takemonarchmoney` keeps authorization, negative-money and balance validation inside `__UNIMPLEMENTED__`; no tracked Project_Game caller is currently deployed, so this remains unpromoted.
