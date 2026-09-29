@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "generated_at": "2026-09-29",
+  "source": "STATE.json verified/static mapping text",
+  "packets": [
+    {
+      "name": "GG_LOGIN",
+      "references": [
+        "messenger_mapping.mapped_flows.24"
+      ]
+    },
+    {
+      "name": "GG_LOGOUT",
+      "references": [
+        "messenger_mapping.mapped_flows.24"
+      ]
+    },
+    {
+      "name": "HEADER_CG_ACCE_REFINE_REQUEST",
+      "references": [
+        "mapped_roots.163",
+        "acce_sash_mapping.mapped_flows.1"
+      ]
+    },
+    {
+      "name": "HEADER_CG_CHANGE_LOOK",
+      "references": [
+        "mapped_roots.131",
+        "costume_appearance_closure.mapped_flows.2"
+      ]
+    },
+    {
+      "name": "HEADER_CG_DRAGON_SOUL_REFINE",
+      "references": [
+        "dragon_soul_closure.mapped_flows.2"
+      ]
+    },
+    {
+      "name": "HEADER_CG_FISHING_NEW",
+      "references": [
+        "fishing_mapping.mapped_flows.0"
+      ]
+    },
+    {
+      "name": "HEADER_CG_REFINE",
+      "references": [
+        "mapped_roots.196",
+        "refine_cube_mapping.mapped_flows.4"
+      ]
+    },
+    {
+      "name": "HEADER_CG_SCRIPT_BUTTON",
+      "references": [
+        "mapped_roots.55"
+      ]
+    },
+    {
+      "name": "HEADER_GG_WORLD_BOSS",
+      "references": [
+        "mapped_roots.3"
+      ]
+    }
+  ]
+}
