@@ -1,0 +1,542 @@
+{
+  "schema_version": 3,
+  "project": "Metin2 Project",
+  "canonical": true,
+  "canonical_file": "MAP_STATE.json",
+  "updated_at": "2026-09-29",
+  "mode": "STATIC_MAPPING_ONLY",
+  "execution_lock": "LOCKED",
+  "repository_policy": {
+    "writable": [
+      "sbraslan/Project_Map"
+    ],
+    "read_only": [
+      "sbraslan/Project_ClientSrc",
+      "sbraslan/Project_ServerSRC",
+      "sbraslan/Project_Binary",
+      "sbraslan/Project_Game",
+      "sbraslan/Project_DumpProto"
+    ]
+  },
+  "source_snapshot": {
+    "sbraslan/Project_ClientSrc": "19c1e08141eb8ff2bf22fd8b93df3e4f3a516d81",
+    "sbraslan/Project_ServerSRC": "321712c849aa01d3635b9fe6a9cde79cc0adcb64",
+    "sbraslan/Project_Binary": "c87aea062f8c50e70a854d4e1dc0c75773960e27",
+    "sbraslan/Project_Game": "4f26f48e0b20b76825a5a6158c992b8c5670f44e",
+    "sbraslan/Project_DumpProto": "1066f4620af451c5f728260eb5f8a086672e6384"
+  },
+  "invariants": [
+    "MAP_STATE.json is the only authority for subsystem lifecycle, active cursor and discovery queue.",
+    "Never infer active/completed state from chat history, README text, evidence files, Git commit messages or lookup indexes.",
+    "A CLOSED subsystem MUST NOT be rescanned on the same source snapshot.",
+    "A CLOSED subsystem may be reopened only if the user explicitly requests a re-audit or a relevant source repository SHA changes and an impact check marks that subsystem INVALIDATED.",
+    "Before opening a candidate subsystem, normalize its name through alias_index. If it resolves to CLOSED, skip it. If it resolves to OPEN, continue its cursor. Only UNKNOWN candidates may become new nodes.",
+    "While an OPEN subsystem exists, do not run broad global rediscovery unless its cursor explicitly requires a targeted dependency lookup.",
+    "Raw lookup indexes are accelerators only and can never change lifecycle state.",
+    "Runtime/fault-injection tests remain locked until the user explicitly changes project phase."
+  ],
+  "resume_protocol": [
+    "Read MAP_STATE.json only.",
+    "If active.status is OPEN, continue active.cursor exactly.",
+    "Consult only the active subsystem evidence files unless a dependency lookup is required.",
+    "When active closes, set it CLOSED, add it to closed, clear active, then run targeted UNKNOWN-only feature discovery.",
+    "For every discovery candidate, resolve alias_index before reading source.",
+    "Never revisit a CLOSED node merely because an old evidence file contains words like next, active, open or mapping."
+  ],
+  "counts": {
+    "closed_subsystems": 37,
+    "open_subsystems": 1,
+    "total_canonical_subsystems": 38
+  },
+  "active": {
+    "id": "zodiac_temple",
+    "name": "Zodiac Temple / 12ZI",
+    "status": "OPEN",
+    "evidence": {
+      "system": "systems/zodiac_temple.md",
+      "bugs": "bugs/zodiac_temple.md",
+      "tests": "tests/zodiac_temple.md"
+    },
+    "verified_bug_count": 7,
+    "test_plan_count": 7,
+    "cursor": [
+      "Resolve deployment/entry ownership: server-time portals versus missing tracked quest source.",
+      "Audit DecMember event-flag branch plus party/reconnect teardown.",
+      "Audit private-map/floor timer destruction ordering.",
+      "Audit bead regeneration/persistence and 12ZI shop-limit accounting.",
+      "Close remaining client/server parity findings and promote only source-proven defects."
+    ]
+  },
+  "closed": {
+    "guild_storage": {
+      "name": "Guild Storage + Guild lifecycle",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/guild_storage.md",
+        "bugs": "bugs/guild_storage.md",
+        "tests": "tests/guild_storage.md"
+      }
+    },
+    "inventory_items": {
+      "name": "Inventory / Item / Special Inventory",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/inventory_items.md",
+        "bugs": "bugs/inventory_items.md",
+        "tests": "tests/inventory_items.md"
+      }
+    },
+    "switchbot": {
+      "name": "Switchbot",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/switchbot.md",
+        "bugs": "bugs/switchbot.md",
+        "tests": "tests/switchbot.md"
+      }
+    },
+    "exchange": {
+      "name": "Exchange / Trade",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/exchange.md",
+        "bugs": "bugs/exchange.md",
+        "tests": "tests/exchange.md"
+      }
+    },
+    "shop": {
+      "name": "Shop / Premium Private Shop",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/shop.md",
+        "bugs": "bugs/shop.md",
+        "tests": "tests/shop.md"
+      }
+    },
+    "safebox_mall": {
+      "name": "Safebox / Mall",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/safebox_mall.md",
+        "bugs": "bugs/safebox_mall.md",
+        "tests": "tests/safebox_mall.md"
+      }
+    },
+    "mailbox": {
+      "name": "Mailbox",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/mailbox.md",
+        "bugs": "bugs/mailbox.md",
+        "tests": "tests/mailbox.md"
+      }
+    },
+    "ticket": {
+      "name": "Ticket System",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/ticket.md",
+        "bugs": "bugs/ticket.md",
+        "tests": "tests/ticket.md"
+      }
+    },
+    "dungeon_info": {
+      "name": "Dungeon Info",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/dungeon_info.md",
+        "bugs": "bugs/dungeon_info.md",
+        "tests": "tests/dungeon_info.md"
+      }
+    },
+    "battle_pass": {
+      "name": "Battle Pass",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/battle_pass.md",
+        "bugs": "bugs/battle_pass.md",
+        "tests": "tests/battle_pass.md"
+      }
+    },
+    "achievement": {
+      "name": "Achievement System",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/achievement.md",
+        "bugs": "bugs/achievement.md",
+        "tests": "tests/achievement.md"
+      }
+    },
+    "biolog": {
+      "name": "Biolog System",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/biolog.md",
+        "bugs": "bugs/biolog.md",
+        "tests": "tests/biolog.md"
+      }
+    },
+    "hunting": {
+      "name": "Hunting System",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/hunting.md",
+        "bugs": "bugs/hunting.md",
+        "tests": "tests/hunting.md"
+      }
+    },
+    "ranking": {
+      "name": "Ranking System",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/ranking.md",
+        "bugs": "bugs/ranking.md",
+        "tests": "tests/ranking.md"
+      }
+    },
+    "party": {
+      "name": "Party System",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/party.md",
+        "bugs": "bugs/party.md",
+        "tests": "tests/party.md"
+      }
+    },
+    "party_match": {
+      "name": "Party Match",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/party_match.md",
+        "bugs": "bugs/party_match.md",
+        "tests": "tests/party_match.md"
+      }
+    },
+    "dungeon_core": {
+      "name": "Dungeon Core",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/dungeon_core.md",
+        "bugs": "bugs/dungeon_core.md",
+        "tests": "tests/dungeon_core.md"
+      }
+    },
+    "battle_field": {
+      "name": "Battle Field System",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/battle_field.md",
+        "bugs": "bugs/battle_field.md",
+        "tests": "tests/battle_field.md"
+      }
+    },
+    "world_lottery": {
+      "name": "World Lottery System",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/world_lottery.md",
+        "bugs": "bugs/world_lottery.md",
+        "tests": "tests/world_lottery.md"
+      }
+    },
+    "world_boss": {
+      "name": "World Boss System",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/world_boss.md",
+        "bugs": "bugs/world_boss.md",
+        "tests": "tests/world_boss.md"
+      }
+    },
+    "sung_mahi_tower": {
+      "name": "Sung Mahi Tower",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/sung_mahi_tower.md",
+        "bugs": "bugs/sung_mahi_tower.md",
+        "tests": "tests/sung_mahi_tower.md"
+      }
+    },
+    "costume_appearance": {
+      "name": "Costume / Appearance / ChangeLook",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/costume_appearance.md",
+        "bugs": "bugs/costume_appearance.md",
+        "tests": "tests/costume_appearance.md"
+      }
+    },
+    "acce": {
+      "name": "Acce / Sash",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/acce.md",
+        "bugs": "bugs/acce.md",
+        "tests": "tests/acce.md"
+      }
+    },
+    "dragon_soul": {
+      "name": "Dragon Soul / Alchemy",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/dragon_soul.md",
+        "bugs": "bugs/dragon_soul.md",
+        "tests": "tests/dragon_soul.md"
+      }
+    },
+    "aura": {
+      "name": "Aura System",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/aura.md",
+        "bugs": "bugs/aura.md",
+        "tests": "tests/aura.md"
+      }
+    },
+    "refine_cube": {
+      "name": "Refine / Cube / Crafting",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/refine_cube.md",
+        "bugs": "bugs/refine_cube.md",
+        "tests": "tests/refine_cube.md"
+      }
+    },
+    "growth_pet": {
+      "name": "Growth Pet System",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/growth_pet.md",
+        "bugs": "bugs/growth_pet.md",
+        "tests": "tests/growth_pet.md"
+      }
+    },
+    "horse_mount": {
+      "name": "Horse / Mount / Riding",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/horse_mount.md",
+        "bugs": "bugs/horse_mount.md",
+        "tests": "tests/horse_mount.md"
+      }
+    },
+    "pet": {
+      "name": "Classic Pet System",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/pet.md",
+        "bugs": "bugs/pet.md",
+        "tests": "tests/pet.md"
+      }
+    },
+    "fishing": {
+      "name": "Fishing Renewal",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/fishing.md",
+        "bugs": "bugs/fishing.md",
+        "tests": "tests/fishing.md"
+      }
+    },
+    "mining": {
+      "name": "Mining / Pickaxe",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/mining.md",
+        "bugs": "bugs/mining.md",
+        "tests": "tests/mining.md"
+      }
+    },
+    "messenger": {
+      "name": "Messenger / Friend / Block",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/messenger.md",
+        "bugs": "bugs/messenger.md",
+        "tests": "tests/messenger.md"
+      }
+    },
+    "marriage": {
+      "name": "Marriage / Wedding",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/marriage.md",
+        "bugs": "bugs/marriage.md",
+        "tests": "tests/marriage.md"
+      }
+    },
+    "oxevent": {
+      "name": "OX Event",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/oxevent.md",
+        "bugs": "bugs/oxevent.md",
+        "tests": "tests/oxevent.md"
+      }
+    },
+    "arena": {
+      "name": "Arena / PvP Duel",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/arena.md",
+        "bugs": "bugs/arena.md",
+        "tests": "tests/arena.md"
+      }
+    },
+    "monarch": {
+      "name": "Monarch System",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/monarch.md",
+        "bugs": "bugs/monarch.md",
+        "tests": "tests/monarch.md"
+      }
+    },
+    "attr6th7th": {
+      "name": "6th/7th Attribute",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/attr6th7th.md",
+        "bugs": "bugs/attr6th7th.md",
+        "tests": "tests/attr6th7th.md"
+      }
+    }
+  },
+  "alias_index": {
+    "guild_storage": "guild_storage",
+    "guild": "guild_storage",
+    "guild lifecycle": "guild_storage",
+    "guild storage": "guild_storage",
+    "guild bank": "guild_storage",
+    "guildbank": "guild_storage",
+    "inventory_items": "inventory_items",
+    "inventory": "inventory_items",
+    "item": "inventory_items",
+    "items": "inventory_items",
+    "special inventory": "inventory_items",
+    "switchbot": "switchbot",
+    "switch bot": "switchbot",
+    "exchange": "exchange",
+    "trade": "exchange",
+    "trading": "exchange",
+    "shop": "shop",
+    "private shop": "shop",
+    "premium private shop": "shop",
+    "myshop": "shop",
+    "safebox_mall": "safebox_mall",
+    "safebox": "safebox_mall",
+    "mall": "safebox_mall",
+    "mailbox": "mailbox",
+    "mail": "mailbox",
+    "ticket": "ticket",
+    "ticket system": "ticket",
+    "dungeon_info": "dungeon_info",
+    "dungeon info": "dungeon_info",
+    "battle_pass": "battle_pass",
+    "battle pass": "battle_pass",
+    "achievement": "achievement",
+    "achievements": "achievement",
+    "biolog": "biolog",
+    "biologist": "biolog",
+    "hunting": "hunting",
+    "hunting system": "hunting",
+    "ranking": "ranking",
+    "rank": "ranking",
+    "party": "party",
+    "group party": "party",
+    "party_match": "party_match",
+    "party match": "party_match",
+    "group match": "party_match",
+    "groupmatch": "party_match",
+    "dungeon_core": "dungeon_core",
+    "dungeon core": "dungeon_core",
+    "generic dungeon": "dungeon_core",
+    "battle_field": "battle_field",
+    "battle field": "battle_field",
+    "battlefield": "battle_field",
+    "world_lottery": "world_lottery",
+    "world lottery": "world_lottery",
+    "lottery": "world_lottery",
+    "world_boss": "world_boss",
+    "world boss": "world_boss",
+    "sung_mahi_tower": "sung_mahi_tower",
+    "sung mahi": "sung_mahi_tower",
+    "sung mahi tower": "sung_mahi_tower",
+    "smh tower": "sung_mahi_tower",
+    "costume_appearance": "costume_appearance",
+    "costume": "costume_appearance",
+    "appearance": "costume_appearance",
+    "changelook": "costume_appearance",
+    "change look": "costume_appearance",
+    "transmutation": "costume_appearance",
+    "acce": "acce",
+    "sash": "acce",
+    "shoulder sash": "acce",
+    "dragon_soul": "dragon_soul",
+    "dragon soul": "dragon_soul",
+    "alchemy": "dragon_soul",
+    "ds": "dragon_soul",
+    "aura": "aura",
+    "aura system": "aura",
+    "refine_cube": "refine_cube",
+    "refine": "refine_cube",
+    "cube": "refine_cube",
+    "crafting": "refine_cube",
+    "growth_pet": "growth_pet",
+    "growth pet": "growth_pet",
+    "new pet": "growth_pet",
+    "horse_mount": "horse_mount",
+    "horse": "horse_mount",
+    "mount": "horse_mount",
+    "riding": "horse_mount",
+    "horse riding": "horse_mount",
+    "pet": "pet",
+    "classic pet": "pet",
+    "pet system": "pet",
+    "fishing": "fishing",
+    "fishing renewal": "fishing",
+    "renewed fishing": "fishing",
+    "mining": "mining",
+    "pickaxe": "mining",
+    "mine": "mining",
+    "messenger": "messenger",
+    "friend": "messenger",
+    "friends": "messenger",
+    "block": "messenger",
+    "messenger friend block": "messenger",
+    "messenger_friend_block": "messenger",
+    "marriage": "marriage",
+    "wedding": "marriage",
+    "marriage wedding": "marriage",
+    "oxevent": "oxevent",
+    "ox": "oxevent",
+    "ox event": "oxevent",
+    "arena": "arena",
+    "pvp duel": "arena",
+    "duel": "arena",
+    "battle arena": "arena",
+    "monarch": "monarch",
+    "kingdom monarch": "monarch",
+    "attr6th7th": "attr6th7th",
+    "6th 7th attribute": "attr6th7th",
+    "6th/7th attribute": "attr6th7th",
+    "attr67": "attr6th7th",
+    "6 7 efsun": "attr6th7th",
+    "6. 7. efsun": "attr6th7th"
+  },
+  "discovery": {
+    "status": "PAUSED_WHILE_ACTIVE",
+    "queue": [],
+    "last_transition": "attr6th7th CLOSED -> targeted discovery found zodiac_temple",
+    "next_after_active_close": "Use raw lookup indexes to search only feature families that do not resolve through alias_index."
+  },
+  "lookup_indexes": {
+    "authority": "NON_CANONICAL_ACCELERATOR_ONLY",
+    "source_snapshot_required": true,
+    "files": "index/files.json",
+    "symbols": "index/symbols.json",
+    "packets": "index/packets.json",
+    "callgraph": "index/callgraph.json",
+    "repositories": "index/repositories.json"
+  }
+}
