@@ -8,13 +8,14 @@
   "active": {
     "subsystem": "fishing",
     "display_name": "Fishing Renewal",
-    "status": "MAPPING IN PROGRESS / 2 VERIFIED BUGS / EXECUTION LOCKED",
+    "status": "MAPPING IN PROGRESS / 3 VERIFIED BUGS / EXECUTION LOCKED",
     "system_file": "systems/fishing.md",
     "bug_file": "bugs/fishing.md",
     "test_file": "tests/fishing.md",
     "verified_bug_ids": [
       "BUG-FISH-001",
-      "BUG-FISH-002"
+      "BUG-FISH-002",
+      "BUG-FISH-003"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
@@ -283,7 +284,8 @@
     "game/src/fishing.cpp::GetFishCatchedVnum second-table bounds -> BUG-FISH-001",
     "game/src/char_fishing.cpp::CreateItem(50187) inventory probe lifetime -> BUG-FISH-002",
     "Project_Binary/root/uifishing.py::renewed fishing minigame UI",
-    "Project_DumpProto/tr/item_names.txt::rod family 27400..27591"
+    "Project_DumpProto/tr/item_names.txt::rod family 27400..27591",
+    "Project_Binary/root/uifishing.py + game/src/char_fishing.cpp::client-authoritative catch validation -> BUG-FISH-003"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -2491,7 +2493,8 @@
     },
     "verified_bug_ids": [
       "BUG-FISH-001",
-      "BUG-FISH-002"
+      "BUG-FISH-002",
+      "BUG-FISH-003"
     ],
     "mapped_flows": [
       "HEADER_CG_FISHING_NEW -> CInputMain::FishingNew -> CHARACTER::fishing_new_start/stop/catch",
@@ -2499,7 +2502,8 @@
       "rod/bait validation -> GetFishCatchedVnum -> fishing event -> fishing_catch_decision",
       "current rod names 27400..27591 split at 27490",
       "second normal table bounds defect -> BUG-FISH-001",
-      "temporary CreateItem(50187) inventory probe lifetime -> BUG-FISH-002"
+      "temporary CreateItem(50187) inventory probe lifetime -> BUG-FISH-002",
+      "client UI hit-test -> trusted CATCH packet -> server catch counter -> BUG-FISH-003"
     ],
     "candidates": [
       "Carbon rod bonus condition is logically impossible as written; intended semantics not yet closed.",
@@ -2509,7 +2513,8 @@
       "status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN",
       "canonical_test_ids": [
         "FISH-T01",
-        "FISH-T02"
+        "FISH-T02",
+        "FISH-T03"
       ],
       "first_live_gate_unchanged": "DUNGEON-T09"
     }
