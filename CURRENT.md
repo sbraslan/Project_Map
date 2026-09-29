@@ -2,7 +2,7 @@
 
 **Active phase:** Detection / Mapping Only  
 **Active state:** Static mapping continuation  
-**Status:** MESSENGER / FRIEND / BLOCK — MAPPING IN PROGRESS / 9 VERIFIED BUGS / EXECUTION LOCKED  
+**Status:** MESSENGER / FRIEND / BLOCK — MAPPING IN PROGRESS / 11 VERIFIED BUGS / EXECUTION LOCKED  
 **Machine state:** `STATE.json`  
 **Active subsystem:** Messenger / Friend / Block  
 **System:** `systems/messenger.md`  
@@ -25,6 +25,8 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 - `BUG-MSG-007` — companion logout erases persistent outgoing friend/block cache for still-online users; relog does not reconstruct it.
 - `BUG-MSG-008` — client-visible `/party_request` route bypasses messenger block checks that protect the normal party-invite packet route.
 - `BUG-MSG-009` — unblock-by-VID can dereference a vanished target instance after the confirmation delay.
+- `BUG-MSG-010` — pending party/guild invitations are not revalidated against a newly established messenger block at acceptance time.
+- `BUG-MSG-011` — `pc.is_blocked` / `pc.is_friend` reject ordinary player-name strings because they require `lua_isnumber` before `FindPC(name)`.
 
 ## Closed / scoped observations
 - Shout delivery checks the receiver's messenger block relation on both local and P2P fanout. BUG-MSG-007 can still undermine it after logout/relog cache loss.
@@ -34,8 +36,8 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 - `OnBlockLogin`'s missing local handler-null guard is closed as non-bug because `PyCallClassMemberFunc` safely rejects a null handler.
 
 ## Exact resume cursor
-1. Audit pending party/guild invite acceptance after either side establishes a messenger block.
-2. Finish GM messenger cache/login/logout lifecycle symmetry.
-3. Re-check channel-change boundaries against BUG-MSG-003/007 and P2P presence reconstruction.
-4. Continue remaining client parser/state boundaries after BUG-MSG-009.
+1. Finish GM messenger cache/login/logout lifecycle symmetry beyond BUG-MSG-005.
+2. Re-check channel-change/reconnect ordering against BUG-MSG-003 and BUG-MSG-007.
+3. Audit remaining client messenger parser/state boundaries after BUG-MSG-009.
+4. Check tracked quest usage of `pc.is_blocked` / `pc.is_friend` from BUG-MSG-011.
 5. Do not execute runtime tests; global first future live gate remains `DUNGEON-T09`.
