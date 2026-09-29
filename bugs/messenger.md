@@ -375,3 +375,23 @@ An observer who is intentionally blocked from adding a visible target by VID can
 ### Deferred validation
 `MSG-T14`.
 
+
+---
+
+## BUG-MSG-018 — Battle Field friend-add restriction is bypassed by the VID path
+
+**Class:** server authorization / path-parity defect  
+**Reachability:** VERIFIED through the normal target-board friend action while `ENABLE_BATTLE_FIELD` is enabled.
+
+### Proof
+1. `ENABLE_BATTLE_FIELD` is enabled in the shared build defines.
+2. `MESSENGER_SUBHEADER_CG_ADD_BY_NAME` explicitly rejects friend creation when `CBattleField::Instance().IsBattleZoneMapIndex(ch->GetMapIndex())` is true.
+3. `MESSENGER_SUBHEADER_CG_ADD_BY_VID` contains no equivalent Battle Field map check.
+4. `uitarget.py::OnAppendToMessenger` is the normal target-board friend action and sends `SendMessengerAddByVIDPacket(self.vid)`.
+5. The target-board friend-button flow contains no Battle Field-specific gate before that send path.
+
+### Consequence
+The intended “cannot add friends in Battle Field” server restriction depends on which client surface is used. Typing a name is rejected, while targeting the same visible player and using the friend button can reach `RequestToAdd` through the unguarded VID branch.
+
+### Deferred validation
+`MSG-T18`.
