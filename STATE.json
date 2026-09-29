@@ -8,7 +8,7 @@
   "active": {
     "subsystem": "messenger",
     "display_name": "Messenger / Friend / Block",
-    "status": "MAPPING IN PROGRESS / 16 VERIFIED BUGS / EXECUTION LOCKED",
+    "status": "MAPPING IN PROGRESS / 14 VERIFIED BUGS / EXECUTION LOCKED",
     "system_file": "systems/messenger.md",
     "bug_file": "bugs/messenger.md",
     "test_file": "tests/messenger.md",
@@ -32,10 +32,10 @@
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
+      "Continue channel-change/reconnect P2P ordering candidate without promoting timing-dependent behavior.",
+      "Finish remaining GM messenger lifecycle and inverse-cache semantics after BUG-MSG-013.",
       "Audit remaining client messenger packet/parser boundaries after BUG-MSG-012.",
-      "Check tracked quest/deployed usage reachability of BUG-MSG-011 Lua helpers.",
-      "Re-check residual P2P resynchronization paths after BUG-MSG-016 and interaction with BUG-MSG-003/007.",
-      "Run a final static relation/presence symmetry pass and assess Messenger static-closure readiness.",
+      "Check tracked quest usage/reachability of BUG-MSG-011 Lua helpers.",
       "Do not execute runtime tests; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -2710,9 +2710,12 @@
       "MessengerManager::Login LoadGMList SQL -> valid WIZARD authority omitted",
       "uimessenger.py name-based friend/block add -> server observer-mode parity bypass",
       "MessengerManager::LoadGMList -> m_InverseGMRelation[gm] accumulation without logout pruning",
-      "P2P channel/core handoff -> existing CCI update by LOGIN(new) -> stale LOGOUT(old) name-only teardown"
+      "P2P channel/core handoff -> existing CCI update by LOGIN(new) -> stale LOGOUT(old) name-only teardown",
+      "CInputMain Messenger add-by-name/block-by-name -> normal uimessenger.py name dialogs -> observer-mode guard bypass"
     ],
-    "candidates": [],
+    "candidates": [
+      "channel-change P2P presence ordering: third core can observe LOGIN(new) before delayed LOGOUT(old); logout is name-only and does not validate source descriptor"
+    ],
     "runtime_tests": {
       "status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN",
       "canonical_test_ids": [
