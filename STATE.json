@@ -6,28 +6,19 @@
   "mode": "detection_only_mapping",
   "canonical_rule": "GitHub state wins over chat history",
   "active": {
-    "subsystem": "attr6th7th",
-    "display_name": "6th/7th Attribute",
-    "status": "STATIC MAPPING OPEN / 9 VERIFIED BUGS / EXECUTION LOCKED",
-    "system_file": "systems/attr6th7th.md",
-    "bug_file": "bugs/attr6th7th.md",
-    "test_file": "tests/attr6th7th.md",
-    "verified_bug_ids": [
-      "BUG-ATTR67-001",
-      "BUG-ATTR67-002",
-      "BUG-ATTR67-003",
-      "BUG-ATTR67-004",
-      "BUG-ATTR67-005",
-      "BUG-ATTR67-006",
-      "BUG-ATTR67-007",
-      "BUG-ATTR67-008"
-    ],
+    "subsystem": "global_feature_coverage",
+    "display_name": "Global Source-Feature Coverage Discovery",
+    "status": "37 STATIC COMPLETE SUBSYSTEMS / GLOBAL DISCOVERY OPEN / EXECUTION LOCKED",
+    "system_file": "INDEX.md",
+    "bug_file": "bugs/INDEX.md",
+    "test_file": "RUNTIME.md",
+    "verified_bug_ids": [],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Finish Attr67 private-shop/shop/material cross-window boundary pass.",
-      "Audit NPC_STORAGE delayed retrieval plus reconnect/restart reconstruction.",
-      "Audit percent/support bounds and rare-attribute mutation.",
-      "Close deployment-shadowed client/server parity candidates.",
+      "Run global source-feature coverage discovery against the indexed source corpus.",
+      "Compare feature flags, packet families, quest/Lua bindings, server managers and client UI/modules against INDEX.md.",
+      "Open exactly one new subsystem if an unmapped feature family is found.",
+      "Otherwise record global static coverage closure/readiness handoff.",
       "Keep runtime/fault-injection execution locked; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -404,7 +395,15 @@
     "refine_cube",
     "marriage",
     "oxevent",
-    "monarch"
+    "monarch",
+    "growth_pet",
+    "horse_mount",
+    "pet",
+    "fishing",
+    "mining",
+    "messenger",
+    "arena",
+    "attr6th7th"
   ],
   "ranking_closure": {
     "status": "STATIC COMPLETE",
@@ -3088,7 +3087,7 @@
     ]
   },
   "attr6th7th_mapping": {
-    "status": "STATIC MAPPING OPEN / 9 VERIFIED BUGS",
+    "status": "STATIC COMPLETE / 9 VERIFIED BUGS",
     "canonical_files": {
       "system": "systems/attr6th7th.md",
       "bugs": "bugs/attr6th7th.md",
@@ -3149,10 +3148,14 @@
       "Context7 is supplementary only; tracked Metin2 source remains authoritative.",
       "CPython C-API docs confirm PyList_Size drives iteration length; the native fixed-array copy must impose its own cap. This remains deployment-shadowed rather than a new active server bug."
     ],
-    "next_actions": [
-      "Close remaining deployment-shadowed client/server parity findings.",
-      "Re-check dormant retrieval candidates for any non-quest/native caller.",
-      "Decide Attr67 STATIC COMPLETE."
+    "next_actions": [],
+    "closure_notes": [
+      "Attr67 static mapping complete with BUG-ATTR67-001..009.",
+      "ATTR67-T01..ATTR67-T09 are canonical deferred tests; none executed.",
+      "NPC_STORAGE and attr_6th_7th quest-flag persistence/reconstruction mapped without a promoted reconnect/restart loss bug.",
+      "No tracked non-Lua/native retrieval caller exists; retrieval null/full-inventory/wait candidates remain dormant.",
+      "Cross-window shop/private-shop review produced no independent bug beyond BUG-ATTR67-001/003/004.",
+      "Runtime remains locked; first future live gate remains DUNGEON-T09."
     ]
   }
 }
