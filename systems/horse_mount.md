@@ -268,3 +268,99 @@ However, the tracked `Project_DumpProto/*/item_proto.txt` snapshot is not expose
 5. decide Horse/Mount STATIC COMPLETE and prepare deferred runtime tests.
 
 No runtime execution is authorized. Global first future live gate remains `DUNGEON-T10`.
+
+
+## Final checkpoint — client race/combat coverage + subsystem closure
+
+### BUG-HORSE-003 — deployed 2021/2022 mount races fall through client mount classification
+
+Current packed item proto was decoded from the exact blob shared by:
+- `Project_Binary/locale/locale/common/item_proto`;
+- `Project_DumpProto/tr/item_proto`;
+- blob SHA: `24ed504beb93a38aff772b8c24d9b6e1bcd4c2d0`.
+
+Verified current mount items:
+- 71259 -> `APPLY_MOUNT 20276`
+- 71260 -> `APPLY_MOUNT 20277`
+- 71261 -> `APPLY_MOUNT 20278`
+- 71262 -> `APPLY_MOUNT 20279`
+- 71263 -> `APPLY_MOUNT 20280`
+- 71264 -> `APPLY_MOUNT 20281`
+- 71265 -> `APPLY_MOUNT 20282`
+- 71266 -> `APPLY_MOUNT 20283`
+
+All eight rows are current `ITEM_COSTUME / COSTUME_MOUNT` records and all have matching client `npclist.txt` race names.
+
+Client feature state:
+- `ENABLE_NO_MOUNT_CHECK` is disabled.
+- `InstanceBase.cpp::GetMountLevelByVnum()` contains none of 20276..20283.
+- unmatched races return `MOUNT_TYPE_NONE`.
+
+Combat consequence:
+- `SHORSE::CanAttack()` requires at least `MOUNT_TYPE_COMBAT`;
+- `SHORSE::CanUseSkill()` requires `MOUNT_TYPE_MILITARY`;
+- `CInstanceBase::CanAttackHorseLevel()` forwards `m_kHorse.CanAttack()`;
+- `CPythonPlayer` clears auto-attack when a mounted actor fails that check;
+- normal `CInstanceBase::CanAttack()` is also rejected by the horse check.
+
+The server can therefore equip and render these current mount races, but the client classifies them as no mount level and blocks mounted combat/horse skills.
+
+Promoted as `BUG-HORSE-003`.
+
+### Client mount packet/render lifecycle closed
+Normal server `CHARACTER::MountVnum()`:
+1. updates `m_dwMountVnum`;
+2. sends an actor re-insert;
+3. `TPacketGCCharacterAdditionalInfo.dwMountVnum` carries the race;
+4. client `RecvCharacterAdditionalInfo` stores it in `SNetworkActorData`;
+5. `NetworkActorManager` recreates the instance when mount status changes;
+6. `CInstanceBase::Create` calls `MountHorse(race)`.
+
+The commented direct mount/dismount block inside `NetworkActorManager::UpdateActor()` is therefore not a separate defect for the normal `MountVnum()` path.
+
+### Horse name / appearance closure
+Horse names:
+- quest setter validates name then writes a 30-day quest flag/affect;
+- `CHorseNameManager` broadcasts through DB;
+- DB persists in `horse_name` via `REPLACE`;
+- login requests missing cached name;
+- affect processing calls `CHorseNameManager::Validate()` to remove expired names.
+
+Horse appearance:
+- `horse_appearance` is persisted in the player table and restored at login;
+- `GetMyHorseVnum()` prefers the persisted appearance when non-zero;
+- Lua `horse.set_appearance` accepts an arbitrary numeric VNUM, but no tracked active quest producer calls it, so no reachable validation bug is promoted.
+
+### ChangeLook mount lifetime candidate — data side proven, reachability not promoted
+The decoded current item proto contains 131 time-limited `COSTUME_MOUNT` rows, including real-time family 52001+.
+
+Transmutation:
+- accepts compatible mount donor material;
+- stores only donor VNUM;
+- destroys donor;
+- does not transfer donor lifetime into target socket2;
+- does not start target ChangeLook expiry as part of Accept.
+
+Engine `game.open_transmutation` exists, but the tracked current `quest_list` / compiled quest object tree does not expose a normal-player opener in this snapshot. Under the verified-reachability rule this remains an unpromoted cross-system candidate owned by Costume/Appearance.
+
+### Additional Equipment Page closure
+- `WEAR_COSTUME_MOUNT` is excluded from alternate equipment page by `GetWearNotChange()`.
+- UNIQUE ride slots can theoretically participate; the remove-side helper has a suspicious `IsEquipped()` check after clearing `m_bEquipped`, but no tracked live `RefreshAdditionalEquipmentItems(..., false)` producer was established.
+- no Horse bug is promoted from this boundary.
+
+### Asset coverage note
+`npclist.txt` contains 20276..20283 mappings. Raw newer MSM/GR2 client pack assets are not versioned in the tracked repos, so physical pack presence remains a runtime/deployment check rather than a static missing-asset bug.
+
+## Horse / Mount / Riding — STATIC COMPLETE
+
+Verified Horse bug set:
+- `BUG-HORSE-001`
+- `BUG-HORSE-002`
+- `BUG-HORSE-003`
+
+Deferred runtime tests:
+- `HORSE-T01`
+- `HORSE-T02`
+- `HORSE-T03`
+
+No Horse/Mount runtime test has been executed. Global first future live gate remains `DUNGEON-T10`.
