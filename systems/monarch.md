@@ -1,6 +1,6 @@
 # Monarch — Static Map
 
-**Status:** STATIC MAPPING IN PROGRESS / 9 VERIFIED BUGS  
+**Status:** STATIC MAPPING IN PROGRESS / 10 VERIFIED BUGS  
 **Phase:** Detection / Mapping Only  
 **Opened:** 2026-09-29  
 **Source/Game repositories:** READ-ONLY  
@@ -161,12 +161,13 @@ Game-core `DecMoney` can refuse the underflow locally, but there is no failure a
 
 Promoted as `BUG-MON-005`.
 
-## BUG-MON-006 — monarch tax cooldown is written but never enforced
-`InitMC()` configures MI_TAX cooldown and `do_monarch_tax` calls `SetMC(MI_TAX)` after a tax change.
+## BUG-MON-006 — setmonarch persistence column differs from authoritative loader
+Legacy `CMonarch::SetMonarch` updates the selected PID in memory, then persists:
+`REPLACE INTO monarch (empire, name, windate, money) VALUES(..., p->pid[Empire], ...)`.
 
-Unlike warp/transfer/summon/heal paths, `do_monarch_tax` contains no `IsMCOK(MI_TAX)` check before applying another tax change.
+It omits `pid`, while `LoadMonarch` reconstructs identity from `a.pid` and joins `a.pid=b.id`. The newer `ChangeMonarchLord` path explicitly writes `pid`.
 
-Therefore the cooldown timestamp is updated but never gates the command.
+No tracked schema/trigger path repairs this source-level column contract mismatch, and the REPLACE result is asynchronous/unverified.
 
 Promoted as `BUG-MON-006`.
 
@@ -194,13 +195,6 @@ A recursive tracked quest inventory plus repository search found no current `Pro
 - `oh.monarchbless`.
 
 These Lua APIs remain mapped but are not promoted as deployed gameplay bugs without a tracked caller.
-
-## Current audit cursor
-1. audit SetMonarch SQL column/schema consistency using any authoritative schema source available;
-2. inspect candidacy/election persistence reload behavior across DB restart;
-3. close process-local power/defense as dormant vs deployed;
-4. inspect remaining monarch notice/warp and money-add boundaries;
-5. decide Monarch static closure.
 
 
 ## BUG-MON-008 — DB restart discards persisted candidacy and vote state from runtime
@@ -246,3 +240,20 @@ Promoted as `BUG-MON-009`.
 - inspect add-money edge handling;
 - inspect monarch notice and remaining warp edges;
 - decide STATIC COMPLETE.
+
+
+## BUG-MON-010 — MI_TAX cooldown is not enforced
+`do_monarch_tax` sets `MI_TAX` after changing tax state but does not call `IsMCOK(MI_TAX)` before accepting the next change. Other monarch actions enforce their cooldown categories.
+
+Promoted as `BUG-MON-010`.
+
+## Dormant candidate closure
+- `oh.monarchpowerup`, `oh.monarchdefenseup`, `oh.monarchbless` and `oh.takemonarchmoney` have no current tracked Project_Game caller.
+- `monarch_defenseup_event` has a wrong dynamic_cast target type and would risk a stuck defense effect if that Lua API becomes deployed; kept dormant/unpromoted under current corpus.
+- `takemonarchmoney` security checks remain under `__UNIMPLEMENTED__`, but no deployed caller was found.
+
+## Current audit cursor
+1. audit AddMoney overflow/failure fanout symmetry;
+2. audit remaining mto/mtr private-map and WarpSet failure boundaries;
+3. inspect notice path and treasury producers for independent defects;
+4. decide Monarch STATIC COMPLETE.
