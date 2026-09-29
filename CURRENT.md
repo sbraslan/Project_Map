@@ -122,3 +122,10 @@ Runtime remains locked; no live test was executed.
 - selected mission detail can consume the undefined mission type via SetMissionInfo.
 - canonical handoff: `BP_T02_HANDOFF.md`.
 - global first live gate remains `DUNGEON-T09`; no Battle Pass runtime test executed.
+
+
+## Achievement normal-path preflight — 2026-09-29
+- `ACH-T03` missing gameplay-hook families reverified against current config: 16 mount / 5 search-shop spend / 3 shop spend / 5 withdraw tasks.
+- `ACH-T04` reverified: 29 explore tasks; progression hook is reached from login, not mapped normal map transitions.
+- canonical handoffs: `ACH_T03_HANDOFF.md`, `ACH_T04_HANDOFF.md`.
+- global first live gate remains `DUNGEON-T09`; no Achievement runtime test executed.
