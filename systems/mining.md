@@ -1,6 +1,6 @@
 # Mining / Pickaxe
 
-**Status:** MAPPING IN PROGRESS / 6 VERIFIED BUGS / EXECUTION LOCKED  
+**Status:** STATIC COMPLETE / 7 VERIFIED BUGS / EXECUTION LOCKED  
 **Phase:** Detection / Mapping Only  
 **Source repos:** read-only  
 **Writable repo:** Project_Map only
@@ -212,3 +212,51 @@ Promoted as `BUG-MIN-006`.
 - **Vein VID reuse:** normal VID allocation is monotonically increasing. Destroyed vein VIDs are removed from the manager and are not normally reused during a mining attempt; no stale-VID retarget bug promoted.
 - **Battle Field ownership:** map 357 has no deployed vein spawns, and the dynamic Mining Event uses map 230 while the alternate mining initializer uses map 103. The no-ownership Battle Field branch is not currently reachable through mapped mining content.
 - **Pickaxe proto rows:** DumpProto contains proto blobs, but the available representation does not yield authoritative readable 29101..29109 rows. No values are inferred.
+
+
+## BUG-MIN-007 — scheduled Mining Event is deployment-incomplete and enters false-active state
+The enabled Event Manager registers `EVENT_TYPE_MINING` and routes it to `SetMiningEvent()`.
+
+The configured event map constant is:
+`EVENT_MAP_INDEX = 230`.
+
+Current deployed `Project_Game/share/locale/europe/map/index` contains no map index 230.
+
+`SetMiningEvent(true)` performs operations in this order:
+1. `UpdateGameFlag("mining_event", true)`;
+2. `SECTREE_MANAGER::GetMap(EVENT_MAP_INDEX)`;
+3. if map is missing, return false;
+4. otherwise clear regen and load `data/event/mining_event_regen_type_0.txt`.
+
+Therefore in the current deployment:
+- the global/event flag is switched to active first;
+- map 230 cannot be resolved;
+- the start function fails;
+- event state can advertise active while no Mining Event map/spawns exist.
+
+Additionally, the referenced regen file `data/event/mining_event_regen_type_0.txt` is absent from the tracked runtime/game repository snapshot, so even adding map 230 alone would not complete this path.
+
+Promoted as `BUG-MIN-007`.
+
+## Final static closure notes
+Closed without promotion:
+- `OreRefine()` removes ore before its internal gold check, but deployed `guild_building_melt.quest` prechecks the exact gold cost before invoking the Lua API.
+- Battle Field ore no-ownership branch is not reachable through current mapped content: map 357 has no vein spawns; scheduled mining event is map 230; alternate mining initializer targets map 103.
+- destroyed vein VID retargeting is not a normal risk because character VIDs increment monotonically and destroyed entries are removed from the VID map.
+- `InitializeMiningEvent()` also references missing `data/event/mining/map_mining.txt`, but no active caller was established in this snapshot; retained as deployment-risk evidence rather than a separate verified bug.
+- no Battle Pass mining mission type or Achievement mining task type exists, so no missing integration hook is expected.
+- readable authoritative pickaxe proto rows were not available from the tracked proto blobs; no numeric values were inferred.
+
+## Static closure
+Coverage completed for:
+- mining start/cancel/event settlement;
+- movement/death/warp/logout lifecycle;
+- pickaxe identity, mastery and refine quest binding;
+- distance/anti-hack validation;
+- vein lifetime and VID lifecycle;
+- ore drop/ownership behavior;
+- OreRefine Lua + deployed quest transaction;
+- scheduled Mining Event deployment/config;
+- Battle Pass/Achievement integration expectations.
+
+**Mining / Pickaxe: STATIC COMPLETE.**
