@@ -94,3 +94,18 @@ Expected bug signature: level 25 produces an EXP-derived update while level 26+ 
 Covers `BUG-MARR-007`.
 
 Do not run while the execution lock is active.
+
+
+## MARR-T08 — cross-core marriage item sharing
+After runtime is explicitly unlocked:
+1. marry two characters and establish a known love-point percentage;
+2. equip one tracked marriage bonus item (71069..71074) on spouse A only;
+3. place both spouses on the same game core and record A/B bonus behavior;
+4. move spouse B to a different game core without changing equipment or marriage state;
+5. repeat the same relevant combat/EXP measurement on B.
+
+Expected bug signature: B receives the advertised shared effect when both are represented on one process but loses it after cross-core separation, while A's item remains equipped.
+
+Covers `BUG-MARR-008`.
+
+Do not run while the execution lock is active.
