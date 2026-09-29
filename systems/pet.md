@@ -152,3 +152,43 @@ This is a strong stale-pet candidate. Promotion is deferred until a concrete cur
 6. promote only verified reachable additional Classic Pet bugs/tests.
 
 No runtime execution is authorized. Global first future live gate remains `DUNGEON-T10`.
+
+
+## Checkpoint — REAL_TIME PET_PAY expiry reachability closed
+
+Current decoded deployment data in `Project_DumpProto/tr/item_proto.txt` closes the forced-removal producer:
+- many current `ITEM_PET / PET_PAY` rows carry `REAL_TIME` limits;
+- Bruce item `53233` is `PET_PAY`, `WEAR_PET`, `REAL_TIME 2592000`, VALUE0/race `34055`;
+- multiple 530xx/532xx/533xx classic pet families use the same real-time lifetime model.
+
+Server expiry chain:
+`CItem::StartRealTimeExpireEvent`
+-> `real_time_expire_event`
+-> `ITEM_MANAGER::RemoveItem(item, "REAL_TIME_EXPIRE")`.
+
+Classic PET_PAY is not exempt from this expiry handler. The forced item-removal path unequips/destroys the item without calling `CHARACTER::PetUnsummon()`.
+
+On the next classic-pet update:
+- `CPetActor::Update()` cannot resolve the summon-item VID;
+- it returns `false` before `Unsummon()`;
+- `CPetSystem::Update()` only folds that return into its local result;
+- `petsystem_update_event` ignores the result and schedules itself again.
+
+Therefore an equipped/summoned real-time classic pet can outlive its expired summon item. This is promoted as `BUG-PET-003`.
+
+### Teardown boundary
+`CHARACTER::Destroy()` explicitly destroys `m_petSystem`. `CPetSystem::Destroy()` deletes actors and cancels the update event; actor destruction calls `Unsummon()`.
+
+So the stale classic pet is not proven permanent across owner teardown. The verified defect window is after item expiry and before owner/pet-system destruction or another explicit cleanup path.
+
+### Achievement follow-on candidate
+`CPetActor::Unsummon()` resets `pet.summon_time` only inside the branch where the summon item can still be resolved. If stale-pet cleanup happens after REAL_TIME removed the item, the achievement flag can survive that cleanup. A later normal summon overwrites the flag, so the exact externally visible accounting consequence still needs closure before separate promotion.
+
+## Updated next work
+1. locate/exclude active `pet.summon()` quest producers and resolve the legacy Lua signature mismatch;
+2. finish current PET_PAY item/race/client coverage;
+3. close Achievement TYPE_SUMMON_PET abnormal-cleanup consequence;
+4. audit remaining death/warp/login restoration edges;
+5. promote only verified reachable additional bugs/tests.
+
+No Classic Pet runtime test is authorized. Global first future live gate remains `DUNGEON-T10`.
