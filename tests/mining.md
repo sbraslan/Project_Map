@@ -1,33 +1,33 @@
-# Mining / Pickaxe — Deferred Runtime Tests
+# Mining / Pickaxe — Runtime Tests
 
-Runtime execution is locked. Do not run these until an explicit phase change. Global first live runtime gate remains `DUNGEON-T09`.
+> Documentation only. Execution remains locked.
 
-## MINE-T01 — pickaxe refine eligibility mismatch
-On isolated data after runtime unlock:
-1. prepare pickaxe 29101..29109 with `socket0 == Value2`;
-2. give it to NPC 20015 through the current mining quest;
-3. verify quest reaches `__refine_pick` but `RealRefinePick` rejects it;
-4. separately reach `socket0 > Value2` through practice and verify the quest routes to its not-ready branch.
+## MINE-T01 — current pickaxe refine threshold
+Using disposable data after runtime unlock:
+1. bring a 29101..29109 pickaxe to exactly `socket0 == value2`;
+2. give it to NPC 20015 through the normal mining quest;
+3. observe `__refine_pick` / return code and item state;
+4. separately test a controlled `socket0 > value2` state.
+
+Bug indicator:
+- equality reaches quest refine UI but C++ returns failure;
+- greater-than state is rejected by quest before calling refine.
 
 Covers `BUG-MINE-001`.
 
-## MINE-T02 — warp during mining countdown
-On isolated data:
-1. start mining a valid ore vein;
-2. keep the vein alive;
-3. perform a same-process/same-character warp before the 10..30 second mining event resolves;
-4. force/instrument a success if necessary;
-5. inspect event survival and ore-drop map/coordinates.
+## MINE-T02 — mining death/warp lifecycle
+After runtime unlock in isolated/dev conditions:
 
-Bug indicator: event survives and ore is created at the destination.
+Death branch:
+- begin mining beside a valid vein;
+- die without ordinary movement before delayed completion;
+- verify whether ore roll/drop and pick practice still resolve.
+
+Warp branch:
+- begin mining beside a valid vein;
+- trigger a same-character warp before delayed completion;
+- verify event survival and whether ore drops at destination coordinates.
 
 Covers `BUG-MINE-002`.
 
-## MINE-T03 — death during mining countdown
-On isolated data:
-1. start mining with a valid equipped pickaxe;
-2. die before completion while the source vein remains;
-3. keep the character object in the normal dead state;
-4. observe whether completion still rolls success, creates ore and runs pickaxe practice.
-
-Covers `BUG-MINE-003`.
+Global first future live gate remains `DUNGEON-T09`; do not run these now.
