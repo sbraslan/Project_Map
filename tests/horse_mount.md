@@ -17,7 +17,7 @@ When runtime phase is explicitly opened:
 Expected static result: `POINT_MOUNT` changes without the corresponding `MountVnum` synchronization.
 
 No Horse/Mount runtime test has been executed.
-The global first future live gate remains `DUNGEON-T10`.
+The global first future live gate remains `DUNGEON-T09`.
 
 
 ## HORSE-T02 — zero-level horse progression reachability
