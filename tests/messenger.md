@@ -66,4 +66,14 @@ After runtime is explicitly unlocked:
 
 Bug signature: A's server-side outgoing block entry for B was erased at B logout and is not restored by B's reload, so the interaction is no longer blocked.
 
+## MSG-T08 — blocked party-request UI bypass
+After runtime is explicitly unlocked:
+1. have B join or lead an existing party so A's target board shows “request to join party”;
+2. establish a messenger block between A and B in either direction;
+3. verify the direct party-invite path is rejected;
+4. from A's target board, use the request-to-join-party button;
+5. observe B's party-request UI/event.
+
+Bug signature: the `/party_request <vid>` route reaches B despite the messenger block.
+
 Do not run any MSG test while the project execution lock is active.
