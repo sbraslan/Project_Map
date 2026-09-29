@@ -1,6 +1,6 @@
 # OX Event — Bug Registry
 
-**Status:** STATIC MAPPING IN PROGRESS / 3 VERIFIED BUGS  
+**Status:** STATIC MAPPING IN PROGRESS / 5 VERIFIED BUGS  
 **Execution:** LOCKED / NOT RUN
 
 ## BUG-OX-001 — renewal quiz timer collides with the 35-second outer scheduler
@@ -28,7 +28,7 @@ The automatic renewal OX cadence is structurally corrupted: every collision can 
 ### Deferred validation
 `OX-T01`.
 
-## BUG-OX-002 — asynchronous login counter cannot enforce the configured player cap atomically
+## BUG-OX-002 — OX player-cap accounting is non-authoritative and can be corrupted
 
 **Class:** admission race / distributed event flag  
 **Reachability:** VERIFIED in normal multiplayer entry.
@@ -44,8 +44,11 @@ The automatic renewal OX cadence is structurally corrupted: every collision can 
 8. Their target-side counter writes can either collapse to the same value or produce max+1.
 9. If the counter becomes max+1, the quest's equality-only guard returns “allowed” again because it does not test `>=`.
 
+10. A participant relogging at exact attendee spawn triggers the deployed map login handler again, increments the global counter again, but `m_map_attender.insert(pid,pid)` does not add another unique attendee.
+11. The logout cooldown is checked only before the original NPC warp, not on a map relog.
+
 ### Consequence
-Actual OX attendees can exceed the configured maximum; under max+1 state the quest can also reopen further admissions.
+Actual OX attendees can exceed the configured maximum; the counter can diverge from unique attendee count, and any state above max reopens entry because the quest checks equality rather than `>=`. A single participant can also consume/corrupt cap accounting by repeated spawn relogs.
 
 ### Deferred validation
 `OX-T02`.
@@ -69,6 +72,46 @@ A player admitted just before the source-side registration cutoff can arrive aft
 
 ### Deferred validation
 `OX-T03`.
+
+## BUG-OX-004 — automatic round restart does not reset the deployed admission counter
+
+**Class:** multi-round state reset / quest-manager integration  
+**Reachability:** VERIFIED in the intended automatic three-round OX path.
+
+### Proof
+1. `OX_ROUND_COUNT = 3`.
+2. Outer FINISH state with rounds remaining calls `COXEventManager::CloseEvent()`.
+3. CloseEvent/Initialize clears local participant state.
+4. Outer state is changed back to OPEN and registration countdown is reset.
+5. No server OX path resets `ox_map_login_counter`.
+6. The deployed quest resets that counter only in its manual `cleanup_event()` helper / force-management path.
+7. New entrants still use `check_limit()` against the stale cumulative counter.
+
+### Consequence
+Later automatic rounds inherit earlier-round admission usage. A full first round can make round 2 registration reject everyone; partial rounds expose only the remaining cumulative slots.
+
+### Deferred validation
+`OX-T04`.
+
+## BUG-OX-005 — GM force-end does not cancel the automatic Event Manager process
+
+**Class:** scheduler ownership / stop semantics  
+**Reachability:** VERIFIED when an Event Manager OX is administratively force-ended through the deployed GM quest.
+
+### Proof
+1. Event Manager owns outer `m_pOXEvent`.
+2. Deployed GM force-end calls only `oxevent.end_event_force()`.
+3. Lua binding executes `COXEventManager::CloseEvent()` and sets FINISH.
+4. It never calls `CEventManager::SetOXEvent(false)` or cancels `m_pOXEvent`.
+5. The outer process remains queued and retains its own state/round counters.
+6. Under `ENABLE_EVENT_MANAGER`, COX Initialize does not clear the quiz vector.
+7. A later outer callback can continue and set status/launch quiz logic again.
+
+### Consequence
+An OX event reported/forced as ended can partially resurrect from its still-live automatic scheduler.
+
+### Deferred validation
+`OX-T05`.
 
 ## Open candidates
 - Automatic Event Manager OX does not initialize the deployed quest's `ox_map_level_min/max`, `ox_map_player_max`, or login counter; current DB event-table/flag values are required before declaring this deployed breakage.
