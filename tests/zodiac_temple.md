@@ -1,6 +1,6 @@
 # Zodiac Temple / 12ZI — Deferred Runtime Tests
 
-**Status:** STATIC MAPPING OPEN / 7 TESTS DOCUMENTED / EXECUTION LOCKED / NOT RUN
+**Status:** STATIC MAPPING CLOSED / 9 TESTS DOCUMENTED / EXECUTION LOCKED / NOT RUN
 
 These are documentation-only test specifications. No runtime/fault-injection test is authorized while the global execution lock is active. Global first future live gate remains `DUNGEON-T09`.
 
@@ -52,5 +52,19 @@ With sanitizers/compiler diagnostics, execute Zodiac manager initialization on a
 Expected signature: control reaches the end of a non-void `bool` function with no return value.
 
 Covers `BUG-ZOD-007`.
+
+## ZOD-T08 — alternate DecMember iterator invalidation
+Set `zodiac_disconnect_member_2=1`, place a PC in a Zodiac instance so it exists in `m_set_pkCharacter`, then trigger the normal member-removal/disconnect path under an iterator-debug build and/or ASan/UBSan.
+
+Expected signature: erasing the current set element is followed by incrementing the invalidated iterator; debug STL/sanitizer instrumentation should flag the invalid iterator operation or expose a crash/corrupted traversal.
+
+Covers `BUG-ZOD-008`.
+
+## ZOD-T09 — bead catch-up remainder preservation
+Prepare a character with fewer than 36 beads and `12zi_temple.beadtime` approximately 7199 seconds in the past, then perform the login path that calls `BeadTime()`.
+
+Expected signature in the current code: one bead is granted, `beadtime` is reset to the current second instead of preserving the ~3599-second remainder, and the immediate `Bead_time` command carries a negative value. A corrected implementation should preserve the modulo-hour progress and publish a non-negative interval to the next bead.
+
+Covers `BUG-ZOD-009`.
 
 Do not run any ZOD test until the user explicitly changes the execution phase.
