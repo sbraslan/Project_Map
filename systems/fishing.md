@@ -245,3 +245,50 @@ But `Disconnect()` flushes equipped items before final character destruction. Fi
 Therefore logging out during an active renewed fishing session can persist the non-zero bait socket; relog restores the already-consumed bait on the rod, allowing it to be reused in a later fishing start.
 
 Promoted as `BUG-FISH-010`.
+
+
+## BUG-FISH-011 — CATCH_FAILED is unthrottled and immediately rebroadcast to nearby players
+`fishing_new_catch_failed()` checks only that `m_pkFishingNewEvent` exists.
+
+For every accepted client packet it:
+1. increments the uint32 failed counter;
+2. immediately builds `FISHING_SUBHEADER_NEW_CATCH_FAILED`;
+3. calls `PacketAround(&p, sizeof(p))`.
+
+Unlike successful CATCH, there is no `GetLastCatchTime()` rate limit.
+
+The accumulated failed count is consumed only by the periodic fishing event on the next tick, where it advances `info->sec` and may stop the session.
+
+Therefore, during the interval before that tick, a modified client can burst repeated CATCH_FAILED packets and force the server to rebroadcast each one to nearby clients.
+
+This is a multiplayer/server-amplification defect rather than a reward bypass.
+
+Promoted as `BUG-FISH-011`.
+
+## Final candidate closure
+### POINT_FISHING_RARE / uint8 narrowing
+`GetFishCatchedVnum` still accepts uint8 inputs while the caller expression is wider:
+`15 + GetPoint(POINT_FISHING_RARE) + rod->GetSocket(2)`.
+
+However, this source snapshot contains the point enum/use sites but no mapped active producer/apply source that proves a reachable value outside the uint8 domain. No current deployment row proving >255 was found.
+
+Result: retain as a code-quality/domain-risk note only; do not promote as a current verified bug.
+
+### CATCH_FAILED counter overflow
+The counter is uint32 and unchecked, but practical overflow requires an extreme packet volume. The directly reachable and meaningful defect is the unthrottled immediate broadcast captured by `BUG-FISH-011`; no separate overflow bug is promoted.
+
+## Static closure
+Fishing Renewal coverage now includes:
+- feature gates and packet registration;
+- client minigame and trust boundary;
+- start/stop/catch/fail/event lifecycle;
+- movement/death/warp/logout/equipment cleanup;
+- bait persistence;
+- fish selection and reward tables;
+- rod family and Carbon special handling;
+- rod refine lifecycle;
+- Battle Pass and Achievement integration;
+- logging/audit integrity;
+- current data/config cross-checks.
+
+**Fishing Renewal: STATIC COMPLETE.**
