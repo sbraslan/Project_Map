@@ -59,6 +59,7 @@ Remote target: target is represented by P2P `CCI` and relay descriptor while `pk
 - `BUG-MSG-014` — add-by-name friend/block paths omit the observer-mode rejection enforced by their VID counterparts, and both name paths are exposed by the Messenger UI.
 - `BUG-MSG-015` — GM inverse watcher sets retain logged-out accounts because logout does not prune `m_InverseGMRelation[gm]`.
 - `BUG-MSG-016` — delayed old-core P2P logout can remove a newer same-name CCI/session presence after channel/core handoff.
+- `BUG-MSG-017` — client→server name-based messenger packets use a 48-byte field for a configured 48-byte name, truncating add/block-add to 47 bytes and leaving long remove/unblock fields without an explicit final NUL.
 
 ## Current cursor
 Continue static audit of:
@@ -84,10 +85,10 @@ Do not execute runtime tests. Global first future live gate remains `DUNGEON-T09
 
 ## Updated cursor
 Continue static audit of:
-- remaining client messenger parser/state boundaries after BUG-MSG-012;
-- tracked quest/deployed usage reachability of BUG-MSG-011 Lua helpers;
-- residual P2P presence ordering/resynchronization after BUG-MSG-016;
-- final relation/presence symmetry pass before deciding Messenger static closure.
+- Battle Field friend-add path parity: name path rejects battle-zone use while VID path currently has no equivalent server gate;
+- residual P2P presence resynchronization after BUG-MSG-016 and interaction with BUG-MSG-003/007;
+- final friend/block/GM relation symmetry and packet-boundary pass after BUG-MSG-017;
+- Messenger static-closure readiness.
 
 Do not execute runtime tests. Global first future live gate remains `DUNGEON-T09`.
 
@@ -118,3 +119,10 @@ Every account login synthesizes outgoing GM relations and also inserts the accou
 
 ### Observer-mode name-path parity
 The friend and block VID branches explicitly reject observer mode. Their name-based counterparts do not, while `uimessenger.py` exposes both friend-by-name and block-by-name inputs without an observer gate. This is `BUG-MSG-014`; deferred validation is `MSG-T14`.
+
+
+### Client-to-server long-name packet boundary
+The outgoing messenger helpers do not reserve `CHARACTER_NAME_MAX_LEN + 1` like the canonical player-name representation. Add-by-name and block-add-by-name deliberately terminate byte 47 and therefore cannot encode a full 48-byte configured name. Remove/unblock helpers copy at most 47 bytes into a 48-byte stack array but omit an explicit last-byte terminator; at the long-name boundary the transmitted field may contain a stale final byte. This is tracked as `BUG-MSG-017`, separate from the server→client overflow in `BUG-MSG-012`.
+
+### Deployment/reachability qualification
+A repository-wide Project_Game search found no tracked quest caller for `pc.is_blocked` or `pc.is_friend`; `BUG-MSG-011` remains a verified registered Lua API defect, but no currently tracked deployed quest depends on it.
