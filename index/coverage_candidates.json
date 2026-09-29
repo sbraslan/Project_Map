@@ -2,11 +2,11 @@
   "schema": 1,
   "generated_at": "2026-09-29",
   "source": "index/files.json coverage discovery",
-  "selected_next": "monarch",
+  "selected_next": "attr6th7th",
   "candidates": [
     {
       "id": "marriage",
-      "status": "STATIC COMPLETE / 13 VERIFIED BUGS",
+      "status": "STATIC COMPLETE / 14 VERIFIED BUGS",
       "evidence": [
         "Project_ServerSRC:db/src/Marriage.cpp",
         "Project_ServerSRC:db/src/Marriage.h",
@@ -25,7 +25,7 @@
     },
     {
       "id": "oxevent",
-      "status": "STATIC COMPLETE / 5 VERIFIED BUGS",
+      "status": "STATIC COMPLETE / 8 VERIFIED BUGS",
       "evidence": [
         "Project_ServerSRC:game/src/OXEvent.cpp",
         "Project_ServerSRC:game/src/questlua_oxevent.cpp",
@@ -54,7 +54,7 @@
     },
     {
       "id": "monarch",
-      "status": "ACTIVE / 7 VERIFIED BUGS",
+      "status": "STATIC COMPLETE / 11 VERIFIED BUGS",
       "evidence": [
         "Project_ServerSRC:db/src/Monarch.cpp",
         "Project_ServerSRC:game/src/monarch.cpp",
@@ -68,7 +68,7 @@
     },
     {
       "id": "attr6th7th",
-      "status": "QUEUED",
+      "status": "SELECTED / OPEN",
       "evidence": [
         "Project_ServerSRC:game/src/Attr6th7th.cpp",
         "Project_ServerSRC:game/src/questlua_attr6th7th.cpp"
