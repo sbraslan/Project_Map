@@ -55,6 +55,76 @@
       ]
     },
     {
+      "name": "HEADER_DG_MARRIAGE_ADD",
+      "references": [
+        "marriage_mapping.mapped_flows.0",
+        "marriage_mapping.mapped_flows.4"
+      ]
+    },
+    {
+      "name": "HEADER_DG_MARRIAGE_REMOVE",
+      "references": [
+        "marriage_mapping.mapped_flows.3"
+      ]
+    },
+    {
+      "name": "HEADER_DG_MARRIAGE_UPDATE",
+      "references": [
+        "marriage_mapping.mapped_flows.2",
+        "marriage_mapping.mapped_flows.4"
+      ]
+    },
+    {
+      "name": "HEADER_DG_WEDDING_READY",
+      "references": [
+        "marriage_mapping.mapped_flows.1",
+        "marriage_mapping.mapped_flows.4"
+      ]
+    },
+    {
+      "name": "HEADER_DG_WEDDING_REQUEST",
+      "references": [
+        "marriage_mapping.mapped_flows.1"
+      ]
+    },
+    {
+      "name": "HEADER_DG_WEDDING_START",
+      "references": [
+        "marriage_mapping.mapped_flows.1",
+        "marriage_mapping.mapped_flows.4"
+      ]
+    },
+    {
+      "name": "HEADER_GD_MARRIAGE_ADD",
+      "references": [
+        "marriage_mapping.mapped_flows.0"
+      ]
+    },
+    {
+      "name": "HEADER_GD_MARRIAGE_REMOVE",
+      "references": [
+        "marriage_mapping.mapped_flows.3"
+      ]
+    },
+    {
+      "name": "HEADER_GD_MARRIAGE_UPDATE",
+      "references": [
+        "marriage_mapping.mapped_flows.2"
+      ]
+    },
+    {
+      "name": "HEADER_GD_WEDDING_READY",
+      "references": [
+        "marriage_mapping.mapped_flows.1"
+      ]
+    },
+    {
+      "name": "HEADER_GD_WEDDING_REQUEST",
+      "references": [
+        "marriage_mapping.mapped_flows.1"
+      ]
+    },
+    {
       "name": "HEADER_GG_WORLD_BOSS",
       "references": [
         "mapped_roots.3"
