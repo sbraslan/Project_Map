@@ -82,10 +82,10 @@ Do not execute runtime tests. Global first future live gate remains `DUNGEON-T09
 
 ## Updated cursor
 Continue static audit of:
-- finish residual party/guild invite lifecycle after BUG-MSG-010;
-- GM messenger cache lifecycle beyond the already verified teardown leak;
-- channel-change/reconnect interaction with asynchronous loads and relation cache reconstruction;
-- remaining client messenger parser/state boundaries after BUG-MSG-009.
+- remaining client messenger parser/state boundaries after BUG-MSG-012;
+- tracked quest/deployed usage reachability of BUG-MSG-011 Lua helpers;
+- residual P2P presence ordering/resynchronization after BUG-MSG-015;
+- final relation/presence symmetry pass before deciding Messenger static closure.
 
 Do not execute runtime tests. Global first future live gate remains `DUNGEON-T09`.
 
@@ -107,5 +107,12 @@ The same send path removes the local block entry immediately and has no positive
 ### Messenger name-length compatibility
 Both server and client canonical character-name constants are 48 in this snapshot, while `RecvMessenger()` retains the pre-extension literal `char_name[24 + 1]`. All friend/GM/block/mobile variable-length name branches trust the packet length and write a terminator at that index. This is BUG-MSG-012.
 
-### Channel-change ordering candidate
-`MoveChannel -> WarpSet(custom addr/port)` sends `GC_WARP`; the client immediately calls `Connect(newAddr,newPort)`. The old process broadcasts `GG_LOGOUT` during character disconnect, while the new process broadcasts `GG_LOGIN` from `WarpEnd`. On a third process, `P2P_MANAGER::Login` updates an existing CCI without calling messenger `P2PLogin`, while `CInputP2P::Logout` removes by name only and does not verify the packet's source descriptor against the CCI's current descriptor. Thus LOGIN(new) -> delayed LOGOUT(old) can remove the newer CCI and messenger presence. Keep candidate-only until runtime/order validation; do not assign a BUG-MSG ID yet.
+### Channel-change ordering pass
+`MoveChannel -> WarpSet(custom addr/port)` sends `GC_WARP`; the destination process later broadcasts a new `GG_LOGIN`, while the source process broadcasts `GG_LOGOUT` as the old character disconnects. On an observer process, `P2P_MANAGER::Login` updates an existing same-name CCI in place, but `CInputP2P::Logout` removes by name only and does not verify that the logout came from the descriptor/session currently stored in that CCI. Because old logout and new login originate from different P2P peer connections, no global packet order is guaranteed. LOGIN(new) followed by delayed LOGOUT(old) therefore deletes the newer CCI and runs messenger logout against the still-online identity. This is now `BUG-MSG-015`; deferred validation is `MSG-T15`.
+
+
+### GM inverse lifecycle pass
+Every account login synthesizes outgoing GM relations and also inserts the account into each GM's `m_InverseGMRelation` watcher set. Logout erases the account's outgoing GM relation but never removes that account from the GM inverse sets, and `MessengerManager::Destroy()` is empty. This produces `BUG-MSG-014`; deferred validation is `MSG-T14`.
+
+### Observer-mode name-path parity
+The friend and block VID branches explicitly reject observer mode. Their name-based counterparts do not, while `uimessenger.py` exposes both friend-by-name and block-by-name inputs without an observer gate. This is `BUG-MSG-016`; deferred validation is `MSG-T16`.
