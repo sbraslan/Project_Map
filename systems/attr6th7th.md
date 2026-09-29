@@ -1,6 +1,6 @@
 # 6th/7th Attribute — Static Map
 
-**Status:** STATIC MAPPING OPEN / 8 VERIFIED BUGS  
+**Status:** STATIC MAPPING OPEN / 9 VERIFIED BUGS  
 **Phase:** Detection / Mapping Only  
 **Opened:** 2026-09-29  
 **Source/Game repositories:** READ-ONLY  
@@ -102,6 +102,9 @@ With the enabled extended inventory configuration:
 
 But `TPacketCGAttr67Send::bCell[10]` stores each skillbook cell as `uint8_t`. Client native code assigns Python global slot integers directly to those bytes. Positions 256..359 therefore wrap/truncate before reaching the server.
 
+### BUG-ATTR67-009 — server normal-attribute count does not represent 6th/7th state
+`CheckItemAdded` uses `GetAttributeCount()`, but that function counts only the five normal attribute slots. Consequently a five-normal + two-rare item still passes the server eligibility test. During retrieval, `AddRareAttribute()` correctly refuses a third rare attribute, but `GetItemAttr` ignores the failure and reports result 1.
+
 ## Deployment-shadowed UI parity findings
 These are verified source mismatches but are not promoted as separate active gameplay bugs while BUG-ATTR67-007 blocks the stock quest entry:
 - skillbook UI displays 1,000,000 Yang while server checks/charges 100,000;
@@ -116,13 +119,26 @@ These are verified source mismatches but are not promoted as separate active gam
 No deployed caller was found, so these remain unpromoted pending deployment repair.
 
 ## NPC_STORAGE lifecycle
-The server persists/restores NPC_STORAGE item rows. Character teardown contains dedicated Attr67 NPC_STORAGE handling. No logout-loss bug is promoted at this stage.
+The server persists/restores NPC_STORAGE item rows:
+- DB player-item SELECT explicitly includes `NPC_STORAGE`;
+- `CInputDB::ItemLoad` reconstructs `NPC_STORAGE` through `AddToCharacter`;
+- character deletion is refused while an Attr67 NPC-storage row exists;
+- disconnect flushes delayed item saves.
+
+Attr67 time/percent are quest flags. `SetQuestFlag -> PC::SetFlag -> SaveFlag -> CHARACTER::SaveReal -> PC::Save -> HEADER_GD_QUEST_SAVE` persists them, and disconnect routes through `SaveReal` before quest-PC teardown.
+
+No reconnect/restart item-loss or flag-loss bug is promoted from the mapped path.
+
+## Cross-window / percent closure
+- NPC shop and premium private-shop entry paths independently include `W_ATTR_6TH_7TH` guards, reinforcing BUG-ATTR67-001's intended mutual-exclusion model.
+- Direct Attr67 actions bypass that state, but shop paths that re-fetch inventory items did not expose a new independent lifetime bug beyond BUG-ATTR67-003/004.
+- Client and server use the same visible success-percent formula and 10-fragment / 5-support limits.
+- Authoritative support-item `value1` rows are not retrievable from the oversized tracked DumpProto text through the current connector, so no unsupported percent-overflow claim is promoted.
 
 ## Current audit cursor
-1. Finish private-shop/shop/material cross-window boundary pass.
-2. Audit delayed NPC_STORAGE retrieval and reconnect/restart state reconstruction.
-3. Audit percent bounds/support item values and rare-attribute mutation.
-4. Close remaining client/server parity candidates.
-5. Decide STATIC COMPLETE.
+1. Close remaining deployment-shadowed client/server parity findings.
+2. Re-check dormant retrieval candidates against any non-quest/native caller.
+3. Decide Attr67 STATIC COMPLETE.
+4. Keep runtime locked; source/game repos remain read-only.
 
 Source/Game repositories remain read-only. Runtime remains locked; first future live gate remains `DUNGEON-T09`.
