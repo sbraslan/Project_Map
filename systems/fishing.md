@@ -188,3 +188,60 @@ Because bait is stored in rod socket2 and `SetSocket` is persisted, a disconnect
 - failure under the active renewal flag keeps the rod grade and subtracts 10% of current mastery socket0.
 
 No additional verified Fishing bug is promoted from the refine routine in this pass.
+
+
+## BUG-FISH-007 — fish_new_log records a fresh reroll instead of the actual selected fish
+`fishing_new_start()` selects the actual session fish once and stores it in `info->vnum`.
+
+After the minigame completes, `fishing_catch_decision(itemVnum)` receives that actual selected VNUM.
+
+However both success and failure logging call `GetFishCatchedVnum(...)` again instead of logging `itemVnum`.
+
+Worse, `rod->SetSocket(2, 0)` is executed before the log call, so the reroll is computed without the bait/socket2 contribution used when the real session fish was selected.
+
+Therefore `fish_new_log.vnum` is not a reliable record of the fish actually selected/rewarded for the session.
+
+Promoted as `BUG-FISH-007`.
+
+## BUG-FISH-008 — renewed successful catches do not progress TYPE_FISH achievements
+Legacy successful fishing calls:
+`CAchievementSystem::OnFishItem(ch, TYPE_FISH, item_vnum, 1)`.
+
+Renewed `fishing_catch_decision()` rewards `itemVnum` but contains no `OnFishItem(...TYPE_FISH...)` call.
+
+Current achievements.xml actively contains TYPE_FISH (numeric type 8) tasks.
+
+Therefore successful catches through the enabled renewed system do not progress configured fishing achievements.
+
+Promoted as `BUG-FISH-008`.
+
+## BUG-FISH-009 — renewed catch updates the wrong Battle Pass fishing mission family
+Current Battle Pass configs define three distinct fishing mission types:
+- `FISH_FISHING`;
+- `FISH_GRILL`;
+- `FISH_CATCH`.
+
+Legacy successful fishing advances `FISH_FISHING`.
+Legacy `UseFish()` advances `FISH_CATCH`.
+
+Renewed successful fishing instead calls:
+`UpdateExtBattlePassMissionProgress(FISH_CATCH, 1, itemVnum)`.
+
+Thus a renewed catch can progress the configured `FISH_CATCH` family while the configured `FISH_FISHING` mission does not progress from the actual fishing action.
+
+Promoted as `BUG-FISH-009`.
+
+## BUG-FISH-010 — disconnect preserves loaded bait across relog
+Using a bait item:
+- writes bait power into equipped rod socket2;
+- consumes one bait item immediately.
+
+Normal renewed stop/decision clears socket2.
+
+But `Disconnect()` flushes equipped items before final character destruction. Final `Destroy()` cancels `m_pkFishingNewEvent` directly rather than calling `fishing_new_stop()`, so socket2 is not cleared during an active-session logout.
+
+`CItem::SetSocket` is persisted and item saves serialize all sockets.
+
+Therefore logging out during an active renewed fishing session can persist the non-zero bait socket; relog restores the already-consumed bait on the rod, allowing it to be reused in a later fishing start.
+
+Promoted as `BUG-FISH-010`.
