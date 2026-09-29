@@ -40,22 +40,22 @@ Legacy `SWITCHBOT-Txx`, `EX-Txx`, `EXCHANGE-Txx`, `SHOP-Txx`, and `TEST-WB-*` fo
 ## Post-audit prefix extension — 2026-09-28
 - `LOOK-T` -> `costume_appearance.md`
 
-This subsystem was added after the original global readiness audit. Its test ownership is canonical here; global first execution gate remains `DUNGEON-T10`.
+This subsystem was added after the original global readiness audit. Its test ownership is canonical here; global first execution gate remains `DUNGEON-T09`.
 
 
 ## Dragon Soul prefix ownership — 2026-09-28
 - `DS-T` -> `dragon_soul.md`
 
-Dragon Soul is STATIC COMPLETE. `DS-T01..DS-T11` are canonical deferred plans; none has been executed. Global first execution gate remains `DUNGEON-T10`.
+Dragon Soul is STATIC COMPLETE. `DS-T01..DS-T11` are canonical deferred plans; none has been executed. Global first execution gate remains `DUNGEON-T09`.
 
 
 ## Acce / Sash prefix ownership — 2026-09-28
 - `ACCE-T` -> `acce.md`
 
-Acce is STATIC COMPLETE. `ACCE-T01..ACCE-T08` are canonical deferred tests; none has been executed. Global first execution gate remains `DUNGEON-T10`.
+Acce is STATIC COMPLETE. `ACCE-T01..ACCE-T08` are canonical deferred tests; none has been executed. Global first execution gate remains `DUNGEON-T09`.
 
 
 ## Aura System prefix ownership — 2026-09-28
 - `AURA-T` -> `aura.md`.
 
-Aura is mapping-in-progress. `AURA-T01` is deferred and has not been executed. Global first execution gate remains `DUNGEON-T10`.
+Aura is mapping-in-progress. `AURA-T01` is deferred and has not been executed. Global first execution gate remains `DUNGEON-T09`.
