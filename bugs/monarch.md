@@ -1,6 +1,6 @@
 # Monarch — Bug Registry
 
-**Status:** STATIC MAPPING IN PROGRESS / 7 VERIFIED BUGS  
+**Status:** STATIC MAPPING IN PROGRESS / 9 VERIFIED BUGS  
 **Execution:** LOCKED / NOT RUN
 
 ## BUG-MON-001 — election finalizer does not produce a monarch
@@ -141,8 +141,47 @@ A target logout/core handoff or warp failure after the source-side CCI check can
 ### Deferred validation
 `MON-T07`.
 
+## BUG-MON-008 — election SQL survives DB restart but election runtime state does not
+
+**Class:** persistence reconstruction  
+**Reachability:** VERIFIED.
+
+### Proof
+1. `VoteMonarch` inserts votes into `monarch_election`.
+2. `AddCandidacy` inserts candidates into `monarch_candidacy`.
+3. Active election logic reads only `m_map_MonarchElection` and `m_vec_MonarchCandidacy`.
+4. `CMonarch` construction starts those containers empty.
+5. DB startup `InitializeMonarch()` calls only `LoadMonarch()`.
+6. `LoadMonarch()` selects only from the `monarch` table.
+7. No candidacy/election reload method exists in the class.
+8. Game boot receives whatever is currently in the empty candidate vector.
+
+### Consequence
+A DB restart during an election disconnects persistent vote/candidate rows from the runtime election state; finalization and candidate administration operate on an empty/rebuilt-incompletely state.
+
+### Deferred validation
+`MON-T08`.
+
+## BUG-MON-009 — monarch action cooldowns reset on character recreation
+
+**Class:** session lifecycle / cooldown persistence  
+**Reachability:** VERIFIED for commands/functions that check `IsMCOK`.
+
+### Proof
+1. `CHARACTER::Initialize()` calls `InitMC()`.
+2. `InitMC()` sets each Monarch cooldown timestamp to current pulse.
+3. It immediately subtracts that category's full limit, making `IsMCOK` true.
+4. Cooldown fields are members of the transient `CHARACTER` object.
+5. The mapped player persistence structure contains no Monarch cooldown fields.
+
+### Consequence
+Logging out and creating a fresh character session clears active cooldowns for heal, warp, transfer and summon. Tax is already separately affected by `BUG-MON-006` because its command never checks `MI_TAX`.
+
+### Deferred validation
+`MON-T09`.
+
 ## Open candidates
 - process-local PowerUp/DefenseUp buffs; deployed caller closure pending;
 - unguarded `takemonarchmoney` Lua API while validation is compiled under `__UNIMPLEMENTED__`; deployed caller not yet proven;
-- add-money overflow/failure broadcast symmetry;
-- monarch cooldown persistence across reconnect/core moves.
+- add-money overflow/failure reporting symmetry;
+- legacy `SetMonarch` SQL column mismatch remains candidate until authoritative table schema is available.
