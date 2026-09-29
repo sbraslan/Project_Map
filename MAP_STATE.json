@@ -59,8 +59,8 @@
       "bugs": "bugs/classic_dungeons.md",
       "tests": "tests/classic_dungeons.md"
     },
-    "verified_bug_count": 3,
-    "test_plan_count": 3,
+    "verified_bug_count": 4,
+    "test_plan_count": 4,
     "cursor": [
       "Audit item/reward consumption, replay/duplicate behavior and failure rollback for Devil Tower, Devil Catacombs, Spider, Flame and Snow/Nemere.",
       "Audit disconnect/reconnect/party-change and timeout/exit cleanup.",
