@@ -25,6 +25,7 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 - `BUG-MSG-007` — companion logout erases persistent outgoing friend/block cache for still-online users; relog does not reconstruct it.
 - `BUG-MSG-008` — client-visible `/party_request` route bypasses messenger block checks that protect the normal party-invite packet route.
 - `BUG-MSG-009` — unblock-by-VID can dereference a vanished target instance after the confirmation delay.
+- `BUG-MSG-010` — `RecvMessenger()` uses a legacy 25-byte buffer while the configured character-name limit is 48.
 - `BUG-MSG-010` — pending party/guild invitations are not revalidated against a newly established messenger block at acceptance time.
 - `BUG-MSG-011` — `pc.is_blocked` / `pc.is_friend` reject ordinary player-name strings because they require `lua_isnumber` before `FindPC(name)`.
 
