@@ -85,4 +85,20 @@ After runtime is explicitly unlocked:
 
 Bug signature: `GetInstancePtr(vid)` returns null and the client dereferences it in `SendMessengerBlockRemoveByVIDPacket`, producing a client crash.
 
+## MSG-T10 — block change during pending party/guild invite
+After runtime is explicitly unlocked:
+1. A sends B a party invite;
+2. before B accepts, establish a messenger block between A and B;
+3. accept the original pending party invite;
+4. repeat the sequence with a guild invite.
+
+Bug signature: the pre-existing invite still completes although a newly-created invite would now be rejected by messenger block.
+
+## MSG-T11 — Lua friend/block name argument
+After runtime is explicitly unlocked in a test quest:
+1. keep two normally named characters online;
+2. call `pc.is_blocked("OtherPlayer")` and `pc.is_friend("OtherPlayer")`;
+3. compare the Lua return values with the actual messenger relations and server error log.
+
+Bug signature: the helper takes the numeric-argument error path / returns no intended boolean for a normal player-name string.
 Do not run any MSG test while the project execution lock is active.
