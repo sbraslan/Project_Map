@@ -1,6 +1,6 @@
 # Monarch — Static Map
 
-**Status:** STATIC MAPPING IN PROGRESS / 12 VERIFIED BUGS  
+**Status:** STATIC COMPLETE / 13 VERIFIED BUGS  
 **Phase:** Detection / Mapping Only  
 **Opened:** 2026-09-29  
 **Source/Game repositories:** READ-ONLY  
@@ -248,10 +248,7 @@ Promoted as `BUG-MON-010`.
 - `takemonarchmoney` security checks remain under `__UNIMPLEMENTED__`, but no deployed caller was found.
 
 ## Current audit cursor
-1. audit AddMoney overflow/failure fanout symmetry;
-2. audit remaining mto/mtr private-map and WarpSet failure boundaries;
-3. inspect notice path and treasury producers for independent defects;
-4. decide Monarch STATIC COMPLETE.
+Monarch static closure complete. Select the next queued subsystem from the coverage index; keep source/game repos read-only and runtime locked.
 
 
 ## BUG-MON-011 — mto loses private-instance identity
@@ -267,3 +264,22 @@ Local `mtr` preserves `ch->GetMapIndex()`, including private instance IDs. The r
 When the monarch is in an allowed private instance, the remote target is routed to the base/public map rather than the monarch's instance, while treasury and MI_TRANSFER are consumed.
 
 Promoted as `BUG-MON-012`.
+
+
+## BUG-MON-013 — long monarch notices diverge across game cores
+The normal command/chat path accepts messages longer than 256 characters. `BroadcastMonarchNotice` sends the full text locally and in the P2P packet, but remote `CInputP2P::MonarchNotice` copies into a fixed `char[257]` before delivery.
+
+Long notices are therefore complete on the source core and truncated on remote cores.
+
+Promoted as `BUG-MON-013`.
+
+## Static closure
+Monarch static mapping is complete with `BUG-MON-001..013`.
+
+Closed without promotion:
+- AddMoney ceiling/fanout: mapped game and DB layers consistently reject/ignore additions above the 2,000,000,000 treasury ceiling; no independent state divergence was proven.
+- PowerUp/DefenseUp and `takemonarchmoney`: no current tracked Project_Game caller.
+- Wrong defense-event info cast remains dormant until that Lua API is deployed.
+- Remaining generic WarpSet failure cases are already represented by the concrete transfer/private-instance findings and were not split further.
+
+Runtime remains locked; deferred tests are `MON-T01..MON-T13`.
