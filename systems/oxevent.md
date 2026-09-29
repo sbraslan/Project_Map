@@ -1,6 +1,6 @@
 # OX Event — Static Map
 
-**Status:** STATIC COMPLETE / 5 VERIFIED BUGS  
+**Status:** STATIC COMPLETE / 7 VERIFIED BUGS  
 **Phase:** Detection / Mapping Only  
 **Opened:** 2026-09-29  
 **Source/Game repositories:** READ-ONLY  
@@ -209,7 +209,7 @@ The OX map has one tracked core owner, so no duplicate-map-manager bug comparabl
 OX Event static mapping is complete for the tracked source/deployment snapshot.
 
 Verified bugs:
-- `BUG-OX-001..005`.
+- `BUG-OX-001..007`.
 
 Closed/scoped:
 - map 113 has a single tracked core owner (`ch99/core99`), so no duplicate local OX-manager ownership bug is promoted;
@@ -221,3 +221,34 @@ Closed/scoped:
 
 ## Runtime
 No OX runtime test may be executed while the global execution lock is active. First future live gate remains `DUNGEON-T09`.
+
+
+### BUG-OX-006 — offline-before-answer reconnect can re-enter attendee state after evaluation
+The map-113 login path always calls `COXEventManager::Enter(ch)`. `Enter` rejects only FINISH; CLOSE and QUIZ remain accepted.
+
+If a participant logs out at the fixed attendee spawn before `CheckAnswer`:
+1. logout does not remove the PID from `m_map_attender`;
+2. `CheckAnswer` runs while the character is offline, cannot resolve the PID, and removes it from attendee/character maps;
+3. the saved login position remains the attendee spawn;
+4. reconnect during CLOSE/QUIZ bypasses the NPC quest/cooldown path;
+5. input-login calls `Enter`, which accepts the active state and exact spawn;
+6. `EnterAttender` reinserts the PID after answer evaluation.
+
+Promoted as `BUG-OX-006`.
+
+### BUG-OX-007 — automatic Event Manager OX has no self-contained admission policy
+The deployed entry quest requires `ox_map_level_min`, `ox_map_level_max` and `ox_map_player_max`. Missing event flags return 0.
+
+`CEventManager::SetOXEvent(true)` initializes lifecycle/status and quiz data but does not set these admission flags.
+
+Therefore:
+- on a clean flag state, `ox_map_login_counter=0` and `ox_map_player_max=0`, so equality-only `check_limit()` reports full immediately;
+- even if the cap is externally nonzero, missing min/max values reject normal positive-level characters;
+- because DB event flags persist in the quest table, a prior manual OX can instead leave stale admission policy that a later automated OX silently inherits.
+
+Promoted as `BUG-OX-007`.
+
+## Additional closure
+- Winner reward is intentionally implemented as an online-character operation; no persistence requirement was found, so offline reward loss is not promoted independently.
+- Automatic admission-policy dependency is no longer a candidate: missing flags are defined as zero and the Event Manager does not initialize them.
+- Reconnect elimination bypass is distinct from cap-accounting corruption because it restores competitive attendee eligibility after `CheckAnswer`.
