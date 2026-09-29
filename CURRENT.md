@@ -147,3 +147,11 @@ Runtime remains locked; no live test was executed.
 - adjacent `BUG-ITEM-001` UAF may interrupt the same flow and remains owned by `ITEM-T02`.
 - canonical handoff: `ITEM_T01_HANDOFF.md`.
 - global first live gate remains `DUNGEON-T09`; no Inventory/Item runtime test executed.
+
+
+## Inventory / Item ITEM-T02 handoff — 2026-09-29
+- `ITEM-T02` destroy use-after-free path reverified directly in current server source.
+- `CHARACTER::RemoveItem` destroys the item through ITEM_MANAGER and then dereferences `item->GetName()` for the final ChatPacket.
+- ordinary destroy flow reaches the path without a malformed packet; ASan/debug allocator evidence is preferred because freed memory may remain readable.
+- canonical handoff: `ITEM_T02_HANDOFF.md`.
+- global first live gate remains `DUNGEON-T09`; no Inventory/Item runtime test executed.
