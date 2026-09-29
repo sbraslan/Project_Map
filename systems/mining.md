@@ -1,6 +1,6 @@
 # Mining / Pickaxe
 
-**Status:** MAPPING IN PROGRESS / 2 VERIFIED BUGS / EXECUTION LOCKED  
+**Status:** MAPPING IN PROGRESS / 5 VERIFIED BUGS / EXECUTION LOCKED  
 **Phase:** Detection / Mapping Only  
 **Source repos:** read-only  
 **Writable repo:** Project_Map only
@@ -93,3 +93,68 @@ Promoted as `BUG-MIN-002`.
 
 ## Runtime
 No Mining runtime test may be executed while the global execution lock is active. First future live gate remains `DUNGEON-T09`.
+
+
+## BUG-MIN-003 — delayed mining uses whichever pickaxe is equipped at completion
+The mining event stores only:
+- player PID;
+- ore-load VID.
+
+It does not store the initiating pickaxe ID/VID.
+
+At event completion it resolves:
+`LPITEM pick = ch->GetWear(WEAR_WEAPON)`
+
+and then uses that current pick for:
+- `GetOrePct(ch)`, including current pick refine grade;
+- `PracticePick(ch, pick)`, including mastery increment.
+
+`CanHandleItem()` does not block item movement because a mining event is active, and no item equip/unequip path calls `mining_cancel()`.
+
+Therefore a player can start the delayed action with one valid pickaxe, replace it with another pickaxe before completion, and have the second pickaxe determine success chance and receive mastery progress.
+
+Promoted as `BUG-MIN-003`.
+
+## BUG-MIN-004 — direct warp preserves active mining and event does not revalidate map/distance
+Normal movement cancels mining through `OnMove() -> mining_cancel()`.
+
+Direct warp follows a different path:
+- `CanWarp()` has no `m_pkMiningEvent` check;
+- `WarpSet()` calls `Stop()`, not `OnMove()`;
+- `Stop()` does not cancel mining;
+- `WarpSet()/WarpEnd()` do not explicitly cancel `m_pkMiningEvent`.
+
+The delayed `mining_event` later resolves the original ore by global VID but does not check:
+- player map equals ore map;
+- current distance to ore;
+- current coordinates relative to the original mining point.
+
+On same-process warps where the character object survives and the original vein still exists, the mining result can therefore complete after relocation. `OreDrop()` places the ore at the player's current coordinates/map.
+
+Promoted as `BUG-MIN-004`.
+
+## BUG-MIN-005 — MINING_LOCATION anti-hack branch is unreachable
+`CHARACTER::mining()` first rejects:
+`map mismatch || distance > 1000`
+with an immediate return.
+
+Later it contains:
+`if (distance > 2500) { HackLog("MINING_LOCATION"); return; }`
+
+Every distance greater than 2500 is already greater than 1000 and has returned earlier.
+
+Therefore the explicit `MINING_LOCATION` detection/logging branch cannot execute for distance abuse.
+
+Promoted as `BUG-MIN-005`.
+
+## OreRefine ordering closure status
+`OreRefine()` still subtracts 100 raw ore before checking whether the player has enough gold:
+1. owner/count/refined-vnum checks;
+2. `item->SetCount(item->GetCount() - 100)`;
+3. compute fee;
+4. if gold is insufficient, return false.
+
+The local resource-loss defect is confirmed in the function. However no current deployed quest source in the mapped quest tree has been found calling `pc.ore_refine` or `pc.diamond_refine`. It remains a **reachability candidate**, not yet promoted as a deployed gameplay bug.
+
+## Multiplayer ownership closure
+Normal mining drops use 15-second ownership for the miner. Battle Field maps intentionally skip `SetOwnership`. No independent ownership bug is promoted in this pass.
