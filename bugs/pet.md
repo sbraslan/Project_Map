@@ -67,3 +67,28 @@ Canonical runtime test: `PET-T03`.
 ## Open candidates
 - legacy Lua `pet.summon` argument/signature mismatch; needs tracked active quest producer;
 - Achievement `pet.summon_time` is reset only when `Unsummon()` can still resolve the summon item; exact visible accounting consequence after abnormal cleanup still needs closure.
+
+
+## BUG-PET-004 — forced pet-item loss discards time-based pet achievement progress
+
+**Class:** cross-system progression / accounting loss  
+**Reachability:** VERIFIED — current Achievement 60 tracks 2,592,000 seconds of `TYPE_SUMMON_PET` time.
+
+### Static proof
+1. Current `achievements.xml` includes Achievement 60, "Summon pet for 30 days", with a time-restricted `TYPE_SUMMON_PET` task.
+2. Normal pet summon stores `pet.summon_time`.
+3. Normal `CPetActor::Unsummon()` resolves the summon item and submits elapsed summon duration to `CAchievementSystem::OnSummon`, which adds `time` to time-restricted tasks.
+4. Under BUG-PET-003, REAL_TIME expiry destroys the summon item before the pet is unsummoned.
+5. When `CPetActor::Unsummon()` later runs, the achievement branch only credits elapsed time and clears `pet.summon_time` if `FindByVID(m_dwSummonItemVID)` succeeds.
+6. After expiry, that lookup fails, so no elapsed-time credit is emitted.
+7. `CAchievementSystem::OnLogout()` later clears any remaining `pet.summon_time` flag without awarding the missing duration.
+
+### Consequence
+A player can legitimately keep a classic pet summoned until its REAL_TIME item expires and lose the entire uncommitted summon interval from the 30-day pet-summon achievement.
+
+### Deferred validation
+Canonical runtime test: `PET-T04`.
+
+## Dormant / non-promoted compatibility hazard
+- `questlua_pet.cpp` still uses the legacy four-argument `pet.summon` call shape against the active ENABLE_PET_SYSTEM signature.
+- Current tracked `Project_Game` quest sources and `quest_list` expose no live `pet.summon` producer, so current gameplay reachability is not established.
