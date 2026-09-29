@@ -1,6 +1,6 @@
 # 6th/7th Attribute — Bug Registry
 
-**Status:** STATIC MAPPING OPEN / 9 VERIFIED BUGS  
+**Status:** STATIC COMPLETE / 9 VERIFIED BUGS  
 **Execution:** LOCKED / NOT RUN
 
 ## BUG-ATTR67-001 — action packets bypass OPEN/window authorization
@@ -185,3 +185,6 @@ Not promoted independently while the legitimate quest entry is absent:
 No deployed caller is present in the tracked corpus.
 
 Runtime execution remains locked.
+
+## Static closure
+Attr67 static mapping is closed with `BUG-ATTR67-001..009`. NPC_STORAGE persistence/reconstruction and quest-flag persistence were mapped without an additional loss bug. Remaining retrieval hazards stay explicitly dormant because the tracked deployment contains no retrieval caller. Runtime execution remains locked.
