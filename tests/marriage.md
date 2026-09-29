@@ -177,3 +177,20 @@ Expected bug signature: relation is removed server-side but neither client recei
 Covers `BUG-MARR-013`.
 
 Do not run this test while the global execution lock is active.
+
+
+## MARR-T14 — divorce while DB wedding is still running
+After runtime is explicitly unlocked:
+1. create a marriage whose wedding is currently active;
+2. leave the private wedding map using an ordinary stored recall/talisman destination;
+3. satisfy the deployed divorce-time requirement and execute unilateral divorce;
+4. verify the marriage SQL/relation is removed while DB still has the running wedding;
+5. let the original wedding timeout fire;
+6. trace DG WEDDING_END and game `CManager::WeddingEnd`;
+7. inspect `WeddingManager::Find(privateMapIndex)` afterward.
+
+Expected bug signature: game rejects WEDDING_END because the marriage relation is already absent, so `WeddingManager::End` is not invoked and the private map remains registered.
+
+Covers `BUG-MARR-014`.
+
+Do not run while the global execution lock is active.
