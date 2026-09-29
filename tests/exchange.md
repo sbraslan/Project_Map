@@ -178,4 +178,4 @@ Validates the AddGold boolean-condition observation only; no verified bug promot
 - BUG-EXCHANGE-005 remains the gold-cap TOCTOU specialization and is covered together with EXC-T06.
 - Observation numbering is also historically inconsistent around the cheque AddGold condition; EXC-T05 and EXC-T10 use descriptive semantics rather than relying on the duplicated legacy observation label.
 - Primary legitimate normal-path candidates: EXC-T01 and EXC-T02. EXC-T07 requires suppressing client auto-cancel and is isolated.
-- Overall first live runtime gate remains DUNGEON-T10.
+- Overall first live runtime gate remains DUNGEON-T09.
