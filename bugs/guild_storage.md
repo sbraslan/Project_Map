@@ -160,3 +160,15 @@ yorumu mevcut fakat karşılığında kod yok.
 
 Sonuç:
 Disband sonrası eski guild itemları DB'de orphan kalabilir. Guild ID yeniden kullanılabilen/migrate edilen bir ortamda eski itemların başka guild tarafından görülmesi riski ayrıca test edilmeli.
+
+
+## Folded Guild lifecycle finding
+### BUG-GUILD-001 — Offline member removal + ENABLE_PULSE_MANAGER null pointer
+`CGuild::RemoveMember`:
+`LPCHARACTER ch = FindByPID(pid)`
+sonrasında `if (ch)` kontrolünden **önce**
+`ch->GetPlayerID()`
+kullanıyor.
+
+`ENABLE_PULSE_MANAGER` aktif build'de offline member remove işlemi null dereference riski taşıyor.
+Guild Storage dışı genel guild bug'ı olarak ayrıca kaydedildi.
