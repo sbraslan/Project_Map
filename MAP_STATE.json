@@ -59,8 +59,8 @@
       "bugs": "bugs/blue_dragon_lair.md",
       "tests": "tests/blue_dragon_lair.md"
     },
-    "verified_bug_count": 0,
-    "test_plan_count": 0,
+    "verified_bug_count": 1,
+    "test_plan_count": 1,
     "cursor": [
       "Map entry authority, global event state, channel serialization, group-entry window and access-item transaction.",
       "Map boss spawn/combat hooks, skill timers and stone modifiers.",
