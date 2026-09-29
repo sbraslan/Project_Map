@@ -37,9 +37,8 @@
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Messenger / Friend / Block static mapping is closed with BUG-MSG-001..021.",
-      "MSG-T01..MSG-T21 remain documented and unexecuted.",
-      "Open the next independent subsystem for detection-only mapping.",
+      "Run global source-feature coverage discovery to identify the next subsystem not yet represented in Project_Map.",
+      "Preserve Messenger as STATIC COMPLETE with BUG-MSG-001..021 and MSG-T01..MSG-T21.",
       "Do not execute runtime tests; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -2781,6 +2780,13 @@
       "Pending friend-token CRC collision remains theoretical-only and unpromoted without a concrete ordinary-flow collision.",
       "Malformed fixed-width Messenger parser concerns beyond the configured long-name defects are adversarial-only/unpromoted.",
       "Pre-existing messenger block versus later marriage/engagement is a semantic-policy ambiguity, not promoted without an explicit invariant requiring automatic unblock or marriage rejection."
+    ],
+    "closure_notes": [
+      "Messenger / Friend / Block static mapping complete with BUG-MSG-001..021.",
+      "MSG-T01..MSG-T21 are canonical deferred tests; none has been executed.",
+      "Friend, block and GM inverse watcher logout-pruning share BUG-MSG-015.",
+      "Legacy mobile-message send binding is a no-op, but normal UI reachability is Ymir-only; Europe scope is dormant and unpromoted.",
+      "Global first future live gate remains DUNGEON-T09."
     ]
   }
 }
