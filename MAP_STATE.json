@@ -46,25 +46,11 @@
     "Never revisit a CLOSED node merely because an old evidence file contains words like next, active, open or mapping."
   ],
   "counts": {
-    "closed_subsystems": 38,
-    "open_subsystems": 1,
+    "closed_subsystems": 39,
+    "open_subsystems": 0,
     "total_canonical_subsystems": 39
   },
-  "active": {
-    "id": "classic_dungeons",
-    "name": "Classic Quest Dungeons",
-    "status": "OPEN",
-    "evidence": {
-      "system": "systems/classic_dungeons.md",
-      "bugs": "bugs/classic_dungeons.md",
-      "tests": "tests/classic_dungeons.md"
-    },
-    "verified_bug_count": 4,
-    "test_plan_count": 4,
-    "cursor": [
-      "Close deployment/data parity for Devil Tower, Devil Catacombs, Spider, Flame and Snow/Nemere and promote only source-proven defects."
-    ]
-  },
+  "active": null,
   "closed": {
     "guild_storage": {
       "name": "Guild Storage + Guild lifecycle",
@@ -409,6 +395,17 @@
       },
       "verified_bug_count": 9,
       "test_plan_count": 9
+    },
+    "classic_dungeons": {
+      "name": "Classic Quest Dungeons",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/classic_dungeons.md",
+        "bugs": "bugs/classic_dungeons.md",
+        "tests": "tests/classic_dungeons.md"
+      },
+      "verified_bug_count": 4,
+      "test_plan_count": 4
     }
   },
   "alias_index": {
@@ -554,7 +551,7 @@
     "nemere": "classic_dungeons"
   },
   "discovery": {
-    "status": "PAUSED_WHILE_ACTIVE",
+    "status": "TARGETED_UNKNOWN_ONLY",
     "queue": [
       "dragon_lairs",
       "yohara_progression",
@@ -568,8 +565,8 @@
       "client_service_layer",
       "equipment_extensions"
     ],
-    "last_transition": "final UNKNOWN-only discovery found additional enabled/deployed feature families -> classic_dungeons OPEN",
-    "next_after_active_close": "Resume queue in order; normalize each family/alias before opening it. CLOSED nodes remain locked.",
+    "last_transition": "classic_dungeons CLOSED -> resume queued UNKNOWN-only discovery",
+    "next_after_active_close": "Normalize the next queued family before opening it; CLOSED nodes remain locked.",
     "criteria": "Canonical candidate = enabled and independently stateful/networked/persistent or quest-deployed gameplay feature family. Pure rendering/assets, compile-time fixes and small options remain dependencies/subfeatures rather than standalone nodes."
   },
   "lookup_indexes": {
