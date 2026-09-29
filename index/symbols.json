@@ -11,15 +11,39 @@
       ]
     },
     {
+      "name": "audit::missing",
+      "references": [
+        "mapped_roots.60"
+      ]
+    },
+    {
       "name": "CActorInstance::AttachAcce",
       "references": [
         "acce_sash_mapping.mapped_flows.8"
       ]
     },
     {
+      "name": "CClientManager::MarriageAdd",
+      "references": [
+        "marriage_mapping.mapped_flows.0"
+      ]
+    },
+    {
+      "name": "CClientManager::WeddingRequest",
+      "references": [
+        "marriage_mapping.mapped_flows.1"
+      ]
+    },
+    {
       "name": "CCubeManager::RefineCube",
       "references": [
         "refine_cube_mapping.mapped_flows.1"
+      ]
+    },
+    {
+      "name": "ChangeLook::STATIC",
+      "references": [
+        "mapped_roots.151"
       ]
     },
     {
@@ -56,6 +80,19 @@
       ]
     },
     {
+      "name": "CHARACTER::fishing_new_start",
+      "references": [
+        "fishing_mapping.mapped_flows.0"
+      ]
+    },
+    {
+      "name": "CHARACTER::mining",
+      "references": [
+        "mining_mapping.mapped_flows.1",
+        "mining_mapping.mapped_flows.7"
+      ]
+    },
+    {
       "name": "CHARACTER::OpenAcce",
       "references": [
         "acce_sash_mapping.mapped_flows.0"
@@ -87,16 +124,15 @@
       ]
     },
     {
-      "name": "CHARACTER::fishing_new_start",
+      "name": "CInputDB::MarriageAdd",
       "references": [
-        "fishing_mapping.mapped_flows.0"
+        "marriage_mapping.mapped_flows.0"
       ]
     },
     {
-      "name": "CHARACTER::mining",
+      "name": "CInputDB::WeddingRequest",
       "references": [
-        "mining_mapping.mapped_flows.1",
-        "mining_mapping.mapped_flows.7"
+        "marriage_mapping.mapped_flows.1"
       ]
     },
     {
@@ -228,6 +264,554 @@
       ]
     },
     {
+      "name": "cpp::__ArmorVnumToShape",
+      "references": [
+        "mapped_roots.149"
+      ]
+    },
+    {
+      "name": "cpp::Acce",
+      "references": [
+        "mapped_roots.162",
+        "mapped_roots.165"
+      ]
+    },
+    {
+      "name": "cpp::AllocVID",
+      "references": [
+        "mapped_roots.255"
+      ]
+    },
+    {
+      "name": "cpp::CanMove",
+      "references": [
+        "mapped_roots.221"
+      ]
+    },
+    {
+      "name": "cpp::CanWarp",
+      "references": [
+        "mapped_roots.224",
+        "mapped_roots.239",
+        "mapped_roots.241"
+      ]
+    },
+    {
+      "name": "cpp::Carbon",
+      "references": [
+        "mapped_roots.222"
+      ]
+    },
+    {
+      "name": "cpp::ChangeLook",
+      "references": [
+        "mapped_roots.133"
+      ]
+    },
+    {
+      "name": "cpp::CHARACTER",
+      "references": [
+        "mapped_roots.240"
+      ]
+    },
+    {
+      "name": "cpp::ChatPacket",
+      "references": [
+        "mapped_roots.7"
+      ]
+    },
+    {
+      "name": "cpp::CInputMain",
+      "references": [
+        "mapped_roots.56"
+      ]
+    },
+    {
+      "name": "cpp::client",
+      "references": [
+        "mapped_roots.220"
+      ]
+    },
+    {
+      "name": "cpp::completion",
+      "references": [
+        "mapped_roots.242"
+      ]
+    },
+    {
+      "name": "cpp::CopyAllAttrTo",
+      "references": [
+        "mapped_roots.199"
+      ]
+    },
+    {
+      "name": "cpp::costume",
+      "references": [
+        "mapped_roots.132"
+      ]
+    },
+    {
+      "name": "cpp::CreateItem",
+      "references": [
+        "mapped_roots.217"
+      ]
+    },
+    {
+      "name": "cpp::d",
+      "references": [
+        "mapped_roots.67"
+      ]
+    },
+    {
+      "name": "cpp::damage",
+      "references": [
+        "mapped_roots.25"
+      ]
+    },
+    {
+      "name": "cpp::Dead",
+      "references": [
+        "mapped_roots.28",
+        "mapped_roots.223",
+        "mapped_roots.233"
+      ]
+    },
+    {
+      "name": "cpp::deck",
+      "references": [
+        "mapped_roots.157"
+      ]
+    },
+    {
+      "name": "cpp::DestroyCharacter",
+      "references": [
+        "mapped_roots.19"
+      ]
+    },
+    {
+      "name": "cpp::do_get_wb_reward",
+      "references": [
+        "mapped_roots.9"
+      ]
+    },
+    {
+      "name": "cpp::DoRefine",
+      "references": [
+        "mapped_roots.195"
+      ]
+    },
+    {
+      "name": "cpp::dormant",
+      "references": [
+        "mapped_roots.201"
+      ]
+    },
+    {
+      "name": "cpp::dungeon",
+      "references": [
+        "mapped_roots.101"
+      ]
+    },
+    {
+      "name": "cpp::event",
+      "references": [
+        "mapped_roots.81",
+        "mapped_roots.238"
+      ]
+    },
+    {
+      "name": "cpp::EVENT_TYPE_MINING",
+      "references": [
+        "mapped_roots.256"
+      ]
+    },
+    {
+      "name": "cpp::Fishing",
+      "references": [
+        "mapped_roots.215"
+      ]
+    },
+    {
+      "name": "cpp::FishNewLog",
+      "references": [
+        "mapped_roots.226"
+      ]
+    },
+    {
+      "name": "cpp::fixed",
+      "references": [
+        "mapped_roots.27"
+      ]
+    },
+    {
+      "name": "cpp::FuncAggregateByMaster",
+      "references": [
+        "mapped_roots.66"
+      ]
+    },
+    {
+      "name": "cpp::FuncQuery",
+      "references": [
+        "mapped_roots.267"
+      ]
+    },
+    {
+      "name": "cpp::game",
+      "references": [
+        "mapped_roots.146"
+      ]
+    },
+    {
+      "name": "cpp::generic",
+      "references": [
+        "mapped_roots.76"
+      ]
+    },
+    {
+      "name": "cpp::get_wb_reward",
+      "references": [
+        "mapped_roots.10"
+      ]
+    },
+    {
+      "name": "cpp::GetFishCatchedVnum",
+      "references": [
+        "mapped_roots.216"
+      ]
+    },
+    {
+      "name": "cpp::GetSungMahiTowerDungeonValue",
+      "references": [
+        "mapped_roots.43"
+      ]
+    },
+    {
+      "name": "cpp::GM_PLAYER",
+      "references": [
+        "mapped_roots.31"
+      ]
+    },
+    {
+      "name": "cpp::grade",
+      "references": [
+        "mapped_roots.156"
+      ]
+    },
+    {
+      "name": "cpp::HEADER_CG_ACCE_REFINE_REQUEST",
+      "references": [
+        "mapped_roots.163"
+      ]
+    },
+    {
+      "name": "cpp::HEADER_CG_CHANGE_LOOK",
+      "references": [
+        "mapped_roots.131"
+      ]
+    },
+    {
+      "name": "cpp::HEADER_CG_REFINE",
+      "references": [
+        "mapped_roots.196"
+      ]
+    },
+    {
+      "name": "cpp::hide",
+      "references": [
+        "mapped_roots.142"
+      ]
+    },
+    {
+      "name": "cpp::horse",
+      "references": [
+        "mapped_roots.213"
+      ]
+    },
+    {
+      "name": "cpp::IsSungmaMap",
+      "references": [
+        "mapped_roots.42"
+      ]
+    },
+    {
+      "name": "cpp::last",
+      "references": [
+        "mapped_roots.79"
+      ]
+    },
+    {
+      "name": "cpp::LoadItemScale",
+      "references": [
+        "mapped_roots.187"
+      ]
+    },
+    {
+      "name": "cpp::Logout",
+      "references": [
+        "mapped_roots.273"
+      ]
+    },
+    {
+      "name": "cpp::LogoutPC",
+      "references": [
+        "mapped_roots.77"
+      ]
+    },
+    {
+      "name": "cpp::MAP_SMG_DUNGEON_01",
+      "references": [
+        "mapped_roots.50"
+      ]
+    },
+    {
+      "name": "cpp::Messenger",
+      "references": [
+        "mapped_roots.263",
+        "mapped_roots.264",
+        "mapped_roots.265"
+      ]
+    },
+    {
+      "name": "cpp::messenger_auth",
+      "references": [
+        "mapped_roots.266"
+      ]
+    },
+    {
+      "name": "cpp::mining_event",
+      "references": [
+        "mapped_roots.237"
+      ]
+    },
+    {
+      "name": "cpp::MINING_LOCATION",
+      "references": [
+        "mapped_roots.243"
+      ]
+    },
+    {
+      "name": "cpp::monotonic",
+      "references": [
+        "mapped_roots.245"
+      ]
+    },
+    {
+      "name": "cpp::mount",
+      "references": [
+        "mapped_roots.141",
+        "mapped_roots.214"
+      ]
+    },
+    {
+      "name": "cpp::multi",
+      "references": [
+        "mapped_roots.18"
+      ]
+    },
+    {
+      "name": "cpp::mysql_direct_query",
+      "references": [
+        "mapped_roots.62"
+      ]
+    },
+    {
+      "name": "cpp::no",
+      "references": [
+        "mapped_roots.20",
+        "mapped_roots.22",
+        "mapped_roots.33"
+      ]
+    },
+    {
+      "name": "cpp::NPC",
+      "references": [
+        "mapped_roots.57"
+      ]
+    },
+    {
+      "name": "cpp::pc",
+      "references": [
+        "mapped_roots.71",
+        "mapped_roots.98",
+        "mapped_roots.164"
+      ]
+    },
+    {
+      "name": "cpp::Pick_Refinable",
+      "references": [
+        "mapped_roots.235"
+      ]
+    },
+    {
+      "name": "cpp::quest",
+      "references": [
+        "mapped_roots.72"
+      ]
+    },
+    {
+      "name": "cpp::QuestButtonClick",
+      "references": [
+        "mapped_roots.54"
+      ]
+    },
+    {
+      "name": "cpp::RecvMessenger",
+      "references": [
+        "mapped_roots.269"
+      ]
+    },
+    {
+      "name": "cpp::refine_proto",
+      "references": [
+        "mapped_roots.193"
+      ]
+    },
+    {
+      "name": "cpp::RemoveItem",
+      "references": [
+        "mapped_roots.145"
+      ]
+    },
+    {
+      "name": "cpp::rod",
+      "references": [
+        "mapped_roots.225"
+      ]
+    },
+    {
+      "name": "cpp::SendAcceRefinePacket",
+      "references": [
+        "mapped_roots.166"
+      ]
+    },
+    {
+      "name": "cpp::SendScriptButtonPacket",
+      "references": [
+        "mapped_roots.55"
+      ]
+    },
+    {
+      "name": "cpp::SetDungeon",
+      "references": [
+        "mapped_roots.78"
+      ]
+    },
+    {
+      "name": "cpp::SetDungeonMultipliers",
+      "references": [
+        "mapped_roots.46"
+      ]
+    },
+    {
+      "name": "cpp::SetMiningEvent",
+      "references": [
+        "mapped_roots.247",
+        "mapped_roots.251"
+      ]
+    },
+    {
+      "name": "cpp::SetWorldBossEvent",
+      "references": [
+        "mapped_roots.1"
+      ]
+    },
+    {
+      "name": "cpp::spawn_mob_dir_nomove",
+      "references": [
+        "mapped_roots.70"
+      ]
+    },
+    {
+      "name": "cpp::SpawnGroup",
+      "references": [
+        "mapped_roots.59"
+      ]
+    },
+    {
+      "name": "cpp::Sung",
+      "references": [
+        "mapped_roots.58",
+        "mapped_roots.63",
+        "mapped_roots.92",
+        "mapped_roots.99",
+        "mapped_roots.100"
+      ]
+    },
+    {
+      "name": "cpp::sung_mahi_ranking",
+      "references": [
+        "mapped_roots.47"
+      ]
+    },
+    {
+      "name": "cpp::SungMa",
+      "references": [
+        "mapped_roots.36"
+      ]
+    },
+    {
+      "name": "cpp::sungMahiCurseType",
+      "references": [
+        "mapped_roots.95",
+        "mapped_roots.96"
+      ]
+    },
+    {
+      "name": "cpp::tower",
+      "references": [
+        "mapped_roots.69",
+        "mapped_roots.97"
+      ]
+    },
+    {
+      "name": "cpp::transmutation",
+      "references": [
+        "mapped_roots.137"
+      ]
+    },
+    {
+      "name": "cpp::TRANSMUTATION_REVERSAL",
+      "references": [
+        "mapped_roots.138"
+      ]
+    },
+    {
+      "name": "cpp::unique",
+      "references": [
+        "mapped_roots.65"
+      ]
+    },
+    {
+      "name": "cpp::Warp",
+      "references": [
+        "mapped_roots.73"
+      ]
+    },
+    {
+      "name": "cpp::WarpSet",
+      "references": [
+        "mapped_roots.232"
+      ]
+    },
+    {
+      "name": "cpp::World",
+      "references": [
+        "mapped_roots.6"
+      ]
+    },
+    {
+      "name": "cpp::world_boss_event",
+      "references": [
+        "mapped_roots.26"
+      ]
+    },
+    {
+      "name": "cpp::WorldBoss",
+      "references": [
+        "mapped_roots.5"
+      ]
+    },
+    {
       "name": "CPythonMessenger",
       "references": [
         "messenger_mapping.mapped_flows.6"
@@ -240,6 +824,12 @@
       ]
     },
     {
+      "name": "Crafting::STATIC",
+      "references": [
+        "mapped_roots.207"
+      ]
+    },
+    {
       "name": "CTransmutation::Open",
       "references": [
         "mapped_roots.147",
@@ -247,21 +837,157 @@
       ]
     },
     {
-      "name": "ChangeLook::STATIC",
+      "name": "data::no",
       "references": [
-        "mapped_roots.151"
-      ]
-    },
-    {
-      "name": "Crafting::STATIC",
-      "references": [
-        "mapped_roots.207"
+        "mapped_roots.259"
       ]
     },
     {
       "name": "DINFO::BUG",
       "references": [
         "runtime_readiness.dungeon_t10_handoff.canonical_bug"
+      ]
+    },
+    {
+      "name": "event::no",
+      "references": [
+        "mapped_roots.253"
+      ]
+    },
+    {
+      "name": "h::ChangeLook",
+      "references": [
+        "mapped_roots.130"
+      ]
+    },
+    {
+      "name": "h::ClearDungeonFlags",
+      "references": [
+        "mapped_roots.68"
+      ]
+    },
+    {
+      "name": "h::Conqueror",
+      "references": [
+        "mapped_roots.44"
+      ]
+    },
+    {
+      "name": "h::CRefineManager",
+      "references": [
+        "mapped_roots.194"
+      ]
+    },
+    {
+      "name": "h::Cube",
+      "references": [
+        "mapped_roots.197"
+      ]
+    },
+    {
+      "name": "h::ENABLE_MESSENGER_BLOCK",
+      "references": [
+        "mapped_roots.261"
+      ]
+    },
+    {
+      "name": "h::ENABLE_WORLD_BOSS",
+      "references": [
+        "mapped_roots.0"
+      ]
+    },
+    {
+      "name": "h::ESungMahiDungeon",
+      "references": [
+        "mapped_roots.49"
+      ]
+    },
+    {
+      "name": "h::friend",
+      "references": [
+        "mapped_roots.262",
+        "mapped_roots.268"
+      ]
+    },
+    {
+      "name": "h::HEADER_GG_WORLD_BOSS",
+      "references": [
+        "mapped_roots.3"
+      ]
+    },
+    {
+      "name": "h::horse",
+      "references": [
+        "mapped_roots.212"
+      ]
+    },
+    {
+      "name": "h::IsSungMahiDungeon",
+      "references": [
+        "mapped_roots.45"
+      ]
+    },
+    {
+      "name": "h::Mining",
+      "references": [
+        "mapped_roots.230"
+      ]
+    },
+    {
+      "name": "h::P2P_MANAGER",
+      "references": [
+        "mapped_roots.4"
+      ]
+    },
+    {
+      "name": "h::process",
+      "references": [
+        "mapped_roots.23"
+      ]
+    },
+    {
+      "name": "h::renewed",
+      "references": [
+        "mapped_roots.147"
+      ]
+    },
+    {
+      "name": "h::session",
+      "references": [
+        "mapped_roots.32"
+      ]
+    },
+    {
+      "name": "h::Sung",
+      "references": [
+        "mapped_roots.93"
+      ]
+    },
+    {
+      "name": "h::tier",
+      "references": [
+        "mapped_roots.8"
+      ]
+    },
+    {
+      "name": "h::tower",
+      "references": [
+        "mapped_roots.51",
+        "mapped_roots.94"
+      ]
+    },
+    {
+      "name": "h::World",
+      "references": [
+        "mapped_roots.2"
+      ]
+    },
+    {
+      "name": "index::no",
+      "references": [
+        "mapped_roots.248",
+        "mapped_roots.252",
+        "mapped_roots.257"
       ]
     },
     {
@@ -328,6 +1054,241 @@
       ]
     },
     {
+      "name": "key::deferred",
+      "references": [
+        "mapped_roots.91"
+      ]
+    },
+    {
+      "name": "lifecycle::CanWarp",
+      "references": [
+        "mapped_roots.180"
+      ]
+    },
+    {
+      "name": "marriage::CManager::Add",
+      "references": [
+        "marriage_mapping.mapped_flows.0",
+        "marriage_mapping.mapped_flows.1"
+      ]
+    },
+    {
+      "name": "marriage::CManager::OnSetup",
+      "references": [
+        "marriage_mapping.mapped_flows.4"
+      ]
+    },
+    {
+      "name": "marriage::CManager::Remove",
+      "references": [
+        "marriage_mapping.mapped_flows.3"
+      ]
+    },
+    {
+      "name": "marriage::CManager::RequestAdd",
+      "references": [
+        "marriage_mapping.mapped_flows.0"
+      ]
+    },
+    {
+      "name": "marriage::CManager::RequestRemove",
+      "references": [
+        "marriage_mapping.mapped_flows.3"
+      ]
+    },
+    {
+      "name": "marriage::CManager::RequestUpdate",
+      "references": [
+        "marriage_mapping.mapped_flows.2"
+      ]
+    },
+    {
+      "name": "md::Acce",
+      "references": [
+        "mapped_roots.190"
+      ]
+    },
+    {
+      "name": "md::ACCE",
+      "references": [
+        "mapped_roots.189"
+      ]
+    },
+    {
+      "name": "md::Achievement",
+      "references": [
+        "mapped_roots.110"
+      ]
+    },
+    {
+      "name": "md::Battle",
+      "references": [
+        "mapped_roots.109",
+        "mapped_roots.123"
+      ]
+    },
+    {
+      "name": "md::Biolog",
+      "references": [
+        "mapped_roots.111"
+      ]
+    },
+    {
+      "name": "md::ChangeLook",
+      "references": [
+        "mapped_roots.150"
+      ]
+    },
+    {
+      "name": "md::conversation",
+      "references": [
+        "mapped_roots.129"
+      ]
+    },
+    {
+      "name": "md::Costume",
+      "references": [
+        "mapped_roots.153"
+      ]
+    },
+    {
+      "name": "md::DS",
+      "references": [
+        "mapped_roots.161",
+        "mapped_roots.192"
+      ]
+    },
+    {
+      "name": "md::Dungeon",
+      "references": [
+        "mapped_roots.106",
+        "mapped_roots.122"
+      ]
+    },
+    {
+      "name": "md::Exchange",
+      "references": [
+        "mapped_roots.115"
+      ]
+    },
+    {
+      "name": "md::first",
+      "references": [
+        "mapped_roots.128"
+      ]
+    },
+    {
+      "name": "md::global",
+      "references": [
+        "mapped_roots.127"
+      ]
+    },
+    {
+      "name": "md::GPET",
+      "references": [
+        "mapped_roots.210"
+      ]
+    },
+    {
+      "name": "md::Guild",
+      "references": [
+        "mapped_roots.114"
+      ]
+    },
+    {
+      "name": "md::Hunting",
+      "references": [
+        "mapped_roots.108"
+      ]
+    },
+    {
+      "name": "md::Inventory",
+      "references": [
+        "mapped_roots.112"
+      ]
+    },
+    {
+      "name": "md::LOOK",
+      "references": [
+        "mapped_roots.152"
+      ]
+    },
+    {
+      "name": "md::Mailbox",
+      "references": [
+        "mapped_roots.118"
+      ]
+    },
+    {
+      "name": "md::MSG",
+      "references": [
+        "mapped_roots.272"
+      ]
+    },
+    {
+      "name": "md::Party",
+      "references": [
+        "mapped_roots.120",
+        "mapped_roots.121"
+      ]
+    },
+    {
+      "name": "md::post",
+      "references": [
+        "mapped_roots.154"
+      ]
+    },
+    {
+      "name": "md::Ranking",
+      "references": [
+        "mapped_roots.119"
+      ]
+    },
+    {
+      "name": "md::Safebox",
+      "references": [
+        "mapped_roots.117"
+      ]
+    },
+    {
+      "name": "md::Shop",
+      "references": [
+        "mapped_roots.116"
+      ]
+    },
+    {
+      "name": "md::SMT",
+      "references": [
+        "mapped_roots.104"
+      ]
+    },
+    {
+      "name": "md::Sung",
+      "references": [
+        "mapped_roots.105",
+        "mapped_roots.126"
+      ]
+    },
+    {
+      "name": "md::Switchbot",
+      "references": [
+        "mapped_roots.113"
+      ]
+    },
+    {
+      "name": "md::Ticket",
+      "references": [
+        "mapped_roots.107"
+      ]
+    },
+    {
+      "name": "md::World",
+      "references": [
+        "mapped_roots.124",
+        "mapped_roots.125"
+      ]
+    },
+    {
       "name": "MessengerManager",
       "references": [
         "messenger_mapping.mapped_flows.0",
@@ -362,930 +1323,6 @@
       ]
     },
     {
-      "name": "Riding::MAPPING",
-      "references": [
-        "mapped_roots.211"
-      ]
-    },
-    {
-      "name": "Sash::STATIC",
-      "references": [
-        "mapped_roots.188"
-      ]
-    },
-    {
-      "name": "System::STATIC",
-      "references": [
-        "mapped_roots.208"
-      ]
-    },
-    {
-      "name": "Tower::STATIC",
-      "references": [
-        "mapped_roots.103"
-      ]
-    },
-    {
-      "name": "audit::missing",
-      "references": [
-        "mapped_roots.60"
-      ]
-    },
-    {
-      "name": "cpp::Acce",
-      "references": [
-        "mapped_roots.162",
-        "mapped_roots.165"
-      ]
-    },
-    {
-      "name": "cpp::AllocVID",
-      "references": [
-        "mapped_roots.255"
-      ]
-    },
-    {
-      "name": "cpp::CHARACTER",
-      "references": [
-        "mapped_roots.240"
-      ]
-    },
-    {
-      "name": "cpp::CInputMain",
-      "references": [
-        "mapped_roots.56"
-      ]
-    },
-    {
-      "name": "cpp::CanMove",
-      "references": [
-        "mapped_roots.221"
-      ]
-    },
-    {
-      "name": "cpp::CanWarp",
-      "references": [
-        "mapped_roots.224",
-        "mapped_roots.239",
-        "mapped_roots.241"
-      ]
-    },
-    {
-      "name": "cpp::Carbon",
-      "references": [
-        "mapped_roots.222"
-      ]
-    },
-    {
-      "name": "cpp::ChangeLook",
-      "references": [
-        "mapped_roots.133"
-      ]
-    },
-    {
-      "name": "cpp::ChatPacket",
-      "references": [
-        "mapped_roots.7"
-      ]
-    },
-    {
-      "name": "cpp::CopyAllAttrTo",
-      "references": [
-        "mapped_roots.199"
-      ]
-    },
-    {
-      "name": "cpp::CreateItem",
-      "references": [
-        "mapped_roots.217"
-      ]
-    },
-    {
-      "name": "cpp::Dead",
-      "references": [
-        "mapped_roots.28",
-        "mapped_roots.223",
-        "mapped_roots.233"
-      ]
-    },
-    {
-      "name": "cpp::DestroyCharacter",
-      "references": [
-        "mapped_roots.19"
-      ]
-    },
-    {
-      "name": "cpp::DoRefine",
-      "references": [
-        "mapped_roots.195"
-      ]
-    },
-    {
-      "name": "cpp::EVENT_TYPE_MINING",
-      "references": [
-        "mapped_roots.256"
-      ]
-    },
-    {
-      "name": "cpp::FishNewLog",
-      "references": [
-        "mapped_roots.226"
-      ]
-    },
-    {
-      "name": "cpp::Fishing",
-      "references": [
-        "mapped_roots.215"
-      ]
-    },
-    {
-      "name": "cpp::FuncAggregateByMaster",
-      "references": [
-        "mapped_roots.66"
-      ]
-    },
-    {
-      "name": "cpp::FuncQuery",
-      "references": [
-        "mapped_roots.267"
-      ]
-    },
-    {
-      "name": "cpp::GM_PLAYER",
-      "references": [
-        "mapped_roots.31"
-      ]
-    },
-    {
-      "name": "cpp::GetFishCatchedVnum",
-      "references": [
-        "mapped_roots.216"
-      ]
-    },
-    {
-      "name": "cpp::GetSungMahiTowerDungeonValue",
-      "references": [
-        "mapped_roots.43"
-      ]
-    },
-    {
-      "name": "cpp::HEADER_CG_ACCE_REFINE_REQUEST",
-      "references": [
-        "mapped_roots.163"
-      ]
-    },
-    {
-      "name": "cpp::HEADER_CG_CHANGE_LOOK",
-      "references": [
-        "mapped_roots.131"
-      ]
-    },
-    {
-      "name": "cpp::HEADER_CG_REFINE",
-      "references": [
-        "mapped_roots.196"
-      ]
-    },
-    {
-      "name": "cpp::IsSungmaMap",
-      "references": [
-        "mapped_roots.42"
-      ]
-    },
-    {
-      "name": "cpp::LoadItemScale",
-      "references": [
-        "mapped_roots.187"
-      ]
-    },
-    {
-      "name": "cpp::Logout",
-      "references": [
-        "mapped_roots.273"
-      ]
-    },
-    {
-      "name": "cpp::LogoutPC",
-      "references": [
-        "mapped_roots.77"
-      ]
-    },
-    {
-      "name": "cpp::MAP_SMG_DUNGEON_01",
-      "references": [
-        "mapped_roots.50"
-      ]
-    },
-    {
-      "name": "cpp::MINING_LOCATION",
-      "references": [
-        "mapped_roots.243"
-      ]
-    },
-    {
-      "name": "cpp::Messenger",
-      "references": [
-        "mapped_roots.263",
-        "mapped_roots.264",
-        "mapped_roots.265"
-      ]
-    },
-    {
-      "name": "cpp::NPC",
-      "references": [
-        "mapped_roots.57"
-      ]
-    },
-    {
-      "name": "cpp::Pick_Refinable",
-      "references": [
-        "mapped_roots.235"
-      ]
-    },
-    {
-      "name": "cpp::QuestButtonClick",
-      "references": [
-        "mapped_roots.54"
-      ]
-    },
-    {
-      "name": "cpp::RecvMessenger",
-      "references": [
-        "mapped_roots.269"
-      ]
-    },
-    {
-      "name": "cpp::RemoveItem",
-      "references": [
-        "mapped_roots.145"
-      ]
-    },
-    {
-      "name": "cpp::SendAcceRefinePacket",
-      "references": [
-        "mapped_roots.166"
-      ]
-    },
-    {
-      "name": "cpp::SendScriptButtonPacket",
-      "references": [
-        "mapped_roots.55"
-      ]
-    },
-    {
-      "name": "cpp::SetDungeon",
-      "references": [
-        "mapped_roots.78"
-      ]
-    },
-    {
-      "name": "cpp::SetDungeonMultipliers",
-      "references": [
-        "mapped_roots.46"
-      ]
-    },
-    {
-      "name": "cpp::SetMiningEvent",
-      "references": [
-        "mapped_roots.247",
-        "mapped_roots.251"
-      ]
-    },
-    {
-      "name": "cpp::SetWorldBossEvent",
-      "references": [
-        "mapped_roots.1"
-      ]
-    },
-    {
-      "name": "cpp::SpawnGroup",
-      "references": [
-        "mapped_roots.59"
-      ]
-    },
-    {
-      "name": "cpp::Sung",
-      "references": [
-        "mapped_roots.58",
-        "mapped_roots.63",
-        "mapped_roots.92",
-        "mapped_roots.99",
-        "mapped_roots.100"
-      ]
-    },
-    {
-      "name": "cpp::SungMa",
-      "references": [
-        "mapped_roots.36"
-      ]
-    },
-    {
-      "name": "cpp::TRANSMUTATION_REVERSAL",
-      "references": [
-        "mapped_roots.138"
-      ]
-    },
-    {
-      "name": "cpp::Warp",
-      "references": [
-        "mapped_roots.73"
-      ]
-    },
-    {
-      "name": "cpp::WarpSet",
-      "references": [
-        "mapped_roots.232"
-      ]
-    },
-    {
-      "name": "cpp::World",
-      "references": [
-        "mapped_roots.6"
-      ]
-    },
-    {
-      "name": "cpp::WorldBoss",
-      "references": [
-        "mapped_roots.5"
-      ]
-    },
-    {
-      "name": "cpp::__ArmorVnumToShape",
-      "references": [
-        "mapped_roots.149"
-      ]
-    },
-    {
-      "name": "cpp::client",
-      "references": [
-        "mapped_roots.220"
-      ]
-    },
-    {
-      "name": "cpp::completion",
-      "references": [
-        "mapped_roots.242"
-      ]
-    },
-    {
-      "name": "cpp::costume",
-      "references": [
-        "mapped_roots.132"
-      ]
-    },
-    {
-      "name": "cpp::d",
-      "references": [
-        "mapped_roots.67"
-      ]
-    },
-    {
-      "name": "cpp::damage",
-      "references": [
-        "mapped_roots.25"
-      ]
-    },
-    {
-      "name": "cpp::deck",
-      "references": [
-        "mapped_roots.157"
-      ]
-    },
-    {
-      "name": "cpp::do_get_wb_reward",
-      "references": [
-        "mapped_roots.9"
-      ]
-    },
-    {
-      "name": "cpp::dormant",
-      "references": [
-        "mapped_roots.201"
-      ]
-    },
-    {
-      "name": "cpp::dungeon",
-      "references": [
-        "mapped_roots.101"
-      ]
-    },
-    {
-      "name": "cpp::event",
-      "references": [
-        "mapped_roots.81",
-        "mapped_roots.238"
-      ]
-    },
-    {
-      "name": "cpp::fixed",
-      "references": [
-        "mapped_roots.27"
-      ]
-    },
-    {
-      "name": "cpp::game",
-      "references": [
-        "mapped_roots.146"
-      ]
-    },
-    {
-      "name": "cpp::generic",
-      "references": [
-        "mapped_roots.76"
-      ]
-    },
-    {
-      "name": "cpp::get_wb_reward",
-      "references": [
-        "mapped_roots.10"
-      ]
-    },
-    {
-      "name": "cpp::grade",
-      "references": [
-        "mapped_roots.156"
-      ]
-    },
-    {
-      "name": "cpp::hide",
-      "references": [
-        "mapped_roots.142"
-      ]
-    },
-    {
-      "name": "cpp::horse",
-      "references": [
-        "mapped_roots.213"
-      ]
-    },
-    {
-      "name": "cpp::last",
-      "references": [
-        "mapped_roots.79"
-      ]
-    },
-    {
-      "name": "cpp::messenger_auth",
-      "references": [
-        "mapped_roots.266"
-      ]
-    },
-    {
-      "name": "cpp::mining_event",
-      "references": [
-        "mapped_roots.237"
-      ]
-    },
-    {
-      "name": "cpp::monotonic",
-      "references": [
-        "mapped_roots.245"
-      ]
-    },
-    {
-      "name": "cpp::mount",
-      "references": [
-        "mapped_roots.141",
-        "mapped_roots.214"
-      ]
-    },
-    {
-      "name": "cpp::multi",
-      "references": [
-        "mapped_roots.18"
-      ]
-    },
-    {
-      "name": "cpp::mysql_direct_query",
-      "references": [
-        "mapped_roots.62"
-      ]
-    },
-    {
-      "name": "cpp::no",
-      "references": [
-        "mapped_roots.20",
-        "mapped_roots.22",
-        "mapped_roots.33"
-      ]
-    },
-    {
-      "name": "cpp::pc",
-      "references": [
-        "mapped_roots.71",
-        "mapped_roots.98",
-        "mapped_roots.164"
-      ]
-    },
-    {
-      "name": "cpp::quest",
-      "references": [
-        "mapped_roots.72"
-      ]
-    },
-    {
-      "name": "cpp::refine_proto",
-      "references": [
-        "mapped_roots.193"
-      ]
-    },
-    {
-      "name": "cpp::rod",
-      "references": [
-        "mapped_roots.225"
-      ]
-    },
-    {
-      "name": "cpp::spawn_mob_dir_nomove",
-      "references": [
-        "mapped_roots.70"
-      ]
-    },
-    {
-      "name": "cpp::sungMahiCurseType",
-      "references": [
-        "mapped_roots.95",
-        "mapped_roots.96"
-      ]
-    },
-    {
-      "name": "cpp::sung_mahi_ranking",
-      "references": [
-        "mapped_roots.47"
-      ]
-    },
-    {
-      "name": "cpp::tower",
-      "references": [
-        "mapped_roots.69",
-        "mapped_roots.97"
-      ]
-    },
-    {
-      "name": "cpp::transmutation",
-      "references": [
-        "mapped_roots.137"
-      ]
-    },
-    {
-      "name": "cpp::unique",
-      "references": [
-        "mapped_roots.65"
-      ]
-    },
-    {
-      "name": "cpp::world_boss_event",
-      "references": [
-        "mapped_roots.26"
-      ]
-    },
-    {
-      "name": "data::no",
-      "references": [
-        "mapped_roots.259"
-      ]
-    },
-    {
-      "name": "event::no",
-      "references": [
-        "mapped_roots.253"
-      ]
-    },
-    {
-      "name": "h::CRefineManager",
-      "references": [
-        "mapped_roots.194"
-      ]
-    },
-    {
-      "name": "h::ChangeLook",
-      "references": [
-        "mapped_roots.130"
-      ]
-    },
-    {
-      "name": "h::ClearDungeonFlags",
-      "references": [
-        "mapped_roots.68"
-      ]
-    },
-    {
-      "name": "h::Conqueror",
-      "references": [
-        "mapped_roots.44"
-      ]
-    },
-    {
-      "name": "h::Cube",
-      "references": [
-        "mapped_roots.197"
-      ]
-    },
-    {
-      "name": "h::ENABLE_MESSENGER_BLOCK",
-      "references": [
-        "mapped_roots.261"
-      ]
-    },
-    {
-      "name": "h::ENABLE_WORLD_BOSS",
-      "references": [
-        "mapped_roots.0"
-      ]
-    },
-    {
-      "name": "h::ESungMahiDungeon",
-      "references": [
-        "mapped_roots.49"
-      ]
-    },
-    {
-      "name": "h::HEADER_GG_WORLD_BOSS",
-      "references": [
-        "mapped_roots.3"
-      ]
-    },
-    {
-      "name": "h::IsSungMahiDungeon",
-      "references": [
-        "mapped_roots.45"
-      ]
-    },
-    {
-      "name": "h::Mining",
-      "references": [
-        "mapped_roots.230"
-      ]
-    },
-    {
-      "name": "h::P2P_MANAGER",
-      "references": [
-        "mapped_roots.4"
-      ]
-    },
-    {
-      "name": "h::Sung",
-      "references": [
-        "mapped_roots.93"
-      ]
-    },
-    {
-      "name": "h::World",
-      "references": [
-        "mapped_roots.2"
-      ]
-    },
-    {
-      "name": "h::friend",
-      "references": [
-        "mapped_roots.262",
-        "mapped_roots.268"
-      ]
-    },
-    {
-      "name": "h::horse",
-      "references": [
-        "mapped_roots.212"
-      ]
-    },
-    {
-      "name": "h::process",
-      "references": [
-        "mapped_roots.23"
-      ]
-    },
-    {
-      "name": "h::renewed",
-      "references": [
-        "mapped_roots.147"
-      ]
-    },
-    {
-      "name": "h::session",
-      "references": [
-        "mapped_roots.32"
-      ]
-    },
-    {
-      "name": "h::tier",
-      "references": [
-        "mapped_roots.8"
-      ]
-    },
-    {
-      "name": "h::tower",
-      "references": [
-        "mapped_roots.51",
-        "mapped_roots.94"
-      ]
-    },
-    {
-      "name": "index::no",
-      "references": [
-        "mapped_roots.248",
-        "mapped_roots.252",
-        "mapped_roots.257"
-      ]
-    },
-    {
-      "name": "key::deferred",
-      "references": [
-        "mapped_roots.91"
-      ]
-    },
-    {
-      "name": "lifecycle::CanWarp",
-      "references": [
-        "mapped_roots.180"
-      ]
-    },
-    {
-      "name": "md::ACCE",
-      "references": [
-        "mapped_roots.189"
-      ]
-    },
-    {
-      "name": "md::Acce",
-      "references": [
-        "mapped_roots.190"
-      ]
-    },
-    {
-      "name": "md::Achievement",
-      "references": [
-        "mapped_roots.110"
-      ]
-    },
-    {
-      "name": "md::Battle",
-      "references": [
-        "mapped_roots.109",
-        "mapped_roots.123"
-      ]
-    },
-    {
-      "name": "md::Biolog",
-      "references": [
-        "mapped_roots.111"
-      ]
-    },
-    {
-      "name": "md::ChangeLook",
-      "references": [
-        "mapped_roots.150"
-      ]
-    },
-    {
-      "name": "md::Costume",
-      "references": [
-        "mapped_roots.153"
-      ]
-    },
-    {
-      "name": "md::DS",
-      "references": [
-        "mapped_roots.161",
-        "mapped_roots.192"
-      ]
-    },
-    {
-      "name": "md::Dungeon",
-      "references": [
-        "mapped_roots.106",
-        "mapped_roots.122"
-      ]
-    },
-    {
-      "name": "md::Exchange",
-      "references": [
-        "mapped_roots.115"
-      ]
-    },
-    {
-      "name": "md::GPET",
-      "references": [
-        "mapped_roots.210"
-      ]
-    },
-    {
-      "name": "md::Guild",
-      "references": [
-        "mapped_roots.114"
-      ]
-    },
-    {
-      "name": "md::Hunting",
-      "references": [
-        "mapped_roots.108"
-      ]
-    },
-    {
-      "name": "md::Inventory",
-      "references": [
-        "mapped_roots.112"
-      ]
-    },
-    {
-      "name": "md::LOOK",
-      "references": [
-        "mapped_roots.152"
-      ]
-    },
-    {
-      "name": "md::MSG",
-      "references": [
-        "mapped_roots.272"
-      ]
-    },
-    {
-      "name": "md::Mailbox",
-      "references": [
-        "mapped_roots.118"
-      ]
-    },
-    {
-      "name": "md::Party",
-      "references": [
-        "mapped_roots.120",
-        "mapped_roots.121"
-      ]
-    },
-    {
-      "name": "md::Ranking",
-      "references": [
-        "mapped_roots.119"
-      ]
-    },
-    {
-      "name": "md::SMT",
-      "references": [
-        "mapped_roots.104"
-      ]
-    },
-    {
-      "name": "md::Safebox",
-      "references": [
-        "mapped_roots.117"
-      ]
-    },
-    {
-      "name": "md::Shop",
-      "references": [
-        "mapped_roots.116"
-      ]
-    },
-    {
-      "name": "md::Sung",
-      "references": [
-        "mapped_roots.105",
-        "mapped_roots.126"
-      ]
-    },
-    {
-      "name": "md::Switchbot",
-      "references": [
-        "mapped_roots.113"
-      ]
-    },
-    {
-      "name": "md::Ticket",
-      "references": [
-        "mapped_roots.107"
-      ]
-    },
-    {
-      "name": "md::World",
-      "references": [
-        "mapped_roots.124",
-        "mapped_roots.125"
-      ]
-    },
-    {
-      "name": "md::conversation",
-      "references": [
-        "mapped_roots.129"
-      ]
-    },
-    {
-      "name": "md::first",
-      "references": [
-        "mapped_roots.128"
-      ]
-    },
-    {
-      "name": "md::global",
-      "references": [
-        "mapped_roots.127"
-      ]
-    },
-    {
-      "name": "md::post",
-      "references": [
-        "mapped_roots.154"
-      ]
-    },
-    {
       "name": "py::Acce",
       "references": [
         "mapped_roots.167"
@@ -1298,15 +1335,45 @@
       ]
     },
     {
+      "name": "py::messenger",
+      "references": [
+        "mapped_roots.270"
+      ]
+    },
+    {
+      "name": "py::no",
+      "references": [
+        "mapped_roots.74"
+      ]
+    },
+    {
       "name": "py::Open",
       "references": [
         "mapped_roots.21"
       ]
     },
     {
+      "name": "py::quest",
+      "references": [
+        "mapped_roots.39"
+      ]
+    },
+    {
+      "name": "py::ranking",
+      "references": [
+        "mapped_roots.24"
+      ]
+    },
+    {
       "name": "py::RefineDialogNew",
       "references": [
         "mapped_roots.200"
+      ]
+    },
+    {
+      "name": "py::renewed",
+      "references": [
+        "mapped_roots.218"
       ]
     },
     {
@@ -1330,6 +1397,12 @@
       ]
     },
     {
+      "name": "py::titlebar",
+      "references": [
+        "mapped_roots.29"
+      ]
+    },
+    {
       "name": "py::World",
       "references": [
         "mapped_roots.12",
@@ -1337,45 +1410,21 @@
       ]
     },
     {
-      "name": "py::messenger",
-      "references": [
-        "mapped_roots.270"
-      ]
-    },
-    {
-      "name": "py::no",
-      "references": [
-        "mapped_roots.74"
-      ]
-    },
-    {
-      "name": "py::quest",
-      "references": [
-        "mapped_roots.39"
-      ]
-    },
-    {
-      "name": "py::ranking",
-      "references": [
-        "mapped_roots.24"
-      ]
-    },
-    {
-      "name": "py::renewed",
-      "references": [
-        "mapped_roots.218"
-      ]
-    },
-    {
-      "name": "py::titlebar",
-      "references": [
-        "mapped_roots.29"
-      ]
-    },
-    {
       "name": "py::worldboss",
       "references": [
         "mapped_roots.11"
+      ]
+    },
+    {
+      "name": "quest_list::no",
+      "references": [
+        "mapped_roots.48"
+      ]
+    },
+    {
+      "name": "quest::ore",
+      "references": [
+        "mapped_roots.234"
       ]
     },
     {
@@ -1386,21 +1435,21 @@
       ]
     },
     {
-      "name": "quest::ore",
-      "references": [
-        "mapped_roots.234"
-      ]
-    },
-    {
-      "name": "quest_list::no",
-      "references": [
-        "mapped_roots.48"
-      ]
-    },
-    {
       "name": "questlua_global::__refine_pick",
       "references": [
         "mapped_roots.231"
+      ]
+    },
+    {
+      "name": "Riding::MAPPING",
+      "references": [
+        "mapped_roots.211"
+      ]
+    },
+    {
+      "name": "Sash::STATIC",
+      "references": [
+        "mapped_roots.188"
       ]
     },
     {
@@ -1416,6 +1465,12 @@
       ]
     },
     {
+      "name": "System::STATIC",
+      "references": [
+        "mapped_roots.208"
+      ]
+    },
+    {
       "name": "tables::valid",
       "references": [
         "mapped_roots.83"
@@ -1428,17 +1483,27 @@
       ]
     },
     {
-      "name": "txt::Acce",
+      "name": "TMarriage::Save",
       "references": [
-        "mapped_roots.186"
+        "marriage_mapping.mapped_flows.2"
       ]
     },
     {
-      "name": "txt::Sung",
+      "name": "TMarriage::SetMarried",
       "references": [
-        "mapped_roots.84",
-        "mapped_roots.85",
-        "mapped_roots.86"
+        "marriage_mapping.mapped_flows.2"
+      ]
+    },
+    {
+      "name": "Tower::STATIC",
+      "references": [
+        "mapped_roots.103"
+      ]
+    },
+    {
+      "name": "txt::Acce",
+      "references": [
+        "mapped_roots.186"
       ]
     },
     {
@@ -1454,6 +1519,14 @@
       ]
     },
     {
+      "name": "txt::Sung",
+      "references": [
+        "mapped_roots.84",
+        "mapped_roots.85",
+        "mapped_roots.86"
+      ]
+    },
+    {
       "name": "txt::tower",
       "references": [
         "mapped_roots.53"
@@ -1463,6 +1536,12 @@
       "name": "visual::item_list",
       "references": [
         "mapped_roots.179"
+      ]
+    },
+    {
+      "name": "WeddingManager::Request",
+      "references": [
+        "marriage_mapping.mapped_flows.1"
       ]
     }
   ]
