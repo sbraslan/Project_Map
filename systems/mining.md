@@ -1,6 +1,6 @@
 # Mining / Pickaxe
 
-**Status:** STATIC COMPLETE / 7 VERIFIED BUGS / EXECUTION LOCKED  
+**Status:** PAUSED / MAPPING IN PROGRESS / 5 VERIFIED BUGS / EXECUTION LOCKED
 **Phase:** Detection / Mapping Only  
 **Source repos:** read-only  
 **Writable repo:** Project_Map only
@@ -260,3 +260,17 @@ Coverage completed for:
 - Battle Pass/Achievement integration expectations.
 
 **Mining / Pickaxe: STATIC COMPLETE.**
+
+
+## Pause checkpoint
+Work intentionally stopped at user request.
+
+Verified set remains `BUG-MIN-001..005`.
+
+Open work on resume:
+- finish `ENABLE_MINING_EVENT` dynamic vein-spawn audit;
+- close Battle Field map 357 ownership reachability;
+- cross-check pickaxe proto/value progression if readable authoritative proto data becomes available;
+- determine final STATIC COMPLETE status.
+
+Do not re-audit already closed Mining findings when resuming.
