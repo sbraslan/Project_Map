@@ -1,6 +1,6 @@
 # OX Event — Bug Registry
 
-**Status:** STATIC COMPLETE / 5 VERIFIED BUGS  
+**Status:** STATIC COMPLETE / 7 VERIFIED BUGS  
 **Execution:** LOCKED / NOT RUN
 
 ## BUG-OX-001 — renewal quiz timer collides with the 35-second outer scheduler
@@ -114,12 +114,7 @@ An OX event reported/forced as ended can partially resurrect from its still-live
 `OX-T05`.
 
 ## Closed / deferred candidates
-- Automatic Event Manager OX does not initialize `ox_map_level_min/max` or `ox_map_player_max`; no tracked persisted runtime event-flag values are available, so current deployment breakage cannot be asserted.
 - `Quiz(level == m_vec_quiz.size())` remains API-only/unpromoted with current level-1 callers/table.
 - Offline-winner reward persistence is unspecified; no bug promoted.
 - Same-map `Show()` audience relocation was mapped and no independent lifecycle defect was proven.
-
-## Open candidates
-- Automatic Event Manager OX does not initialize the deployed quest's `ox_map_level_min/max`, `ox_map_player_max`, or login counter; current DB event-table/flag values are required before declaring this deployed breakage.
-- Automatic multi-round restart clears COX local state but does not explicitly reset `ox_map_login_counter`; interaction with current persisted flag values remains under audit.
-- `Quiz(level == m_vec_quiz.size())` can index out of bounds, but deployed quiz caller/table do not reach it.
+- Automatic admission-policy initialization is promoted as `BUG-OX-007`.
