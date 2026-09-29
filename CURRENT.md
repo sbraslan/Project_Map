@@ -17,20 +17,16 @@
 Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-only. Runtime/fault-injection execution remains locked until an explicit phase change.
 
 ## Verified Mining findings
-- `BUG-MINE-001` — current mining quest requires pick mastery `socket0 == value2`, while C++ `Pick_Refinable` rejects equality and requires `socket0 > value2`; the normal quest refine path has no satisfiable state.
-- `BUG-MINE-002` — delayed mining event is not cancelled/revalidated on death or warp and can resolve ore at dead/destination state.
-
-## Open candidates
-- `OreRefine` removes 100 raw ore before checking Yang affordability; current Project_Game caller not yet established.
-- the later >2500 `MINING_LOCATION` hack-log branch is unreachable because an earlier >1000 check already returns.
+- `BUG-MIN-001` — deployed mining quest requires pickaxe mastery socket0 == Value2, while C++ `Pick_Refinable()` accepts only socket0 > Value2; normal refine path is contradictory.
+- `BUG-MIN-002` — delayed mining event is not cancelled on death and does not check `IsDead()`, so ore/mastery can resolve after death.
 
 ## Exact next work
-1. map click/quest entry ownership and packet trust boundary;
-2. audit logout/equipment-change and delayed-event cleanup;
-3. audit pick mastery/refine extended-inventory cell behavior;
-4. establish current OreRefine caller/reachability and fee/material atomicity;
-5. audit mining skill-book progression/cooldown;
-6. audit ore ownership/Battle Field/multiplayer interactions;
-7. promote only verified reachable findings.
+1. close direct warp/map-change cleanup and distance revalidation;
+2. audit equipment swap/unequip during the delayed event;
+3. close the unreachable >2500 MINING_LOCATION anti-hack branch;
+4. audit OreRefine resource/payment ordering and current quest reachability;
+5. audit ore ownership/Battle Field and multiplayer contention;
+6. cross-check pickaxe progression/proto values where authoritative rows exist;
+7. promote only statically verified reachable findings.
 
-Do not execute `MINE-T01` or `MINE-T02`. Global first live runtime gate remains `DUNGEON-T09`.
+Do not execute `MIN-T01` or `MIN-T02`. Global first live runtime gate remains `DUNGEON-T09`.
