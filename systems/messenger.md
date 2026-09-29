@@ -163,3 +163,12 @@ The block-by-VID branch rejects a GM target only when the requester is `GM_PLAYE
 
 ### Oversized list framing
 `TPacketGCMessenger::size` is 16-bit while friend/block list builders use a 128 KiB buffer and enforce no cumulative relation-count/packet-size ceiling. Once a list exceeds 65,535 bytes the advertised size wraps but the full buffer is still sent. This is `BUG-MSG-020`.
+
+### Mobile/SMS deployment scope
+- `PythonNetworkStreamModule.cpp::netSendMobileMessagePacket` is a no-op stub.
+- `uimessenger.py` contains the legacy mobile-message UI, but `uigameoption.py` defaults `MOBILE = False` and enables it only for `localeInfo.IsYMIR()`.
+- Current Europe deployment therefore has no ordinary UI reachability for the broken send binding; this is closed as dormant/Ymir-only and is not assigned a bug ID.
+
+## Static closure
+Messenger / Friend / Block is **STATIC COMPLETE** with canonical `BUG-MSG-001..021` and deferred `MSG-T01..MSG-T21`.
+No runtime/fault-injection test has been executed. Global first future live gate remains `DUNGEON-T09`.
