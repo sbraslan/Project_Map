@@ -14,7 +14,30 @@ Expected bug signature: idle opponent returns 0 and the quest rejects before con
 
 Covers `BUG-ARENA-001`.
 
-## Deferred-after-fix probes
+## ARENA-T02 — Weekly/BattleArena deployment preflight
+After runtime is explicitly unlocked:
+1. verify map-location registry for 190/191/192;
+2. verify expected battlearena map/regen files;
+3. invoke `weeklyevent 1` only in an isolated environment;
+4. trace `CBattleArena::Start`, status, event flag and first map lookup.
+
+Expected bug signature: Start reports success/running state while target map has no deployed route/data.
+
+Covers `BUG-ARENA-002`.
+
+## ARENA-T03 — BattleArena force-end timing
+After runtime is explicitly unlocked in a repaired isolated BattleArena deployment:
+1. start Weekly/BattleArena;
+2. enter an active monster-wave phase;
+3. issue `weeklyevent` again to invoke ForceEnd;
+4. record immediate GM response and `m_bForceEnd`;
+5. trace subsequent `battle_arena_event` states/timestamps.
+
+Expected bug signature: GM receives “Weekly Event End”, but replacement state-3 event continues normal monitoring/spawn progression because `m_bForceEnd` is never consumed.
+
+Covers `BUG-ARENA-003`.
+
+## Deferred-after-fix classic probes
 Do not execute these as canonical bug tests until BUG-ARENA-001/start reachability is repaired:
 - map112 routing / WarpSet result and arena-slot reservation;
 - duel timeout client reset packet symmetry A vs B;
