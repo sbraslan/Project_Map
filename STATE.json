@@ -646,6 +646,17 @@
       ],
       "db_atomicity": [
         "ACH-T09"
+      ],
+      "handoffs": {
+        "ACH-T03": "ACH_T03_HANDOFF.md",
+        "ACH-T04": "ACH_T04_HANDOFF.md"
+      },
+      "preflight_notes": [
+        "Current XML configured task counts: TYPE_SUMMON_MOUNT=16, TYPE_SPEND_SEARCH_SHOP=5, TYPE_SPEND_SHOP=3, TYPE_WITHDRAW=5.",
+        "No mapped gameplay callers were found for those four task families.",
+        "Current XML has 29 TYPE_EXPLORE task rows.",
+        "Achievement OnLogin explicitly calls OnVisitMap; mapped normal map-transition paths do not.",
+        "ACH-T03 and ACH-T04 remain normal-path candidates after BP-T02."
       ]
     },
     "biolog": {
