@@ -47,4 +47,4 @@ Do not execute runtime/fault-injection tests unless the user explicitly changes 
 - Dormant ranking endpoint: WLOT-T11, T12.
 - Crash/fault-injection: WLOT-T13, T14.
 - Primary ordinary/current-flow candidates: WLOT-T04 and WLOT-T10; WLOT-T03/T15 require high-value boundary state.
-- Overall first live runtime gate remains DUNGEON-T10.
+- Overall first live runtime gate remains DUNGEON-T09.
