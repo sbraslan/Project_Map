@@ -104,3 +104,12 @@ Runtime remains locked; no live test was executed.
 - direct BUG-TICKET-005 OOB is not part of normal T07; UI only requests C++ rows 0..9.
 - canonical handoff: `TICKET_T07_HANDOFF.md`.
 - global first future live gate remains `DUNGEON-T09`; Ticket follows the Dungeon normal-path cluster.
+
+
+## Hunting normal-path preflight — 2026-09-29
+- `HUNT-T04` current terminal boundary reverified.
+- mission 90 claim unconditionally stores hunting level 91.
+- valid table domain remains 0..90.
+- reproduction requires character level >=91 before reopening Hunting.
+- canonical handoff: `HUNT_T04_HANDOFF.md`.
+- global first live gate remains `DUNGEON-T09`; no Hunting runtime test executed.
