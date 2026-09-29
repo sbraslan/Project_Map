@@ -37,10 +37,10 @@
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
-      "Audit friend/block remove and inverse-cache symmetry after BUG-MSG-019.",
-      "Review remaining Messenger packet boundaries after BUG-MSG-012/017/020.",
-      "Review residual P2P presence reconstruction after BUG-MSG-016.",
-      "Perform final static-closure pass and decide Messenger STATIC COMPLETE.",
+      "Audit remaining friend/block remove and inverse-cache symmetry after BUG-MSG-019/021.",
+      "Re-check residual P2P resynchronization after BUG-MSG-016.",
+      "Finish remaining client/server messenger parser and framing boundaries after BUG-MSG-012/017/020.",
+      "Perform final Messenger relation/cache/P2P symmetry pass and decide STATIC COMPLETE.",
       "Do not execute runtime tests; first future live gate remains DUNGEON-T09."
     ]
   },
@@ -2729,7 +2729,11 @@
       "Battle Field target-board add-by-VID -> friend request without add-by-name map gate",
       "pending friend request -> block relation created -> messenger_auth accept -> AuthToAdd without block revalidation",
       "Battle Field add-by-name restriction -> target-board add-by-VID path without equivalent server map gate",
-      "RequestToAdd pending friend token -> messenger_auth accept -> AuthToAdd without messenger-block revalidation"
+      "RequestToAdd pending friend token -> messenger_auth accept -> AuthToAdd without messenger-block revalidation",
+      "Battle Field friend add-by-name restriction vs target-board add-by-VID bypass",
+      "pending friend authorization -> AuthToAdd token-only acceptance without block revalidation",
+      "SendList/SendBlockList 128KiB payload -> uint16 messenger size wrap -> client stream framing risk",
+      "GM requester block target via VID vs name path authorization mismatch"
     ],
     "candidates": [],
     "runtime_tests": {
@@ -2770,7 +2774,10 @@
       "Project_Game contains no tracked caller of pc.is_blocked/pc.is_friend; BUG-MSG-011 remains a registered API defect with no current tracked quest dependency.",
       "Battle Field add-by-name vs add-by-VID parity promoted to BUG-MSG-018.",
       "Pending friend authorization block revalidation promoted to BUG-MSG-019.",
-      "Battle Field friend-add parity promoted to BUG-MSG-018."
+      "Battle Field friend-add parity promoted to BUG-MSG-018.",
+      "Battle Field friend-add VID parity promoted to BUG-MSG-018.",
+      "Oversized friend/block list framing promoted to BUG-MSG-020.",
+      "GM-to-GM block path parity promoted to BUG-MSG-021."
     ]
   }
 }
