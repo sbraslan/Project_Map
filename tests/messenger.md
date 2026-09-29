@@ -185,4 +185,25 @@ After runtime execution is explicitly unlocked:
 
 Bug signature: offline historical accounts remain in the GM inverse set and are still traversed on later GM presence changes.
 
+
+## MSG-T20 — oversized friend/block list packet framing
+After runtime is explicitly unlocked in an isolated environment:
+1. seed one account with enough friend relations for the serialized list to exceed 65,535 bytes;
+2. log in and capture the `MESSENGER_SUBHEADER_GC_LIST` header and actual bytes sent;
+3. compare the 16-bit advertised `pack.size` with the real list payload and observe the next client packet boundary;
+4. repeat with the block-list path.
+
+Bug signature: the advertised messenger size wraps/truncates while the server still transmits the full list payload, leaving excess bytes to desynchronize the client stream.
+
+## MSG-T21 — GM-to-GM block path parity
+After runtime is explicitly unlocked with `test_server == false`:
+1. keep two GM characters A and B online and otherwise eligible for blocking;
+2. from A, block B through the target-board VID route;
+3. clear/reset that relation;
+4. from A, block B through the Messenger name-entry route;
+5. compare the server response and resulting block state.
+
+Bug signature: the VID route allows the GM requester to block the GM target while the name route rejects the same operation.
+
+
 Do not run any MSG test while the project execution lock is active.
