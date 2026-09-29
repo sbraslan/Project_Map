@@ -8,7 +8,7 @@
   "active": {
     "subsystem": "fishing",
     "display_name": "Fishing Renewal",
-    "status": "MAPPING IN PROGRESS / 5 VERIFIED BUGS / EXECUTION LOCKED",
+    "status": "MAPPING IN PROGRESS / 6 VERIFIED BUGS / EXECUTION LOCKED",
     "system_file": "systems/fishing.md",
     "bug_file": "bugs/fishing.md",
     "test_file": "tests/fishing.md",
@@ -17,7 +17,8 @@
       "BUG-FISH-002",
       "BUG-FISH-003",
       "BUG-FISH-004",
-      "BUG-FISH-005"
+      "BUG-FISH-005",
+      "BUG-FISH-006"
     ],
     "rule": "Source code and game data are read-only. Only Project_Map may be edited.",
     "next_actions": [
@@ -289,7 +290,10 @@
     "Project_DumpProto/tr/item_names.txt::rod family 27400..27591",
     "Project_Binary/root/uifishing.py + game/src/char_fishing.cpp::client-authoritative catch validation -> BUG-FISH-003",
     "game/src/char.cpp::CanMove omits renewed fishing state -> BUG-FISH-004",
-    "game/src/char_fishing.cpp::Carbon rod impossible special chance condition -> BUG-FISH-005"
+    "game/src/char_fishing.cpp::Carbon rod impossible special chance condition -> BUG-FISH-005",
+    "game/src/char_battle.cpp::Dead omits renewed fishing cancel + event callback lacks IsDead -> BUG-FISH-006",
+    "game/src/char.cpp::CanWarp/WarpSet omit renewed fishing lifecycle cleanup -> BUG-FISH-006",
+    "game/src/fishing.cpp::rod refine lifecycle closed; no additional verified bug"
   ],
   "write_protocol": {
     "every_meaningful_turn": [
@@ -2500,7 +2504,8 @@
       "BUG-FISH-002",
       "BUG-FISH-003",
       "BUG-FISH-004",
-      "BUG-FISH-005"
+      "BUG-FISH-005",
+      "BUG-FISH-006"
     ],
     "mapped_flows": [
       "HEADER_CG_FISHING_NEW -> CInputMain::FishingNew -> CHARACTER::fishing_new_start/stop/catch",
@@ -2511,11 +2516,13 @@
       "temporary CreateItem(50187) inventory probe lifetime -> BUG-FISH-002",
       "client UI hit-test -> trusted CATCH packet -> server catch counter -> BUG-FISH-003",
       "renewed fishing start lacks POS_FISHING/movement lock and event position revalidation -> BUG-FISH-004",
-      "Carbon rod 27591 impossible special chance condition -> BUG-FISH-005"
+      "Carbon rod 27591 impossible special chance condition -> BUG-FISH-005",
+      "death/warp lifecycle boundaries do not cancel renewed fishing -> BUG-FISH-006"
     ],
     "candidates": [
       "GetFishCatchedVnum uint8 rare_chance narrowing/wrap remains unpromoted until current producer/value ranges are proven.",
-      "CATCH_FAILED has no rate-limit and feeds a uint32 failed counter into event sec; practical external impact beyond self-cancel remains unproven."
+      "CATCH_FAILED has no rate-limit and feeds a uint32 failed counter into event sec; practical external impact beyond self-cancel remains unproven.",
+      "Disconnect flushes rod socket2 before final event destruction, so active bait can persist across logout; intended bait persistence semantics still need closure."
     ],
     "runtime_tests": {
       "status": "DOCUMENTED / EXECUTION LOCKED / NOT RUN",
@@ -2524,7 +2531,8 @@
         "FISH-T02",
         "FISH-T03",
         "FISH-T04",
-        "FISH-T05"
+        "FISH-T05",
+        "FISH-T06"
       ],
       "first_live_gate_unchanged": "DUNGEON-T09"
     }
