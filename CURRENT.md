@@ -16,16 +16,17 @@
 Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-only. Runtime/fault-injection execution remains locked until an explicit phase change.
 
 ## Active Monarch findings
-- `BUG-MON-001` — registered election finalizer never selects/persists/publishes a winner; internal count uses voter PID and uninitialized scalar counters.
-- `BUG-MON-002` — `setmonarch` persists DB state but sends the wrong DG header and never refreshes live game-core monarch info.
-- `BUG-MON-003` — `DelMonarch` checks DELETE via `uiNumRows` instead of `uiAffectedRows`; persistent deletion can occur while runtime state remains stale, and RMMonarch calls it twice.
-- `BUG-MON-004` — `mtax` reports values outside 1..50 as invalid but still writes the invalid `trade_tax` flag and cooldown.
-- `BUG-MON-005` — different monarch actions can pass the same stale treasury balance before async DB deduction returns, producing an effect DB later cannot charge.
-- `BUG-MON-006` — MI_TAX is set but never checked, so tax cooldown is unenforced.
-- `BUG-MON-007` — remote `mtr` charges treasury/cooldown before any delivery acknowledgement; target disappearance makes it fail silently.
-- `BUG-MON-008` — DB restart reloads only monarch identity/treasury, not persisted candidacy/vote runtime state.
-- `BUG-MON-009` — new character sessions run `InitMC()` and reset enforced Monarch cooldowns to immediately ready.
-- Deferred tests: `MON-T01..MON-T09`; none executed.
+- `BUG-MON-001` — election finalizer never selects/persists/publishes a winner and its counter logic is invalid.
+- `BUG-MON-002` — `setmonarch` does not refresh live game-core monarch state.
+- `BUG-MON-003` — `rmmonarch` DELETE result handling uses result rows instead of affected rows and leaves stale runtime state.
+- `BUG-MON-004` — invalid `mtax` values are reported but still applied.
+- `BUG-MON-005` — asynchronous treasury prechecks can grant an effect the DB cannot ultimately charge.
+- `BUG-MON-006` — legacy `setmonarch` persistence writes the selected PID through `name` while authoritative reload reads `pid`.
+- `BUG-MON-007` — remote `mtr` charges treasury/cooldown without delivery acknowledgement.
+- `BUG-MON-008` — DB restart loses candidacy/vote runtime state although election rows were persisted.
+- `BUG-MON-009` — relog/CHARACTER recreation resets enforced monarch cooldowns to immediately ready.
+- `BUG-MON-010` — `MI_TAX` is written but never checked, so tax cooldown is unenforced.
+- Deferred tests: `MON-T01..MON-T10`; none executed.
 
 ## Recent static closures
 - Arena / PvP Duel: `BUG-ARENA-001..003`.
@@ -33,11 +34,11 @@ Only `sbraslan/Project_Map` is writable. Source/game repositories remain read-on
 - Marriage / Wedding: canonical registry remains closed; runtime locked.
 
 ## Exact resume cursor
-1. Close PowerUp/DefenseUp and `takemonarchmoney` as deployed versus dormant.
-2. Audit add-money overflow/failure reporting symmetry.
-3. Audit remaining monarch notice and warp boundaries.
-4. Decide Monarch STATIC COMPLETE and select the next subsystem.
-5. Keep source/game repositories read-only and runtime execution locked.
+1. Audit AddMoney overflow/failure fanout symmetry.
+2. Audit remaining mto/mtr private-map and WarpSet failure boundaries.
+3. Inspect monarch notice path and treasury producers for independent defects.
+4. Keep dormant Lua PowerUp/DefenseUp/takemonarchmoney unpromoted unless deployment appears.
+5. Decide Monarch STATIC COMPLETE; source/game repos remain read-only and runtime stays locked.
 
 ## Mapping acceleration index
 - Status: **READY / ACTIVE**
