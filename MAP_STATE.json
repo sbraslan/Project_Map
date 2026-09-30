@@ -47,23 +47,11 @@
     "Never revisit a CLOSED node merely because an old evidence file contains words like next, active, open or mapping."
   ],
   "counts": {
-    "closed_subsystems": 43,
-    "open_subsystems": 1,
+    "closed_subsystems": 44,
+    "open_subsystems": 0,
     "total_canonical_subsystems": 44
   },
-  "active": {
-    "id": "auto_hunt",
-    "name": "Auto Hunt",
-    "status": "OPEN",
-    "cursor": "4. Client/server command and affect parity.",
-    "evidence": {
-      "system": "systems/auto_hunt.md",
-      "bugs": "bugs/auto_hunt.md",
-      "tests": "tests/auto_hunt.md"
-    },
-    "verified_bug_count": 4,
-    "test_plan_count": 4
-  },
+  "active": null,
   "closed": {
     "guild_storage": {
       "name": "Guild Storage + Guild lifecycle",
@@ -463,6 +451,17 @@
       },
       "verified_bug_count": 4,
       "test_plan_count": 4
+    },
+    "auto_hunt": {
+      "name": "Auto Hunt",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/auto_hunt.md",
+        "bugs": "bugs/auto_hunt.md",
+        "tests": "tests/auto_hunt.md"
+      },
+      "verified_bug_count": 4,
+      "test_plan_count": 4
     }
   },
   "alias_index": {
@@ -671,7 +670,7 @@
       "client_service_layer",
       "equipment_extensions"
     ],
-    "last_transition": "auto_hunt cursor 3 completed with AUTO-003 and AUTO-004 verified; advanced to client/server command and affect parity",
+    "last_transition": "auto_hunt CLOSED with 4 verified bugs and 4 test plans -> resume appearance_skill_extensions discovery",
     "next_after_active_close": "Resume with appearance_skill_extensions; CLOSED nodes remain locked.",
     "criteria": "Canonical candidate = enabled and independently stateful/networked/persistent or quest-deployed gameplay feature family. Pure rendering/assets, compile-time fixes and small options remain dependencies/subfeatures rather than standalone nodes.",
     "classified": {
