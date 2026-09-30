@@ -46,3 +46,46 @@ Authorize `SCMD_RESTART_AUTOHUNT` server-side using active Auto Hunt + valid pre
 
 ### Regression target
 See `tests/auto_hunt.md#auto-002`.
+
+
+## AUTO-003 — Auto Hunt disables the entire MOVE anti-cheat validation block
+
+**Status:** VERIFIED_STATIC  
+**Severity:** Critical  
+**Affected:** ServerSRC / movement trust boundary
+
+### Evidence
+- In `CInputMain::Move()`, the teleport-distance check, dead-move guard, speedhack timing checks and combohack check are all wrapped by:
+  `if (!ch->IsAffectFlag(AFF_AUTO_USE)) { ... }`.
+- Therefore every one of those validations is skipped while `AFF_AUTO_USE` is active.
+- After the skipped block, the server still accepts the client-provided movement coordinates and calls `Goto(pinfo->lX, pinfo->lY)` / `Move(pinfo->lX, pinfo->lY)`.
+
+### Reachable consequence
+A modified client with valid Auto Hunt state can send movement packets that would normally be rejected as teleport/speed/dead/combo movement abuse. Auto Hunt therefore acts as a broad server-side anti-cheat bypass rather than a narrowly scoped automation exception.
+
+### Fix boundary
+Do not wrap the full movement validation block with Auto Hunt state. Keep authoritative teleport/dead/speed/combo validation active and add only the minimum, explicitly bounded tolerance needed by legitimate Auto Hunt-generated movement.
+
+### Regression target
+See `tests/auto_hunt.md#auto-003`.
+
+## AUTO-004 — Auto Hunt bypasses SyncPosition distance limits and permits extreme displacement of a sync-owned attackable target
+
+**Status:** VERIFIED_STATIC  
+**Severity:** Critical  
+**Affected:** ServerSRC / SyncPosition trust boundary
+
+### Evidence
+- `SyncPosition()` normally rejects/logs sync deltas where `fDist > 25.0f`.
+- Under `ENABLE_AUTO_SYSTEM`, that distance condition is guarded by `&& !ch->IsAffectFlag(AFF_AUTO_USE)`; active Auto Hunt therefore falls through to `victim->Sync(e->lX, e->lY)`.
+- `SetSyncOwner(ch)` requires the target to be attackable and initially within the sync-owner distance boundary.
+- Once the same character already owns sync, the >250 distance branch returns true when `m_pkChrSyncOwner == ch`, allowing ownership to persist after displacement.
+
+### Reachable consequence
+A modified client can first establish sync ownership over a nearby attackable target and, while Auto Hunt is active, submit a large coordinate delta that bypasses the normal SyncPosition distance guard. The server then applies the requested target position, enabling extreme server-authoritative displacement within valid map coordinates.
+
+### Fix boundary
+Never disable the authoritative sync-distance bound based solely on Auto Hunt. Preserve the same victim displacement limit for automated and manual play, or introduce a tightly bounded server-generated Auto Hunt movement path that does not trust arbitrary client SyncPosition coordinates.
+
+### Regression target
+See `tests/auto_hunt.md#auto-004`.
