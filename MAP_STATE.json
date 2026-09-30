@@ -47,23 +47,11 @@
     "Never revisit a CLOSED node merely because an old evidence file contains words like next, active, open or mapping."
   ],
   "counts": {
-    "closed_subsystems": 45,
-    "open_subsystems": 1,
+    "closed_subsystems": 46,
+    "open_subsystems": 0,
     "total_canonical_subsystems": 46
   },
-  "active": {
-    "id": "move_costume_attr",
-    "name": "Move Costume Attr",
-    "status": "OPEN",
-    "cursor": "2. Mutation/consumption ordering and item-state guards.",
-    "evidence": {
-      "system": "systems/move_costume_attr.md",
-      "bugs": "bugs/move_costume_attr.md",
-      "tests": "tests/move_costume_attr.md"
-    },
-    "verified_bug_count": 1,
-    "test_plan_count": 1
-  },
+  "active": null,
   "closed": {
     "guild_storage": {
       "name": "Guild Storage + Guild lifecycle",
@@ -485,6 +473,17 @@
       },
       "verified_bug_count": 1,
       "test_plan_count": 1
+    },
+    "move_costume_attr": {
+      "name": "Move Costume Attr",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/move_costume_attr.md",
+        "bugs": "bugs/move_costume_attr.md",
+        "tests": "tests/move_costume_attr.md"
+      },
+      "verified_bug_count": 1,
+      "test_plan_count": 1
     }
   },
   "alias_index": {
@@ -692,12 +691,11 @@
   "discovery": {
     "status": "TARGETED_UNKNOWN_ONLY",
     "queue": [
-      "appearance_skill_extensions",
       "client_service_layer",
       "equipment_extensions"
     ],
-    "last_transition": "appearance_skill_extensions: move_costume_attr promoted; passive skill extensions remain integrated generic skill behavior",
-    "next_after_active_close": "Classify remaining appearance_skill_extensions, then client_service_layer.",
+    "last_transition": "appearance_skill_extensions fully resolved -> resume client_service_layer",
+    "next_after_active_close": "Resume with client_service_layer; CLOSED nodes remain locked.",
     "criteria": "Canonical candidate = enabled and independently stateful/networked/persistent or quest-deployed gameplay feature family. Pure rendering/assets, compile-time fixes and small options remain dependencies/subfeatures rather than standalone nodes.",
     "classified": {
       "meley_lair": {
@@ -781,6 +779,18 @@
           "vip": "ACTIVE_INTEGRATED_ENTITLEMENT"
         },
         "reopen_on": "Relevant source snapshot change or new independent VIP persistence/packet/lifecycle evidence."
+      },
+      "appearance_skill_extensions": {
+        "name": "Appearance / Skill Extensions",
+        "status": "SPLIT_RESOLVED",
+        "canonical": false,
+        "resolution": {
+          "skill_color": "PROMOTED_CANONICAL_CLOSED",
+          "move_costume_attr": "PROMOTED_CANONICAL_CLOSED",
+          "change_look": "ALREADY_OWNED_BY_CLOSED_COSTUME_APPEARANCE",
+          "passive_skill_extensions": "INTEGRATED_GENERIC_SKILL_LAYER"
+        },
+        "reopen_on": "Relevant source snapshot change or new independent lifecycle evidence."
       }
     }
   },
