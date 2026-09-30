@@ -1,13 +1,26 @@
 # Snake Lair / Queen Nethis — Deferred Runtime Tests
 
-**Status:** STATIC MAPPING OPEN / 1 TEST DOCUMENTED / EXECUTION LOCKED / NOT RUN
+**Status:** STATIC MAPPING OPEN / 3 TESTS DOCUMENTED / EXECUTION LOCKED / NOT RUN
 
 Runtime/fault-injection execution remains globally locked.
 
+## SNK-T01 — wrong-order pillar key consumption
+Reach the six-pillar floor with a valid 70422 key, then use it on pillar 2 before pillar 1.
 
-## SNK-T01 — construct Snake instance under memory/UB instrumentation
-Create repeated Snake private instances under an iterator/memory-debug build and preferably ASan/UBSan, with allocator patterns that do not zero freshly allocated object storage.
-
-Expected signature in the current code: construction reads the three event pointer members before initialization; a non-zero indeterminate value can reach `event_cancel`. A corrected constructor must initialize all event pointers before any read/cancel operation.
+Expected signature in the current code: the key disappears, the pillar remains locked, the progression counter is unchanged, and no replacement/refund occurs.
 
 Covers `BUG-SNK-001`.
+
+## SNK-T02 — wrong statue item consumption
+Reach the statue floor and give a statue an unrelated item or the wrong elemental Snake statue item. Also repeat against a statue already marked complete.
+
+Expected signature in the current code: the handed item is removed before target/element/block validation and no progression is awarded. A corrected implementation must validate first and consume only on success.
+
+Covers `BUG-SNK-002`.
+
+## SNK-T03 — multi-Siren floor completion
+Force step-4 substep 11 to spawn 2, 3 or 4 Ice Sirens, then kill exactly one.
+
+Expected signature in the current code: the first kill advances the instance to floor 5 even though other spawned Sirens remain. A corrected counter must require all spawned Sirens to be killed.
+
+Covers `BUG-SNK-003`.
