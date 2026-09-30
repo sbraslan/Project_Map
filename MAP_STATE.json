@@ -605,12 +605,14 @@
     "temple of ochao": "dawnmist_dungeon",
     "ochao": "dawnmist_dungeon",
     "jotun": "dawnmist_dungeon",
-    "jotun thrym": "dawnmist_dungeon"
+    "jotun thrym": "dawnmist_dungeon",
+    "elemental_world": "elemental_world",
+    "elemental world": "elemental_world",
+    "elemental maps": "elemental_world"
   },
   "discovery": {
     "status": "TARGETED_UNKNOWN_ONLY",
     "queue": [
-      "elemental_world",
       "event_minigames",
       "economy_extensions",
       "automation_vip",
@@ -618,8 +620,8 @@
       "client_service_layer",
       "equipment_extensions"
     ],
-    "last_transition": "defense_wave classified ACTIVE_INTEGRATED_SUBFEATURE -> continue queued discovery",
-    "next_after_active_close": "Resume with elemental_world; CLOSED nodes remain locked.",
+    "last_transition": "elemental_world classified ACTIVE_INTEGRATED_WORLD_ZONE -> continue queued discovery",
+    "next_after_active_close": "Resume with event_minigames; CLOSED nodes remain locked.",
     "criteria": "Canonical candidate = enabled and independently stateful/networked/persistent or quest-deployed gameplay feature family. Pure rendering/assets, compile-time fixes and small options remain dependencies/subfeatures rather than standalone nodes.",
     "classified": {
       "meley_lair": {
@@ -667,6 +669,18 @@
           "dedicated Defense Wave manager/registry appears",
           "tracked independently deployed entry/state quest owns lifecycle beyond generic CDungeon",
           "persistent or networked Defense Wave-owned state appears",
+          "relevant source snapshot changes"
+        ]
+      },
+      "elemental_world": {
+        "name": "Elemental World",
+        "status": "ACTIVE_INTEGRATED_WORLD_ZONE",
+        "evidence": "systems/elemental_world.md",
+        "canonical": false,
+        "reclassify_when": [
+          "dedicated Elemental World manager/registry appears",
+          "independent persistent or networked Elemental World-owned state appears",
+          "dedicated deployed quest/service owns lifecycle beyond generic warp/map behavior",
           "relevant source snapshot changes"
         ]
       }
