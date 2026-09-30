@@ -134,3 +134,11 @@ Runtime execution remains locked.
 
 ### Next cursor
 Boss spawn/combat hooks, Blue Dragon skill timers and stone modifiers.
+
+
+## Cursor 2 finding — deployed lair data spawns the wrong boss VNUM
+The deployed `data/dungeon/dragon_lair.txt` boss row spawns VNUM `2430`. The active quest death handler is `when 2493.kill`, and `BlueDragon.cpp` applies the Blue Dragon combat logic only to VNUM `2493`.
+
+The pinned DumpProto source defines `2493` as `Beran-Setaou`; no `2430` entry exists in the tracked mob names/proto.
+
+Promoted as `BUG-BDL-003`.
