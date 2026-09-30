@@ -854,11 +854,11 @@
   },
   "modernization": {
     "track": "X64_FOUNDATION",
-    "status": "AUDIT_ACTIVE",
+    "status": "FIRST_X64_BUILD_READY",
     "audit_file": "X64_MIGRATION_AUDIT.md",
-    "active_task": "M64-01",
-    "active_cursor": "M64-01: raw-size contract proven for MOVE/SYNC and representative GC packets; next produce exact Wave A1 field conversion table and x86 sizeof baseline harness specification.",
-    "source_write_authorization": "PROJECT_MAP_ONLY",
+    "active_task": "M64-04",
+    "active_cursor": "First real FreeBSD x64 build: packet widths normalized, common shared table long widths normalized, project build graph switched from -m32 to -m64. Await compiler/linker output.",
+    "source_write_authorization": "ALL_PROJECT_REPOS_WITH_PRECHANGE_BACKUP",
     "runtime_queue_status": "PRESERVED_PAUSED",
     "next": [
       "M64-02",
@@ -887,6 +887,16 @@
         "client_packet": 74
       },
       "timestamp_contract_risk": true
+    },
+    "last_backup_branches": {
+      "server_pre_x64": "backup/pre-x64-2026-10-01",
+      "client_pre_x64": "backup/pre-x64-2026-10-01",
+      "waveA1_server": "backup/x64-M64-01-waveA1-before",
+      "waveA1_client": "backup/x64-M64-01-waveA1-before",
+      "waveA2_server": "backup/x64-M64-01-waveA2-before",
+      "waveA2_client": "backup/x64-M64-01-waveA2-before",
+      "waveA3_server": "backup/x64-M64-01-waveA3-before",
+      "buildflags_server": "backup/x64-M64-02-buildflags-before"
     }
   }
 }
