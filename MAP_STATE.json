@@ -47,23 +47,11 @@
     "Never revisit a CLOSED node merely because an old evidence file contains words like next, active, open or mapping."
   ],
   "counts": {
-    "closed_subsystems": 46,
-    "open_subsystems": 1,
+    "closed_subsystems": 47,
+    "open_subsystems": 0,
     "total_canonical_subsystems": 47
   },
-  "active": {
-    "id": "additional_equipment_page",
-    "name": "Additional Equipment Page",
-    "status": "OPEN",
-    "cursor": "2. Selected-page combat stat application and equip/unequip lifecycle.",
-    "evidence": {
-      "system": "systems/additional_equipment_page.md",
-      "bugs": "bugs/additional_equipment_page.md",
-      "tests": "tests/additional_equipment_page.md"
-    },
-    "verified_bug_count": 1,
-    "test_plan_count": 1
-  },
+  "active": null,
   "closed": {
     "guild_storage": {
       "name": "Guild Storage + Guild lifecycle",
@@ -496,6 +484,17 @@
       },
       "verified_bug_count": 1,
       "test_plan_count": 1
+    },
+    "additional_equipment_page": {
+      "name": "Additional Equipment Page",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/additional_equipment_page.md",
+        "bugs": "bugs/additional_equipment_page.md",
+        "tests": "tests/additional_equipment_page.md"
+      },
+      "verified_bug_count": 1,
+      "test_plan_count": 1
     }
   },
   "alias_index": {
@@ -705,11 +704,9 @@
   },
   "discovery": {
     "status": "TARGETED_UNKNOWN_ONLY",
-    "queue": [
-      "equipment_extensions"
-    ],
-    "last_transition": "equipment_extensions: additional_equipment_page promoted to OPEN canonical subsystem",
-    "next_after_active_close": "Resume with equipment_extensions; CLOSED nodes remain locked.",
+    "queue": [],
+    "last_transition": "equipment_extensions fully resolved; discovery queue empty; static mapping complete on pinned snapshot",
+    "next_after_active_close": null,
     "criteria": "Canonical candidate = enabled and independently stateful/networked/persistent or quest-deployed gameplay feature family. Pure rendering/assets, compile-time fixes and small options remain dependencies/subfeatures rather than standalone nodes.",
     "classified": {
       "meley_lair": {
@@ -815,8 +812,22 @@
           "ticket": "ALREADY_OWNED_BY_CLOSED_TICKET"
         },
         "reopen_on": "New server-owned persistent/network lifecycle evidence or relevant source snapshot change."
+      },
+      "equipment_extensions": {
+        "name": "Equipment Extensions",
+        "status": "SPLIT_RESOLVED",
+        "canonical": false,
+        "resolution": {
+          "additional_equipment_page": "PROMOTED_CANONICAL_CLOSED",
+          "pendant": "INTEGRATED_EQUIPMENT_EXTENSION",
+          "quiver": "INTEGRATED_EQUIPMENT_EXTENSION",
+          "belt_inventory": "ALREADY_OWNED_BY_INVENTORY_ITEMS",
+          "special_inventory": "ALREADY_OWNED_BY_INVENTORY_ITEMS"
+        },
+        "reopen_on": "Relevant source snapshot change or new independent lifecycle evidence."
       }
-    }
+    },
+    "static_mapping_complete": true
   },
   "lookup_indexes": {
     "authority": "NON_CANONICAL_ACCELERATOR_ONLY",
