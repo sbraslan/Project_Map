@@ -1,6 +1,6 @@
 # Blue Dragon / Beran Setaou — Bug Registry
 
-**Status:** STATIC MAPPING OPEN / 4 VERIFIED BUGS
+**Status:** STATIC MAPPING CLOSED / 4 VERIFIED BUGS
 **Execution:** LOCKED / NOT RUN
 
 ## BUG-BDL-001 — access items are consumed before a disconnect-cancellable personal entry timer
@@ -78,3 +78,7 @@ Below 31% HP, Beran loses the configured final-phase +20% skill-damage factor an
 
 ### Deferred validation
 `BDL-T04`.
+
+
+## Static closure
+Blue Dragon / Beran Setaou closed with `BUG-BDL-001..004`. No additional bug was promoted from final deployment/data parity.
