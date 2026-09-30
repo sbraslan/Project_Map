@@ -55,14 +55,14 @@
     "id": "auto_hunt",
     "name": "Auto Hunt",
     "status": "OPEN",
-    "cursor": "2. Logout/death/map/warp/restart lifecycle.",
+    "cursor": "3. Movement/sync anti-hack bypass boundaries.",
     "evidence": {
       "system": "systems/auto_hunt.md",
       "bugs": "bugs/auto_hunt.md",
       "tests": "tests/auto_hunt.md"
     },
-    "verified_bug_count": 1,
-    "test_plan_count": 1
+    "verified_bug_count": 2,
+    "test_plan_count": 2
   },
   "closed": {
     "guild_storage": {
@@ -671,7 +671,7 @@
       "client_service_layer",
       "equipment_extensions"
     ],
-    "last_transition": "auto_hunt cursor 1 completed with AUTO-001 verified; advanced to logout/death/map/warp/restart lifecycle",
+    "last_transition": "auto_hunt cursor 2 completed with AUTO-002 verified; advanced to movement/sync anti-hack boundary audit",
     "next_after_active_close": "Resume with appearance_skill_extensions; CLOSED nodes remain locked.",
     "criteria": "Canonical candidate = enabled and independently stateful/networked/persistent or quest-deployed gameplay feature family. Pure rendering/assets, compile-time fixes and small options remain dependencies/subfeatures rather than standalone nodes.",
     "classified": {
