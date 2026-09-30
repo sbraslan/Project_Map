@@ -160,3 +160,34 @@ The normal group-entry branch is selected solely by `starttime + group_time >= c
 Boss death sets `dragon_lair_alive = 0`, but the paid group-entry branch never checks that flag. Therefore a boss killed before the group-entry window expires does not close new paid entry.
 
 Promoted as `BUG-BDL-005`.
+
+
+## Cursor 2 checkpoint — boss/combat
+- The deployed boss data mismatch is captured as `BUG-BDL-003`.
+- 2493 is the canonical Beran-Setaou identity in the pinned DumpProto source.
+- Skill cadence uses the configured `hp_period` bands; the deployed single map-208 ownership means process-static skill cooldown state does not collide with a second live Beran instance in this snapshot.
+- DragonStone effect types map consistently to defense, attack, regen-time and regen-percent behavior.
+- The unreachable low-HP regen band is captured as `BUG-BDL-004`.
+- The inverted `hp_damage[4]` table is not promoted because no live source call to `hp_damage` exists in the pinned snapshot.
+
+## Cursor 3 checkpoint — timeout / death / rejoin
+- The global one-shot `blue_dragon_timer` owns full-run expiry and warps the room out at cooldown end.
+- Existing participants can rejoin while their stored run time matches the active global start time.
+- Boss death clears the alive flag and purges the combat room; paid new group entry remaining open after death is captured as `BUG-BDL-005`.
+- No additional source-proven timeout/rejoin defect was promoted.
+
+## Cursor 4 checkpoint — legacy DragonLair reachability
+- `RegisterDragonLairFunctionTable()` is compiled/registered.
+- The pinned Game quest sources and active `quest_list` contain no tracked caller for `DragonLair.startRaid`.
+- The active Blue Dragon renewal flow is quest/event-flag based and does not call `CDragonLairManager::Start`.
+- The legacy manager is therefore dependency/dormant code for this snapshot and is not promoted into active lifecycle findings.
+
+## Final deployment/data parity
+- `ENABLE_BLUEDRAGON_RENEWAL` is enabled.
+- Both renewal quests are active in `quest_list`.
+- Map 208 is deployed only on ch1/core4 in the tracked CONFIG set.
+- BlueDragon Lua config and lair regen/data are present.
+- The boss VNUM parity defect is already captured as `BUG-BDL-003`; no additional deployment mismatch was found.
+
+## Static closure
+Blue Dragon / Beran Setaou is **STATIC MAPPING CLOSED** for the pinned snapshot with `BUG-BDL-001..005`. Runtime execution remains locked.
