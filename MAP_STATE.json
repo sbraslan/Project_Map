@@ -48,10 +48,28 @@
   ],
   "counts": {
     "closed_subsystems": 40,
-    "open_subsystems": 0,
-    "total_canonical_subsystems": 40
+    "open_subsystems": 1,
+    "total_canonical_subsystems": 41
   },
-  "active": null,
+  "active": {
+    "id": "yohara_progression",
+    "name": "Yohara Progression / Conqueror + Sungma",
+    "status": "OPEN",
+    "evidence": {
+      "system": "systems/yohara_progression.md",
+      "bugs": "bugs/yohara_progression.md",
+      "tests": "tests/yohara_progression.md"
+    },
+    "verified_bug_count": 0,
+    "test_plan_count": 0,
+    "cursor": [
+      "Audit Conqueror EXP -> quarter-step -> level-up state machine, overflow recursion and point awards.",
+      "Audit DB load/save and client point synchronization for type/range/order mismatches.",
+      "Audit Sungma map-attribute loading, missing-map behavior and combat/movement/HP penalties.",
+      "Audit reset/stat-allocation/item application boundaries and overflow/negative paths.",
+      "Close deployment/data parity and promote only source-proven defects."
+    ]
+  },
   "closed": {
     "guild_storage": {
       "name": "Guild Storage + Guild lifecycle",
@@ -570,12 +588,18 @@
     "meley": "meley_lair",
     "red dragon lair": "meley_lair",
     "guild dragonlair": "meley_lair",
-    "guild dragon lair": "meley_lair"
+    "guild dragon lair": "meley_lair",
+    "yohara_progression": "yohara_progression",
+    "yohara progression": "yohara_progression",
+    "yohara": "yohara_progression",
+    "conqueror": "yohara_progression",
+    "conqueror level": "yohara_progression",
+    "sungma": "yohara_progression",
+    "sungma stats": "yohara_progression"
   },
   "discovery": {
-    "status": "TARGETED_UNKNOWN_ONLY",
+    "status": "PAUSED_WHILE_ACTIVE",
     "queue": [
-      "yohara_progression",
       "advanced_yohara_dungeons",
       "defense_wave",
       "elemental_world",
@@ -586,8 +610,8 @@
       "client_service_layer",
       "equipment_extensions"
     ],
-    "last_transition": "meley_lair classified DORMANT_NO_DEPLOY_CALLER; compiled manager retained as dormant evidence, not a canonical OPEN node",
-    "next_after_active_close": "Resume with yohara_progression; CLOSED and DORMANT nodes remain locked.",
+    "last_transition": "yohara_progression normalized and OPEN",
+    "next_after_active_close": "Resume with advanced_yohara_dungeons; CLOSED and DORMANT nodes remain locked.",
     "criteria": "Canonical candidate = enabled and independently stateful/networked/persistent or quest-deployed gameplay feature family. Pure rendering/assets, compile-time fixes and small options remain dependencies/subfeatures rather than standalone nodes.",
     "classified": {
       "meley_lair": {
