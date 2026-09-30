@@ -48,10 +48,22 @@
   ],
   "counts": {
     "closed_subsystems": 45,
-    "open_subsystems": 0,
-    "total_canonical_subsystems": 45
+    "open_subsystems": 1,
+    "total_canonical_subsystems": 46
   },
-  "active": null,
+  "active": {
+    "id": "move_costume_attr",
+    "name": "Move Costume Attr",
+    "status": "OPEN",
+    "cursor": "2. Mutation/consumption ordering and item-state guards.",
+    "evidence": {
+      "system": "systems/move_costume_attr.md",
+      "bugs": "bugs/move_costume_attr.md",
+      "tests": "tests/move_costume_attr.md"
+    },
+    "verified_bug_count": 1,
+    "test_plan_count": 1
+  },
   "closed": {
     "guild_storage": {
       "name": "Guild Storage + Guild lifecycle",
@@ -684,7 +696,7 @@
       "client_service_layer",
       "equipment_extensions"
     ],
-    "last_transition": "skill_color CLOSED with 1 verified bug and 1 test plan -> resume remaining appearance_skill_extensions classification",
+    "last_transition": "appearance_skill_extensions: move_costume_attr promoted; passive skill extensions remain integrated generic skill behavior",
     "next_after_active_close": "Classify remaining appearance_skill_extensions, then client_service_layer.",
     "criteria": "Canonical candidate = enabled and independently stateful/networked/persistent or quest-deployed gameplay feature family. Pure rendering/assets, compile-time fixes and small options remain dependencies/subfeatures rather than standalone nodes.",
     "classified": {
