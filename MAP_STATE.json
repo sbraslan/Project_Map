@@ -691,11 +691,10 @@
   "discovery": {
     "status": "TARGETED_UNKNOWN_ONLY",
     "queue": [
-      "client_service_layer",
       "equipment_extensions"
     ],
-    "last_transition": "appearance_skill_extensions fully resolved -> resume client_service_layer",
-    "next_after_active_close": "Resume with client_service_layer; CLOSED nodes remain locked.",
+    "last_transition": "client_service_layer resolved without new canonical subsystem -> resume equipment_extensions",
+    "next_after_active_close": "Resume with equipment_extensions; CLOSED nodes remain locked.",
     "criteria": "Canonical candidate = enabled and independently stateful/networked/persistent or quest-deployed gameplay feature family. Pure rendering/assets, compile-time fixes and small options remain dependencies/subfeatures rather than standalone nodes.",
     "classified": {
       "meley_lair": {
@@ -791,6 +790,16 @@
           "passive_skill_extensions": "INTEGRATED_GENERIC_SKILL_LAYER"
         },
         "reopen_on": "Relevant source snapshot change or new independent lifecycle evidence."
+      },
+      "client_service_layer": {
+        "name": "Client Service Layer",
+        "status": "RESOLVED_NONCANONICAL",
+        "canonical": false,
+        "resolution": {
+          "wiki_browser_loading_tip": "CLIENT_ONLY_SUPPORT_LAYER",
+          "ticket": "ALREADY_OWNED_BY_CLOSED_TICKET"
+        },
+        "reopen_on": "New server-owned persistent/network lifecycle evidence or relevant source snapshot change."
       }
     }
   },
