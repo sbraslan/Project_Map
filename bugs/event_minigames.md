@@ -83,3 +83,28 @@ End-of-round cleanup must be independent from whether a reward item exists. Rewa
 
 ### Regression target
 See `tests/event_minigames.md#em-003`.
+
+
+## EM-004 — Attendance login info dereferences an empty reward vector
+
+**Status:** VERIFIED_STATIC  
+**Severity:** Medium-High  
+**Affected:** ServerSRC / Attendance
+
+### Evidence
+- `attendanceRewardVec` is a normal `std::vector<TRewardItem>` and therefore starts empty.
+- `ReadRewardItemFile()` can return false when the reward file cannot be opened and does not establish a non-empty invariant.
+- `CInputLogin` calls `CMiniGameManager::AttendanceEventInfo(ch)` for every login while `ENABLE_MONSTER_BACK` is compiled, independent of whether the attendance event is active.
+- `AttendanceEventInfo()` sends:
+  `Packet(&attendanceRewardVec[0], sizeof(TRewardItem) * attendanceRewardVec.size())`
+  without checking `empty()`.
+- Taking element 0 from an empty vector is invalid even when the transmitted byte count is zero.
+
+### Reachable consequence
+If the attendance reward list is missing, fails to load, or is otherwise empty, a normal player login reaches invalid vector element access. Depending on build/runtime behavior this can produce undefined behavior and may crash or destabilize the game process.
+
+### Fix boundary
+Never index element 0 when the vector is empty. Send the reward payload only when `!attendanceRewardVec.empty()`; also make startup/reload handling explicitly report and handle a missing/empty reward configuration.
+
+### Regression target
+See `tests/event_minigames.md#em-004`.
