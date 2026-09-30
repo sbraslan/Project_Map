@@ -47,23 +47,11 @@
     "Never revisit a CLOSED node merely because an old evidence file contains words like next, active, open or mapping."
   ],
   "counts": {
-    "closed_subsystems": 42,
-    "open_subsystems": 1,
+    "closed_subsystems": 43,
+    "open_subsystems": 0,
     "total_canonical_subsystems": 43
   },
-  "active": {
-    "id": "gem_shop",
-    "name": "Gem Shop",
-    "status": "OPEN",
-    "cursor": "4. login/load/save/reset and time-refresh lifecycle.",
-    "evidence": {
-      "system": "systems/gem_shop.md",
-      "bugs": "bugs/gem_shop.md",
-      "tests": "tests/gem_shop.md"
-    },
-    "verified_bug_count": 4,
-    "test_plan_count": 4
-  },
+  "active": null,
   "closed": {
     "guild_storage": {
       "name": "Guild Storage + Guild lifecycle",
@@ -452,6 +440,17 @@
       },
       "verified_bug_count": 4,
       "test_plan_count": 4
+    },
+    "gem_shop": {
+      "name": "Gem Shop",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/gem_shop.md",
+        "bugs": "bugs/gem_shop.md",
+        "tests": "tests/gem_shop.md"
+      },
+      "verified_bug_count": 4,
+      "test_plan_count": 4
     }
   },
   "alias_index": {
@@ -657,7 +656,7 @@
       "client_service_layer",
       "equipment_extensions"
     ],
-    "last_transition": "gem_shop cursors 2-3 completed with GEM-002..004 verified; advanced to login/load/save/time-refresh lifecycle",
+    "last_transition": "gem_shop CLOSED with 4 verified bugs and 4 test plans -> resume automation_vip discovery",
     "next_after_active_close": "Resume with automation_vip; CLOSED nodes remain locked.",
     "criteria": "Canonical candidate = enabled and independently stateful/networked/persistent or quest-deployed gameplay feature family. Pure rendering/assets, compile-time fixes and small options remain dependencies/subfeatures rather than standalone nodes.",
     "classified": {
