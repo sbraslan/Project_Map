@@ -48,10 +48,22 @@
   ],
   "counts": {
     "closed_subsystems": 46,
-    "open_subsystems": 0,
-    "total_canonical_subsystems": 46
+    "open_subsystems": 1,
+    "total_canonical_subsystems": 47
   },
-  "active": null,
+  "active": {
+    "id": "additional_equipment_page",
+    "name": "Additional Equipment Page",
+    "status": "OPEN",
+    "cursor": "2. Selected-page combat stat application and equip/unequip lifecycle.",
+    "evidence": {
+      "system": "systems/additional_equipment_page.md",
+      "bugs": "bugs/additional_equipment_page.md",
+      "tests": "tests/additional_equipment_page.md"
+    },
+    "verified_bug_count": 1,
+    "test_plan_count": 1
+  },
   "closed": {
     "guild_storage": {
       "name": "Guild Storage + Guild lifecycle",
@@ -686,14 +698,17 @@
     "auto system": "auto_hunt",
     "skill_color": "skill_color",
     "skill color": "skill_color",
-    "skillcolor": "skill_color"
+    "skillcolor": "skill_color",
+    "additional_equipment_page": "additional_equipment_page",
+    "additional equipment": "additional_equipment_page",
+    "equipment page": "additional_equipment_page"
   },
   "discovery": {
     "status": "TARGETED_UNKNOWN_ONLY",
     "queue": [
       "equipment_extensions"
     ],
-    "last_transition": "client_service_layer resolved without new canonical subsystem -> resume equipment_extensions",
+    "last_transition": "equipment_extensions: additional_equipment_page promoted to OPEN canonical subsystem",
     "next_after_active_close": "Resume with equipment_extensions; CLOSED nodes remain locked.",
     "criteria": "Canonical candidate = enabled and independently stateful/networked/persistent or quest-deployed gameplay feature family. Pure rendering/assets, compile-time fixes and small options remain dependencies/subfeatures rather than standalone nodes.",
     "classified": {
