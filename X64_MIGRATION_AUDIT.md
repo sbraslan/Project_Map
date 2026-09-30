@@ -343,3 +343,37 @@ Do not leave raw `time_t` in a binary protocol contract.
 **First implementation target once source-write is authorized:** Wave A1 client<->game packet-width normalization, because it is the immediate incompatibility between FreeBSD LP64 server and Windows LLP64 client.
 
 The existing x86 values and semantics should be preserved; this is an ABI cleanup, not a protocol redesign.
+
+
+## M64-01 producer/consumer proof — first confirmed raw-size contracts
+
+The following paths are now source-proven to depend directly on struct size:
+
+- `TPacketCGMove`
+  - server packet table registers `HEADER_CG_MOVE` with `sizeof(TPacketCGMove)`;
+  - client constructs the same struct for transmission.
+- `TPacketCGSyncPositionElement`
+  - server validates extra payload length with modulo/division by `sizeof(TPacketCGSyncPositionElement)`;
+  - client constructs the same element type.
+- `TPacketGCPointChange`
+  - client receives exactly `sizeof(TPacketGCPointChange)`.
+- `TPacketGCWarp`
+  - client receives/uses the fixed packet struct.
+- `TPacketGCDungeonInfo`
+  - client receives the fixed packet struct.
+- item packet dispatch includes the fixed `HEADER_GC_ITEM_SET` family.
+
+This proves packet-width normalization is not optional: changing server `long` width changes parser framing/expected payload sizes, not merely in-memory representation.
+
+### First source patch set definition
+
+When source-write phase begins, the first patch set should be deliberately small:
+
+1. introduce/document canonical wire scalar aliases or explicit fixed-width fields;
+2. normalize only movement/sync packet coordinates and size/delta fields first;
+3. mirror the exact same widths in client packet declarations;
+4. add packet-size assertions;
+5. build x86 client/server and confirm no packet size changed from baseline;
+6. only then continue to character/point/item packet families.
+
+This gives an early compatibility gate before touching the larger item/player table surface.
