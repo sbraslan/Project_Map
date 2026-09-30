@@ -24,3 +24,13 @@
 4. Send Okey START while event is active with valid Yang + card set.
 5. Verify the server always enters the initialization/payment branch exactly once for a fresh game.
 6. Disconnect/relogin and repeat; state must again start from a deterministic zero state unless persistence is explicitly added.
+
+
+## EM-003 — Catch King no-reward terminal cleanup
+1. Start Catch King normally.
+2. Complete a run with final score below 10.
+3. Send the normal reward/end request.
+4. **Expected after fix:** no reward item is granted, but score/bet/field runtime state is cleared and `gameStatus == false`.
+5. Immediately start another Catch King round.
+6. **Expected after fix:** new round starts normally without requiring relog.
+7. Repeat with a score >= 10 and verify reward + cleanup behavior remains unchanged.
