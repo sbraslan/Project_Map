@@ -1,6 +1,6 @@
 # Blue Dragon / Beran Setaou — Static System Map
 
-**Status:** STATIC MAPPING OPEN / 1 VERIFIED BUG
+**Status:** STATIC MAPPING OPEN / 2 VERIFIED BUGS
 **Mode:** detection / mapping only
 **Execution:** LOCKED / NOT RUN
 
@@ -25,3 +25,17 @@ The first entrant gives the required access items before the run is committed. T
 Player quest timers are owned by the quest `PC` object. On character disconnect, `CQuestManager::DisconnectPC` erases that object; `PC::~PC -> Destroy -> ClearTimer` cancels its timers. If disconnect occurs after item removal but before `dragon_lair_warptimer` executes, neither the successful warp path nor the race-refund path runs.
 
 Promoted as `BUG-BDL-001`.
+
+
+## Cursor 1 finding — disconnect can strand the entry NPC lock
+The first-entry path uses `npc.lock()` before several interactive suspend points. Normal quest completion eventually reaches `PC::EndRunning()`, which detects a locked quest NPC and clears `npc->SetQuestNPCID(0)`.
+
+Disconnect follows a different path:
+- `LogoutPC()` calls `CloseState()` and then `CancelRunning()`;
+- `CloseState()` only unreferences the Lua coroutine;
+- `CancelRunning()` only clears running-quest state;
+- `PC::EndRunning()` is not called, so its NPC-unlock logic never executes.
+
+The NPC therefore retains the disconnected player's PID in `GetQuestNPCID()`. Future `npc.lock()` calls reject other players because they only accept lock-owner 0 or the same PID.
+
+Promoted as `BUG-BDL-002`.
