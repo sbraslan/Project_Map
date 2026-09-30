@@ -1,6 +1,6 @@
 # Blue Dragon / Beran Setaou — Bug Registry
 
-**Status:** STATIC MAPPING OPEN / 2 VERIFIED BUGS
+**Status:** STATIC MAPPING OPEN / 3 VERIFIED BUGS
 **Execution:** LOCKED / NOT RUN
 
 ## BUG-BDL-001 — access items are consumed before a disconnect-cancellable personal entry timer
@@ -41,3 +41,21 @@ Disconnecting while the Blue Dragon entry NPC is locked can strand the NPC with 
 
 ### Deferred validation
 `BDL-T02`.
+
+
+## BUG-BDL-003 — existing-run join ignores that Beran has already died
+
+**Class:** run-state validation / paid entry after completion
+
+### Proof
+- The existing-run entry condition is `starttime + group_time >= current_time`.
+- That branch validates the shared entry code and access items, consumes the items, stores the run start time and warps the player into map 208.
+- It never checks `dragon_lair_alive`.
+- The 2493 kill handler sets `dragon_lair_alive = 0` and purges the room but does not clear `dragon_lair_time`.
+- `group_time` is half the 20-minute live cooldown, so a kill inside the first 10 minutes leaves a positive paid-join window for an already completed run.
+
+### Consequence
+Players can spend Blue Dragon access items to enter an empty/completed lair after Beran has already been killed.
+
+### Deferred validation
+`BDL-T03`.
