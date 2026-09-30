@@ -48,10 +48,22 @@
   ],
   "counts": {
     "closed_subsystems": 42,
-    "open_subsystems": 0,
-    "total_canonical_subsystems": 42
+    "open_subsystems": 1,
+    "total_canonical_subsystems": 43
   },
-  "active": null,
+  "active": {
+    "id": "gem_shop",
+    "name": "Gem Shop",
+    "status": "OPEN",
+    "cursor": "1. Table initialization / random-row generation / persisted item-id validity.",
+    "evidence": {
+      "system": "systems/gem_shop.md",
+      "bugs": "bugs/gem_shop.md",
+      "tests": "tests/gem_shop.md"
+    },
+    "verified_bug_count": 1,
+    "test_plan_count": 1
+  },
   "closed": {
     "guild_storage": {
       "name": "Guild Storage + Guild lifecycle",
@@ -631,19 +643,22 @@
     "find m": "event_minigames",
     "black and white": "event_minigames",
     "bnw": "event_minigames",
-    "attendance event": "event_minigames"
+    "attendance event": "event_minigames",
+    "gem_shop": "gem_shop",
+    "gem shop": "gem_shop",
+    "gaya shop": "gem_shop",
+    "gaya": "gem_shop"
   },
   "discovery": {
     "status": "TARGETED_UNKNOWN_ONLY",
     "queue": [
-      "economy_extensions",
       "automation_vip",
       "appearance_skill_extensions",
       "client_service_layer",
       "equipment_extensions"
     ],
-    "last_transition": "event_minigames CLOSED with 4 verified bugs and 4 test plans -> resume economy_extensions discovery",
-    "next_after_active_close": "Resume with economy_extensions; CLOSED nodes remain locked.",
+    "last_transition": "economy_extensions split: existing Shop/Exchange extensions remain locked; gem_shop promoted to OPEN canonical subsystem",
+    "next_after_active_close": "Resume with automation_vip; CLOSED nodes remain locked.",
     "criteria": "Canonical candidate = enabled and independently stateful/networked/persistent or quest-deployed gameplay feature family. Pure rendering/assets, compile-time fixes and small options remain dependencies/subfeatures rather than standalone nodes.",
     "classified": {
       "meley_lair": {
@@ -705,6 +720,18 @@
           "dedicated deployed quest/service owns lifecycle beyond generic warp/map behavior",
           "relevant source snapshot changes"
         ]
+      },
+      "economy_extensions": {
+        "name": "Economy Extensions",
+        "status": "SPLIT_RESOLVED",
+        "canonical": false,
+        "resolution": {
+          "gem_shop": "PROMOTED_CANONICAL_OPEN",
+          "premium_private_shop": "ALREADY_OWNED_BY_CLOSED_SHOP",
+          "private_shop_search": "ALREADY_OWNED_BY_CLOSED_SHOP",
+          "won_cheque_exchange": "INTEGRATED_CURRENCY_EXTENSION"
+        },
+        "reopen_on": "Relevant source snapshot change or new independent lifecycle evidence outside current ownership boundaries."
       }
     }
   },
