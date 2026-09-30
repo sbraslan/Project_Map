@@ -1,6 +1,6 @@
 # Event MiniGames — Static System Map
 
-**Status:** STATIC MAPPING OPEN  
+**Status:** STATIC MAPPING CLOSED  
 **Mode:** detection / mapping only  
 **Execution:** LOCKED / NOT RUN  
 **Source snapshot:** pinned by `MAP_STATE.json`
@@ -63,3 +63,11 @@ Not owned here:
 - Attendance info sends from `attendanceRewardVec[0]`; prove whether an empty reward vector is reachable before classifying.
 - BNW random-opponent selection assumes at least one unused opponent card; prove state invariants before classifying.
 - Recursive Okey card randomization is bounded by deck uniqueness in intended state; verify corrupted/desynchronized state handling before classifying.
+
+
+## Closeout
+- Client/server packet headers and active minigame packet families were checked for parity on the pinned snapshot.
+- No additional source-proven parity defect was found.
+- Final verified bugs: 4.
+- Final test plans: 4.
+- Lifecycle is now CLOSED and locked on this source snapshot.
