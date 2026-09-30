@@ -610,7 +610,6 @@
   "discovery": {
     "status": "TARGETED_UNKNOWN_ONLY",
     "queue": [
-      "defense_wave",
       "elemental_world",
       "event_minigames",
       "economy_extensions",
@@ -619,8 +618,8 @@
       "client_service_layer",
       "equipment_extensions"
     ],
-    "last_transition": "dawnmist_dungeon classified ACTIVE_INTEGRATED_SUBFEATURE -> continue queued discovery",
-    "next_after_active_close": "Resume with defense_wave; CLOSED nodes remain locked.",
+    "last_transition": "defense_wave classified ACTIVE_INTEGRATED_SUBFEATURE -> continue queued discovery",
+    "next_after_active_close": "Resume with elemental_world; CLOSED nodes remain locked.",
     "criteria": "Canonical candidate = enabled and independently stateful/networked/persistent or quest-deployed gameplay feature family. Pure rendering/assets, compile-time fixes and small options remain dependencies/subfeatures rather than standalone nodes.",
     "classified": {
       "meley_lair": {
@@ -656,6 +655,18 @@
         "reclassify_when": [
           "dedicated entry/private-map/member lifecycle appears",
           "persistent or networked DawnMist-owned state appears",
+          "relevant source snapshot changes"
+        ]
+      },
+      "defense_wave": {
+        "name": "Defense Wave / Ship Defense",
+        "status": "ACTIVE_INTEGRATED_SUBFEATURE",
+        "evidence": "systems/defense_wave.md",
+        "canonical": false,
+        "reclassify_when": [
+          "dedicated Defense Wave manager/registry appears",
+          "tracked independently deployed entry/state quest owns lifecycle beyond generic CDungeon",
+          "persistent or networked Defense Wave-owned state appears",
           "relevant source snapshot changes"
         ]
       }
