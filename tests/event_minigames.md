@@ -34,3 +34,11 @@
 5. Immediately start another Catch King round.
 6. **Expected after fix:** new round starts normally without requiring relog.
 7. Repeat with a score >= 10 and verify reward + cleanup behavior remains unchanged.
+
+
+## EM-004 — Attendance empty reward-list login
+1. Start the server with the attendance reward list absent or intentionally empty.
+2. Login a normal character while `ENABLE_MONSTER_BACK` is compiled.
+3. **Expected after fix:** login completes normally; the attendance header may report zero reward entries, but no vector element is dereferenced and no payload is sent.
+4. Repeat with a valid populated reward list.
+5. **Expected after fix:** all configured reward entries are transmitted normally.
