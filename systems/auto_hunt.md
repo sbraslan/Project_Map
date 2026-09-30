@@ -1,6 +1,6 @@
 # Auto Hunt — Static System Map
 
-**Status:** STATIC MAPPING OPEN  
+**Status:** STATIC MAPPING CLOSED  
 **Mode:** detection / mapping only  
 **Execution:** LOCKED / NOT RUN  
 **Source snapshot:** pinned by `MAP_STATE.json`
@@ -45,3 +45,11 @@ Not owned here:
 3. Movement/sync anti-hack bypass boundaries.
 4. Client/server command and affect parity.
 5. Close subsystem and return to discovery queue.
+
+
+## Closeout
+- Entitlement activation/expiry, logout/death/restart lifecycle, movement/sync trust boundaries and client/server command/affect parity were audited.
+- Final verified bugs: 4.
+- Final test plans: 4.
+- No additional parity defect was promoted.
+- Lifecycle is CLOSED and locked on the pinned source snapshot.
