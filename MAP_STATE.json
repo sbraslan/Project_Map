@@ -60,10 +60,9 @@
       "bugs": "bugs/snake_lair.md",
       "tests": "tests/snake_lair.md"
     },
-    "verified_bug_count": 1,
-    "test_plan_count": 1,
+    "verified_bug_count": 3,
+    "test_plan_count": 3,
     "cursor": [
-      "Audit floor/state progression, timer/event ownership and item-based transitions.",
       "Audit disconnect, party-leave, kick/exit and destruction ordering.",
       "Audit Sungma calculations, boss/debuff logic and client/server parity.",
       "Close deployment/data parity and promote only source-proven defects."
