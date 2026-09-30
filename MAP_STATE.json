@@ -55,14 +55,14 @@
     "id": "event_minigames",
     "name": "Event MiniGames",
     "status": "OPEN",
-    "cursor": "2. Audit per-character state initialization/reset/disconnect/relogin boundaries.",
+    "cursor": "3. Audit reward/payment ordering, duplicate-claim/replay paths and inventory-space handling.",
     "evidence": {
       "system": "systems/event_minigames.md",
       "bugs": "bugs/event_minigames.md",
       "tests": "tests/event_minigames.md"
     },
-    "verified_bug_count": 1,
-    "test_plan_count": 1
+    "verified_bug_count": 2,
+    "test_plan_count": 2
   },
   "closed": {
     "guild_storage": {
@@ -643,7 +643,7 @@
       "client_service_layer",
       "equipment_extensions"
     ],
-    "last_transition": "event_minigames cursor 1 completed with EM-001 verified; advanced to per-character lifecycle audit",
+    "last_transition": "event_minigames cursor 2 completed with EM-002 verified; advanced to reward/payment audit",
     "next_after_active_close": "Resume with economy_extensions; CLOSED nodes remain locked.",
     "criteria": "Canonical candidate = enabled and independently stateful/networked/persistent or quest-deployed gameplay feature family. Pure rendering/assets, compile-time fixes and small options remain dependencies/subfeatures rather than standalone nodes.",
     "classified": {
