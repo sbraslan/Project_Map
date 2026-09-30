@@ -1,6 +1,6 @@
 # Blue Dragon / Beran Setaou — Bug Registry
 
-**Status:** STATIC MAPPING OPEN / 3 VERIFIED BUGS
+**Status:** STATIC MAPPING OPEN / 4 VERIFIED BUGS
 **Execution:** LOCKED / NOT RUN
 
 ## BUG-BDL-001 — access items are consumed before a disconnect-cancellable personal entry timer
@@ -59,3 +59,22 @@ Players can spend Blue Dragon access items to enter an empty/completed lair afte
 
 ### Deferred validation
 `BDL-T03`.
+
+
+## BUG-BDL-004 — low-HP damage and regeneration ranges are reversed in BlueDragon.lua
+
+**Class:** combat configuration / unreachable range
+
+### Proof
+- `BlueDragon_GetRangeFactor` accepts a row only when `min <= currentValue && currentValue <= max`.
+- `BlueDragonSetting.hp_damage[4]` is configured as `min=30, max=0, pct=20`.
+- `BlueDragonSetting.hp_regen[4]` is configured as `min=30, max=0, pct=12`.
+- No HP percentage can satisfy `30 <= hp <= 0`.
+- Active skill code calls `BlueDragon_GetRangeFactor("hp_damage", ...)`.
+- The 2493 recovery event calls `BlueDragon_GetRangeFactor("hp_regen", ...)`.
+
+### Consequence
+Below 31% HP, Beran loses the configured final-phase +20% skill-damage factor and +12% regeneration factor. Both lookups fall through to zero rather than applying the intended low-HP row.
+
+### Deferred validation
+`BDL-T04`.
