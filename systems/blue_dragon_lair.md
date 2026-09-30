@@ -142,3 +142,13 @@ The deployed `data/dungeon/dragon_lair.txt` boss row spawns VNUM `2430`. The act
 The pinned DumpProto source defines `2493` as `Beran-Setaou`; no `2430` entry exists in the tracked mob names/proto.
 
 Promoted as `BUG-BDL-003`.
+
+
+## Cursor 2 finding — low-HP regen range is impossible
+`BlueDragon.lua` defines the fourth `hp_regen` band as `min=30, max=0, pct=12`. The binder accepts a band only when `min <= hp <= max`, so this range can never match.
+
+The 2493 monster recovery event in `char.cpp` actively calls `BlueDragon_GetRangeFactor("hp_regen", HPPct)`; therefore the intended +12 percentage-point low-HP regeneration bonus is never applied.
+
+The similarly inverted `hp_damage[4]` table is not promoted because no live source call to `hp_damage` was found in the pinned snapshot.
+
+Promoted as `BUG-BDL-004`.
