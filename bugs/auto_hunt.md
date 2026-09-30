@@ -20,3 +20,29 @@ Tie active Auto Hunt state to entitlement validity continuously: on premium expi
 
 ### Regression target
 See `tests/auto_hunt.md#auto-001`.
+
+
+## AUTO-002 — `/restart_auto` bypasses Auto Hunt entitlement and special-map revive-cost rules
+
+**Status:** VERIFIED_STATIC  
+**Severity:** High  
+**Affected:** ServerSRC / Auto Hunt restart lifecycle
+
+### Evidence
+- `restart_auto` is registered for `GM_PLAYER` and routes to `SCMD_RESTART_AUTOHUNT`.
+- The intended Auto Hunt restart eligibility guard is commented out in the restart branch.
+- The Zodiac revive/prism validation is executed only for `SCMD_RESTART_HERE`.
+- `SCMD_RESTART_AUTOHUNT` is a distinct subcommand, so it bypasses that Zodiac prism dialog/cost branch.
+- Later, the Auto Hunt restart branch directly calls `RestartAtSamePos()`, restores HP to 50, applies death penalty handling and revive invisibility.
+- No `AFF_AUTO_USE` or `PREMIUM_AUTO_USE` check is performed before that branch.
+
+### Reachable consequence
+A dead player can invoke `/restart_auto` without an active Auto Hunt entitlement/state. On maps whose special revive restrictions are keyed specifically to normal restart subcommands—proven here for Zodiac prism handling—the player can reach same-position revival without paying/processing the intended special revive requirement.
+
+The generic death wait guard still applies, so this is not classified as an instant-revive cooldown bypass.
+
+### Fix boundary
+Authorize `SCMD_RESTART_AUTOHUNT` server-side using active Auto Hunt + valid premium entitlement, and route it through the same map-specific revive validation/cost rules as the equivalent normal restart operation.
+
+### Regression target
+See `tests/auto_hunt.md#auto-002`.
