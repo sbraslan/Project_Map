@@ -1,6 +1,6 @@
 # Snake Lair / Queen Nethis — Deferred Runtime Tests
 
-**Status:** STATIC MAPPING OPEN / 5 TESTS DOCUMENTED / EXECUTION LOCKED / NOT RUN
+**Status:** STATIC MAPPING CLOSED / 5 TESTS DOCUMENTED / EXECUTION LOCKED / NOT RUN
 
 Runtime/fault-injection execution remains globally locked.
 
@@ -40,3 +40,7 @@ Stay alive in an active Snake instance until the map-wide skill pulse schedules 
 Expected signature in the current code: CHARACTER teardown does not cancel the queued Snake skill; when it fires, the raw saved character pointer is dereferenced. A corrected teardown must cancel the event or use a safe identity lookup/lifetime guard.
 
 Covers `BUG-SNK-005`.
+
+
+## Static closure
+`SNK-T01..SNK-T05` remain documented and **NOT RUN**. Runtime/fault-injection execution is still globally locked.
