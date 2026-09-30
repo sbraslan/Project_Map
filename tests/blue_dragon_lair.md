@@ -1,6 +1,6 @@
 # Blue Dragon / Beran Setaou — Deferred Runtime Tests
 
-**Status:** STATIC MAPPING OPEN / 3 TESTS DOCUMENTED / EXECUTION LOCKED / NOT RUN
+**Status:** STATIC MAPPING OPEN / 4 TESTS DOCUMENTED / EXECUTION LOCKED / NOT RUN
 
 Runtime/fault-injection execution remains globally locked.
 
@@ -27,3 +27,11 @@ Start a run, kill Beran before the 10-minute group-entry window ends, then use a
 Expected signature in the current code: the second character's items are consumed and the character is warped into map 208 even though `dragon_lair_alive == 0` and the room has already been purged.
 
 Covers `BUG-BDL-003`.
+
+
+## BDL-T04 — low-HP skill-damage and regeneration factors
+Reduce Beran below 31% HP and compare the resolved `hp_damage` / `hp_regen` factors with the configured final rows.
+
+Expected signature in the current code: both lookups return 0 because the final rows are defined as min 30 / max 0. A corrected table should make the 0-30 interval reachable and return 20 for damage and 12 for regen.
+
+Covers `BUG-BDL-004`.
