@@ -1,6 +1,6 @@
 # Snake Lair / Queen Nethis — Static System Map
 
-**Status:** STATIC MAPPING OPEN / 4 VERIFIED BUGS
+**Status:** STATIC MAPPING OPEN / 5 VERIFIED BUGS
 **Mode:** detection / mapping only
 **Execution:** LOCKED / NOT RUN
 
@@ -81,3 +81,15 @@ Promoted as `BUG-SNK-004`.
 
 ### Next cursor
 Sungma calculations, Queen Nethis boss/debuff logic and client/server parity.
+
+
+## Cursor 4 finding — delayed Snake skill retains a raw CHARACTER after disconnect
+
+The map-wide `r_snakeskill_event` runs every 25 seconds. For every living PC it calls:
+`pkChar->ComputeSnakeSkill(273, pkChar, 1)`.
+
+`ComputeSnakeSkill` creates a second event scheduled two seconds later and stores `this` in `r_snakeskill_info::pkVictim` as a raw `LPCHARACTER`. Its callback dereferences that pointer through `GetSectree()`.
+
+The CHARACTER owns the event handle in `m_pkSnakeSkillEvent`, but `CHARACTER::Destroy()` does not cancel that event. Destruction releases the CHARACTER-side intrusive handle while the global event queue still retains the event and its raw character pointer.
+
+Promoted as `BUG-SNK-005`.
