@@ -1,6 +1,6 @@
 # Skill Color — Static System Map
 
-**Status:** STATIC MAPPING OPEN  
+**Status:** STATIC MAPPING CLOSED  
 **Mode:** detection / mapping only  
 **Execution:** LOCKED / NOT RUN  
 **Source snapshot:** pinned by `MAP_STATE.json`
@@ -38,3 +38,11 @@ Not owned here:
 2. DB save/load persistence and matrix sizing.
 3. Character add/update propagation and client bounds.
 4. Close subsystem and resume remaining appearance discovery.
+
+
+## Closeout
+- Slot-domain parity, DB save/load sizing and character packet propagation were audited.
+- Final verified bugs: 1.
+- Final test plans: 1.
+- No additional persistence/propagation defect was promoted.
+- Lifecycle is CLOSED and locked on the pinned source snapshot.
