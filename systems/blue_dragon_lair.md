@@ -1,6 +1,6 @@
 # Blue Dragon / Beran Setaou — Static System Map
 
-**Status:** STATIC MAPPING OPEN / 4 VERIFIED BUGS
+**Status:** STATIC MAPPING CLOSED / 4 VERIFIED BUGS
 **Mode:** detection / mapping only
 **Execution:** LOCKED / NOT RUN
 
@@ -102,3 +102,24 @@ Current verified Blue Dragon bugs:
 - `BUG-BDL-004` — final low-HP damage/regen factor ranges are inverted and unreachable.
 
 Next exact step: final deployment/data parity, then close `blue_dragon_lair` if no new source-proven mismatch appears.
+
+
+## Final deployment/data parity closure
+- `ENABLE_BLUEDRAGON_RENEWAL` is enabled under the tracked dragon-lair feature set.
+- Active `quest_list` deploys both Blue Dragon renewal quests.
+- Compiled quest/object outputs exist for NPC 30121 entry/exit handlers, Beran 2493 kill, stone kills 8031-8034, login/enter/button/info hooks and both personal/server timers.
+- Map 73 and map 208 data are present; tracked channel configuration places both on `ch1/core4`.
+- `dragon_lair.txt` group 2430 resolves through `group.txt` to leader 2493 Beran-Setaou.
+- DumpProto contains Beran 2493 and the relevant tracked mob data.
+- No additional source-proven deployment mismatch was found.
+
+## Static closure
+Blue Dragon / Beran Setaou is **STATIC MAPPING CLOSED** for the pinned source snapshot.
+
+Verified bugs:
+- `BUG-BDL-001` — access-item loss on disconnect before delayed entry.
+- `BUG-BDL-002` — disconnect can strand NPC quest lock.
+- `BUG-BDL-003` — paid join remains open after Beran is dead.
+- `BUG-BDL-004` — low-HP damage/regen factor ranges are unreachable.
+
+Runtime execution remains locked.
