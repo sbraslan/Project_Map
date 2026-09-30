@@ -59,10 +59,9 @@
       "bugs": "bugs/blue_dragon_lair.md",
       "tests": "tests/blue_dragon_lair.md"
     },
-    "verified_bug_count": 3,
-    "test_plan_count": 3,
+    "verified_bug_count": 4,
+    "test_plan_count": 4,
     "cursor": [
-      "Map reachable Beran boss AI/skill timing and distinguish active static-map combat from dormant/private renewal hooks.",
       "Audit timeout, death, rejoin/login and room purge/warp lifecycle.",
       "Resolve legacy DragonLair.startRaid reachability.",
       "Close deployment/data parity and promote only source-proven defects."
