@@ -17,3 +17,19 @@
 5. Send the Auto Hunt restart path.
 6. **Expected after fix:** the same Zodiac prism requirement/dialog/payment rules used by the normal same-position revive path are enforced.
 7. Verify valid Auto Hunt restart still functions on ordinary maps after the standard death wait.
+
+
+## AUTO-003 — MOVE anti-cheat remains authoritative during Auto Hunt
+1. Activate valid Auto Hunt.
+2. Send crafted MOVE packets exceeding normal teleport-distance thresholds.
+3. Send abnormal timing/speed packets and, where applicable, dead/combo movement cases.
+4. **Expected after fix:** the same authoritative rejection/logging rules still apply while Auto Hunt is active; only explicitly allowed automation tolerance differs.
+5. Confirm normal Auto Hunt movement continues to work.
+
+## AUTO-004 — SyncPosition distance enforcement during Auto Hunt
+1. Activate valid Auto Hunt.
+2. Establish normal sync ownership over a nearby attackable target.
+3. Send a crafted SyncPosition element moving that target by more than the normal allowed delta.
+4. **Expected after fix:** request is rejected/ignored and the target position remains authoritative.
+5. Repeat after the target has moved beyond the initial owner-distance threshold.
+6. Verify existing sync ownership cannot be used to chain large displacements.
