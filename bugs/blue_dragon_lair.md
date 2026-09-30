@@ -135,3 +135,7 @@ A new player can spend the entry items and be admitted to the already-cleared la
 
 ### Deferred validation
 `BDL-T05`.
+
+
+## Static closure
+Blue Dragon / Beran Setaou closed with `BUG-BDL-001..005`. No additional defect was promoted from final legacy/deployment parity.
