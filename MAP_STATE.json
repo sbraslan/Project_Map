@@ -4,7 +4,7 @@
   "canonical": true,
   "canonical_file": "MAP_STATE.json",
   "updated_at": "2026-09-30",
-  "mode": "RUNTIME_VALIDATION_READY",
+  "mode": "MODERNIZATION_X64_AUDIT",
   "execution_lock": "LOCKED",
   "repository_policy": {
     "writable": [
@@ -851,5 +851,23 @@
       "AUTO-002"
     ],
     "invariant": "Capture runtime evidence before any source fix; one test at a time."
+  },
+  "modernization": {
+    "track": "X64_FOUNDATION",
+    "status": "AUDIT_ACTIVE",
+    "audit_file": "X64_MIGRATION_AUDIT.md",
+    "active_task": "M64-01",
+    "active_cursor": "Build producer/consumer matrix for ABI-sensitive packed structs in common/tables.h, game/src/packet.h and UserInterface/Packet.h.",
+    "source_write_authorization": "PROJECT_MAP_ONLY",
+    "runtime_queue_status": "PRESERVED_PAUSED",
+    "next": [
+      "M64-02",
+      "M64-03",
+      "M64-04",
+      "M64-05",
+      "M64-06",
+      "M64-07",
+      "M64-08"
+    ]
   }
 }
