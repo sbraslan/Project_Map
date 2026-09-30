@@ -152,3 +152,11 @@ The 2493 monster recovery event in `char.cpp` actively calls `BlueDragon_GetRang
 The similarly inverted `hp_damage[4]` table is not promoted because no live source call to `hp_damage` was found in the pinned snapshot.
 
 Promoted as `BUG-BDL-004`.
+
+
+## Cursor 3 finding — paid group entry remains open after boss death
+The normal group-entry branch is selected solely by `starttime + group_time >= current_time`. It validates the shared entry code, consumes the access items, stores the run time and warps the player into map 208.
+
+Boss death sets `dragon_lair_alive = 0`, but the paid group-entry branch never checks that flag. Therefore a boss killed before the group-entry window expires does not close new paid entry.
+
+Promoted as `BUG-BDL-005`.
