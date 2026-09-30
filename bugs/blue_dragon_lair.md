@@ -117,3 +117,21 @@ At 0–30% HP, Beran-Setaou never receives the configured +12 regeneration contr
 
 ### Deferred validation
 `BDL-T04`.
+
+
+## BUG-BDL-005 — new paid group entry is still accepted after Beran-Setaou is dead
+
+**Class:** run-state validation / item transaction
+
+### Proof
+- During an active run, the group-entry branch is selected when `dragon_lair_time + group_time >= now`.
+- That branch checks the shared entry code, consumes the required access items, writes the player's run time and warps the player to the lair.
+- Beran death explicitly writes `dragon_lair_alive = 0`.
+- The group-entry branch never checks `dragon_lair_alive`.
+- The global run timer continues until the full cooldown expires, so a boss killed early can leave a substantial paid-entry window after death.
+
+### Consequence
+A new player can spend the entry items and be admitted to the already-cleared lair after the boss has died. The payment is accepted even though the combat objective can no longer be completed in that run.
+
+### Deferred validation
+`BDL-T05`.
