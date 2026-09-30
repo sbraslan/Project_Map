@@ -47,3 +47,11 @@ Start a fresh Blue Dragon run and inspect the entity created by `data/dungeon/dr
 Expected signature in the current tracked data: the regen attempts VNUM 2430, while the configured Beran-Setaou proto/quest/C++ logic expects 2493. A corrected deployment must spawn the same canonical VNUM consumed by quest and combat code.
 
 Covers `BUG-BDL-003`.
+
+
+## BDL-T04 — low-HP regeneration band
+Spawn canonical Beran-Setaou VNUM 2493 with the tracked `BlueDragon.lua`, reduce it below 30% HP, and inspect one recovery tick with no regen-percent stone contribution.
+
+Expected signature in the current code: `BlueDragon_GetRangeFactor("hp_regen", hpPct)` returns 0 for the fourth band instead of 12 because the configured range is reversed.
+
+Covers `BUG-BDL-004`.
