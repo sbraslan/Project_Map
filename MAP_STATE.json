@@ -48,10 +48,22 @@
   ],
   "counts": {
     "closed_subsystems": 44,
-    "open_subsystems": 0,
-    "total_canonical_subsystems": 44
+    "open_subsystems": 1,
+    "total_canonical_subsystems": 45
   },
-  "active": null,
+  "active": {
+    "id": "skill_color",
+    "name": "Skill Color",
+    "status": "OPEN",
+    "cursor": "1. Skill/buff slot index domain and packet validation parity.",
+    "evidence": {
+      "system": "systems/skill_color.md",
+      "bugs": "bugs/skill_color.md",
+      "tests": "tests/skill_color.md"
+    },
+    "verified_bug_count": 0,
+    "test_plan_count": 0
+  },
   "closed": {
     "guild_storage": {
       "name": "Guild Storage + Guild lifecycle",
@@ -661,7 +673,10 @@
     "auto_hunt": "auto_hunt",
     "auto hunt": "auto_hunt",
     "autohunt": "auto_hunt",
-    "auto system": "auto_hunt"
+    "auto system": "auto_hunt",
+    "skill_color": "skill_color",
+    "skill color": "skill_color",
+    "skillcolor": "skill_color"
   },
   "discovery": {
     "status": "TARGETED_UNKNOWN_ONLY",
@@ -670,8 +685,8 @@
       "client_service_layer",
       "equipment_extensions"
     ],
-    "last_transition": "auto_hunt CLOSED with 4 verified bugs and 4 test plans -> resume appearance_skill_extensions discovery",
-    "next_after_active_close": "Resume with appearance_skill_extensions; CLOSED nodes remain locked.",
+    "last_transition": "appearance_skill_extensions discovery: skill_color promoted to OPEN canonical subsystem; costume_appearance remains locked",
+    "next_after_active_close": "Resume remaining appearance_skill_extensions classification, then client_service_layer.",
     "criteria": "Canonical candidate = enabled and independently stateful/networked/persistent or quest-deployed gameplay feature family. Pure rendering/assets, compile-time fixes and small options remain dependencies/subfeatures rather than standalone nodes.",
     "classified": {
       "meley_lair": {
