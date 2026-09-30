@@ -47,26 +47,11 @@
     "Never revisit a CLOSED node merely because an old evidence file contains words like next, active, open or mapping."
   ],
   "counts": {
-    "closed_subsystems": 40,
-    "open_subsystems": 1,
+    "closed_subsystems": 41,
+    "open_subsystems": 0,
     "total_canonical_subsystems": 41
   },
-  "active": {
-    "id": "snake_lair",
-    "name": "Snake Lair / Queen Nethis",
-    "status": "OPEN",
-    "evidence": {
-      "system": "systems/snake_lair.md",
-      "bugs": "bugs/snake_lair.md",
-      "tests": "tests/snake_lair.md"
-    },
-    "verified_bug_count": 5,
-    "test_plan_count": 5,
-    "cursor": [
-      "Audit Sungma calculations, boss/debuff logic and client/server parity.",
-      "Close deployment/data parity and promote only source-proven defects."
-    ]
-  },
+  "active": null,
   "closed": {
     "guild_storage": {
       "name": "Guild Storage + Guild lifecycle",
@@ -433,6 +418,17 @@
       },
       "verified_bug_count": 5,
       "test_plan_count": 5
+    },
+    "snake_lair": {
+      "name": "Snake Lair / Queen Nethis",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/snake_lair.md",
+        "bugs": "bugs/snake_lair.md",
+        "tests": "tests/snake_lair.md"
+      },
+      "verified_bug_count": 5,
+      "test_plan_count": 5
     }
   },
   "alias_index": {
@@ -601,7 +597,7 @@
     "schlangentempel": "snake_lair"
   },
   "discovery": {
-    "status": "PAUSED_WHILE_ACTIVE",
+    "status": "TARGETED_UNKNOWN_ONLY",
     "queue": [
       "white_dragon_lair",
       "dawnmist_dungeon",
@@ -614,7 +610,7 @@
       "client_service_layer",
       "equipment_extensions"
     ],
-    "last_transition": "advanced_yohara_dungeons split into Snake Lair, White Dragon and DawnMist; snake_lair OPEN",
+    "last_transition": "snake_lair CLOSED -> resume queued UNKNOWN-only discovery",
     "next_after_active_close": "Resume with white_dragon_lair, then dawnmist_dungeon; CLOSED nodes remain locked.",
     "criteria": "Canonical candidate = enabled and independently stateful/networked/persistent or quest-deployed gameplay feature family. Pure rendering/assets, compile-time fixes and small options remain dependencies/subfeatures rather than standalone nodes.",
     "classified": {
