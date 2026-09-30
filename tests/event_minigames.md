@@ -15,3 +15,12 @@
 - Catch King: variable subpacket lengths are checked before payload casts; active handlers gate on `mini_game_catchking_event`.
 - FindM: fixed request struct size is checked; active handlers gate on `mini_game_findm_event`.
 - BNW: fixed request struct size is checked; active handlers gate on `mini_game_bnw_event`.
+
+
+## EM-002 — Okey state initialization
+1. Construct/login a fresh character without opening Okey previously.
+2. Before any Okey request, inspect/verify server-side Okey state.
+3. **Expected after fix:** `cards_left == 0`, points/field_points are 0, all hand/field/randomized card entries are zero.
+4. Send Okey START while event is active with valid Yang + card set.
+5. Verify the server always enters the initialization/payment branch exactly once for a fresh game.
+6. Disconnect/relogin and repeat; state must again start from a deterministic zero state unless persistence is explicitly added.
