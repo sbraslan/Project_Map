@@ -1,6 +1,6 @@
 # Snake Lair / Queen Nethis — Static System Map
 
-**Status:** STATIC MAPPING OPEN / 5 VERIFIED BUGS
+**Status:** STATIC MAPPING CLOSED / 5 VERIFIED BUGS
 **Mode:** detection / mapping only
 **Execution:** LOCKED / NOT RUN
 
@@ -93,3 +93,30 @@ The map-wide `r_snakeskill_event` runs every 25 seconds. For every living PC it 
 The CHARACTER owns the event handle in `m_pkSnakeSkillEvent`, but `CHARACTER::Destroy()` does not cancel that event. Destruction releases the CHARACTER-side intrusive handle while the global event queue still retains the event and its raw character pointer.
 
 Promoted as `BUG-SNK-005`.
+
+
+## Cursor 4 checkpoint — Sungma / Queen Nethis / client parity
+- Snake Sungma requirements are loaded as five point types across dungeon floors 1-7 and are resolved through `GetSungmaQueenDungeonValue` only for a registered private Snake instance.
+- STR, HP, MOVE, IMMUNE and HIT_PCT consumers route through `CHARACTER::GetSungmaMapAttribute`; no additional Snake-specific calculation mismatch was proven.
+- `QueenDebuffAttack()` exists but no caller was found among the tracked server integration points that include/use SnakeLair. It is treated as a dormant helper, not as an active defect.
+- The recurring Queen skill path is live through `FSkillQueenNethis -> ComputeSnakeSkill`; its disconnect lifetime problem is `BUG-SNK-005`.
+- Client/server special-effect parity is complete: server sends `SE_EFFECT_SNAKE_REGEN`, client packet enum contains it, `RecvSpecialEffect()` maps it to `EFFECT_SNAKE_REGEN`, and `playersettingmodule.py` registers `snake_circle_snake.mse` when `app.ENABLE_QUEEN_NETHIS` is enabled.
+
+## Final deployment/data parity closure
+- Server `ENABLE_QUEEN_NETHIS` is enabled under the Yohara feature family and the corresponding client feature flag is exported to Python.
+- Snake Temple 01/02 map assets and Town data are tracked.
+- Runtime C++ integration is present for portal click, kill handling, item-give interactions, party lifecycle and Sungma lookups.
+- The tracked Game quest/object snapshot still does not expose the outer `SnakeLair.Access()` caller or an object binding for the visible entry NPC 20807. This remains a deployment/source-completeness gap; no fabricated level/item/cooldown rule is added to the map.
+- The Lua bindings themselves are present in ServerSRC, but without a tracked caller their return-count oddities are not promoted as live deployment defects.
+
+## Static closure
+Snake Lair / Queen Nethis is **STATIC MAPPING CLOSED** for the pinned source snapshot.
+
+Verified bugs:
+- `BUG-SNK-001` — wrong-order pillar use consumes the valid pillar key.
+- `BUG-SNK-002` — statue interaction can consume arbitrary/wrong items before validation.
+- `BUG-SNK-003` — Ice Siren phase completes on the first Siren kill.
+- `BUG-SNK-004` — party destruction unregisters but leaves the private instance orphaned until timeout.
+- `BUG-SNK-005` — delayed Queen skill can dereference a destroyed player.
+
+Runtime execution remains locked.
