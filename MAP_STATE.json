@@ -47,23 +47,11 @@
     "Never revisit a CLOSED node merely because an old evidence file contains words like next, active, open or mapping."
   ],
   "counts": {
-    "closed_subsystems": 44,
-    "open_subsystems": 1,
+    "closed_subsystems": 45,
+    "open_subsystems": 0,
     "total_canonical_subsystems": 45
   },
-  "active": {
-    "id": "skill_color",
-    "name": "Skill Color",
-    "status": "OPEN",
-    "cursor": "1. Skill/buff slot index domain and packet validation parity.",
-    "evidence": {
-      "system": "systems/skill_color.md",
-      "bugs": "bugs/skill_color.md",
-      "tests": "tests/skill_color.md"
-    },
-    "verified_bug_count": 0,
-    "test_plan_count": 0
-  },
+  "active": null,
   "closed": {
     "guild_storage": {
       "name": "Guild Storage + Guild lifecycle",
@@ -474,6 +462,17 @@
       },
       "verified_bug_count": 4,
       "test_plan_count": 4
+    },
+    "skill_color": {
+      "name": "Skill Color",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/skill_color.md",
+        "bugs": "bugs/skill_color.md",
+        "tests": "tests/skill_color.md"
+      },
+      "verified_bug_count": 1,
+      "test_plan_count": 1
     }
   },
   "alias_index": {
@@ -685,8 +684,8 @@
       "client_service_layer",
       "equipment_extensions"
     ],
-    "last_transition": "appearance_skill_extensions discovery: skill_color promoted to OPEN canonical subsystem; costume_appearance remains locked",
-    "next_after_active_close": "Resume remaining appearance_skill_extensions classification, then client_service_layer.",
+    "last_transition": "skill_color CLOSED with 1 verified bug and 1 test plan -> resume remaining appearance_skill_extensions classification",
+    "next_after_active_close": "Classify remaining appearance_skill_extensions, then client_service_layer.",
     "criteria": "Canonical candidate = enabled and independently stateful/networked/persistent or quest-deployed gameplay feature family. Pure rendering/assets, compile-time fixes and small options remain dependencies/subfeatures rather than standalone nodes.",
     "classified": {
       "meley_lair": {
