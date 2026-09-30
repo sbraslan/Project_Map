@@ -1,6 +1,6 @@
 # Snake Lair / Queen Nethis — Deferred Runtime Tests
 
-**Status:** STATIC MAPPING OPEN / 4 TESTS DOCUMENTED / EXECUTION LOCKED / NOT RUN
+**Status:** STATIC MAPPING OPEN / 5 TESTS DOCUMENTED / EXECUTION LOCKED / NOT RUN
 
 Runtime/fault-injection execution remains globally locked.
 
@@ -32,3 +32,11 @@ Create/start a Snake private instance, then trigger the server party-destruction
 Expected signature in the current code: players are warped out and the map index disappears from the Snake registry, but the private sectree remains allocated and its Snake events/entities continue until the original one-hour limit event fires. A corrected lifecycle should tear down or explicitly transfer ownership of the instance when registration is removed.
 
 Covers `BUG-SNK-004`.
+
+
+## SNK-T05 — disconnect during delayed Queen skill
+Stay alive in an active Snake instance until the map-wide skill pulse schedules `m_pkSnakeSkillEvent`, then disconnect/destroy the character within the two-second delay under ASan/UBSan or an equivalent lifetime-debug build.
+
+Expected signature in the current code: CHARACTER teardown does not cancel the queued Snake skill; when it fires, the raw saved character pointer is dereferenced. A corrected teardown must cancel the event or use a safe identity lookup/lifetime guard.
+
+Covers `BUG-SNK-005`.
