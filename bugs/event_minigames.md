@@ -60,3 +60,26 @@ Initialize both Okey state blocks in `CHARACTER::Initialize()`, preferably by ca
 
 ### Regression target
 See `tests/event_minigames.md#em-002`.
+
+
+## EM-003 — Catch King losing game can leave character permanently stuck in active game state
+
+**Status:** VERIFIED_STATIC  
+**Severity:** Medium-High  
+**Affected:** ServerSRC / Catch King lifecycle
+
+### Evidence
+- `MiniGameCatchKingStartGame()` refuses to start if `MiniGameCatchKingGetGameStatus() == true`.
+- At the end of a run, `MiniGameCatchKingGetReward()` requires hand card = 0 and hand-card-left = 0.
+- Reward vnum is assigned only when score >= 10.
+- State cleanup (`SetScore(0)`, `SetBetNumber(0)`, `SetGameStatus(false)`, field clear) happens only inside `if (dwRewardVnum)`.
+- If the completed run has score < 10, `dwRewardVnum == 0`; the function only sets `bReturnCode = 1` and leaves the active-game state intact.
+
+### Reachable consequence
+A player who completes a Catch King round below the minimum reward threshold can remain with `gameStatus == true` after the game is over. Subsequent START requests are rejected by the existing active-game guard, so the character cannot start another Catch King round without a lifecycle reset such as relog/reconstruction.
+
+### Fix boundary
+End-of-round cleanup must be independent from whether a reward item exists. Reward delivery may remain conditional, but terminal game state must always be cleared once the run is finished.
+
+### Regression target
+See `tests/event_minigames.md#em-003`.
