@@ -594,12 +594,15 @@
     "queen nethis": "snake_lair",
     "nethis": "snake_lair",
     "snake temple": "snake_lair",
-    "schlangentempel": "snake_lair"
+    "schlangentempel": "snake_lair",
+    "white_dragon_lair": "white_dragon_lair",
+    "white dragon": "white_dragon_lair",
+    "alastor": "white_dragon_lair",
+    "white dragon lair": "white_dragon_lair"
   },
   "discovery": {
     "status": "TARGETED_UNKNOWN_ONLY",
     "queue": [
-      "white_dragon_lair",
       "dawnmist_dungeon",
       "defense_wave",
       "elemental_world",
@@ -610,8 +613,8 @@
       "client_service_layer",
       "equipment_extensions"
     ],
-    "last_transition": "snake_lair CLOSED -> resume queued UNKNOWN-only discovery",
-    "next_after_active_close": "Resume with white_dragon_lair, then dawnmist_dungeon; CLOSED nodes remain locked.",
+    "last_transition": "white_dragon_lair classified DORMANT_NO_DEPLOY_CALLER -> continue queued discovery",
+    "next_after_active_close": "Resume with dawnmist_dungeon; CLOSED nodes remain locked.",
     "criteria": "Canonical candidate = enabled and independently stateful/networked/persistent or quest-deployed gameplay feature family. Pure rendering/assets, compile-time fixes and small options remain dependencies/subfeatures rather than standalone nodes.",
     "classified": {
       "meley_lair": {
@@ -625,6 +628,17 @@
         "reopen_when": [
           "tracked quest/object entry caller appears",
           "non-quest caller to RegisterGuild/EnterGuild/EnterParty is proven",
+          "relevant source snapshot changes"
+        ]
+      },
+      "white_dragon_lair": {
+        "name": "White Dragon / Alastor",
+        "status": "DORMANT_NO_DEPLOY_CALLER",
+        "evidence": "systems/white_dragon_lair.md",
+        "canonical": false,
+        "reopen_when": [
+          "tracked quest/object caller to WhiteDragon.Access/Access2/StartDungeon appears",
+          "non-quest caller to CWhDr::Access/StartDungeon is proven",
           "relevant source snapshot changes"
         ]
       }
