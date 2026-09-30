@@ -73,3 +73,32 @@ Promoted as `BUG-BDL-004`.
 - The tracked static lair data uses its older group/stone layout; the separate private-map renewal combat surface is therefore retained as dependency/dormant evidence until a deployed caller is found.
 
 No other source-proven active combat defect was promoted in this cursor.
+
+
+## Cursor 3 checkpoint — timeout / death / rejoin / room cleanup
+- Boss-kill cleanup drops items before `purge_area`; the C++ purge helper destroys only monster/stone character entities, not item entities, so reward drops are preserved.
+- The global timeout timer runs on the same tracked core that hosts maps 73 and 208.
+- Personal countdown timers are reconnect-safe at quest level: disconnect cancels the personal timer, but `kill_dragon.login` recomputes remaining time and recreates it when the same run is still valid.
+- Expired or mismatched returning characters transition back to `start`; the start state's enter/login path removes non-GM players from map 208.
+- A timed-out living room is cleaned before the next leader run by `purge_area` followed by `regen_in_map`.
+- The already-promoted `BUG-BDL-003` remains the run-completion/rejoin validation defect.
+
+No additional source-proven lifecycle defect was promoted.
+
+## Cursor 4 checkpoint — legacy DragonLair manager reachability
+- `questlua_dragonlair.cpp` exposes `DragonLair.startRaid`, backed by `CDragonLairManager`.
+- The deployed Blue Dragon quest set is `dragon_lair.quest` plus `dragon_lair_access.quest`.
+- Neither deployed quest calls `DragonLair.startRaid`.
+- The active entry path uses NPC 30121, global quest state and direct warp to static map 208.
+- The legacy private-map manager is therefore dormant/dependency code for this pinned snapshot, not an active execution path.
+
+## Checkpoint — 2026-09-30
+Static analysis saved after lifecycle and legacy reachability closure.
+
+Current verified Blue Dragon bugs:
+- `BUG-BDL-001` — access-item loss if disconnect occurs before delayed personal entry timer.
+- `BUG-BDL-002` — disconnect during locked entry dialogue can strand NPC quest lock.
+- `BUG-BDL-003` — paid join remains open after Beran is already dead.
+- `BUG-BDL-004` — final low-HP damage/regen factor ranges are inverted and unreachable.
+
+Next exact step: final deployment/data parity, then close `blue_dragon_lair` if no new source-proven mismatch appears.
