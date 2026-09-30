@@ -55,14 +55,14 @@
     "id": "gem_shop",
     "name": "Gem Shop",
     "status": "OPEN",
-    "cursor": "1. Table initialization / random-row generation / persisted item-id validity.",
+    "cursor": "3. REFRESH / ADD item consumption and state persistence.",
     "evidence": {
       "system": "systems/gem_shop.md",
       "bugs": "bugs/gem_shop.md",
       "tests": "tests/gem_shop.md"
     },
-    "verified_bug_count": 1,
-    "test_plan_count": 1
+    "verified_bug_count": 2,
+    "test_plan_count": 2
   },
   "closed": {
     "guild_storage": {
@@ -657,7 +657,7 @@
       "client_service_layer",
       "equipment_extensions"
     ],
-    "last_transition": "economy_extensions split: existing Shop/Exchange extensions remain locked; gem_shop promoted to OPEN canonical subsystem",
+    "last_transition": "gem_shop cursor 2 completed with GEM-002 verified; advanced to refresh/add persistence audit",
     "next_after_active_close": "Resume with automation_vip; CLOSED nodes remain locked.",
     "criteria": "Canonical candidate = enabled and independently stateful/networked/persistent or quest-deployed gameplay feature family. Pure rendering/assets, compile-time fixes and small options remain dependencies/subfeatures rather than standalone nodes.",
     "classified": {
