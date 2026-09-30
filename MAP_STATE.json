@@ -55,14 +55,14 @@
     "id": "gem_shop",
     "name": "Gem Shop",
     "status": "OPEN",
-    "cursor": "3. REFRESH / ADD item consumption and state persistence.",
+    "cursor": "4. login/load/save/reset and time-refresh lifecycle.",
     "evidence": {
       "system": "systems/gem_shop.md",
       "bugs": "bugs/gem_shop.md",
       "tests": "tests/gem_shop.md"
     },
-    "verified_bug_count": 2,
-    "test_plan_count": 2
+    "verified_bug_count": 4,
+    "test_plan_count": 4
   },
   "closed": {
     "guild_storage": {
@@ -657,7 +657,7 @@
       "client_service_layer",
       "equipment_extensions"
     ],
-    "last_transition": "gem_shop cursor 2 completed with GEM-002 verified; advanced to refresh/add persistence audit",
+    "last_transition": "gem_shop cursors 2-3 completed with GEM-002..004 verified; advanced to login/load/save/time-refresh lifecycle",
     "next_after_active_close": "Resume with automation_vip; CLOSED nodes remain locked.",
     "criteria": "Canonical candidate = enabled and independently stateful/networked/persistent or quest-deployed gameplay feature family. Pure rendering/assets, compile-time fixes and small options remain dependencies/subfeatures rather than standalone nodes.",
     "classified": {
