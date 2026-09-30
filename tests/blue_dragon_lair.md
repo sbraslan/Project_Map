@@ -39,3 +39,11 @@ Covers `BUG-BDL-004`.
 
 ## Static closure
 `BDL-T01..BDL-T04` remain documented and **NOT RUN**. Runtime/fault-injection execution is still globally locked.
+
+
+## BDL-T03 — verify lair boss identity from deployed regen
+Start a fresh Blue Dragon run and inspect the entity created by `data/dungeon/dragon_lair.txt`.
+
+Expected signature in the current tracked data: the regen attempts VNUM 2430, while the configured Beran-Setaou proto/quest/C++ logic expects 2493. A corrected deployment must spawn the same canonical VNUM consumed by quest and combat code.
+
+Covers `BUG-BDL-003`.
