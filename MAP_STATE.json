@@ -63,10 +63,9 @@
     "verified_bug_count": 0,
     "test_plan_count": 0,
     "cursor": [
-      "Audit Conqueror EXP -> quarter-step -> level-up state machine, overflow recursion and point awards.",
-      "Audit DB load/save and client point synchronization for type/range/order mismatches.",
-      "Audit Sungma map-attribute loading, missing-map behavior and combat/movement/HP penalties.",
-      "Audit reset/stat-allocation/item application boundaries and overflow/negative paths.",
+      "Map boss spawn/combat hooks, Blue Dragon skill timers and stone modifiers.",
+      "Audit timeout, death, rejoin/login and room purge/warp lifecycle.",
+      "Resolve legacy DragonLair.startRaid reachability.",
       "Close deployment/data parity and promote only source-proven defects."
     ]
   },
