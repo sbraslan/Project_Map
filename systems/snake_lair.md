@@ -1,6 +1,6 @@
 # Snake Lair / Queen Nethis — Static System Map
 
-**Status:** STATIC MAPPING OPEN / 3 VERIFIED BUGS
+**Status:** STATIC MAPPING OPEN / 4 VERIFIED BUGS
 **Mode:** detection / mapping only
 **Execution:** LOCKED / NOT RUN
 
@@ -59,3 +59,25 @@ Step-4 substep 11 stores the number of spawned Ice Sirens in `KillCountMonsters`
 
 ### Next cursor
 Disconnect, party-leave, kick/exit and destruction ordering.
+
+
+## Cursor 3 finding — party destruction orphans the private Snake instance
+`CParty::Destroy()` contains explicit Snake handling for connected members. For a member currently on a Snake map it calls:
+1. `CSnk::LeaveParty(mapIndex)`;
+2. `CSnk::Leave(character)`.
+
+`LeaveParty` only erases the map index from `m_dwRegGroups`. It does **not** call `CSnkMap::EndDungeonWarp`, destroy the private sectree, cancel Snake events or delete the `CSnkMap` object. The subsequent `Leave` only warps that connected character out.
+
+The private map, monsters and its spawn/skill/end events therefore continue to exist without a manager registration until the original one-hour `r_snakelimit_event` finally calls `EndDungeonWarp`.
+
+Promoted as `BUG-SNK-004`.
+
+### Other lifecycle checks
+- Normal character disconnect does not destroy the party; it marks the party member offline and unlinks the character, allowing normal party relink on reconnect.
+- Voluntary party leave/kick packets are blocked while the requester is on a Snake map.
+- `EndDungeonWarp` cancels owned events in `Destroy()`, destroys the private sectree, removes the registration and deletes the `CSnkMap`; no additional teardown UAF was proven.
+- Event callbacks that terminate while retained in an `LPEVENT` owner are safe because `LPEVENT` is intrusive and completed events carry `q_el == nullptr`.
+- Several global Snake wrappers use `m_dwRegGroups.find(map)->second` without an end check. In the mapped normal orphan branch, party destruction also clears/warps connected party members, and the wrappers require a live party before the unsafe lookup. A normal post-removal crash path was therefore not promoted from that pattern.
+
+### Next cursor
+Sungma calculations, Queen Nethis boss/debuff logic and client/server parity.
