@@ -55,3 +55,11 @@ Spawn canonical Beran-Setaou VNUM 2493 with the tracked `BlueDragon.lua`, reduce
 Expected signature in the current code: `BlueDragon_GetRangeFactor("hp_regen", hpPct)` returns 0 for the fourth band instead of 12 because the configured range is reversed.
 
 Covers `BUG-BDL-004`.
+
+
+## BDL-T05 — paid entry after boss death inside group window
+Start a run, kill Beran-Setaou before the group-entry window expires, then use a second eligible character with the correct shared entry code and required access items.
+
+Expected signature in the current code: the second character's items are consumed and the character is warped into map 208 even though `dragon_lair_alive == 0` and the room has already been purged.
+
+Covers `BUG-BDL-005`.
