@@ -60,8 +60,8 @@
       "bugs": "bugs/yohara_progression.md",
       "tests": "tests/yohara_progression.md"
     },
-    "verified_bug_count": 0,
-    "test_plan_count": 0,
+    "verified_bug_count": 3,
+    "test_plan_count": 3,
     "cursor": [
       "Map boss spawn/combat hooks, Blue Dragon skill timers and stone modifiers.",
       "Audit timeout, death, rejoin/login and room purge/warp lifecycle.",
