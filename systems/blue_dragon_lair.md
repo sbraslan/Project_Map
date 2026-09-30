@@ -1,6 +1,6 @@
 # Blue Dragon / Beran Setaou — Static System Map
 
-**Status:** STATIC MAPPING OPEN / 2 VERIFIED BUGS
+**Status:** STATIC MAPPING OPEN / 3 VERIFIED BUGS
 **Mode:** detection / mapping only
 **Execution:** LOCKED / NOT RUN
 
@@ -39,3 +39,17 @@ Disconnect follows a different path:
 The NPC therefore retains the disconnected player's PID in `GetQuestNPCID()`. Future `npc.lock()` calls reject other players because they only accept lock-owner 0 or the same PID.
 
 Promoted as `BUG-BDL-002`.
+
+
+## Cursor 1 finding — paid join remains open after the dragon is already dead
+The existing-run entry branch is selected solely by `starttime + group_time >= current_time`. It does not require `dragon_lair_alive == 1`.
+
+The boss-kill handler explicitly sets `dragon_lair_alive = 0` and purges the room, but leaves the original start time intact. If the boss dies during the first half of the cooldown window, new players can still pass the group-window branch, pay the access items and warp into the already-completed lair.
+
+Promoted as `BUG-BDL-003`.
+
+## Cursor 1 checkpoint — entry authority / deployment ownership
+- Tracked entry NPC 30121 is spawned on map 73 and inside map 208.
+- Map 73 and map 208 are both hosted on `ch1/core4`; the process-local Blue Dragon server timer therefore stays on the same core as the active lair in the tracked deployment.
+- Global event flags serialize start time / room state across peers; the tracked deployment exposes only one active map-208 host.
+- Entry transaction produced `BUG-BDL-001`, NPC lock lifecycle produced `BUG-BDL-002`, and dead-run paid join produced `BUG-BDL-003`.
