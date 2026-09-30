@@ -1,6 +1,6 @@
 # Snake Lair / Queen Nethis — Static System Map
 
-**Status:** STATIC MAPPING OPEN / 1 VERIFIED BUG
+**Status:** STATIC MAPPING OPEN / 3 VERIFIED BUGS
 **Mode:** detection / mapping only
 **Execution:** LOCKED / NOT RUN
 
@@ -29,26 +29,33 @@ White Dragon / Alastor and DawnMist / Temple of Ochao are separate canonical fam
 4. Audit Sungma calculations, boss/debuff logic and client/server parity.
 5. Close deployment/data parity and promote only source-proven defects.
 
-
-## Cursor 1 finding — CSnkMap reads uninitialized event pointers during construction
-`CSnk::Access()` creates each private instance with `M2_NEW CSnkMap(lMapIndex)`.
-
-The `CSnkMap` class declares `e_SpawnEvent`, `e_pEndEvent` and `e_pSkillEvent` as raw pointer members without in-class initializers. The constructor immediately does:
-- `if (e_SpawnEvent != nullptr) event_cancel(&e_SpawnEvent)`;
-- the same for `e_pEndEvent` and `e_pSkillEvent`;
-- then calls `SetDungeonStep(1)`, which reads `e_SpawnEvent` again;
-- later `Start()` reads `e_pEndEvent` again.
-
-No constructor initializer establishes these members before the reads. Under the normal C++ object-allocation semantics used by this construction path, these pointer values are indeterminate. A non-null garbage value can reach `event_cancel()`.
-
-Promoted as `BUG-SNK-001`.
-
 ## Cursor 1 checkpoint — entry / registration ownership
 - `SnakeLair.Access()` is the private-map creation API. It requires a party and party leader, creates a private copy of `MAP_SNAKE_TEMPLE_02`, registers `CSnkMap*` by private map index, and warps only same-map party members.
 - The private instance constructor spawns portal VNUM 4022; clicking that portal is wired directly in `CHARACTER::OnClick` to `CSnk::Start()`, which binds the current party and starts floor 2.
-- The tracked Game map spawns NPC 20807 on Snake Temple 01, but the pinned quest source/object tree does not expose a tracked `SnakeLair.Access()` caller or a 20807 quest-object binding. Full outer-entry requirements (level/item/cooldown) are therefore a deployment/source-completeness gap and are not invented from C++.
+- The tracked Game map spawns NPC 20807 on Snake Temple 01, but the pinned quest source/object tree does not expose a tracked `SnakeLair.Access()` caller or a 20807 quest-object binding. Full outer-entry requirements are therefore a deployment/source-completeness gap and are not invented from C++.
 - `Access()` has a recall-position failure branch after private-map allocation/registration that returns success without immediate cleanup. The pinned Snake Temple 02 has a valid Town recall entry, so this branch is not promoted as an active snapshot defect.
 - Same-map party collection is consistent with the actual warp set; off-map party members are neither collected nor warped.
 
+### Closed constructor candidate
+The earlier constructor-pointer suspicion was rejected after tracing the event type: `LPEVENT` is `boost::intrusive_ptr<EVENT>`, not a raw pointer. Its default constructor runs before the `CSnkMap` constructor body and initializes the handle to null. The initial `event_cancel` guards therefore do not read indeterminate raw pointers and are **not** a defect.
+
+## Cursor 2 findings — floor/item progression
+
+### BUG-SNK-001 — wrong-order pillar use destroys the valid key
+`CSnkMap::OnKillPilar` removes the 70422 pillar key before validating the required pillar order. Pillars 2-6 then reject an out-of-order attempt with an early return, but the key has already been destroyed.
+
+### BUG-SNK-002 — statue interaction destroys items before target/element validation
+The outer statue-item filter is impossible:
+`itemVnum < SNAKE_STATUE1 && itemVnum > SNAKE_STATUE4`.
+It can never reject any item and also compares item VNUMs to statue NPC VNUMs. The inner handler then removes the item before checking whether the target statue is already locked or whether the item element matches that statue. Arbitrary/wrong items can therefore be lost without progress.
+
+### BUG-SNK-003 — Ice Siren counter completes the floor on the first kill
+Step-4 substep 11 stores the number of spawned Ice Sirens in `KillCountMonsters`. On a Siren kill, the code saves that value as `remainSirens`, increments the counter, and tests `newCount >= remainSirens`. For any spawned count 1-4, that condition is true on the first kill, so the dungeon advances to floor 5 immediately instead of requiring all spawned Sirens.
+
+### Event ownership checkpoint
+- `r_snakespawn_event`, `r_snakelimit_event` and `r_snakeskill_event` hold `CSnkMap*` in their event-info objects.
+- Completed `LPEVENT` objects are safely retained by their intrusive owner handle with `q_el == nullptr`; later `event_cancel` simply clears the handle. No dangling-event-handle defect was promoted from this pattern.
+- Stage transitions cancel/replace the spawn event before installing the next progression event.
+
 ### Next cursor
-Floor/state progression, timer/event ownership and item-based transitions.
+Disconnect, party-leave, kick/exit and destruction ordering.
