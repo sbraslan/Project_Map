@@ -82,3 +82,21 @@ Below 31% HP, Beran loses the configured final-phase +20% skill-damage factor an
 
 ## Static closure
 Blue Dragon / Beran Setaou closed with `BUG-BDL-001..004`. No additional bug was promoted from final deployment/data parity.
+
+
+## BUG-BDL-003 — deployed Blue Dragon regen spawns undefined/wrong VNUM 2430 while all logic targets 2493
+
+**Class:** deployment/data parity / boss identity mismatch
+
+### Proof
+- `dragon_lair.txt` ends with a boss spawn row for VNUM `2430`.
+- The active Blue Dragon quest listens for `2493.kill`.
+- `BlueDragon.cpp` gates Blue Dragon combat/damage behavior on VNUM `2493`.
+- The pinned DumpProto dataset defines `2493` as `Beran-Setaou`.
+- The same tracked DumpProto dataset has no `2430` mob entry.
+
+### Consequence
+The deployed lair data does not spawn the boss identity expected by quest completion and C++ combat logic. Depending on regen handling of an unknown VNUM, the boss may fail to spawn entirely; if an external DB happens to define 2430, that entity still will not trigger the mapped 2493 death/combat path.
+
+### Deferred validation
+`BDL-T03`.
