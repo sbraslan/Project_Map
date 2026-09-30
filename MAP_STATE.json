@@ -48,10 +48,20 @@
   ],
   "counts": {
     "closed_subsystems": 41,
-    "open_subsystems": 0,
-    "total_canonical_subsystems": 41
+    "open_subsystems": 1,
+    "total_canonical_subsystems": 42
   },
-  "active": null,
+  "active": {
+    "id": "event_minigames",
+    "name": "Event MiniGames",
+    "status": "OPEN",
+    "cursor": "1. Audit CG packet/subheader length validation and active-event gating for Okey/Catch King/FindM/BNW.",
+    "evidence": {
+      "system": "systems/event_minigames.md",
+      "bugs": "bugs/event_minigames.md",
+      "tests": "tests/event_minigames.md"
+    }
+  },
   "closed": {
     "guild_storage": {
       "name": "Guild Storage + Guild lifecycle",
@@ -608,20 +618,31 @@
     "jotun thrym": "dawnmist_dungeon",
     "elemental_world": "elemental_world",
     "elemental world": "elemental_world",
-    "elemental maps": "elemental_world"
+    "elemental maps": "elemental_world",
+    "event_minigames": "event_minigames",
+    "event minigames": "event_minigames",
+    "minigames": "event_minigames",
+    "mini games": "event_minigames",
+    "okey": "event_minigames",
+    "rumi": "event_minigames",
+    "catch king": "event_minigames",
+    "findm": "event_minigames",
+    "find m": "event_minigames",
+    "black and white": "event_minigames",
+    "bnw": "event_minigames",
+    "attendance event": "event_minigames"
   },
   "discovery": {
     "status": "TARGETED_UNKNOWN_ONLY",
     "queue": [
-      "event_minigames",
       "economy_extensions",
       "automation_vip",
       "appearance_skill_extensions",
       "client_service_layer",
       "equipment_extensions"
     ],
-    "last_transition": "elemental_world classified ACTIVE_INTEGRATED_WORLD_ZONE -> continue queued discovery",
-    "next_after_active_close": "Resume with event_minigames; CLOSED nodes remain locked.",
+    "last_transition": "event_minigames promoted to OPEN canonical subsystem",
+    "next_after_active_close": "Resume with economy_extensions; CLOSED nodes remain locked.",
     "criteria": "Canonical candidate = enabled and independently stateful/networked/persistent or quest-deployed gameplay feature family. Pure rendering/assets, compile-time fixes and small options remain dependencies/subfeatures rather than standalone nodes.",
     "classified": {
       "meley_lair": {
