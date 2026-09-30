@@ -857,7 +857,7 @@
     "status": "AUDIT_ACTIVE",
     "audit_file": "X64_MIGRATION_AUDIT.md",
     "active_task": "M64-01",
-    "active_cursor": "Build producer/consumer matrix for ABI-sensitive packed structs in common/tables.h, game/src/packet.h and UserInterface/Packet.h.",
+    "active_cursor": "M64-01 Wave A1 identified: client<->game packet-width normalization; next map exact producer/consumer and current x86 packet-size baseline targets.",
     "source_write_authorization": "PROJECT_MAP_ONLY",
     "runtime_queue_status": "PRESERVED_PAUSED",
     "next": [
@@ -868,6 +868,25 @@
       "M64-06",
       "M64-07",
       "M64-08"
-    ]
+    ],
+    "findings": {
+      "client_projects_win32_only": 16,
+      "server_m32_core_targets": [
+        "game",
+        "db",
+        "libthecore",
+        "libgame",
+        "libsql",
+        "libpoly",
+        "libachievement",
+        "liblua5.0"
+      ],
+      "audited_long_occurrences": {
+        "server_common_tables": 57,
+        "server_game_packet": 99,
+        "client_packet": 74
+      },
+      "timestamp_contract_risk": true
+    }
   }
 }
