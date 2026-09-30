@@ -1,6 +1,6 @@
 # Snake Lair / Queen Nethis — Bug Registry
 
-**Status:** STATIC MAPPING OPEN / 3 VERIFIED BUGS
+**Status:** STATIC MAPPING OPEN / 4 VERIFIED BUGS
 **Execution:** LOCKED / NOT RUN
 
 ## BUG-SNK-001 — wrong-order pillar use consumes the valid pillar key
@@ -58,3 +58,22 @@ When 2-4 Ice Sirens are spawned, killing only one is sufficient to skip the rema
 
 ### Deferred validation
 `SNK-T03`.
+
+
+## BUG-SNK-004 — party destruction unregisters but does not destroy the Snake private instance
+
+**Class:** lifecycle cleanup / orphaned private-map resources
+
+### Proof
+- `CParty::Destroy()` explicitly detects connected members on a Snake map.
+- It calls `CSnk::LeaveParty(mapIndex)`, whose complete implementation is only `Remove(mapIndex)`.
+- `Remove` erases the `m_dwRegGroups` entry and performs no instance teardown.
+- `CParty::Destroy()` then calls `CSnk::Leave(member)`, which only warps the connected member out.
+- The private `SECTREE_MAP`, `CSnkMap` object, spawned entities and Snake events are left intact.
+- Their eventual cleanup depends on the already-running one-hour `r_snakelimit_event` reaching `CSnkMap::EndDungeonWarp()`.
+
+### Consequence
+A party destroyed during a Snake run can leave an inaccessible/unregistered private dungeon consuming a private-map slot, mobs and event processing for the remainder of the original one-hour lifetime.
+
+### Deferred validation
+`SNK-T04`.
