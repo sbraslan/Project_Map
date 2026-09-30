@@ -223,3 +223,123 @@ Start with structures containing `long` or `time_t` that are directly sent using
 - no speculative performance rewrites.
 
 The runtime bug-validation queue remains preserved but paused behind infrastructure modernization.
+
+
+## M64-01 — First concrete ABI waves
+
+### Wave A1 — Client <-> Game packet mirror (mandatory before server x64)
+
+The audit found direct mirrored packet families whose current `long` width is architecture-sensitive on the server and remains 32-bit on Windows x64 client.
+
+Highest-priority packet families:
+
+**Movement / position**
+- `TPacketCGMove`
+- `TPacketCGSyncPositionElement`
+- `TPacketCGFlyTargeting`
+- `TPacketGCFlyTargeting`
+- `TPacketGCMove`
+- `TPacketGCSyncPositionElement`
+- `TPacketGCWarp`
+- `TPacketGCMainCharacter*`
+- `TPacketGCCharacterAdd`
+- party/shop/NPC/target position packets
+
+**Character / points**
+- `TPacketGCPoints`
+- `TPacketGCPointChange`
+- `TPacketGCCharacterAdditionalInfo`
+- `TPacketGCCharacterUpdate`
+- `TPacketGCDead`
+
+**Item / economy**
+- `TPacketGCItemSet`
+- `TPacketGCItemUpdate`
+- `TPacketGCItemGroundAdd`
+- `TPacketPlayerShopSet`
+- `TPacketGCExchange`
+- `TEquipmentItemSet`
+- `TSwitchbotUpdateItem`
+- mailbox item payloads
+
+**Affect / progression / feature packets**
+- `TPacketGCAffectElement` / client mirror
+- `TPacketGCTime`
+- `TPacketGCDungeonInfo`
+- `TPacketGCBiologManagerInfo`
+- `TPacketEventData`
+
+**Rule:** preserve today's 32-bit wire width. Server-side `long` fields in these packet contracts should become explicit 32-bit fields unless a semantic range audit proves a field intentionally needs 64-bit and both protocol ends are versioned together.
+
+### Wave A2 — Game <-> DB / shared tables
+
+Packed `common/tables.h` structures with ABI-sensitive fields include at least:
+
+- `TSimplePlayer`
+- `TSungmaTable`
+- `TGrowthPetInfo`
+- `TPlayerItem`
+- `TPlayerSkill`
+- `TPlayerTable`
+- `TSkillTable`
+- `TPlayerShopTable`
+- `TQuestTable`
+- `TItemLimit`
+- `TItemApply`
+- `TItemTable`
+- `TItemAttrTable`
+- `TMoveChannel`
+- `TRespondMoveChannel`
+- `TPacketGDSetup`
+- `TMapLocation`
+- `TPacketGDAffectElement`
+- guild war/ladder packets
+- privilege packets with `time_t`
+- marriage/block/event packets
+- mailbox/event/biolog tables
+
+This wave requires producer/consumer verification between game, DB and P2P before any type edit.
+
+### Wave A3 — P2P Game <-> Game packets
+
+High-priority P2P packet structs using `long`:
+- `TPacketGGLogin`
+- `TPacketGGRelay`
+- `TPacketGGNotice`
+- `TPacketGGMonarchNotice`
+- `TPacketGGWarpCharacter`
+- `TPacketGGGuildWarMapIndex`
+- `TPacketGGTransfer`
+- `TPacketGGBlockChat`
+- `TPacketGGCommand`
+- `TPacketGGShopStartOffline`
+- `TPacketMonarchGGTransfer`
+- `TPacketGGBigNotice`
+
+These must retain the existing protocol width across all game cores.
+
+## Timestamp policy blocker
+
+Raw `time_t` exists in both shared tables and client/game packets.
+
+Examples:
+- Growth Pet birthday/end/max/skill cooldown;
+- player skill next-read time;
+- privilege duration/end time;
+- marriage time;
+- mailbox send/delete time;
+- Biolog cooldown;
+- `TPacketGCTime`;
+- Biolog manager packet cooldowns.
+
+Before x64 implementation, choose one explicit serialized timestamp type. Preferred migration principle:
+- wire/persistence timestamp width is explicit and documented;
+- runtime APIs may still convert to/from native `time_t` internally.
+
+Do not leave raw `time_t` in a binary protocol contract.
+
+## Current audit decision
+
+**First implementation target once source-write is authorized:** Wave A1 client<->game packet-width normalization, because it is the immediate incompatibility between FreeBSD LP64 server and Windows LLP64 client.
+
+The existing x86 values and semantics should be preserved; this is an ABI cleanup, not a protocol redesign.
