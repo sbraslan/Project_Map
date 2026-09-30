@@ -63,3 +63,7 @@ Start a run, kill Beran-Setaou before the group-entry window expires, then use a
 Expected signature in the current code: the second character's items are consumed and the character is warped into map 208 even though `dragon_lair_alive == 0` and the room has already been purged.
 
 Covers `BUG-BDL-005`.
+
+
+## Static closure
+`BDL-T01..BDL-T05` remain documented and **NOT RUN**. Runtime/fault-injection execution stays globally locked.
