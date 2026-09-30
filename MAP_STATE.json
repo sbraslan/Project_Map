@@ -48,27 +48,10 @@
   ],
   "counts": {
     "closed_subsystems": 40,
-    "open_subsystems": 1,
-    "total_canonical_subsystems": 41
+    "open_subsystems": 0,
+    "total_canonical_subsystems": 40
   },
-  "active": {
-    "id": "yohara_progression",
-    "name": "Yohara Progression / Conqueror + Sungma",
-    "status": "OPEN",
-    "evidence": {
-      "system": "systems/yohara_progression.md",
-      "bugs": "bugs/yohara_progression.md",
-      "tests": "tests/yohara_progression.md"
-    },
-    "verified_bug_count": 5,
-    "test_plan_count": 5,
-    "cursor": [
-      "Map boss spawn/combat hooks, Blue Dragon skill timers and stone modifiers.",
-      "Audit timeout, death, rejoin/login and room purge/warp lifecycle.",
-      "Resolve legacy DragonLair.startRaid reachability.",
-      "Close deployment/data parity and promote only source-proven defects."
-    ]
-  },
+  "active": null,
   "closed": {
     "guild_storage": {
       "name": "Guild Storage + Guild lifecycle",
@@ -433,8 +416,8 @@
         "bugs": "bugs/blue_dragon_lair.md",
         "tests": "tests/blue_dragon_lair.md"
       },
-      "verified_bug_count": 4,
-      "test_plan_count": 4
+      "verified_bug_count": 5,
+      "test_plan_count": 5
     }
   },
   "alias_index": {
@@ -597,7 +580,7 @@
     "sungma stats": "yohara_progression"
   },
   "discovery": {
-    "status": "PAUSED_WHILE_ACTIVE",
+    "status": "TARGETED_UNKNOWN_ONLY",
     "queue": [
       "advanced_yohara_dungeons",
       "defense_wave",
@@ -609,8 +592,8 @@
       "client_service_layer",
       "equipment_extensions"
     ],
-    "last_transition": "yohara_progression normalized and OPEN",
-    "next_after_active_close": "Resume with advanced_yohara_dungeons; CLOSED and DORMANT nodes remain locked.",
+    "last_transition": "blue_dragon_lair CLOSED -> resume queued UNKNOWN-only discovery",
+    "next_after_active_close": "Normalize/open meley_lair next; CLOSED nodes remain locked.",
     "criteria": "Canonical candidate = enabled and independently stateful/networked/persistent or quest-deployed gameplay feature family. Pure rendering/assets, compile-time fixes and small options remain dependencies/subfeatures rather than standalone nodes.",
     "classified": {
       "meley_lair": {
