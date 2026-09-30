@@ -1,6 +1,6 @@
 # Snake Lair / Queen Nethis — Bug Registry
 
-**Status:** STATIC MAPPING OPEN / 5 VERIFIED BUGS
+**Status:** STATIC MAPPING CLOSED / 5 VERIFIED BUGS
 **Execution:** LOCKED / NOT RUN
 
 ## BUG-SNK-001 — wrong-order pillar use consumes the valid pillar key
@@ -96,3 +96,7 @@ If a player disconnects/is destroyed during the two-second delay, the queued Sna
 
 ### Deferred validation
 `SNK-T05`.
+
+
+## Static closure
+Snake Lair closed with `BUG-SNK-001..005`. No additional defect was promoted from final Sungma/client/deployment parity. The missing tracked outer `SnakeLair.Access()` caller remains a deployment/source-completeness gap rather than a guessed runtime bug.
