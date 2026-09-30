@@ -1,6 +1,6 @@
 # Additional Equipment Page — Static System Map
 
-**Status:** STATIC MAPPING OPEN
+**Status:** STATIC MAPPING CLOSED
 **Mode:** detection / mapping only
 **Execution:** LOCKED / NOT RUN
 
@@ -22,3 +22,11 @@
 1. Swap/move/equip window routing and slot-domain validation.
 2. Selected-page combat stat application and equip/unequip lifecycle.
 3. persistence/client parity and closeout.
+
+
+## Closeout
+- Swap/move routing, selected-page bonus activation, persistence and active-client parity were audited.
+- Active client build uses `ENABLE_EXTEND_INVEN_SYSTEM` and `uinewinventory.py`, which contains both the page-change command and refresh handler.
+- Final verified bugs: 1.
+- Final test plans: 1.
+- Lifecycle is CLOSED and locked on the pinned source snapshot.
