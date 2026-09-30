@@ -100,3 +100,20 @@ The deployed lair data does not spawn the boss identity expected by quest comple
 
 ### Deferred validation
 `BDL-T03`.
+
+
+## BUG-BDL-004 — Blue Dragon low-HP regen configuration has an impossible range
+
+**Class:** combat configuration / unreachable HP band
+
+### Proof
+- `BlueDragonSetting.hp_regen[4]` is configured as `min=30`, `max=0`, `pct=12`.
+- `BlueDragon_GetRangeFactor` matches only when `min <= val && val <= max`.
+- No HP value can satisfy `30 <= hp <= 0`.
+- The 2493 recovery event in `char.cpp` actively adds `BlueDragon_GetRangeFactor("hp_regen", ch->GetHPPct())` to the monster's base regen percent.
+
+### Consequence
+At 0–30% HP, Beran-Setaou never receives the configured +12 regeneration contribution. The low-health combat phase is weaker/different from the tracked configuration's declared intent.
+
+### Deferred validation
+`BDL-T04`.
