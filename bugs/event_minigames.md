@@ -32,3 +32,31 @@ Add authoritative server-side `mini_game_okey_event` checks before starting or m
 
 ### Regression target
 See `tests/event_minigames.md#em-001`.
+
+
+## EM-002 — Okey/Rumi runtime state is not initialized in CHARACTER::Initialize
+
+**Status:** VERIFIED_STATIC  
+**Severity:** High  
+**Affected:** ServerSRC / Okey-Rumi lifecycle
+
+### Evidence
+- `CHARACTER::CHARACTER()` calls `Initialize()`.
+- `CHARACTER::Initialize()` explicitly initializes Catch King, BNW, FindM and YutNori runtime state.
+- Under `ENABLE_MINI_GAME_OKEY_NORMAL`, `CHARACTER` owns:
+  - `CARDS_INFO character_cards`;
+  - `S_CARD randomized_cards[DECK_COUNT_MAX]`.
+- `S_CARD` and `CARDS_INFO` are plain structs with no constructors or default member initializers.
+- No Okey initialization for these members is present in `CHARACTER::Initialize()`.
+- `Cards_open()` immediately reads `character_cards.cards_left` before calling `Cards_clean_list()`.
+
+### Reachable consequence
+A newly created `CHARACTER` may enter `Cards_open()` with indeterminate Okey state. If `cards_left` happens to be greater than zero, the normal initialization branch is skipped and the server proceeds using uninitialized hand/field/randomized-card data.
+
+This can produce corrupted game state, invalid card counts/points, and nondeterministic behavior. It also undermines the intended payment/init boundary because the branch that consumes Yang + card set is conditional on an uninitialized value.
+
+### Fix boundary
+Initialize both Okey state blocks in `CHARACTER::Initialize()`, preferably by calling the same zeroing logic used by `Cards_clean_list()` or equivalent explicit zero initialization.
+
+### Regression target
+See `tests/event_minigames.md#em-002`.
