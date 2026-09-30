@@ -60,8 +60,8 @@
       "bugs": "bugs/snake_lair.md",
       "tests": "tests/snake_lair.md"
     },
-    "verified_bug_count": 4,
-    "test_plan_count": 4,
+    "verified_bug_count": 5,
+    "test_plan_count": 5,
     "cursor": [
       "Audit Sungma calculations, boss/debuff logic and client/server parity.",
       "Close deployment/data parity and promote only source-proven defects."
