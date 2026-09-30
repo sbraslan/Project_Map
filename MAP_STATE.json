@@ -46,26 +46,11 @@
     "Never revisit a CLOSED node merely because an old evidence file contains words like next, active, open or mapping."
   ],
   "counts": {
-    "closed_subsystems": 39,
-    "open_subsystems": 1,
+    "closed_subsystems": 40,
+    "open_subsystems": 0,
     "total_canonical_subsystems": 40
   },
-  "active": {
-    "id": "blue_dragon_lair",
-    "name": "Blue Dragon / Beran Setaou",
-    "status": "OPEN",
-    "evidence": {
-      "system": "systems/blue_dragon_lair.md",
-      "bugs": "bugs/blue_dragon_lair.md",
-      "tests": "tests/blue_dragon_lair.md"
-    },
-    "verified_bug_count": 4,
-    "test_plan_count": 4,
-    "cursor": [
-      "Close Blue Dragon deployment/data parity and promote only source-proven defects.",
-      "If parity is clean, mark blue_dragon_lair CLOSED and resume discovery with meley_lair."
-    ]
-  },
+  "active": null,
   "closed": {
     "guild_storage": {
       "name": "Guild Storage + Guild lifecycle",
@@ -421,6 +406,17 @@
       },
       "verified_bug_count": 4,
       "test_plan_count": 4
+    },
+    "blue_dragon_lair": {
+      "name": "Blue Dragon / Beran Setaou",
+      "status": "CLOSED",
+      "evidence": {
+        "system": "systems/blue_dragon_lair.md",
+        "bugs": "bugs/blue_dragon_lair.md",
+        "tests": "tests/blue_dragon_lair.md"
+      },
+      "verified_bug_count": 4,
+      "test_plan_count": 4
     }
   },
   "alias_index": {
@@ -571,7 +567,7 @@
     "beran setaou": "blue_dragon_lair"
   },
   "discovery": {
-    "status": "PAUSED_WHILE_ACTIVE",
+    "status": "TARGETED_UNKNOWN_ONLY",
     "queue": [
       "meley_lair",
       "yohara_progression",
@@ -585,7 +581,7 @@
       "client_service_layer",
       "equipment_extensions"
     ],
-    "last_transition": "Blue Dragon lifecycle + legacy reachability checkpoint saved; final parity remains",
+    "last_transition": "blue_dragon_lair CLOSED with 4 verified bugs / 4 deferred tests",
     "next_after_active_close": "Resume with meley_lair; CLOSED nodes remain locked.",
     "criteria": "Canonical candidate = enabled and independently stateful/networked/persistent or quest-deployed gameplay feature family. Pure rendering/assets, compile-time fixes and small options remain dependencies/subfeatures rather than standalone nodes."
   },
