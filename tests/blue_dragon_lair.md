@@ -1,6 +1,6 @@
 # Blue Dragon / Beran Setaou — Deferred Runtime Tests
 
-**Status:** STATIC MAPPING OPEN / 4 TESTS DOCUMENTED / EXECUTION LOCKED / NOT RUN
+**Status:** STATIC MAPPING CLOSED / 4 TESTS DOCUMENTED / EXECUTION LOCKED / NOT RUN
 
 Runtime/fault-injection execution remains globally locked.
 
@@ -35,3 +35,7 @@ Reduce Beran below 31% HP and compare the resolved `hp_damage` / `hp_regen` fact
 Expected signature in the current code: both lookups return 0 because the final rows are defined as min 30 / max 0. A corrected table should make the 0-30 interval reachable and return 20 for damage and 12 for regen.
 
 Covers `BUG-BDL-004`.
+
+
+## Static closure
+`BDL-T01..BDL-T04` remain documented and **NOT RUN**. Runtime/fault-injection execution is still globally locked.
