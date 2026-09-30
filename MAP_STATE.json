@@ -598,12 +598,18 @@
     "white_dragon_lair": "white_dragon_lair",
     "white dragon": "white_dragon_lair",
     "alastor": "white_dragon_lair",
-    "white dragon lair": "white_dragon_lair"
+    "white dragon lair": "white_dragon_lair",
+    "dawnmist_dungeon": "dawnmist_dungeon",
+    "dawnmist": "dawnmist_dungeon",
+    "dawnmist dungeon": "dawnmist_dungeon",
+    "temple of ochao": "dawnmist_dungeon",
+    "ochao": "dawnmist_dungeon",
+    "jotun": "dawnmist_dungeon",
+    "jotun thrym": "dawnmist_dungeon"
   },
   "discovery": {
     "status": "TARGETED_UNKNOWN_ONLY",
     "queue": [
-      "dawnmist_dungeon",
       "defense_wave",
       "elemental_world",
       "event_minigames",
@@ -613,8 +619,8 @@
       "client_service_layer",
       "equipment_extensions"
     ],
-    "last_transition": "white_dragon_lair classified DORMANT_NO_DEPLOY_CALLER -> continue queued discovery",
-    "next_after_active_close": "Resume with dawnmist_dungeon; CLOSED nodes remain locked.",
+    "last_transition": "dawnmist_dungeon classified ACTIVE_INTEGRATED_SUBFEATURE -> continue queued discovery",
+    "next_after_active_close": "Resume with defense_wave; CLOSED nodes remain locked.",
     "criteria": "Canonical candidate = enabled and independently stateful/networked/persistent or quest-deployed gameplay feature family. Pure rendering/assets, compile-time fixes and small options remain dependencies/subfeatures rather than standalone nodes.",
     "classified": {
       "meley_lair": {
@@ -639,6 +645,17 @@
         "reopen_when": [
           "tracked quest/object caller to WhiteDragon.Access/Access2/StartDungeon appears",
           "non-quest caller to CWhDr::Access/StartDungeon is proven",
+          "relevant source snapshot changes"
+        ]
+      },
+      "dawnmist_dungeon": {
+        "name": "DawnMist / Temple of Ochao / Jotun",
+        "status": "ACTIVE_INTEGRATED_SUBFEATURE",
+        "evidence": "systems/dawnmist_dungeon.md",
+        "canonical": false,
+        "reclassify_when": [
+          "dedicated entry/private-map/member lifecycle appears",
+          "persistent or networked DawnMist-owned state appears",
           "relevant source snapshot changes"
         ]
       }
