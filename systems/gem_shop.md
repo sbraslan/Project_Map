@@ -1,6 +1,6 @@
 # Gem Shop — Static System Map
 
-**Status:** STATIC MAPPING OPEN  
+**Status:** STATIC MAPPING CLOSED  
 **Mode:** detection / mapping only  
 **Execution:** LOCKED / NOT RUN  
 **Source snapshot:** pinned by `MAP_STATE.json`
@@ -42,3 +42,11 @@ Not owned here:
 4. login/load/save/reset and time-refresh lifecycle.
 5. client/server packet parity.
 6. close subsystem and return to discovery queue.
+
+
+## Closeout
+- Table generation, persisted state validity, BUY transaction, refresh/unlock persistence, login/load/save lifecycle and client/server packet parity were audited.
+- No additional lifecycle/parity defect was promoted beyond GEM-001..GEM-004.
+- Final verified bugs: 4.
+- Final test plans: 4.
+- Lifecycle is CLOSED and locked on the pinned source snapshot.
