@@ -1,6 +1,6 @@
 # Blue Dragon / Beran Setaou — Static System Map
 
-**Status:** STATIC MAPPING OPEN / 3 VERIFIED BUGS
+**Status:** STATIC MAPPING OPEN / 4 VERIFIED BUGS
 **Mode:** detection / mapping only
 **Execution:** LOCKED / NOT RUN
 
@@ -53,3 +53,23 @@ Promoted as `BUG-BDL-003`.
 - Map 73 and map 208 are both hosted on `ch1/core4`; the process-local Blue Dragon server timer therefore stays on the same core as the active lair in the tracked deployment.
 - Global event flags serialize start time / room state across peers; the tracked deployment exposes only one active map-208 host.
 - Entry transaction produced `BUG-BDL-001`, NPC lock lifecycle produced `BUG-BDL-002`, and dead-run paid join produced `BUG-BDL-003`.
+
+
+## Cursor 2 finding — low-HP Blue Dragon factor ranges are inverted
+`BlueDragon_GetRangeFactor(key, hpPct)` matches a row only when `min <= hpPct <= max`.
+
+In `BlueDragon.lua`:
+- `hp_damage[4].min = 30`, `max = 0`, expected pct 20;
+- `hp_regen[4].min = 30`, `max = 0`, expected pct 12.
+
+Those conditions can never be true. The damage factor is consumed by the active Blue Dragon skill functors, and the regen factor is consumed by the 2493 monster recovery event.
+
+Promoted as `BUG-BDL-004`.
+
+## Cursor 2 checkpoint — active vs dormant combat layers
+- Group 2430 is not a boss-vnum mismatch: it is a group whose leader is 2493 Beran-Setaou.
+- 2493 always receives `BlueDragon_StateBattle()`, so skill timing / BlueDragon.lua skill values are live on static map 208.
+- The `ENABLE_BLUEDRAGON_RENEWAL` stone/damage guard in `char_battle.cpp` requires a private map index in the 208xxxx range plus a generic Dungeon pointer. The tracked quest uses static map 208 via `pc.warp()`, so that private-map-only branch is not reachable from this deployed quest flow.
+- The tracked static lair data uses its older group/stone layout; the separate private-map renewal combat surface is therefore retained as dependency/dormant evidence until a deployed caller is found.
+
+No other source-proven active combat defect was promoted in this cursor.
