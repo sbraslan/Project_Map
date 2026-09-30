@@ -48,10 +48,28 @@
   ],
   "counts": {
     "closed_subsystems": 40,
-    "open_subsystems": 0,
-    "total_canonical_subsystems": 40
+    "open_subsystems": 1,
+    "total_canonical_subsystems": 41
   },
-  "active": null,
+  "active": {
+    "id": "snake_lair",
+    "name": "Snake Lair / Queen Nethis",
+    "status": "OPEN",
+    "evidence": {
+      "system": "systems/snake_lair.md",
+      "bugs": "bugs/snake_lair.md",
+      "tests": "tests/snake_lair.md"
+    },
+    "verified_bug_count": 0,
+    "test_plan_count": 0,
+    "cursor": [
+      "Map portal access, party requirements, private-map creation and registration.",
+      "Audit floor/state progression, timer/event ownership and item-based transitions.",
+      "Audit disconnect, party-leave, kick/exit and destruction ordering.",
+      "Audit Sungma calculations, boss/debuff logic and client/server parity.",
+      "Close deployment/data parity and promote only source-proven defects."
+    ]
+  },
   "closed": {
     "guild_storage": {
       "name": "Guild Storage + Guild lifecycle",
@@ -577,12 +595,19 @@
     "conqueror": "yohara_progression",
     "conqueror level": "yohara_progression",
     "sungma": "yohara_progression",
-    "sungma stats": "yohara_progression"
+    "sungma stats": "yohara_progression",
+    "snake_lair": "snake_lair",
+    "snake lair": "snake_lair",
+    "queen nethis": "snake_lair",
+    "nethis": "snake_lair",
+    "snake temple": "snake_lair",
+    "schlangentempel": "snake_lair"
   },
   "discovery": {
-    "status": "TARGETED_UNKNOWN_ONLY",
+    "status": "PAUSED_WHILE_ACTIVE",
     "queue": [
-      "advanced_yohara_dungeons",
+      "white_dragon_lair",
+      "dawnmist_dungeon",
       "defense_wave",
       "elemental_world",
       "event_minigames",
@@ -592,8 +617,8 @@
       "client_service_layer",
       "equipment_extensions"
     ],
-    "last_transition": "blue_dragon_lair CLOSED -> resume queued UNKNOWN-only discovery",
-    "next_after_active_close": "Normalize/open meley_lair next; CLOSED nodes remain locked.",
+    "last_transition": "advanced_yohara_dungeons split into Snake Lair, White Dragon and DawnMist; snake_lair OPEN",
+    "next_after_active_close": "Resume with white_dragon_lair, then dawnmist_dungeon; CLOSED nodes remain locked.",
     "criteria": "Canonical candidate = enabled and independently stateful/networked/persistent or quest-deployed gameplay feature family. Pure rendering/assets, compile-time fixes and small options remain dependencies/subfeatures rather than standalone nodes.",
     "classified": {
       "meley_lair": {
