@@ -123,3 +123,14 @@ Verified bugs:
 - `BUG-BDL-004` — low-HP damage/regen factor ranges are unreachable.
 
 Runtime execution remains locked.
+
+
+## Cursor 1 checkpoint — entry authority / serialization / access transaction
+- Blue Dragon map 208 is deployed only on `chan/ch1/core4` in the pinned Game snapshot. Channel 2 CONFIG files do not allow map 208.
+- The DB-backed unsuffixed `dragon_lair_*` event flags therefore do not create a live cross-channel map-208 collision in this deployment; the room is effectively serialized onto the single deployed channel/core.
+- Access-item and first-entry ownership paths produced `BUG-BDL-001` and `BUG-BDL-002`.
+- Group-entry timing and reconnect authorization are bound to the globally stored run start time and per-player quest time.
+- No additional source-proven entry/serialization defect was promoted.
+
+### Next cursor
+Boss spawn/combat hooks, Blue Dragon skill timers and stone modifiers.
