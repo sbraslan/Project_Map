@@ -857,7 +857,7 @@
     "status": "AUDIT_ACTIVE",
     "audit_file": "X64_MIGRATION_AUDIT.md",
     "active_task": "M64-01",
-    "active_cursor": "M64-01 Wave A1 identified: client<->game packet-width normalization; next map exact producer/consumer and current x86 packet-size baseline targets.",
+    "active_cursor": "M64-01: raw-size contract proven for MOVE/SYNC and representative GC packets; next produce exact Wave A1 field conversion table and x86 sizeof baseline harness specification.",
     "source_write_authorization": "PROJECT_MAP_ONLY",
     "runtime_queue_status": "PRESERVED_PAUSED",
     "next": [
