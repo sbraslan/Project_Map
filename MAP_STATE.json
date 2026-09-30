@@ -62,9 +62,8 @@
     "verified_bug_count": 4,
     "test_plan_count": 4,
     "cursor": [
-      "Audit timeout, death, rejoin/login and room purge/warp lifecycle.",
-      "Resolve legacy DragonLair.startRaid reachability.",
-      "Close deployment/data parity and promote only source-proven defects."
+      "Close Blue Dragon deployment/data parity and promote only source-proven defects.",
+      "If parity is clean, mark blue_dragon_lair CLOSED and resume discovery with meley_lair."
     ]
   },
   "closed": {
@@ -586,7 +585,7 @@
       "client_service_layer",
       "equipment_extensions"
     ],
-    "last_transition": "dragon_lairs split into independent Blue Dragon and Meley families; blue_dragon_lair OPEN",
+    "last_transition": "Blue Dragon lifecycle + legacy reachability checkpoint saved; final parity remains",
     "next_after_active_close": "Resume with meley_lair; CLOSED nodes remain locked.",
     "criteria": "Canonical candidate = enabled and independently stateful/networked/persistent or quest-deployed gameplay feature family. Pure rendering/assets, compile-time fixes and small options remain dependencies/subfeatures rather than standalone nodes."
   },
