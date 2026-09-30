@@ -1,6 +1,6 @@
 # Snake Lair / Queen Nethis — Bug Registry
 
-**Status:** STATIC MAPPING OPEN / 4 VERIFIED BUGS
+**Status:** STATIC MAPPING OPEN / 5 VERIFIED BUGS
 **Execution:** LOCKED / NOT RUN
 
 ## BUG-SNK-001 — wrong-order pillar use consumes the valid pillar key
@@ -77,3 +77,22 @@ A party destroyed during a Snake run can leave an inaccessible/unregistered priv
 
 ### Deferred validation
 `SNK-T04`.
+
+
+## BUG-SNK-005 — delayed Queen Nethis skill event can dereference a destroyed player
+
+**Class:** asynchronous lifetime / use-after-free
+
+### Proof
+- `FSkillQueenNethis` iterates Snake-map PCs every 25 seconds and calls `ComputeSnakeSkill(273, pkChar, 1)`.
+- `ComputeSnakeSkill` allocates `r_snakeskill_info` and stores `pEventInfo->pkVictim = this` as a raw `LPCHARACTER`.
+- The delayed callback runs two seconds later and dereferences `pEventInfo->pkVictim` to call `GetSectree()` and apply area damage.
+- The event is assigned to CHARACTER member `m_pkSnakeSkillEvent`.
+- `CHARACTER::Destroy()` cancels many owned events, but does not cancel `m_pkSnakeSkillEvent`.
+- The event queue holds its own intrusive reference to the event, so destruction of the CHARACTER-side handle does not remove the queued callback.
+
+### Consequence
+If a player disconnects/is destroyed during the two-second delay, the queued Snake skill can execute with a freed CHARACTER pointer and crash or corrupt the game process.
+
+### Deferred validation
+`SNK-T05`.
