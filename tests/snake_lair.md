@@ -1,6 +1,6 @@
 # Snake Lair / Queen Nethis — Deferred Runtime Tests
 
-**Status:** STATIC MAPPING OPEN / 3 TESTS DOCUMENTED / EXECUTION LOCKED / NOT RUN
+**Status:** STATIC MAPPING OPEN / 4 TESTS DOCUMENTED / EXECUTION LOCKED / NOT RUN
 
 Runtime/fault-injection execution remains globally locked.
 
@@ -24,3 +24,11 @@ Force step-4 substep 11 to spawn 2, 3 or 4 Ice Sirens, then kill exactly one.
 Expected signature in the current code: the first kill advances the instance to floor 5 even though other spawned Sirens remain. A corrected counter must require all spawned Sirens to be killed.
 
 Covers `BUG-SNK-003`.
+
+
+## SNK-T04 — destroy party during an active Snake instance
+Create/start a Snake private instance, then trigger the server party-destruction path while members are connected inside.
+
+Expected signature in the current code: players are warped out and the map index disappears from the Snake registry, but the private sectree remains allocated and its Snake events/entities continue until the original one-hour limit event fires. A corrected lifecycle should tear down or explicitly transfer ownership of the instance when registration is removed.
+
+Covers `BUG-SNK-004`.
