@@ -4,7 +4,7 @@
   "canonical": true,
   "canonical_file": "MAP_STATE.json",
   "updated_at": "2026-09-30",
-  "mode": "STATIC_MAPPING_ONLY",
+  "mode": "RUNTIME_VALIDATION_READY",
   "execution_lock": "LOCKED",
   "repository_policy": {
     "writable": [
@@ -705,7 +705,7 @@
   "discovery": {
     "status": "TARGETED_UNKNOWN_ONLY",
     "queue": [],
-    "last_transition": "equipment_extensions fully resolved; discovery queue empty; static mapping complete on pinned snapshot",
+    "last_transition": "static mapping complete -> runtime validation queue established; first live gate DUNGEON-T09",
     "next_after_active_close": null,
     "criteria": "Canonical candidate = enabled and independently stateful/networked/persistent or quest-deployed gameplay feature family. Pure rendering/assets, compile-time fixes and small options remain dependencies/subfeatures rather than standalone nodes.",
     "classified": {
@@ -835,5 +835,21 @@
     "files": "index/files.json",
     "repositories": "index/repositories.json",
     "rule": "These two files contain source-tree inventory/metadata only. No state-derived symbols, packets, callgraph, features or candidate indexes are allowed."
+  },
+  "runtime": {
+    "status": "READY_NOT_RUN",
+    "queue_file": "RUNTIME_VALIDATION_QUEUE.md",
+    "active_test": "DUNGEON-T09",
+    "active_system": "dungeon_info",
+    "result": null,
+    "next": [
+      "DUNGEON-T11",
+      "DUNGEON-T12",
+      "AUTO-003",
+      "AUTO-004",
+      "AUTO-001",
+      "AUTO-002"
+    ],
+    "invariant": "Capture runtime evidence before any source fix; one test at a time."
   }
 }
