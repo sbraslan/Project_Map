@@ -8,15 +8,15 @@
   "execution_lock": "LOCKED",
   "repository_policy": {
     "writable": [
-      "sbraslan/Project_Map"
-    ],
-    "read_only": [
       "sbraslan/Project_ClientSrc",
       "sbraslan/Project_ServerSRC",
       "sbraslan/Project_Binary",
       "sbraslan/Project_Game",
-      "sbraslan/Project_DumpProto"
-    ]
+      "sbraslan/Project_DumpProto",
+      "sbraslan/Project_Map"
+    ],
+    "read_only": [],
+    "rule": "All repositories are writable only with a pre-change backup branch. Never modify a source repo without creating a backup branch first."
   },
   "source_snapshot": {
     "sbraslan/Project_ClientSrc": "19c1e08141eb8ff2bf22fd8b93df3e4f3a516d81",
@@ -854,10 +854,10 @@
   },
   "modernization": {
     "track": "X64_FOUNDATION",
-    "status": "FIRST_X64_BUILD_READY",
+    "status": "AMD64_ENVIRONMENT_READY",
     "audit_file": "X64_MIGRATION_AUDIT.md",
     "active_task": "M64-04",
-    "active_cursor": "First real FreeBSD x64 build: packet widths normalized, common shared table long widths normalized, project build graph switched from -m32 to -m64. Await compiler/linker output.",
+    "active_cursor": "FreeBSD amd64 + GCC14 verified. Native amd64 Boost/DevIL/Crypto++/MariaDB packages present. game/db Makefiles now prefer /usr/local native libraries. Await libprotect existence/architecture check and first gmake.",
     "source_write_authorization": "ALL_PROJECT_REPOS_WITH_PRECHANGE_BACKUP",
     "runtime_queue_status": "PRESERVED_PAUSED",
     "next": [
@@ -896,7 +896,24 @@
       "waveA2_server": "backup/x64-M64-01-waveA2-before",
       "waveA2_client": "backup/x64-M64-01-waveA2-before",
       "waveA3_server": "backup/x64-M64-01-waveA3-before",
-      "buildflags_server": "backup/x64-M64-02-buildflags-before"
+      "buildflags_server": "backup/x64-M64-02-buildflags-before",
+      "native_libs_server": "backup/x64-M64-04-native-libs-before"
+    },
+    "environment": {
+      "os_arch": "amd64",
+      "long_bit": 64,
+      "compiler": "gcc14/g++14",
+      "compiler_target": "x86_64-portbld-freebsd14.3",
+      "packages": [
+        "boost-libs-1.89.0_2",
+        "cryptopp-8.9.0",
+        "devil-1.8.0_8,1",
+        "gcc14-14.2.0_4",
+        "git-2.53.0",
+        "gmake-4.4.1",
+        "mariadb1011-client-10.11.16",
+        "mariadb1011-server-10.11.16"
+      ]
     }
   }
 }
