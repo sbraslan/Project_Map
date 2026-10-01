@@ -857,7 +857,7 @@
     "status": "GMAKE_PROGRESSING",
     "audit_file": "X64_MIGRATION_AUDIT.md",
     "active_task": "M64-04",
-    "active_cursor": "First compile reached libsql. MariaDB 10.11 incompatibility from direct MYSQL.reconnect field access fixed; Lua 5.0 pointer-hash cast made x64-explicit without changing 32-bit lu_hash semantics. Pull and rerun gmake.",
+    "active_cursor": "Build reached libgame. GCC14 rejected common/stl.h because uint8_t was used without <cstdint>. Added the missing standard header after backup. Pull and rerun gmake.",
     "source_write_authorization": "ALL_PROJECT_REPOS_WITH_PRECHANGE_BACKUP",
     "runtime_queue_status": "PRESERVED_PAUSED",
     "next": [
@@ -901,7 +901,8 @@
       "libprotect_server": "backup/x64-M64-05-libprotect-before",
       "depend_clean_server": "backup/x64-M64-06-depend-clean-before",
       "mariadb_reconnect_server": "backup/x64-M64-07-mariadb-reconnect-before",
-      "lua_pointerhash_server": "backup/x64-M64-08-lua-pointerhash-before"
+      "lua_pointerhash_server": "backup/x64-M64-08-lua-pointerhash-before",
+      "stl_cstdint_server": "backup/x64-M64-09-stl-cstdint-before"
     },
     "environment": {
       "os_arch": "amd64",
