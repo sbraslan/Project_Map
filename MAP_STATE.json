@@ -854,10 +854,10 @@
   },
   "modernization": {
     "track": "X64_FOUNDATION",
-    "status": "FIRST_GMAKE_BLOCKER_FIXED",
+    "status": "GMAKE_PROGRESSING",
     "audit_file": "X64_MIGRATION_AUDIT.md",
     "active_task": "M64-04",
-    "active_cursor": "First gmake clean failed because legacy library Makefiles required missing Depend files. libgame/libthecore/libpoly changed from include Depend to sinclude Depend after backup. Pull and rerun gmake clean && gmake.",
+    "active_cursor": "First compile reached libsql. MariaDB 10.11 incompatibility from direct MYSQL.reconnect field access fixed; Lua 5.0 pointer-hash cast made x64-explicit without changing 32-bit lu_hash semantics. Pull and rerun gmake.",
     "source_write_authorization": "ALL_PROJECT_REPOS_WITH_PRECHANGE_BACKUP",
     "runtime_queue_status": "PRESERVED_PAUSED",
     "next": [
@@ -899,7 +899,9 @@
       "buildflags_server": "backup/x64-M64-02-buildflags-before",
       "native_libs_server": "backup/x64-M64-04-native-libs-before",
       "libprotect_server": "backup/x64-M64-05-libprotect-before",
-      "depend_clean_server": "backup/x64-M64-06-depend-clean-before"
+      "depend_clean_server": "backup/x64-M64-06-depend-clean-before",
+      "mariadb_reconnect_server": "backup/x64-M64-07-mariadb-reconnect-before",
+      "lua_pointerhash_server": "backup/x64-M64-08-lua-pointerhash-before"
     },
     "environment": {
       "os_arch": "amd64",
