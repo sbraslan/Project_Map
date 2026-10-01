@@ -854,10 +854,10 @@
   },
   "modernization": {
     "track": "X64_FOUNDATION",
-    "status": "AMD64_ENVIRONMENT_READY",
+    "status": "FIRST_GMAKE_READY",
     "audit_file": "X64_MIGRATION_AUDIT.md",
     "active_task": "M64-04",
-    "active_cursor": "FreeBSD amd64 + GCC14 verified. Native amd64 Boost/DevIL/Crypto++/MariaDB packages present. game/db Makefiles now prefer /usr/local native libraries. Await libprotect existence/architecture check and first gmake.",
+    "active_cursor": "Verified amd64 native MariaDB/DevIL/Crypto++ libraries. Removed missing legacy -lprotect dependency after backup. Pull modernization/x64 on FreeBSD amd64 and run first serial gmake; capture first compiler/linker error.",
     "source_write_authorization": "ALL_PROJECT_REPOS_WITH_PRECHANGE_BACKUP",
     "runtime_queue_status": "PRESERVED_PAUSED",
     "next": [
@@ -897,7 +897,8 @@
       "waveA2_client": "backup/x64-M64-01-waveA2-before",
       "waveA3_server": "backup/x64-M64-01-waveA3-before",
       "buildflags_server": "backup/x64-M64-02-buildflags-before",
-      "native_libs_server": "backup/x64-M64-04-native-libs-before"
+      "native_libs_server": "backup/x64-M64-04-native-libs-before",
+      "libprotect_server": "backup/x64-M64-05-libprotect-before"
     },
     "environment": {
       "os_arch": "amd64",
