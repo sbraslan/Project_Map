@@ -857,7 +857,7 @@
     "status": "GMAKE_GAME_STAGE",
     "audit_file": "X64_MIGRATION_AUDIT.md",
     "active_task": "M64-04",
-    "active_cursor": "Build passed libsql/libgame/libpoly/libthecore/libachievement and reached game/src. Removed missing legacy <msl/utils.h> dependency from common/utils.h in favor of <cstdint>, <cstdlib>, <string>. Pull and rerun gmake. Watch for next likely missing legacy Extern/libprotect.h dependency.",
+    "active_cursor": "game/src reached CHARACTER LoadSafebox/LoadMall/LoadGuildstorage. CItem socket runtime storage/API normalized from LP64 long to int32_t to match shared TPlayerItem::alSockets wire/storage width. Pull and rerun gmake.",
     "source_write_authorization": "ALL_PROJECT_REPOS_WITH_PRECHANGE_BACKUP",
     "runtime_queue_status": "PRESERVED_PAUSED",
     "next": [
@@ -903,7 +903,8 @@
       "mariadb_reconnect_server": "backup/x64-M64-07-mariadb-reconnect-before",
       "lua_pointerhash_server": "backup/x64-M64-08-lua-pointerhash-before",
       "stl_cstdint_server": "backup/x64-M64-09-stl-cstdint-before",
-      "common_utils_headers_server": "backup/x64-M64-10-common-utils-headers-before"
+      "common_utils_headers_server": "backup/x64-M64-10-common-utils-headers-before",
+      "item_sockets_server": "backup/x64-M64-11-item-sockets-before"
     },
     "environment": {
       "os_arch": "amd64",
