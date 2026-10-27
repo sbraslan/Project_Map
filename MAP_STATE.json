@@ -3,9 +3,9 @@
   "project": "Metin2 Project",
   "canonical": true,
   "canonical_file": "MAP_STATE.json",
-  "updated_at": "2026-09-30",
-  "mode": "MODERNIZATION_X64_AUDIT",
-  "execution_lock": "LOCKED",
+  "updated_at": "2026-10-28",
+  "mode": "X64_PY315_GAMEPLAY_STABLE",
+  "execution_lock": "UNLOCKED_BY_USER",
   "repository_policy": {
     "writable": [
       "sbraslan/Project_Map"
@@ -19,10 +19,10 @@
     ]
   },
   "source_snapshot": {
-    "sbraslan/Project_ClientSrc": "19c1e08141eb8ff2bf22fd8b93df3e4f3a516d81",
-    "sbraslan/Project_ServerSRC": "321712c849aa01d3635b9fe6a9cde79cc0adcb64",
-    "sbraslan/Project_Binary": "c87aea062f8c50e70a854d4e1dc0c75773960e27",
-    "sbraslan/Project_Game": "4f26f48e0b20b76825a5a6158c992b8c5670f44e",
+    "sbraslan/Project_ClientSrc": "2f788743b9818329da4d741ff6912faa0affed74",
+    "sbraslan/Project_ServerSRC": "1742dbdc073324bb7154128218954b9555d6551f",
+    "sbraslan/Project_Binary": "5039c5d65141eef5fc2bf5c9f8895ebc96abcc42",
+    "sbraslan/Project_Game": "24bfe96db414abd070f77f215bece36aaa52e1d0",
     "sbraslan/Project_DumpProto": "1066f4620af451c5f728260eb5f8a086672e6384"
   },
   "invariants": [
@@ -837,12 +837,18 @@
     "rule": "These two files contain source-tree inventory/metadata only. No state-derived symbols, packets, callgraph, features or candidate indexes are allowed."
   },
   "runtime": {
-    "status": "READY_NOT_RUN",
+    "status": "GENERAL_GAMEPLAY_SMOKE_STABLE",
     "queue_file": "RUNTIME_VALIDATION_QUEUE.md",
-    "active_test": "DUNGEON-T09",
-    "active_system": "dungeon_info",
-    "result": null,
+    "active_test": null,
+    "active_system": null,
+    "result": {
+      "general_gameplay_smoke": "PASS",
+      "normal_shutdown": true,
+      "defect_specific_queue": "NOT_RUN",
+      "checkpoint": "checkpoints/2026-10-28-x64-py315-gameplay-stable.md"
+    },
     "next": [
+      "DUNGEON-T09",
       "DUNGEON-T11",
       "DUNGEON-T12",
       "AUTO-003",
@@ -850,16 +856,16 @@
       "AUTO-001",
       "AUTO-002"
     ],
-    "invariant": "Capture runtime evidence before any source fix; one test at a time."
+    "invariant": "General gameplay smoke is proven at the stable checkpoint; mapped defect-specific runtime cases still require one-at-a-time evidence before resolution claims."
   },
   "modernization": {
     "track": "X64_FOUNDATION",
-    "status": "AUDIT_ACTIVE",
+    "status": "CHECKPOINT_STABLE",
     "audit_file": "X64_MIGRATION_AUDIT.md",
-    "active_task": "M64-01",
-    "active_cursor": "M64-01: raw-size contract proven for MOVE/SYNC and representative GC packets; next produce exact Wave A1 field conversion table and x86 sizeof baseline harness specification.",
+    "active_task": "POST_CHECKPOINT_LOCALE",
+    "active_cursor": "Verify Turkish quest/LC mojibake in visible UI versus logger; fix the locale path minimally, then continue visible gameplay regressions and ninth-skill 176-183 validation.",
     "source_write_authorization": "PROJECT_MAP_ONLY",
-    "runtime_queue_status": "PRESERVED_PAUSED",
+    "runtime_queue_status": "GENERAL_SMOKE_COMPLETE_DEFECT_QUEUE_PENDING",
     "next": [
       "M64-02",
       "M64-03",
@@ -888,5 +894,28 @@
       },
       "timestamp_contract_risk": true
     }
+  },
+  "stable_checkpoint": {
+    "date": "2026-10-28",
+    "status": "GAMEPLAY_STABLE",
+    "evidence": "checkpoints/2026-10-28-x64-py315-gameplay-stable.md",
+    "tag": "checkpoint/x64-py315-gameplay-stable-2026-10-28",
+    "client_src_commit": "2f788743b9818329da4d741ff6912faa0affed74",
+    "binary_commit": "5039c5d65141eef5fc2bf5c9f8895ebc96abcc42",
+    "runtime_exe_sha256": "F5AA00C4A9A499D61310BBF4435EBD9385CD7A7FA570CA5E26BFBE668638E60C",
+    "python_ast_files_checked": 140,
+    "python_ast_failures": 0,
+    "latest_smoke_errors": {
+      "traceback": 0,
+      "type_error": 0,
+      "runtime_error": 0,
+      "system_error": 0,
+      "unicode_decode_error": 0,
+      "file_not_found_error": 0,
+      "abort": 0,
+      "access_violation": 0,
+      "fatal_client_crash": 0
+    },
+    "remaining_known_issue": "Turkish quest/LC mojibake; verify UI vs logger before locale-path fix."
   }
 }
