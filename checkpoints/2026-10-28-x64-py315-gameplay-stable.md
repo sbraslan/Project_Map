@@ -188,3 +188,51 @@ For source rollback/reference, use:
 on both `Project_ClientSrc` and `Project_Binary`.
 
 Do not rewrite or move this tag.
+
+
+## Execution Package Matrix
+
+Aşağıdaki tablo, bu checkpoint için kullanılan server/client yürütme ve build paketlerinin kanonik özetidir.
+
+| Katman | Paket / Sürüm | Durum |
+|---|---|---|
+| Server OS | **FreeBSD 14.3 amd64** | Aktif |
+| Server mimari | **64-bit amd64** | `game` + `db` derlenmiş |
+| Server compiler | **GCC / G++ 14** | Aktif |
+| Database | **MariaDB 10.11** | Çalışıyor |
+| Boost | **1.89** | Kurulu |
+| Crypto++ | **8.9** | Kurulu |
+| ccache | Kurulu | Sürümü henüz pinlenmedi |
+| DevIL | Kurulu | Sürümü henüz pinlenmedi |
+| Server locale | `LOCALE = latin1` | Mevcut runtime config |
+| Client hedef | **Windows x64 / Release** | Aktif |
+| Client compiler | **Visual Studio 2022 / v143** | Aktif |
+| Python | **Python 3.15.1 x64** | Aktif, oyun içi doğrulandı |
+| Granny | **Granny 2.11.10.0 x64** | Aktif |
+| Granny DLL | `granny2_x64.dll` | Runtime dependency |
+| CEF | **CEF 90 x64** | Aktif |
+| CEF lib | `libcef.lib` | Build dependency |
+| libjpeg | Static | Aktif |
+| LZ4 | Integrated | Exact sürüm henüz pinlenmedi |
+| Crypto++ client | `cryptlib` x64 | Aktif, exact client library version ayrıca doğrulanmalı |
+| Miles Sound | `mss32` | Dependency mevcut |
+| Renderer | Mevcut legacy renderer | DX11 daha sonraki faz |
+| Binary repo Python | **140 .py dosyası** | Python 3.15 AST: **0 hata** |
+
+### Checkpoint repository snapshot
+
+| Repository | Branch | Commit |
+|---|---|---|
+| `Project_ClientSrc` | `migration/client-x64` | `2f788743b9818329da4d741ff6912faa0affed74` |
+| `Project_ServerSRC` | `modernization/x64-wiretime-compat` | `1742dbdc073324bb7154128218954b9555d6551f` |
+| `Project_Binary` | `main` | `5039c5d65141eef5fc2bf5c9f8895ebc96abcc42` |
+| `Project_Game` | `main` | `24bfe96db414abd070f77f215bece36aaa52e1d0` |
+| `Project_DumpProto` | `main` | `1066f4620af451c5f728260eb5f8a086672e6384` |
+
+### Runtime executable
+
+- Executable: `metin2release.exe`
+- Configuration: **Release x64**
+- SHA256: `F5AA00C4A9A499D61310BBF4435EBD9385CD7A7FA570CA5E26BFBE668638E60C`
+- Size: **12,150,272 bytes**
+- Stable tag: `checkpoint/x64-py315-gameplay-stable-2026-10-28`
