@@ -236,3 +236,56 @@ Aşağıdaki tablo, bu checkpoint için kullanılan server/client yürütme ve b
 - SHA256: `F5AA00C4A9A499D61310BBF4435EBD9385CD7A7FA570CA5E26BFBE668638E60C`
 - Size: **12,150,272 bytes**
 - Stable tag: `checkpoint/x64-py315-gameplay-stable-2026-10-28`
+
+
+## Post-checkpoint full x64 build stabilization
+
+**Date:** 2026-10-28  
+**Project_ClientSrc commit:** `75ad11e2`  
+**Full SHA:** `75ad11e2` (branch head at time of validation)  
+**Branch:** `migration/client-x64`
+
+### Root cause
+
+A full x64 solution build failed only in `GameLib Release|x64` with:
+
+- `C3859: PCH için sanal bellek oluşturulamadı`
+- Windows system error `1455`: pagefile / virtual-memory commit too small
+- follow-on `C1076`
+- downstream `LNK1104 GameLib.lib` in UserInterface because GameLib never produced its Release x64 library
+
+Other x64 configurations built successfully, proving this was not a source-code or dependency-link correctness failure.
+
+### Minimal fix
+
+Only this project setting changed in `Src/GameLib/gamelib.vcxproj` for `Release|x64`:
+
+```diff
+-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
++      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+```
+
+The XML serializer formatting noise from the first edit attempt was discarded. Final committed diff is exactly:
+
+- **1 file changed**
+- **1 insertion**
+- **1 deletion**
+
+### Verification
+
+- `GameLib Release x64` rebuild: **PASS**
+- `GameLib.lib` generated successfully
+- full x64 solution build subsequently reported all projects successful
+- no gameplay/runtime source behavior was changed by this build-only setting
+
+### Git
+
+Commit:
+
+`75ad11e2 build: stabilize GameLib Release x64 memory usage`
+
+The existing stable gameplay tag remains unchanged:
+
+`checkpoint/x64-py315-gameplay-stable-2026-10-28`
+
+Do **not** move or rewrite that tag. This build-system fix is a post-checkpoint stabilization commit layered on top of the gameplay-stable baseline.
